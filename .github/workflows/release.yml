@@ -33,6 +33,7 @@ jobs:
     # Se arma en Linux (los equipos Mac de GitHub no estaban disponibles) y se firma "ad hoc" con rcodesign.
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { arch: arm64, label: AppleSilicon }
@@ -48,13 +49,12 @@ jobs:
           rm -f $R/default_app.asar
           scripts/app.sh $R/app
           python3 - "$V" <<'PY'
-          import plistlib,sys
-          from PIL import Image
+          import plistlib,sys,shutil
           v=sys.argv[1];p='NOX.app/Contents/Info.plist'
           d=plistlib.load(open(p,'rb'))
           d.update(CFBundleName='NOX',CFBundleDisplayName='NOX',CFBundleIdentifier='com.thebnkrmedia.nox',CFBundleShortVersionString=v,CFBundleVersion=v)
           plistlib.dump(d,open(p,'wb'))
-          Image.open('desktop/icon.png').convert('RGBA').save('NOX.app/Contents/Resources/electron.icns')
+          shutil.copy('desktop/icon.icns','NOX.app/Contents/Resources/electron.icns')
           PY
           curl -sSL -o rc.tgz "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.29.0/apple-codesign-0.29.0-x86_64-unknown-linux-musl.tar.gz"
           tar xzf rc.tgz && RC=$(find . -name rcodesign -type f | head -1) && chmod +x "$RC"
