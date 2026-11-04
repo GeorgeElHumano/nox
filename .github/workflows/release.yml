@@ -93,3 +93,11 @@ jobs:
           ls -la dist
           gh release delete "v$V" --yes --cleanup-tag 2>/dev/null || true
           gh release create "v$V" dist/* --title "NOX $V" --latest --notes "NOX $V para Windows, Mac y Android. Con internet, el juego se actualiza solo. Instrucciones: https://noxparaguay.com/#descargar"
+      - name: Avisar a las apps que hay versión nueva
+        run: |
+          V=$(cat VERSION)
+          printf '{\n  "version": "%s",\n  "apk": "https://github.com/GeorgeElHumano/nox/releases/download/v%s/NOX.apk"\n}\n' "$V" "$V" > public/version.json
+          git config user.name "NOX"
+          git config user.email "noreply@noxparaguay.com"
+          git add public/version.json
+          git diff --cached --quiet || (git commit -m "Versión $V publicada para las apps" && git push)

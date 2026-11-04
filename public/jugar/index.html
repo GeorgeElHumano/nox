@@ -549,6 +549,9 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
 .pb{display:flex;gap:6px;flex-wrap:wrap}
 #liveInv{bottom:auto;top:calc(var(--st) + 60px);left:50%;transform:translateX(-50%);width:min(320px,calc(100vw - 20px));text-align:center;align-items:center}
 @media (orientation:landscape) and (max-height:560px){#chatLog{bottom:calc(var(--sb) + 130px);width:min(320px,38vw)}.lpanel{bottom:calc(var(--sb) + 8px);max-height:calc(100vh - 70px)}#chatList{min-height:80px}}
+#updBox{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(8,5,3,.8);padding:16px}
+#updBox .upd-in{width:min(420px,100%);display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:6px;background:linear-gradient(#2a1c10,#120b06);box-shadow:0 0 0 1px #0c0603,0 0 0 2px #c9a050,0 20px 50px rgba(0,0,0,.7);text-align:center}
+#updBox b{font-family:var(--display);color:#f3d38a;letter-spacing:.04em}#updBox p{margin:0;color:#e6d6b8;font-size:14px;line-height:1.45}#updBox small{color:#bfae8e;font-size:12px}#updBox .pb{justify-content:center}#updBox a.btn{text-decoration:none;color:#fff;display:inline-flex;align-items:center}
 @media (prefers-reduced-motion:reduce){.atk::before,#xpbar i::after,.mb.auto.on,.orb.hp.low,#sel .logo{animation:none}}
 </style>
 <div id="boot" role="status" aria-live="polite"><div class="b-in"><div class="b-logo" id="bootLogo"></div><div class="b-ring" aria-hidden="true"></div><div class="b-bar"><i id="bootBar"></i></div><div class="b-txt" id="bootTxt">Cargando el reino…</div><div class="b-tip" id="bootTip">Cuando cae la noche, nacen las leyendas.</div></div></div>
@@ -4345,6 +4348,16 @@ function liveHUD(){if($('#mbChat'))return;const menu=document.querySelector('#hu
     invRej(){liveSend({t:'rej'});LIVE.inv=null;liveUI();},
     vJoin(){voiceStart();},vLeave(){voiceStop();chatAdd({ch:'s',m:'Saliste del chat de voz.'});},vMute(){voiceMute();}
   });}
+/* aviso de actualización de la app de Android */
+function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=String(b||'0').split('.').map(n=>parseInt(n)||0);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)<(y[i]||0)?-1:1;}return 0;}
+async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/([0-9.]+)/);if(!m)return;let mine=m[1];try{if(window.NOXApp&&NOXApp.version)mine=NOXApp.version();}catch(e){}
+  let v;try{v=await (await fetch('../version.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!v||!v.version||!v.apk||verCmp(mine,v.version)>=0)return;
+  try{if(localStorage.getItem('nox-upd-skip')===v.version&&Date.now()-(+localStorage.getItem('nox-upd-t')||0)<6*3600e3)return;}catch(e){}
+  const d=document.createElement('div');d.id='updBox';d.innerHTML=`<div class="upd-in"><b>Hay una versión nueva de NOX</b><p>Tenés la ${esc(mine.length<3?'anterior':mine)} y ya salió la <b>${esc(v.version)}</b>, con mejoras y el chat de voz. Actualizá para seguir jugando con todo.</p><div class="pb"><a class="btn" id="updGo" href="${esc(v.apk)}">Actualizar ahora</a><button class="btn ghost" id="updLater">Más tarde</button></div><small id="updTip">Al terminar la descarga, tocá Instalar. Tus personajes no se pierden: están en tu cuenta.</small></div>`;
+  document.body.appendChild(d);
+  $('#updGo').addEventListener('click',e=>{try{if(window.NOXApp&&NOXApp.update){e.preventDefault();NOXApp.update(v.apk);$('#updTip').textContent='Descargando… cuando termine se abre el instalador. Si Android lo pide, permití instalar apps de NOX.';}}catch(x){}});
+  $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
+setTimeout(appUpdateCheck,3000);
 liveHUD();
 try{window.__NOX={get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
