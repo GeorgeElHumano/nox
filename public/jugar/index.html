@@ -513,8 +513,50 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
   #sel.creating .logo{width:min(250px,56vw);margin:0 auto -6px}#sel.creating .sel-in{gap:8px}
   #sel.creating .clsgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#sel.creating .cls{padding:8px 6px;text-align:center}#sel.creating .cls b{font-size:13px}#sel.creating .cls small{font-size:9.5px;line-height:1.25}#sel.creating .cls span,#sel.creating .cls.on span{display:none}
   #sel.creating{background:linear-gradient(to top,rgba(14,8,5,.97) 0%,rgba(14,8,5,.9) 34%,rgba(14,8,5,0) 56%)}}
+@media (orientation:landscape) and (max-height:560px){
+  #sel{padding-block:calc(var(--st) + 6px) calc(var(--sb) + 6px);overflow:hidden}
+  #sel .sel-in{margin:0 auto 0 0;width:min(620px,62%);gap:6px!important;max-height:100%;overflow:auto;scrollbar-width:none;overscroll-behavior:contain}
+  #sel .sel-in::-webkit-scrollbar{display:none}
+  #sel .logo{width:min(250px,30vw);margin:-6px 0 -10px -8px}
+  #sel .slogan,#sel .sel-head p,#sel .credits,#sel .keys,#sel .orn{display:none!important}
+  #acctBar{gap:6px}#sel .acct{font-size:11px;padding:3px 9px}#acctBar .btn{padding:3px 9px;font-size:11px}
+  #sel .regcard{padding:8px 10px;gap:6px}#sel .regcard h2{font-size:15px}#sel .regcard p{display:none}
+  #sel .regcard .btn.sm{padding:4px 9px;font-size:11px}
+  #sel .namebox{gap:6px}#sel .namebox input{padding:7px 10px;font-size:13px;min-width:0;flex:1 1 120px}#sel .namebox .btn{padding:7px 12px;font-size:12px}
+  #sel .clsgrid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px}#sel .cls{padding:6px 5px;text-align:center}#sel .cls b{font-size:12px}#sel .cls span{display:none!important}#sel .cls small{font-size:9px;line-height:1.2}
+  #sel .facepick{margin:0;font-size:12px}#sel .facepick .btn{padding:3px 9px}
+  #sel .chars{gap:6px}#sel .chr{padding:6px 8px}#sel .chr span{font-size:11px}
+  #sel .it-l{font-size:12px}
+}
 @media (prefers-reduced-motion:reduce){.atk::before,#xpbar i::after,.mb.auto.on,.orb.hp.low,#sel .logo{animation:none}}
 </style>
+<div id="boot" role="status" aria-live="polite"><div class="b-in"><div class="b-logo" id="bootLogo"></div><div class="b-ring" aria-hidden="true"></div><div class="b-bar"><i id="bootBar"></i></div><div class="b-txt" id="bootTxt">Cargando el reino…</div><div class="b-tip" id="bootTip">Cuando cae la noche, nacen las leyendas.</div></div></div>
+<style>
+#boot{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#2a1608 0%,#0f0b09 62%);color:#efe4cc;font-family:Georgia,"Times New Roman",serif;transition:opacity .6s ease;padding:16px}
+#boot.out{opacity:0;pointer-events:none}
+#boot .b-in{display:grid;justify-items:center;gap:14px;width:min(460px,100%);text-align:center}
+#boot .b-logo{width:min(360px,70vw);min-height:40px}#boot .b-logo svg{width:100%;height:auto;display:block;animation:none!important;margin:0!important}
+#boot .b-logo:empty::before{content:"NOX";font-size:64px;letter-spacing:.12em;color:#f0cc84}
+#boot .b-ring{width:34px;height:34px;border-radius:50%;border:2px solid rgba(240,204,132,.2);border-top-color:#f0cc84;animation:bspin 1s linear infinite}
+@keyframes bspin{to{transform:rotate(360deg)}}
+#boot .b-bar{width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(201,160,80,.35)}
+#boot .b-bar i{display:block;height:100%;width:4%;background:linear-gradient(90deg,#b07a2c,#f6dc9c);transition:width .3s ease}
+#boot .b-txt{font-size:14px;letter-spacing:.08em;color:#d9c6a0;font-variant-numeric:tabular-nums}
+#boot .b-tip{font-size:13px;color:#a8977c;font-style:italic;min-height:2.6em;max-width:40ch}
+@media (orientation:landscape) and (max-height:500px){#boot .b-in{gap:8px}#boot .b-logo{width:min(260px,40vw)}}
+@media (prefers-reduced-motion:reduce){#boot .b-ring{animation:none}}
+</style>
+<script>
+(function(){var B={req:0,done:0,t0:Date.now(),last:Date.now()};window.__BOOT=B;var of=window.fetch;
+ window.fetch=function(u){var s=String(u&&u.url||u);var isA=/assets\//.test(s);if(isA){B.req++;B.last=Date.now();}var r=of.apply(this,arguments);if(isA)r.then(function(){B.done++;B.last=Date.now();},function(){B.done++;B.last=Date.now();});return r;};
+ var tips=["Cuando cae la noche, nacen las leyendas.","De noche las bestias dan 15% más de experiencia.","El baúl de Ña Chela lo comparten todos tus personajes.","La Gema de Tupã nunca falla hasta +6.","Con AUTO tu personaje caza solo y usa sus poderes.","Las alas cambian de color en +4, +8 y +12.","Cuando caigan los siete hijos, volverá la luz de Kuarahy."],ti=0;
+ var tick=setInterval(function(){var el=document.getElementById('boot');if(!el){clearInterval(tick);return;}var now=Date.now(),sel=document.getElementById('sel'),ready=sel&&!sel.hidden;var D=document.getElementById('bootLogo'),L=document.querySelector('#sel .logo');if(D&&L&&!D.firstChild)try{D.appendChild(L.cloneNode(true));}catch(e){}
+   var pct=B.req?B.done/B.req:0;pct=Math.min(.97,.08+pct*.85+(ready?.05:0));document.getElementById('bootBar').style.width=Math.round(pct*100)+'%';
+   document.getElementById('bootTxt').textContent=B.req?('Cargando el reino… '+Math.round(pct*100)+'%'):'Preparando el reino…';
+   if((now-B.t0)%4200<210){ti=(ti+1)%tips.length;document.getElementById('bootTip').textContent=tips[ti];}
+   if((ready&&(B.req>0||now-B.t0>8000)&&B.done>=B.req&&now-B.last>900&&now-B.t0>1500)||now-B.t0>45000){clearInterval(tick);document.getElementById('bootBar').style.width='100%';el.classList.add('out');setTimeout(function(){el.remove();},700);}
+ },200);})();
+</script>
 
 <div id="game"></div>
 <div id="hurt"></div>
@@ -922,7 +964,7 @@ const trampleTex=canvasTex(256,(x,s)=>{const n=noiseArr(s,6,4),img=x.createImage
 const petalTex=canvasTex(32,(x,s)=>{x.fillStyle='#fff';x.beginPath();x.ellipse(s/2,s/2,s*.42,s*.22,.6,0,TAU);x.fill();});
 
 /* calidad gráfica y posprocesado */
-const Q={level:'medio'};try{const q=localStorage.getItem('tsm-calidad');Q.level=q||(matchMedia('(pointer:coarse)').matches?'medio':'alto');}catch(e){Q.level='medio';}
+const Q={level:'medio'};try{const q=localStorage.getItem('tsm-calidad');const mob=matchMedia('(pointer:coarse)').matches,mem=navigator.deviceMemory||4,cpu=navigator.hardwareConcurrency||4;Q.auto=!q;Q.level=q||(mob?(mem<=3||cpu<=4?'bajo':'medio'):(mem<=4||cpu<=2?'medio':'alto'));}catch(e){Q.level='medio';}
 let composer=null,bloom=null,FINAL=null,windT=0,shake=0;
 const HAS_PP=!!(THREE.EffectComposer&&THREE.RenderPass&&THREE.UnrealBloomPass&&THREE.ShaderPass);
 const FinalShader={uniforms:{tDiffuse:{value:null},uVig:{value:1.15},uTime:{value:0},uRes:{value:new THREE.Vector2(1,1)},uSplit:{value:.3},uCurve:{value:.1},uSat:{value:.93}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
@@ -938,7 +980,7 @@ const FinalShader={uniforms:{tDiffuse:{value:null},uVig:{value:1.15},uTime:{valu
    'gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);}'].join('\n')};
 const DYN={base:1,cur:1,acc:0,n:0,t:0};
 function setPR(pr){DYN.cur=pr;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);if(composer){composer.setPixelRatio(pr);composer.setSize(innerWidth,innerHeight);}}
-function dynRes(dt){if(mode!=='game'||paused)return;DYN.t+=dt;DYN.acc+=dt;DYN.n++;if(DYN.t<2.5)return;const a=DYN.acc/DYN.n;DYN.t=DYN.acc=DYN.n=0;const mn=innerWidth*innerHeight>1.2e6?.5:.75;if(a>1/33&&DYN.cur>mn)setPR(Math.max(mn,+(DYN.cur-.15).toFixed(2)));else if(a<1/54&&DYN.cur<DYN.base)setPR(Math.min(DYN.base,+(DYN.cur+.1).toFixed(2)));}
+function dynRes(dt){if(mode!=='game'||paused)return;DYN.t+=dt;DYN.acc+=dt;DYN.n++;if(DYN.t<2.5)return;const a=DYN.acc/DYN.n;DYN.t=DYN.acc=DYN.n=0;const mn=innerWidth*innerHeight>1.2e6?.5:.75;if(a>1/33&&DYN.cur>mn)setPR(Math.max(mn,+(DYN.cur-.15).toFixed(2)));else if(a>1/26&&DYN.cur<=mn&&Q.auto&&Q.level!=='bajo'){DYN.slow=(DYN.slow||0)+1;if(DYN.slow>=2){DYN.slow=0;Q.level=Q.level==='alto'?'medio':'bajo';try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();toast('Ajustamos los gráficos a <em>'+Q.level+'</em> para que el juego corra más fluido');}}else if(a<1/54&&DYN.cur<DYN.base)setPR(Math.min(DYN.base,+(DYN.cur+.1).toFixed(2)));}
 function applyQuality(){
   /* presupuesto de píxeles: en monitores grandes (PC) la resolución interna se limita para mantener los FPS */
   const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6;let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,1.5):Math.min(dpr,2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
@@ -3924,7 +3966,7 @@ const ACT={
     const pos=[clamp(t.x+t.r+4,-95,95),t.z];C.gold-=cost;closeAll();
     if(same){const f=$('#fade');f.style.opacity='1';setTimeout(()=>{const o={x:pos[0],z:pos[1]};collide(o,.45);P.x=o.x;P.z=o.z;P.target=null;P.attacking=false;P.moveTo=null;snapCam=true;AUTO.ax=P.x;AUTO.az=P.z;f.style.opacity='0';},260);}
     else travel(d.z,pos);},
-  quality(d){Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
+  quality(d){Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
   cauldSel(d){CALD.sel=+d.i;CALD.res=null;renderCaldero();},
   cauldGo(d){cauldGo(d.r);},
   selPlay(d){enterGame(+d.i);},
