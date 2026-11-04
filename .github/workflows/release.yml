@@ -58,7 +58,9 @@ jobs:
           codesign --force --deep --sign - NOX.app
           ditto -c -k --keepParent NOX.app NOX-Mac-${{ matrix.label }}.zip
       - uses: actions/upload-artifact@v4
-        with: { name: mac-${{ matrix.label }}, path: "NOX-Mac-*.zip" }
+        with:
+          name: mac-${{ matrix.label }}
+          path: NOX-Mac-*.zip
   android:
     runs-on: ubuntu-latest
     steps:
