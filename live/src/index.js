@@ -57,6 +57,13 @@ export class World {
   byName(name) { const k = String(name).toLowerCase(); return this.all().find(x => (x.a.s && String(x.a.s.n).toLowerCase() === k) || String(x.a.acc).toLowerCase() === k); }
   inZone(zone, except) { return this.all().filter(x => x.a.zone && x.a.zone === zone && x.ws !== except); }
   pub(a) { return { id: a.uid, s: a.s, p: a.p }; }
+  // anfitrión del mapa: el que entró primero (y sigue ahí)
+  hostOf(zone) { let best = null; for (const x of this.inZone(zone)) { if (!x.a.s) continue; if (!best || (x.a.jt || 0) < (best.a.jt || 0)) best = x; } return best ? best.a.uid : null; }
+  announceHost(zone) {
+    if (!zone) return; this.hosts = this.hosts || {};
+    const h = this.hostOf(zone); if (this.hosts[zone] === h) return; this.hosts[zone] = h;
+    const out = JSON.stringify({ t: 'host', zone, id: h }); for (const x of this.inZone(zone)) this.send(x.ws, out);
+  }
 
   partyOf(uid) {
     const x = this.byUid(uid); if (!x || !x.a.pid) return [null, null];
@@ -83,10 +90,29 @@ export class World {
   }
 
   async webSocketMessage(ws, raw) {
-    if (typeof raw !== 'string' || raw.length > 4000) return;
+    if (typeof raw !== 'string' || raw.length > 60000) return;
     let m; try { m = JSON.parse(raw); } catch { return; }
     const a = this.att(ws); if (!a) return;
     const t = m.t;
+    if (raw.length > 4000 && t !== 'ms' && t !== 'mr') return;
+
+    // monstruos compartidos: el anfitrión del mapa los mueve; los demás le mandan sus golpes
+    if (t === 'ms' || t === 'mk') { // estado de los monstruos o muerte con el reparto
+      if (!a.zone || this.hostOf(a.zone) !== a.uid) return;
+      const out = JSON.stringify({ ...m, from: a.uid });
+      for (const x of this.inZone(a.zone, ws)) this.send(x.ws, out);
+      return;
+    }
+    if (t === 'mh' || t === 'mreq') { // golpe a un monstruo, o pedido de la lista completa: van al anfitrión
+      if (!a.zone) return; const h = this.hostOf(a.zone); if (!h || h === a.uid) return;
+      const x = this.byUid(h); if (x) this.send(x.ws, { ...m, from: a.uid });
+      return;
+    }
+    if (t === 'mr' || t === 'pa') { // lista completa para un jugador, o un monstruo que le pega a un jugador
+      if (!a.zone || this.hostOf(a.zone) !== a.uid) return;
+      const x = this.byUid(m.to); if (x && x.a.zone === a.zone) this.send(x.ws, { ...m, from: a.uid });
+      return;
+    }
 
     if (t === 'p') { // posición: x,z,ry,mv,ac (contador de ataques),d (muerto),f (vuela)
       a.p = { x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, mv: +m.mv || 0, ac: m.ac | 0, d: m.d ? 1 : 0 };
@@ -102,11 +128,14 @@ export class World {
       if (JSON.stringify(a.s).length > 2500) a.s.eq = {};
       const old = a.zone, zone = m.zone ? clip(m.zone, 24) : a.zone;
       if (m.p) a.p = { x: +m.p.x || 0, z: +m.p.z || 0, ry: +m.p.ry || 0, mv: 0, ac: 0, d: 0 };
+      if (old !== zone) a.jt = Date.now();
       a.zone = zone; this.save(ws, a);
       if (old && old !== zone) for (const x of this.inZone(old, ws)) this.send(x.ws, { t: 'l', id: a.uid });
       if (old !== zone || t === 'hi') {
         this.send(ws, { t: 'w', you: a.uid, list: this.inZone(zone, ws).filter(x => x.a.s).map(x => this.pub(x.a)) });
         for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'j', ...this.pub(a) });
+        this.hosts = this.hosts || {}; if (old && old !== zone) this.announceHost(old);
+        this.hosts[zone] = null; this.announceHost(zone);
       } else for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'eq', id: a.uid, s: a.s });
       const [pid, p] = this.partyOf(a.uid); if (p) this.partyBroadcast(pid, p);
       if (t === 'hi') this.send(ws, { t: 'online', n: this.all().filter(x => x.a.s).length });
@@ -170,7 +199,7 @@ export class World {
   async webSocketError(ws) { this.gone(ws); }
   gone(ws) {
     const a = this.att(ws); if (!a) return;
-    if (a.zone) for (const x of this.inZone(a.zone, ws)) this.send(x.ws, { t: 'l', id: a.uid });
+    if (a.zone) { for (const x of this.inZone(a.zone, ws)) this.send(x.ws, { t: 'l', id: a.uid }); this.announceHost(a.zone); }
     if (a.pid) {
       // el que se fue ya no figura entre las conexiones: avisar al resto del grupo
       const ms = this.all().filter(y => y.ws !== ws && y.a.pid === a.pid);
