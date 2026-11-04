@@ -1,0 +1,13 @@
+NOX - Crónicas del Paraguay · Windows
+
+Cómo jugar
+1. Descomprimí esta carpeta donde quieras (por ejemplo en Documentos).
+2. Abrí NOX.exe. Si Windows muestra "Windows protegió tu PC", tocá "Más información" y después "Ejecutar de todas formas".
+   Aparece porque el juego todavía no tiene firma digital.
+3. F11 alterna pantalla completa.
+
+Actualizaciones
+- Con internet, NOX.exe abre siempre la última versión del juego. No hace falta descargar nada de nuevo.
+- Sin internet usa la copia incluida en esta carpeta, con personajes guardados solo en esta computadora.
+
+Sitio: https://noxparaguay.pages.dev

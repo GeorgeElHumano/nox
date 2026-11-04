@@ -1,0 +1,25 @@
+plugins { id 'com.android.application' }
+def ver = file('../../VERSION').text.trim()
+def p = ver.tokenize('.').collect { it as int }
+android {
+    namespace 'com.thebnkrmedia.nox'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.thebnkrmedia.nox'
+        minSdk 24
+        targetSdk 34
+        versionName ver
+        versionCode p[0] * 10000 + p[1] * 100 + p[2]
+    }
+    signingConfigs {
+        release {
+            storeFile file('../nox.keystore')
+            storePassword 'noxparaguay'
+            keyAlias 'nox'
+            keyPassword 'noxparaguay'
+        }
+    }
+    buildTypes {
+        release { minifyEnabled false; signingConfig signingConfigs.release }
+    }
+}
