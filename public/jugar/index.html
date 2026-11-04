@@ -528,6 +528,27 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
   #sel .chars{gap:6px}#sel .chr{padding:6px 8px}#sel .chr span{font-size:11px}
   #sel .it-l{font-size:12px}
 }
+/* en vivo: jugadores, chat y grupo */
+.lbl.pl{color:#bfe3ff;font-family:var(--display);letter-spacing:.03em}.lbl.pl small{display:block;font-family:var(--body);color:#cfd8e0;letter-spacing:.06em;font-size:9px;font-weight:700}
+.lbl.pl.pty{color:#9cf0a8}.lbl .bub{display:block;max-width:220px;white-space:normal;margin:0 auto 4px;padding:5px 9px;border-radius:10px;background:rgba(14,9,6,.86);box-shadow:0 0 0 1px #6a4c26;color:#f4ead2;font:600 12px/1.3 var(--body);letter-spacing:0;text-shadow:none}
+.mb .dot.live{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#c4532f;color:#fff;font:800 10px/16px var(--body);display:block}.mb .dot.live[hidden]{display:none}
+.mb svg{width:20px;height:20px}
+#liveSt{position:absolute;left:50%;top:calc(var(--st) + 4px);transform:translateX(-50%);font:700 10.5px var(--body);letter-spacing:.06em;color:#d9c6a0;background:rgba(14,9,6,.7);padding:3px 10px;border-radius:10px;pointer-events:none;white-space:nowrap}
+#liveSt::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#c9a050;margin-right:6px;vertical-align:1px}#liveSt.on::before{background:#6fdc7a;box-shadow:0 0 6px #6fdc7a}
+#chatLog{position:absolute;left:calc(var(--sl) + 10px);bottom:calc(var(--sb) + 190px);width:min(360px,46vw);display:flex;flex-direction:column;gap:3px;pointer-events:none}
+.cl{font:600 12.5px/1.35 var(--body);color:#f1e6cf;text-shadow:0 1px 2px #000,0 0 3px #000;word-break:break-word}.cl b{color:#f0cc84}.cl b.adm{color:#ffb070}.cl .cc{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;margin-right:5px;opacity:.75}
+.cl.m .cc{color:#9fd0ff}.cl.p .cc,.cl.p b{color:#9cf0a8}.cl.s{color:#d9c6a0;font-style:italic}.cl.s .cc{display:none}
+.lpanel{position:absolute;z-index:40;left:calc(var(--sl) + 10px);bottom:calc(var(--sb) + 150px);width:min(380px,calc(100vw - 20px));max-height:min(60vh,420px);display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:6px;background:linear-gradient(#22180f,#140d08);box-shadow:0 0 0 1px #0c0704,0 0 0 2px #6a4c26,0 10px 30px rgba(0,0,0,.6)}
+.lp-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.lp-h b{font-family:var(--display);color:#f0cc84;letter-spacing:.06em}
+.lpanel .x{border:0;background:none;color:#d9c6a0;font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+.lpanel .tabs{display:flex;gap:4px}.lpanel .tabs button{border:0;border-radius:4px;padding:5px 10px;background:#1a120c;color:#bfae8e;font:700 12px var(--body);cursor:pointer;box-shadow:inset 0 0 0 1px #4a3420}.lpanel .tabs button.on{color:#f7e2b0;box-shadow:inset 0 0 0 1px #e2b25a}
+#chatList{flex:1;min-height:120px;overflow:auto;display:flex;flex-direction:column;gap:4px;padding:4px 2px;overscroll-behavior:contain}#chatList .cl{text-shadow:none}
+.lpanel .namebox{display:flex;gap:6px}.lpanel .namebox input{flex:1;min-width:0;padding:8px 10px;font-size:14px}
+#partyBody{overflow:auto;display:flex;flex-direction:column;gap:8px}.ph{font:800 10.5px var(--body);letter-spacing:.14em;text-transform:uppercase;color:#c9a050}.pm{margin:0;color:#bfae8e;font-size:13px}
+.pl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.pl-list li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;background:rgba(0,0,0,.25)}.pl-list li>span:first-child{flex:1;min-width:0;display:flex;flex-direction:column}.pl-list b{color:#f7e2b0}.pl-list em{color:#9cf0a8;font-size:11px;font-style:normal}.pl-list small{color:#bfae8e;font-size:11px}
+.pb{display:flex;gap:6px;flex-wrap:wrap}
+#liveInv{bottom:auto;top:calc(var(--st) + 60px);left:50%;transform:translateX(-50%);width:min(320px,calc(100vw - 20px));text-align:center;align-items:center}
+@media (orientation:landscape) and (max-height:560px){#chatLog{bottom:calc(var(--sb) + 130px);width:min(320px,38vw)}.lpanel{bottom:calc(var(--sb) + 8px);max-height:calc(100vh - 70px)}#chatList{min-height:80px}}
 @media (prefers-reduced-motion:reduce){.atk::before,#xpbar i::after,.mb.auto.on,.orb.hp.low,#sel .logo{animation:none}}
 </style>
 <div id="boot" role="status" aria-live="polite"><div class="b-in"><div class="b-logo" id="bootLogo"></div><div class="b-ring" aria-hidden="true"></div><div class="b-bar"><i id="bootBar"></i></div><div class="b-txt" id="bootTxt">Cargando el reino…</div><div class="b-tip" id="bootTip">Cuando cae la noche, nacen las leyendas.</div></div></div>
@@ -3976,7 +3997,7 @@ const ACT={
   lgMode(d){SELV.lg=d.m;SELV.err='';renderSelect();},
   lgDo(){srvAuth(SELV.lg||'in');},
   srvLoginView(){SELV.view='login';SELV.lg='in';SELV.err='';renderSelect();},
-  async srvLogout(){try{await flushNet(true);}catch(e){}try{await srvApi('POST','logout');}catch(e){}srvSetTok(null);NET.role=null;SRV.adm=null;goOffline('');SELV.view='login';renderSelect();previewHero();},
+  async srvLogout(){voiceStop();try{if(LIVE.ws)LIVE.ws.close(1000);}catch(e){}try{await flushNet(true);}catch(e){}try{await srvApi('POST','logout');}catch(e){}srvSetTok(null);NET.role=null;SRV.adm=null;goOffline('');SELV.view='login';renderSelect();previewHero();},
   retryNet(){if(!SRV.on)SRV.on=null;netInit();},
   importLocal(){importLocal();},
   toMenu(){closeAll();persist();flushNet(true);showSelect();},
@@ -4179,6 +4200,154 @@ function loginCard(){const k=SELV.lg||'in',dis=SELV.busy?'disabled':'',errH=SELV
    ${errH}<div class="keys">Usuario de 3 a 14 letras o números, sin espacios. Contraseña de 6 caracteres o más.</div>
    <div><button class="btn sm ghost" data-act="playOffline" ${dis}>Jugar sin cuenta en este dispositivo</button></div></div>`;}
 
+/* ================= en vivo: otros jugadores, chat, grupo y voz (servidor /live) ================= */
+const LIVE={ws:null,on:false,want:false,retry:1,cT:-99,me:null,others:new Map(),zone:null,sendT:0,pingT:20,last:'',eqSig:'',eqT:0,ac:0,wasSw:false,party:null,inv:null,chat:[],unread:0,ch:'g',online:0};
+const VOX={on:false,stream:null,peers:new Map(),muted:false};
+const LIVE_HZ=10,LIVE_MAX=24,CHN={g:'General',m:'Mapa',p:'Grupo',s:'Aviso'};
+function liveURL(){return(location.protocol==='https:'?'wss://':'ws://')+location.host+'/live/ws?t='+encodeURIComponent(srvTok());}
+function liveEq(){const o={};if(!C)return o;for(const k of EQK){const it=C.eq[k];if(it)o[k]={k:it.k,c:it.c,t:it.t|0,lv:it.lv|0,g:it.g|0};}return o;}
+function liveS(){return{n:C.name,c:C.cls,L:C.L,evo:!!C.evo,eq:liveEq(),pet:C.pet?C.pet.sub:null,face:C.face!=null?C.face:hashName(C.name)};}
+function livePos(){return{x:+P.x.toFixed(2),z:+P.z.toFixed(2),ry:+P.ry.toFixed(2),mv:+(P.mv||0).toFixed(2),ac:LIVE.ac,d:P.dead?1:0};}
+function liveSend(o){const w=LIVE.ws;if(w&&w.readyState===1){try{w.send(typeof o==='string'?o:JSON.stringify(o));}catch(e){}}}
+function liveConnect(){if(LIVE.ws||!SRV.on||NET.mode!=='online'||!srvTok())return;let ws;try{ws=new WebSocket(liveURL());}catch(e){return;}
+  LIVE.ws=ws;ws.onopen=()=>{LIVE.on=true;LIVE.retry=1;LIVE.zone=null;liveHello();liveUI();};
+  ws.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(x){return;}try{liveMsg(m);}catch(x){console.error(x);}};
+  ws.onclose=e=>{const was=LIVE.on;LIVE.ws=null;LIVE.on=false;liveClear();voiceStop(true);LIVE.party=null;liveUI();
+    if(e.code===4000){LIVE.want=false;LIVE.block=true;chatAdd({ch:'s',m:'Abriste NOX en otro dispositivo. Acá se apagó el modo en vivo.'});return;}
+    if(was)chatAdd({ch:'s',m:'Se cortó la conexión en vivo. Reconectando…'});LIVE.retry=Math.min(30,LIVE.retry*2);LIVE.cT=T+LIVE.retry;};
+  ws.onerror=()=>{};}
+function liveHello(){if(!C||!Z)return;LIVE.zone=Z.id;LIVE.eqSig=JSON.stringify(liveS());liveSend({t:'hi',zone:Z.id,s:liveS(),p:livePos()});}
+function liveTick(dt){
+  const want=SRV.on&&NET.mode==='online'&&mode==='game'&&!!C&&!!Z&&!LIVE.block;LIVE.want=want;
+  if(!want){if(LIVE.ws&&mode!=='game'){try{LIVE.ws.close(1000);}catch(e){}LIVE.ws=null;LIVE.on=false;liveClear();voiceStop(true);}return;}
+  if(!LIVE.ws){if(T>=LIVE.cT){LIVE.cT=T+3;liveConnect();}return;}
+  if(!LIVE.on)return;
+  const sw=P.swingT>=0||P.spinT>=0;if(sw&&!LIVE.wasSw)LIVE.ac=(LIVE.ac+1)%1000;LIVE.wasSw=sw;
+  if(Z.id!==LIVE.zone){liveClear();LIVE.zone=Z.id;LIVE.eqSig=JSON.stringify(liveS());liveSend({t:'z',zone:Z.id,s:liveS(),p:livePos()});}
+  LIVE.eqT-=dt;if(LIVE.eqT<=0){LIVE.eqT=1;const sig=JSON.stringify(liveS());if(sig!==LIVE.eqSig){LIVE.eqSig=sig;liveSend({t:'eq',zone:Z.id,s:liveS()});}}
+  LIVE.sendT-=dt;LIVE.pingT-=dt;
+  if(LIVE.sendT<=0){const p=livePos(),k=JSON.stringify(p);if(k!==LIVE.last){LIVE.sendT=1/LIVE_HZ;LIVE.last=k;LIVE.pingT=20;liveSend({t:'p',...p});}}
+  if(LIVE.pingT<=0){LIVE.pingT=20;liveSend('{"t":"ping"}');}}
+
+/* otros jugadores */
+function liveEqObj(s){const e={};EQK.forEach(k=>e[k]=null);const q=s.eq||{};for(const k in q){const it=q[k];if(it&&EQK.includes(k))e[k]={u:0,k:it.k||k,c:it.c||s.c,t:it.t|0,lv:it.lv|0,g:it.g|0,op:0,luck:false,ex:[]};}if(s.c==='gladiador')e.helm=null;if(s.c!=='caballero')e.shield=null;return e;}
+function liveModel(o){const old=o.m;const eq=liveEqObj(o.s),hf=HERO_FACE;HERO_FACE=o.s.face|0;let r;try{r=buildHero(o.s.c,eq);}catch(e){console.error(e);}HERO_FACE=hf;if(!r)return;
+  if(old){scene.remove(old.g);disposeTree(old.g);}o.m=r;addBlob(r.g,1.3);scene.add(r.g);r.g.position.set(o.x,H(o.x,o.z),o.z);r.g.rotation.y=o.ry;
+  if(!r.oad)try{const sp=oadHeroSpec(o.s.c,eq);(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!oadHave(sp.files)&&!o.waitOad){o.waitOad=true;oadNeed(sp.files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o)liveModel(o);});}}catch(e){}}
+function liveLabel(o){const cls=CLASSES[o.s.c];const h=`${o.bub?`<span class="bub">${esc(o.bub)}</span>`:''}${esc(o.s.n)}<small>Nv ${o.s.L|0} · ${cls?(o.s.evo?cls.evo:cls.name):''}${o.inParty?' · grupo':''}</small>`;
+  if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>[o.x,(o.m?o.m.g.position.y:0)+2.35,o.z]);else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
+function liveAdd(d){if(!d||!d.s||d.id===LIVE.me)return;let o=LIVE.others.get(d.id);
+  if(!o){if(LIVE.others.size>=LIVE_MAX)return;const p=d.p||{x:0,z:0,ry:0};o={id:d.id,s:d.s,x:p.x,z:p.z,ry:p.ry,tx:p.x,tz:p.z,tr:p.ry,tmv:0,ac:p.ac|0,walk:0,P:{mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false}};LIVE.others.set(d.id,o);liveModel(o);}
+  else{o.s=d.s;liveModel(o);}o.inParty=!!(LIVE.party&&LIVE.party.members.some(m=>m.id===d.id));liveLabel(o);}
+function liveRemove(id){const o=LIVE.others.get(id);if(!o)return;if(o.m){scene.remove(o.m.g);disposeTree(o.m.g);}removeLabel(o.lbl);LIVE.others.delete(id);}
+function liveClear(){[...LIVE.others.keys()].forEach(liveRemove);}
+function liveAnim(dt){if(!LIVE.others.size)return;const k=1-Math.exp(-dt*12);
+  for(const o of LIVE.others.values()){const r=o.m;if(!r)continue;
+    if(Math.hypot(o.tx-o.x,o.tz-o.z)>10){o.x=o.tx;o.z=o.tz;}const ox=o.x,oz=o.z;o.x+=(o.tx-o.x)*k;o.z+=(o.tz-o.z)*k;o.ry=lerpAngle(o.ry,o.tr,Math.min(1,dt*14));
+    const sp=dt>0?Math.hypot(o.x-ox,o.z-oz)/dt:0;o.P.mv+=(Math.min(1,Math.max(o.tmv,sp/7))-o.P.mv)*Math.min(1,dt*8);if(o.tmv<.02&&sp<.05)o.P.mv*=Math.max(0,1-dt*6);
+    o.P.deadK=o.P.dead?Math.min(1,o.P.deadK+dt*1.8):0;
+    if(o.P.swingT>=0){o.P.swingT+=dt/.5;if(o.P.swingT>=1)o.P.swingT=-1;}
+    r.g.position.set(o.x,H(o.x,o.z),o.z);r.g.rotation.y=o.ry;
+    const cls=r.cls,act=o.P.swingT>=0?(VIS(cls)==='caballero'?'slash':cls==='hechicero'?'cast':'bow'):null;
+    if(r.oad){const sP=P;P=o.P;try{oadHeroAnim(r,dt,act);}catch(e){}finally{P=sP;}}
+    else{o.walk+=dt*o.P.mv*9;poseHuman(r,{t:T,mv:o.P.mv,walk:o.walk,act,actT:o.P.swingT,stance:0,spin:false,dead:smooth(0,1,o.P.deadK),hit:0});animCape(r.cape,T,o.P.mv);}
+    if(r.staff&&r.staff.userData.orb)r.staff.userData.orb.rotation.y+=dt*2;
+    if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;try{if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}
+    if(o.bubT&&T>o.bubT){o.bub=null;o.bubT=0;liveLabel(o);}}}
+
+function liveMsg(m){const t=m.t;
+  if(t==='w'){LIVE.me=m.you;liveClear();(m.list||[]).forEach(liveAdd);liveUI();return;}
+  if(t==='j'){liveAdd(m);liveUI();return;}
+  if(t==='l'){liveRemove(m.id);liveUI();return;}
+  if(t==='p'){const o=LIVE.others.get(m.id);if(!o)return;o.tx=m.x;o.tz=m.z;o.tr=m.ry;o.tmv=m.mv||0;if((m.ac|0)!==o.ac){o.ac=m.ac|0;o.P.swingT=0;o.P.lastAtk=T;}o.P.dead=!!m.d;return;}
+  if(t==='eq'){const o=LIVE.others.get(m.id);if(o){o.s=m.s;liveModel(o);liveLabel(o);}return;}
+  if(t==='c'){chatAdd(m);const o=LIVE.others.get(m.id);if(o){o.bub=m.m.length>60?m.m.slice(0,58)+'…':m.m;o.bubT=T+6;liveLabel(o);}return;}
+  if(t==='sys'){chatAdd({ch:'s',m:m.m});return;}
+  if(t==='online'){LIVE.online=m.n|0;liveUI();return;}
+  if(t==='party'){const had=!!LIVE.party;LIVE.party=m.pid?m:null;if(!LIVE.party&&VOX.on)voiceStop(true);if(had&&!LIVE.party)chatAdd({ch:'s',m:'El grupo se disolvió.'});
+    for(const o of LIVE.others.values()){o.inParty=!!(LIVE.party&&LIVE.party.members.some(x=>x.id===o.id));liveLabel(o);}liveUI();return;}
+  if(t==='inv'){LIVE.inv={from:m.from,n:m.n};liveUI();snd&&0;return;}
+  if(t==='vj'){liveUI();return;}
+  if(t==='vl'){voiceDrop(m.id);liveUI();return;}
+  if(t==='v'){voiceSignal(m.from,m.sig);return;}}
+
+/* chat */
+function chatAdd(m){m.ts=m.ts||Date.now();LIVE.chat.push(m);if(LIVE.chat.length>80)LIVE.chat.shift();if($('#chatBox').hidden&&m.ch!=='s'&&m.id!==LIVE.me)LIVE.unread++;chatRender();}
+function chatLine(m){const c=m.ch||'s';return `<div class="cl ${c}"><span class="cc">${CHN[c]||''}</span>${m.n?`<b class="${m.adm?'adm':''}">${esc(m.n)}${m.adm?' ✦':''}</b> `:''}${esc(m.m)}</div>`;}
+function chatRender(){const now=Date.now(),log=$('#chatLog');if(log)log.innerHTML=LIVE.chat.filter(m=>now-m.ts<14000).slice(-5).map(chatLine).join('');
+  const box=$('#chatList');if(box&&!$('#chatBox').hidden){const f=LIVE.chat.filter(m=>LIVE.ch==='g'?true:m.ch===LIVE.ch||m.ch==='s');box.innerHTML=f.slice(-60).map(chatLine).join('')||'<div class="cl s">Todavía no hay mensajes.</div>';box.scrollTop=box.scrollHeight;}
+  const d=$('#chatDot');if(d){d.hidden=!LIVE.unread;d.textContent=LIVE.unread>9?'9+':LIVE.unread;}}
+setInterval(()=>{if(mode==='game')chatRender();},3000);
+function chatSend(){const i=$('#chatIn');if(!i)return;let v=i.value.trim();if(!v)return;i.value='';
+  if(!LIVE.on){chatAdd({ch:'s',m:'No hay conexión en vivo. Entrá con tu cuenta para usar el chat.'});return;}
+  const mm=v.match(/^\/(inv|invitar)\s+(.+)$/i);if(mm){liveSend({t:'inv',name:mm[2].trim()});return;}
+  let ch=LIVE.ch;const pre=v.match(/^\/(g|m|p)\s+(.*)$/i);if(pre){ch=pre[1].toLowerCase();v=pre[2];}
+  if(ch==='p'&&!LIVE.party){chatAdd({ch:'s',m:'No estás en un grupo. Invitá a alguien desde el botón Grupo.'});return;}
+  liveSend({t:'c',ch,m:v});}
+
+/* voz del grupo (WebRTC directo entre integrantes) */
+const ICE={iceServers:[{urls:['stun:stun.cloudflare.com:3478','stun:stun.l.google.com:19302']}]};
+async function voiceStart(){if(!LIVE.party){toast('Primero armá un grupo');return;}if(VOX.on)return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Este navegador no permite el chat de voz');return;}
+  try{VOX.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});}
+  catch(e){toast('No se pudo usar el micrófono. Revisá el permiso del navegador o de la app');return;}
+  VOX.on=true;VOX.muted=false;liveSend({t:'vj'});
+  for(const mb of LIVE.party.members)if(mb.voice&&mb.id!==LIVE.me)voicePeer(mb.id,true);
+  chatAdd({ch:'s',m:'Entraste al chat de voz del grupo.'});liveUI();}
+function voicePeer(id,offer){if(VOX.peers.has(id))return VOX.peers.get(id).pc;const pc=new RTCPeerConnection(ICE);const pr={pc,q:[],au:null};VOX.peers.set(id,pr);
+  if(VOX.stream)VOX.stream.getTracks().forEach(tr=>pc.addTrack(tr,VOX.stream));
+  pc.onicecandidate=e=>{if(e.candidate)liveSend({t:'v',to:id,sig:{c:e.candidate}});};
+  pc.ontrack=e=>{if(!pr.au){pr.au=document.createElement('audio');pr.au.autoplay=true;pr.au.setAttribute('playsinline','');document.body.appendChild(pr.au);}pr.au.srcObject=e.streams[0];pr.au.play().catch(()=>{});};
+  pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState))voiceDrop(id);liveUI();};
+  if(offer)pc.createOffer().then(o=>pc.setLocalDescription(o)).then(()=>liveSend({t:'v',to:id,sig:{sdp:pc.localDescription}})).catch(()=>{});
+  return pc;}
+async function voiceSignal(from,sig){if(!VOX.on||!sig)return;const pc=voicePeer(from,false),pr=VOX.peers.get(from);
+  try{if(sig.sdp){await pc.setRemoteDescription(sig.sdp);for(const c of pr.q.splice(0))try{await pc.addIceCandidate(c);}catch(e){}
+      if(sig.sdp.type==='offer'){const a=await pc.createAnswer();await pc.setLocalDescription(a);liveSend({t:'v',to:from,sig:{sdp:pc.localDescription}});}}
+    else if(sig.c){if(pc.remoteDescription)await pc.addIceCandidate(sig.c);else pr.q.push(sig.c);}}catch(e){}}
+function voiceDrop(id){const pr=VOX.peers.get(id);if(!pr)return;try{pr.pc.close();}catch(e){}if(pr.au){pr.au.srcObject=null;pr.au.remove();}VOX.peers.delete(id);}
+function voiceStop(silent){if(!VOX.on&&!VOX.peers.size)return;[...VOX.peers.keys()].forEach(voiceDrop);if(VOX.stream)VOX.stream.getTracks().forEach(t=>t.stop());VOX.stream=null;const was=VOX.on;VOX.on=false;if(!silent&&was)liveSend({t:'vl'});liveUI();}
+function voiceMute(){VOX.muted=!VOX.muted;if(VOX.stream)VOX.stream.getAudioTracks().forEach(t=>t.enabled=!VOX.muted);liveUI();}
+
+/* interfaz: botones, chat, grupo e invitaciones */
+function liveUI(){const pc=$('#mbParty');if(!pc)return;const n=LIVE.party?LIVE.party.members.length:0;$('#partyN').hidden=!n;$('#partyN').textContent=n;
+  const st=$('#liveSt');if(st){st.hidden=!(SRV.on&&NET.mode==='online');st.textContent=LIVE.on?`En vivo · ${LIVE.others.size} en este mapa${LIVE.online?` · ${LIVE.online} en el reino`:''}`:'Conectando en vivo…';st.classList.toggle('on',LIVE.on);}
+  const iv=$('#liveInv');if(iv){iv.hidden=!LIVE.inv;if(LIVE.inv)$('#liveInvT').innerHTML=`<b>${esc(LIVE.inv.n)}</b> te invita a su grupo`;}
+  const bx=$('#partyBox');if(!bx||bx.hidden)return;const me=LIVE.me;let h='';
+  if(!LIVE.on)h='<p class="pm">El grupo y la voz necesitan la conexión en vivo. Entrá con tu cuenta.</p>';
+  else if(LIVE.party){const lead=LIVE.party.leader===me;h=`<div class="ph">Tu grupo · ${LIVE.party.members.length}/5</div><ul class="pl-list">${LIVE.party.members.map(x=>`<li><span><b>${esc(x.n)}</b>${x.id===LIVE.party.leader?' <em>líder</em>':''}<small>Nv ${x.L|0} · ${esc(ZONES[x.zone]?ZONES[x.zone].name:'—')}</small></span><span class="vi">${x.voice?'🎙':''}</span>${lead&&x.id!==me?`<button class="btn sm ghost" data-act="pKick" data-id="${x.id}">Sacar</button>`:''}</li>`).join('')}</ul>
+    <div class="pb">${VOX.on?`<button class="btn sm" data-act="vMute">${VOX.muted?'Activar micrófono':'Silenciar micrófono'}</button><button class="btn sm ghost" data-act="vLeave">Salir de la voz</button>`:'<button class="btn sm" data-act="vJoin">Entrar al chat de voz</button>'}<button class="btn sm ghost" data-act="pLeave">Salir del grupo</button></div>`;}
+  else h='<p class="pm">No estás en un grupo. Invitá a alguien que esté en este mapa o escribí su nombre.</p>';
+  if(LIVE.on&&(!LIVE.party||LIVE.party.members.length<5)){const near=[...LIVE.others.values()].filter(o=>!o.inParty);
+    h+=`<div class="ph">Jugadores en este mapa</div>${near.length?`<ul class="pl-list">${near.map(o=>`<li><span><b>${esc(o.s.n)}</b><small>Nv ${o.s.L|0} · ${CLASSES[o.s.c]?CLASSES[o.s.c].name:''}</small></span><button class="btn sm" data-act="pInv" data-id="${o.id}">Invitar</button></li>`).join('')}</ul>`:'<p class="pm">No hay nadie más en este mapa ahora.</p>'}
+    <div class="namebox"><input id="pInvIn" maxlength="14" placeholder="Nombre del personaje" autocomplete="off"><button class="btn sm" data-act="pInvName">Invitar</button></div>`;}
+  $('#partyBody').innerHTML=h;}
+function liveHUD(){if($('#mbChat'))return;const menu=document.querySelector('#hud .menu');if(!menu)return;
+  menu.insertAdjacentHTML('beforeend',`<button class="mb" data-act="openChat" aria-label="Chat" id="mbChat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="dot live" id="chatDot" hidden></span></button><button class="mb" data-act="openParty" aria-label="Grupo" id="mbParty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M15 14.5c3 0 6 1.8 6 5"/></svg><span class="dot live" id="partyN" hidden></span></button>`);
+  $('#hud').insertAdjacentHTML('beforeend',`<div id="liveSt" hidden></div><div id="chatLog" aria-live="polite"></div>
+   <div id="chatBox" class="lpanel" hidden><div class="lp-h"><div class="tabs">${['g','m','p'].map(c=>`<button data-act="chatCh" data-c="${c}" class="${c==='g'?'on':''}">${CHN[c]}</button>`).join('')}</div><button class="x" data-act="closeChat" aria-label="Cerrar">×</button></div><div id="chatList"></div><div class="namebox"><input id="chatIn" maxlength="200" placeholder="Escribí un mensaje" autocomplete="off" enterkeyhint="send"><button class="btn sm" data-act="chatSend">Enviar</button></div></div>
+   <div id="partyBox" class="lpanel" hidden><div class="lp-h"><b>Grupo</b><button class="x" data-act="closeParty" aria-label="Cerrar">×</button></div><div id="partyBody"></div></div>
+   <div id="liveInv" class="lpanel" hidden><span id="liveInvT"></span><div class="pb"><button class="btn sm" data-act="invAcc">Aceptar</button><button class="btn sm ghost" data-act="invRej">Rechazar</button></div></div>`);
+  const ci=$('#chatIn');ci.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();chatSend();}if(e.key==='Escape')$('#chatBox').hidden=true;});
+  addEventListener('keydown',e=>{if(mode!=='game'||(e.target&&e.target.tagName==='INPUT'))return;if(e.key==='Enter'&&SRV.on){e.preventDefault();ACT.openChat();}});
+  Object.assign(ACT,{
+    openChat(){$('#partyBox').hidden=true;const b=$('#chatBox');b.hidden=!b.hidden;LIVE.unread=0;chatRender();if(!b.hidden&&matchMedia('(pointer:fine)').matches)$('#chatIn').focus();},
+    closeChat(){$('#chatBox').hidden=true;},
+    chatCh(d){LIVE.ch=d.c;document.querySelectorAll('#chatBox .tabs button').forEach(b=>b.classList.toggle('on',b.dataset.c===d.c));chatRender();},
+    chatSend(){chatSend();},
+    openParty(){$('#chatBox').hidden=true;const b=$('#partyBox');b.hidden=!b.hidden;liveUI();},
+    closeParty(){$('#partyBox').hidden=true;},
+    pInv(d){liveSend({t:'inv',id:d.id});},
+    pInvName(){const i=$('#pInvIn');if(i&&i.value.trim())liveSend({t:'inv',name:i.value.trim()});},
+    pLeave(){voiceStop();liveSend({t:'leave'});},
+    pKick(d){liveSend({t:'kick',id:d.id});},
+    invAcc(){liveSend({t:'acc'});LIVE.inv=null;liveUI();},
+    invRej(){liveSend({t:'rej'});LIVE.inv=null;liveUI();},
+    vJoin(){voiceStart();},vLeave(){voiceStop();chatAdd({ch:'s',m:'Saliste del chat de voz.'});},vMute(){voiceMute();}
+  });}
+liveHUD();
+try{window.__NOX={get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
 function summary(){return{account:NET.account,accountKey:keyOf(NET.account||''),chars:SAVE.chars.map(c=>({name:c.name,cls:c.cls,L:c.L,resets:c.resets||0,evo:!!c.evo})),charKeys:SAVE.chars.map(c=>keyOf(c.name))};}
@@ -4329,7 +4498,7 @@ function frame(now){
   if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game'&&!paused)?(HITSTOP>0?dt*.07:dt):0;T+=mode==='select'?dt:gdt;windT+=dt;WIND_T.value=windT;dnTick(dt);petTick(dt);ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
   try{
     if(mode==='game'&&C){updatePlayer(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}updateEnemies(gdt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}
-    updNpcs(dt);faceTick(dt);updLife(mode==='select'?dt:gdt);if(!$('#pInv').hidden)irPreview(dt);animHero(mode==='select'?dt:gdt);updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);
+    updNpcs(dt);faceTick(dt);updLife(mode==='select'?dt:gdt);if(!$('#pInv').hidden)irPreview(dt);animHero(mode==='select'?dt:gdt);liveTick(dt);if(mode==='game')liveAnim(Math.min(.5,rdt));updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);
     updCamera(dt);updLabels();updNums(gdt);if(AU.ctx&&AU.on){musicTick();ambTick();sndTick(dt);}
     if(mode==='game'&&C){hudT+=dt;if(hudT>.07){hudT=0;hud();}mmT+=dt;if(mmT>.2){mmT=0;drawMinimap();}saveT+=dt;if(saveT>10){saveT=0;persist();}}
     if(NET.mode==='online'&&NET.dirty.size&&!NET.writing&&performance.now()-NET.last>6000)flushNet();

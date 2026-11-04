@@ -52,6 +52,7 @@ jobs:
           import plistlib,sys,shutil
           v=sys.argv[1];p='NOX.app/Contents/Info.plist'
           d=plistlib.load(open(p,'rb'))
+          d['NSMicrophoneUsageDescription']='NOX usa el micrófono para el chat de voz del grupo.'
           d.update(CFBundleName='NOX',CFBundleDisplayName='NOX',CFBundleIdentifier='com.thebnkrmedia.nox',CFBundleShortVersionString=v,CFBundleVersion=v)
           plistlib.dump(d,open(p,'wb'))
           shutil.copy('desktop/icon.icns','NOX.app/Contents/Resources/electron.icns')

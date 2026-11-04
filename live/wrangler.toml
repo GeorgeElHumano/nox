@@ -1,0 +1,22 @@
+# Servidor en vivo de NOX: jugadores en tiempo real, chat, grupos y señal para el chat de voz
+name = "nox-live"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+routes = [
+  { pattern = "noxparaguay.com/live/*", zone_name = "noxparaguay.com" },
+  { pattern = "www.noxparaguay.com/live/*", zone_name = "noxparaguay.com" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nox-db"
+database_id = "5e7034e7-3427-4192-84a4-a13690e6a03f"
+
+[[durable_objects.bindings]]
+name = "WORLD"
+class_name = "World"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["World"]
