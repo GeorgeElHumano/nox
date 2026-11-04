@@ -10,4 +10,4 @@ Actualizaciones
 - Con internet, NOX.exe abre siempre la última versión del juego. No hace falta descargar nada de nuevo.
 - Sin internet usa la copia incluida en esta carpeta, con personajes guardados solo en esta computadora.
 
-Sitio: https://noxparaguay.pages.dev
+Sitio: https://noxparaguay.com

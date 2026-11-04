@@ -14,7 +14,7 @@ import android.webkit.WebViewClient;
 
 /** NOX para Android: abre el juego online a pantalla completa. Se actualiza solo con cada cambio del sitio. */
 public class MainActivity extends Activity {
-    static final String HOME = "https://noxparaguay.pages.dev/jugar/";
+    static final String HOME = "https://noxparaguay.com/jugar/";
     private WebView web;
 
     @Override

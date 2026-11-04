@@ -88,4 +88,4 @@ jobs:
           V=$(cat VERSION)
           ls -la dist
           gh release delete "v$V" --yes --cleanup-tag 2>/dev/null || true
-          gh release create "v$V" dist/* --title "NOX $V" --latest --notes "NOX $V para Windows, Mac y Android. Con internet, el juego se actualiza solo. Instrucciones: https://noxparaguay.pages.dev/#descargar"
+          gh release create "v$V" dist/* --title "NOX $V" --latest --notes "NOX $V para Windows, Mac y Android. Con internet, el juego se actualiza solo. Instrucciones: https://noxparaguay.com/#descargar"
