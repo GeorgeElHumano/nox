@@ -529,6 +529,8 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
   #sel .it-l{font-size:12px}
 }
 /* en vivo: jugadores, chat y grupo */
+.lbl.me{color:#ffd76a;font-family:var(--display);letter-spacing:.04em;text-shadow:0 1px 2px #000,0 0 6px rgba(255,180,60,.55)}.lbl.me i{font-style:normal;color:#ffe9a8}.lbl.me small.tt{color:#ffb070;font-size:9.5px}.lbl.me small{display:block;font-family:var(--body);color:#f3dca0;letter-spacing:.06em;font-size:9px;font-weight:700}
+
 .lbl.pl{color:#bfe3ff;font-family:var(--display);letter-spacing:.03em}.lbl.pl small{display:block;font-family:var(--body);color:#cfd8e0;letter-spacing:.06em;font-size:9px;font-weight:700}
 .lbl.pl.pty{color:#9cf0a8}.lbl .bub{display:block;max-width:220px;white-space:normal;margin:0 auto 4px;padding:5px 9px;border-radius:10px;background:rgba(14,9,6,.86);box-shadow:0 0 0 1px #6a4c26;color:#f4ead2;font:600 12px/1.3 var(--body);letter-spacing:0;text-shadow:none}
 .mb .dot.live{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#c4532f;color:#fff;font:800 10px/16px var(--body);display:block}.mb .dot.live[hidden]{display:none}
@@ -3927,8 +3929,8 @@ function achCheck(){if(!C)return;const a=achData();
     toast(`<em style="color:var(--gold)">Logro: ${esc(L.d)}</em><br>Título nuevo: <b>${esc(t)}</b> · +₲ ${fmt(L.g)}`);if(!snd('mu_levelup',{vol:.8,jit:0}))sfx('level');if(!C.title)C.title=L.id;persist();}}
 let HLBL=null;
 function heroLabelTick(){if(!C||mode!=='game'){if(HLBL)HLBL.el.hidden=true;return;}
-  if(!HLBL)HLBL=addLabel('','hero',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+2.25+y,P.z];},()=>mode==='game'&&!P.dead);
-  const L=C.title&&LOGROS.find(x=>x.id===C.title),h=`${L?`<small>${esc(logroT(L,C.cls))}</small>`:''}${esc(C.name)}`;if(HLBL.html!==h){HLBL.html=h;HLBL.el.innerHTML=h;}}
+  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+2.25+y,P.z];},()=>mode==='game'&&!P.dead);}
+  const L=C.title&&LOGROS.find(x=>x.id===C.title),cl=CLASSES[C.cls],h=`${LIVE.myBub?`<span class="bub">${esc(LIVE.myBub)}</span>`:''}${L?`<small class="tt">${esc(logroT(L,C.cls))}</small>`:''}<i>★</i> ${esc(C.name)}<small>Vos · Nv ${C.L} · ${cl?(C.evo?cl.evo:cl.name):''}</small>`;if(LIVE.myBubT&&T>LIVE.myBubT){LIVE.myBub=null;LIVE.myBubT=0;}if(HLBL.html!==h){HLBL.html=h;HLBL.el.innerHTML=h;}}
 /* misiones diarias: tres por día, cambian a medianoche */
 const DAYT={kill:{d:n=>`Derrotá ${n} bestias`,n:L=>40+Math.min(60,L)},elite:{d:()=>'Derrotá 1 bestia élite',n:()=>1,hard:1},gem:{d:n=>`Usá ${n} gemas en tu equipo`,n:()=>2},event:{d:()=>'Ganá un evento (Añá o Tuguy)',n:()=>1,hard:1},gold:{d:n=>`Derrotá ${n} bestias doradas`,n:()=>2,hard:1},night:{d:n=>`Derrotá ${n} bestias de noche`,n:()=>30}};
 function dayKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
@@ -4234,9 +4236,10 @@ function liveTick(dt){
 
 /* otros jugadores */
 function liveEqObj(s){const e={};EQK.forEach(k=>e[k]=null);const q=s.eq||{};for(const k in q){const it=q[k];if(it&&EQK.includes(k))e[k]={u:0,k:it.k||k,c:it.c||s.c,t:it.t|0,lv:it.lv|0,g:it.g|0,op:0,luck:false,ex:[]};}if(s.c==='gladiador')e.helm=null;if(s.c!=='caballero')e.shield=null;return e;}
-function liveModel(o){const old=o.m;const eq=liveEqObj(o.s),hf=HERO_FACE;HERO_FACE=o.s.face|0;let r;try{r=buildHero(o.s.c,eq);}catch(e){console.error(e);}HERO_FACE=hf;if(!r)return;
+function liveModel(o){const old=o.m;const eq=liveEqObj(o.s),hf=HERO_FACE;HERO_FACE=o.s.face|0;let r,sp=null;try{r=buildHero(o.s.c,eq);sp=oadHeroSpec(o.s.c,eq);}catch(e){console.error(e);}HERO_FACE=hf;if(!r)return;
   if(old){scene.remove(old.g);disposeTree(old.g);}o.m=r;addBlob(r.g,1.3);scene.add(r.g);r.g.position.set(o.x,H(o.x,o.z),o.z);r.g.rotation.y=o.ry;
-  if(!r.oad)try{const sp=oadHeroSpec(o.s.c,eq);(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!oadHave(sp.files)&&!o.waitOad){o.waitOad=true;oadNeed(sp.files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o)liveModel(o);});}}catch(e){}}
+  /* si faltan los modelos de esa clase (o de esa cara), se bajan y se rearma con el modelo completo */
+  if(!r.oad&&sp)try{(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!o.waitOad){o.waitOad=true;oadNeed(sp.files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o&&!(o.m&&o.m.oad))liveModel(o);});}}catch(e){}}
 function liveLabel(o){const cls=CLASSES[o.s.c];const h=`${o.bub?`<span class="bub">${esc(o.bub)}</span>`:''}${esc(o.s.n)}<small>Nv ${o.s.L|0} · ${cls?(o.s.evo?cls.evo:cls.name):''}${o.inParty?' · grupo':''}</small>`;
   if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>[o.x,(o.m?o.m.g.position.y:0)+2.35,o.z]);else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
 function liveAdd(d){if(!d||!d.s||d.id===LIVE.me)return;let o=LIVE.others.get(d.id);
@@ -4264,7 +4267,7 @@ function liveMsg(m){const t=m.t;
   if(t==='l'){liveRemove(m.id);liveUI();return;}
   if(t==='p'){const o=LIVE.others.get(m.id);if(!o)return;o.tx=m.x;o.tz=m.z;o.tr=m.ry;o.tmv=m.mv||0;if((m.ac|0)!==o.ac){o.ac=m.ac|0;o.P.swingT=0;o.P.lastAtk=T;}o.P.dead=!!m.d;return;}
   if(t==='eq'){const o=LIVE.others.get(m.id);if(o){o.s=m.s;liveModel(o);liveLabel(o);}return;}
-  if(t==='c'){chatAdd(m);const o=LIVE.others.get(m.id);if(o){o.bub=m.m.length>60?m.m.slice(0,58)+'…':m.m;o.bubT=T+6;liveLabel(o);}return;}
+  if(t==='c'){chatAdd(m);if(m.id===LIVE.me){LIVE.myBub=m.m.length>60?m.m.slice(0,58)+'…':m.m;LIVE.myBubT=T+6;}const o=LIVE.others.get(m.id);if(o){o.bub=m.m.length>60?m.m.slice(0,58)+'…':m.m;o.bubT=T+6;liveLabel(o);}return;}
   if(t==='sys'){chatAdd({ch:'s',m:m.m});return;}
   if(t==='online'){LIVE.online=m.n|0;liveUI();return;}
   if(t==='party'){const had=!!LIVE.party;LIVE.party=m.pid?m:null;if(!LIVE.party&&VOX.on)voiceStop(true);if(had&&!LIVE.party)chatAdd({ch:'s',m:'El grupo se disolvió.'});
@@ -4359,7 +4362,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
