@@ -1,6 +1,7 @@
 // NOX · servidor (Cloudflare Pages Functions + D1)
 // Cuentas, guardado del juego en la nube, tienda por transferencia y panel de administración.
 import { CATALOG } from '../../lib/catalog.js';
+import { IMPORTS } from '../../lib/imports.js';
 
 const ADMIN_NAME = 'GEORGEELHUMANO';
 const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]{3,14}$/;
@@ -17,6 +18,7 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT UNIQUE, uid TEXT NOT NULL, items TEXT NOT NULL, total INTEGER NOT NULL, status TEXT NOT NULL, created INTEGER, decided INTEGER, note TEXT)`,
   `CREATE TABLE IF NOT EXISTS deliveries(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, oid INTEGER, item TEXT NOT NULL, label TEXT, created INTEGER)`,
   `CREATE TABLE IF NOT EXISTS resets(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, name TEXT, wa TEXT, created INTEGER, status TEXT NOT NULL, handled INTEGER)`,
+  `CREATE TABLE IF NOT EXISTS imported(uid TEXT NOT NULL, id TEXT NOT NULL, t INTEGER, PRIMARY KEY(uid,id))`,
   `CREATE INDEX IF NOT EXISTS orders_status ON orders(status)`,
   `CREATE INDEX IF NOT EXISTS orders_uid ON orders(uid)`,
   `CREATE INDEX IF NOT EXISTS deliv_uid ON deliveries(uid)`,
@@ -202,6 +204,12 @@ route('POST', 'orders/:id/cancel', async ({ db, me, p }) => {
 
 /* juego */
 route('GET', 'game/docs', async ({ db, me }) => {
+  // personajes traídos de la versión anterior: se agregan una sola vez
+  for (const im of IMPORTS) {
+    if (im.account !== keyOf(me.name)) continue;
+    const r = await db.prepare('INSERT OR IGNORE INTO imported(uid,id,t) VALUES(?,?,?)').bind(me.id, im.id, now()).run();
+    if (r.meta.changes) await db.prepare('INSERT OR IGNORE INTO docs(uid,id,data,upd) VALUES(?,?,?,?)').bind(me.id, im.id, JSON.stringify(im.data), now()).run();
+  }
   const rows = (await db.prepare('SELECT id,data FROM docs WHERE uid=?').bind(me.id).all()).results || [];
   return json({ docs: rows.map(r => ({ id: r.id, data: JSON.parse(r.data) })) });
 }, { auth: true });
@@ -234,7 +242,7 @@ route('DELETE', 'game/docs/:id', async ({ db, me, p }) => {
 
 route('PUT', 'game/summary', async ({ db, req, me }) => {
   const b = await body(req);
-  const chars = (Array.isArray(b.chars) ? b.chars : []).slice(0, 5).map(c => ({ name: String(c.name || '').slice(0, 14), cls: String(c.cls || '').slice(0, 12), L: +c.L || 1, resets: +c.resets || 0, evo: !!c.evo }));
+  const chars = (Array.isArray(b.chars) ? b.chars : []).slice(0, 5).map(c => ({ name: String(c.name || '').slice(0, 24), cls: String(c.cls || '').slice(0, 12), L: +c.L || 1, resets: +c.resets || 0, evo: !!c.evo }));
   const ckeys = ',' + chars.map(c => keyOf(c.name)).join(',') + ',';
   await db.prepare('INSERT INTO players(uid,chars,ckeys,upd) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET chars=excluded.chars,ckeys=excluded.ckeys,upd=excluded.upd').bind(me.id, JSON.stringify(chars), ckeys, now()).run();
   return json({ ok: true });

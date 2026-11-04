@@ -98,7 +98,7 @@ export class World {
     }
     if (t === 'hi' || t === 'z' || t === 'eq') { // presentarse, cambiar de mapa o de equipo
       const s = m.s || {};
-      a.s = { n: clip(s.n, 14), c: clip(s.c, 12), L: s.L | 0, evo: !!s.evo, eq: s.eq && typeof s.eq === 'object' ? s.eq : {}, pet: clip(s.pet, 10) || null, face: s.face | 0 };
+      a.s = { n: clip(s.n, 24), c: clip(s.c, 12), L: s.L | 0, evo: !!s.evo, eq: s.eq && typeof s.eq === 'object' ? s.eq : {}, pet: clip(s.pet, 10) || null, face: s.face | 0 };
       if (JSON.stringify(a.s).length > 2500) a.s.eq = {};
       const old = a.zone, zone = m.zone ? clip(m.zone, 24) : a.zone;
       if (m.p) a.p = { x: +m.p.x || 0, z: +m.p.z || 0, ry: +m.p.ry || 0, mv: 0, ac: 0, d: 0 };
