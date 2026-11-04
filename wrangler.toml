@@ -1,0 +1,8 @@
+name = "noxparaguay"
+pages_build_output_dir = "public"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nox-db"
+database_id = "5e7034e7-3427-4192-84a4-a13690e6a03f"
