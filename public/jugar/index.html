@@ -3935,7 +3935,7 @@ const ACT={
   lgDo(){srvAuth(SELV.lg||'in');},
   srvLoginView(){SELV.view='login';SELV.lg='in';SELV.err='';renderSelect();},
   async srvLogout(){try{await flushNet(true);}catch(e){}try{await srvApi('POST','logout');}catch(e){}srvSetTok(null);NET.role=null;SRV.adm=null;goOffline('');SELV.view='login';renderSelect();previewHero();},
-  retryNet(){netInit();},
+  retryNet(){if(!SRV.on)SRV.on=null;netInit();},
   importLocal(){importLocal();},
   toMenu(){closeAll();persist();flushNet(true);showSelect();},
   selNew(){SELV.view='create';SELV.del=null;SELV.err='';renderSelect();previewHero();},
@@ -4093,8 +4093,8 @@ const srvTok=()=>{try{return localStorage.getItem(SRV.tokKey)||'';}catch(e){retu
 const srvSetTok=t=>{try{if(t)localStorage.setItem(SRV.tokKey,t);else localStorage.removeItem(SRV.tokKey);}catch(e){}};
 async function srvApi(m,path,b){const r=await fetch('/api/'+path,{method:m,headers:{'content-type':'application/json',...(srvTok()?{authorization:'Bearer '+srvTok()}:{})},body:b!==undefined?JSON.stringify(b):undefined});
   let j={};try{j=await r.json();}catch(e){}if(!r.ok){const e=new Error(j.error||('Error '+r.status));e.status=r.status;e.code=r.status===401?'revoked':'http';throw e;}return j;}
-async function srvProbe(){if(window.claude&&typeof window.claude.use==='function')return false;if(!/^https?:$/.test(location.protocol))return false;
-  try{const c=new AbortController();const t=setTimeout(()=>c.abort(),5000);const r=await fetch('/api/ping',{signal:c.signal});clearTimeout(t);if(!r.ok)return false;const j=await r.json();return !!(j&&j.ok);}catch(e){return false;}}
+async function srvProbe(){if(window.claude&&typeof window.claude.use==='function')return false;if(!/^https?:$/.test(location.protocol))return false;if(/(^|\.)noxparaguay\.(com|pages\.dev)$/.test(location.hostname))return true;
+  try{const c=new AbortController();const t=setTimeout(()=>c.abort(),15000);const r=await fetch('/api/ping',{signal:c.signal});clearTimeout(t);if(!r.ok)return false;const j=await r.json();return !!(j&&j.ok);}catch(e){return false;}}
 function noxDB(){const snap=(id,data)=>({id,exists:data!=null,data:()=>data});const qs=d=>({empty:!d.length,docs:d.map(x=>snap(x.id,x.data))});
   return{collection(path){
       if(path==='players')return{get:()=>srvApi('GET','game/count').then(r=>({docs:new Array(r.n).fill(0).map((_,i)=>snap('p'+i,{account:'x'}))})),
@@ -4230,7 +4230,7 @@ async function importLocal(){if(NET.mode!=='online'||!NET.account||SELV.busy)ret
 function acctBar(){let h;
   if(NET.mode==='pending')h='<div class="acct"><span class="dot"></span>Conectando con el servidor…</div>';
   else if(NET.mode==='online')h=`<div class="acct on"><span class="dot"></span><span>${NET.account?`Cuenta <b>${esc(NET.account)}</b> · En línea`:'Conectado al servidor'}${NET.players?` · ${NET.players} ${NET.players===1?'jugador registrado':'jugadores registrados'}`:''}</span></div>`+(SRV.on?`<a class="btn sm ghost" href="../cuenta/#tienda" target="_blank" rel="noopener">Tienda</a>${NET.role==='admin'?`<a class="btn sm ${SRV.adm&&(SRV.adm.orders||SRV.adm.resets)?'':'ghost'}" href="../cuenta/#admin" target="_blank" rel="noopener">Administración${SRV.adm&&(SRV.adm.orders+SRV.adm.resets)?' · '+(SRV.adm.orders+SRV.adm.resets):''}</a>`:''}<button class="btn sm ghost" data-act="srvLogout">Salir</button>`:'');
-  else if(SRV.on)h=`<div class="acct off"><span class="dot"></span><span>Sin cuenta · tus personajes se guardan solo en este dispositivo</span></div><button class="btn sm ghost" data-act="srvLoginView">Iniciar sesión</button>`;
+  else if(SRV.on)h=`<div class="acct off"><span class="dot"></span><span>Sin cuenta · tus personajes se guardan solo en este dispositivo</span></div><button class="btn sm ghost" data-act="srvLoginView">Entrar o crear cuenta</button>`;
   else if(/Electron/.test(navigator.userAgent))h='<div class="acct off"><span class="dot"></span><span>Versión de escritorio · tus personajes se guardan en esta computadora</span></div>';
   else h=`<div class="acct off"><span class="dot"></span><span>Sin cuenta · tus personajes se guardan solo en este dispositivo${NET.msg?'. '+esc(NET.msg):''}</span></div><button class="btn sm ghost" data-act="retryNet">Conectar cuenta</button>`;
   $('#acctBar').innerHTML=h;}
