@@ -30,7 +30,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with: { name: windows, path: NOX-Windows.zip }
   mac:
-    runs-on: macos-latest
+    # Se arma en Linux (los equipos Mac de GitHub no estaban disponibles) y se firma "ad hoc" con rcodesign.
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
@@ -42,21 +43,23 @@ jobs:
         run: |
           V=$(cat VERSION)
           curl -sSL -o e.zip "https://github.com/electron/electron/releases/download/v$ELECTRON/electron-v$ELECTRON-darwin-${{ matrix.arch }}.zip"
-          mkdir out && ditto -xk e.zip out && mv out/Electron.app NOX.app
+          mkdir out && cd out && unzip -q ../e.zip && cd .. && mv out/Electron.app NOX.app
           R=NOX.app/Contents/Resources
           rm -f $R/default_app.asar
           scripts/app.sh $R/app
-          mkdir icon.iconset
-          for s in 16 32 128 256 512; do sips -z $s $s desktop/icon.png --out icon.iconset/icon_${s}x${s}.png >/dev/null; d=$((s*2)); sips -z $d $d desktop/icon.png --out icon.iconset/icon_${s}x${s}@2x.png >/dev/null; done
-          iconutil -c icns icon.iconset -o $R/electron.icns
-          P=NOX.app/Contents/Info.plist
-          plutil -replace CFBundleName -string NOX $P
-          plutil -replace CFBundleDisplayName -string NOX $P
-          plutil -replace CFBundleIdentifier -string com.thebnkrmedia.nox $P
-          plutil -replace CFBundleShortVersionString -string "$V" $P
-          plutil -replace CFBundleVersion -string "$V" $P
-          codesign --force --deep --sign - NOX.app
-          ditto -c -k --keepParent NOX.app NOX-Mac-${{ matrix.label }}.zip
+          python3 - "$V" <<'PY'
+          import plistlib,sys
+          from PIL import Image
+          v=sys.argv[1];p='NOX.app/Contents/Info.plist'
+          d=plistlib.load(open(p,'rb'))
+          d.update(CFBundleName='NOX',CFBundleDisplayName='NOX',CFBundleIdentifier='com.thebnkrmedia.nox',CFBundleShortVersionString=v,CFBundleVersion=v)
+          plistlib.dump(d,open(p,'wb'))
+          Image.open('desktop/icon.png').convert('RGBA').save('NOX.app/Contents/Resources/electron.icns')
+          PY
+          curl -sSL -o rc.tgz "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.29.0/apple-codesign-0.29.0-x86_64-unknown-linux-musl.tar.gz"
+          tar xzf rc.tgz && RC=$(find . -name rcodesign -type f | head -1) && chmod +x "$RC"
+          "$RC" sign NOX.app
+          zip -qry -9 NOX-Mac-${{ matrix.label }}.zip NOX.app
       - uses: actions/upload-artifact@v4
         with:
           name: mac-${{ matrix.label }}
