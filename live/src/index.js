@@ -80,35 +80,88 @@ export class World {
     }
     if (!this.sims.size) { clearInterval(this.loop); this.loop = null; }
   }
-  startRaid(ws, a) {
-    const [pid, p] = this.partyOf(a.uid);
-    if (!p) { this.send(ws, { t: 'sys', m: 'Necesitás un grupo para desafiar a Añaretã.' }); return; }
-    if (p.leader !== a.uid) { this.send(ws, { t: 'sys', m: 'Solo el líder del grupo puede iniciar el desafío.' }); return; }
-    if (p.members.size < 2) { this.send(ws, { t: 'sys', m: 'El desafío es para grupos de 2 a 5 jugadores.' }); return; }
-    const key = RAID_KEY + pid; if (this.sims.has(key)) { this.send(ws, { t: 'sys', m: 'Tu grupo ya está en la guarida.' }); return; }
-    const ms = [...p.members].map(uid => this.byUid(uid)).filter(Boolean);
-    const lvl = Math.max(...ms.map(x => (x.a.s && x.a.s.L) || 1));
-    this.sims.set(key, new Sim(key, { lvl: Math.max(10, lvl + 2), size: ms.length })); this.startLoop();
-    for (const x of ms) this.send(x.ws, { t: 'raid', key, lvl: Math.max(10, lvl + 2), n: ms.length });
+  // ---- objetos en el piso compartidos por mapa: el que lo hizo caer tiene prioridad unos segundos ----
+  zoneDrops(zone, make) {
+    this.drops = this.drops || new Map(); let dz = this.drops.get(zone);
+    if (dz) { const now = Date.now(), gone = []; for (const [id, d] of dz) if (now - d.ts > 90000) { dz.delete(id); gone.push(id); }
+      if (gone.length) { const out = JSON.stringify({ t: 'dg', key: zone, ids: gone, by: null }); for (const x of this.inZone(zone)) this.send(x.ws, out); }
+      if (!dz.size && !make) { this.drops.delete(zone); return null; } }
+    if (!dz && make) { dz = new Map(); this.drops.set(zone, dz); }
+    return dz;
   }
-  simZone(zone) { if (!zone) return false; if (zone.startsWith(RAID_KEY)) return this.sims.has(zone); const z = ZONES[zone]; return !!z && !z.safe && !z.event; }
-  ensureSim(zone) { if (!this.simZone(zone)) return null; let sim = this.sims.get(zone); if (!sim) { sim = new Sim(zone); this.sims.set(zone, sim); } this.startLoop(); return sim; }
-  startLoop() { if (this.loop) return; this.lastStep = Date.now(); this.loop = setInterval(() => { try { this.stepAll(); } catch (e) {} }, 100); }
-  stepAll() {
-    const now = Date.now(), dt = Math.min(.3, (now - this.lastStep) / 1000); this.lastStep = now;
-    for (const [key, sim] of this.sims) {
-      const pl = this.inZone(key).filter(x => x.a.s);
-      if (!pl.length) { sim.empty = (sim.empty || 0) + dt; if (sim.empty > (key.startsWith(RAID_KEY) ? 8 : 45)) this.sims.delete(key); continue; }
-      sim.empty = 0;
-      const players = pl.map(x => ({ uid: x.a.uid, p: x.a.p }));
-      sim.step(dt, players, (uid, o) => { const x = pl.find(y => y.a.uid === uid); if (x) this.send(x.ws, o); });
-      if (sim.out.length) { for (const o of sim.out) { const s = JSON.stringify(o); for (const x of pl) this.send(x.ws, s); if (o.t === 'mk' && o.raid) { const w = JSON.stringify({ t: 'raidwin' }); for (const x of pl) this.send(x.ws, w); } } sim.out = []; }
-      sim.snapT = (sim.snapT || 0) - dt; sim.keyT = (sim.keyT || 0) - dt;
-      if (sim.snapT <= 0) { sim.snapT = .15; const key3 = sim.keyT <= 0; if (key3) sim.keyT = 3; const l = [];
-        for (const mo of sim.mobs) { const e = sim.entry(mo), k = e.join(','); if (key3 || k !== mo._ns) { mo._ns = k; l.push(e); } }
-        if (l.length || key3) { const s = JSON.stringify({ t: 'ms', k: key3 ? 1 : 0, l, key }); for (const x of pl) this.send(x.ws, s); } }
+  dropMsg(ws, a, m) {
+    if (!a.zone || !a.s) return;
+    if (m.t === 'dr') {
+      const l = Array.isArray(m.l) ? m.l.slice(0, 24) : []; if (!l.length) return;
+      const now = Date.now(); a.drN = (now - (a.drT || 0) > 10000) ? 0 : (a.drN || 0); a.drT = now; if ((a.drN += l.length) > 120) return; // freno anti abuso
+      const dz = this.zoneDrops(a.zone, true); if (dz.size > 400) return;
+      const out = [];
+      for (const d of l) { if (!d || typeof d !== 'object' || !d.o || JSON.stringify(d.o).length > 1500) continue;
+        const o = d.o.gold != null ? { gold: Math.max(0, Math.min(5e8, Math.round(+d.o.gold || 0))) } : d.o.item && typeof d.o.item === 'object' ? { item: d.o.item } : null; if (!o) continue;
+        const id = (++this.dropN || (this.dropN = 1)) + '' + Math.floor(Math.random() * 1e3);
+        const e = { id, x: +d.x || 0, z: +d.z || 0, o, own: d.free ? null : a.uid, ownN: a.s.n, pid: a.pid || null, ts: now };
+        dz.set(id, e); out.push(e); }
+      if (!out.length) return;
+      const s = JSON.stringify({ t: 'dr', key: a.zone, l: out }); for (const x of this.inZone(a.zone)) this.send(x.ws, s);
+      return;
     }
-    if (!this.sims.size) { clearInterval(this.loop); this.loop = null; }
+    const dz = this.zoneDrops(a.zone, false), d = dz && dz.get(String(m.id));
+    if (!d) { this.send(ws, { t: 'dg', key: a.zone, ids: [String(m.id)], by: null, miss: 1 }); return; }
+    if (d.own && d.own !== a.uid && !(d.pid && d.pid === a.pid) && Date.now() - d.ts < 20000) { this.send(ws, { t: 'sys', m: 'Ese objeto es de ' + d.ownN + ' por unos segundos más.' }); this.send(ws, { t: 'dg', key: a.zone, ids: [], by: null }); return; }
+    dz.delete(d.id);
+    const s = JSON.stringify({ t: 'dg', key: a.zone, ids: [d.id], by: a.uid }); for (const x of this.inZone(a.zone)) this.send(x.ws, s);
+  }
+  // ---- duelos 1 contra 1 con espectadores ----
+  duelOf(uid) { if (!this.duels) return [null, null]; for (const [k, d] of this.duels) if (!d.end && (d.a === uid || d.b === uid)) return [k, d]; return [null, null]; }
+  roomInfo(k, d) { return { key: k, a: d.a, b: d.b, na: d.na, nb: d.nb, la: d.la, lb: d.lb, ca: d.ca, cb: d.cb, hp: d.hp, state: d.end ? 'fin' : Date.now() < d.start ? 'cuenta' : 'pelea', start: d.start, left: d.end ? 0 : Math.max(0, Math.round((d.limit - Date.now()) / 1000)), winner: d.winner || null, spec: this.inZone(k).filter(x => x.a.uid !== d.a && x.a.uid !== d.b).length }; }
+  roomSend(k, o) { const s = JSON.stringify(o); for (const x of this.inZone(k)) this.send(x.ws, s); }
+  duelEnd(k, winner, why) {
+    const d = this.duels && this.duels.get(k); if (!d || d.end) return; d.end = Date.now(); d.winner = winner; clearTimeout(d.timer);
+    const wn = winner === d.a ? d.na : winner === d.b ? d.nb : null, ln = winner === d.a ? d.nb : d.na;
+    const o = { t: 'duelend', key: k, winner, wn, ln, why, a: d.a, b: d.b, na: d.na, nb: d.nb };
+    const sent = new Set(); for (const x of this.inZone(k)) { this.send(x.ws, o); sent.add(x.a.uid); }
+    for (const uid of [d.a, d.b]) if (!sent.has(uid)) { const x = this.byUid(uid); if (x) this.send(x.ws, o); }
+    const txt = wn ? wn + ' ganó el duelo contra ' + ln + (why === 'tiempo' ? ' por vida restante' : why === 'abandono' ? ' por abandono' : '') : 'El duelo entre ' + d.na + ' y ' + d.nb + ' terminó empatado';
+    const msg = JSON.stringify({ t: 'c', ch: 'g', id: 'arena', n: 'Arena', adm: false, m: txt, ts: Date.now() }); for (const x of this.all()) this.send(x.ws, msg);
+    setTimeout(() => { if (this.duels.get(k) === d) this.duels.delete(k); }, 30000);
+  }
+  duelMsg(ws, a, m) {
+    this.duels = this.duels || new Map(); this.dinv = this.dinv || new Map();
+    const t = m.t;
+    if (t === 'rooms') { this.send(ws, { t: 'rooms', list: [...this.duels].filter(([, d]) => !d.end || Date.now() - d.end < 8000).map(([k, d]) => this.roomInfo(k, d)) }); return; }
+    if (t === 'watch') { const d = this.duels.get(m.key); if (!d || d.end) { this.send(ws, { t: 'sys', m: 'Ese duelo ya terminó.' }); return; } if (d.a === a.uid || d.b === a.uid) return; this.send(ws, { t: 'duelgo', key: m.key, side: 'spec', room: this.roomInfo(m.key, d) }); return; }
+    if (t === 'duel') {
+      const x = m.id ? this.byUid(m.id) : this.byName(m.name || ''); if (!x || !x.a.s) { this.send(ws, { t: 'sys', m: 'Ese jugador no está conectado.' }); return; }
+      if (x.a.uid === a.uid || !a.s) return;
+      if (this.duelOf(a.uid)[1]) { this.send(ws, { t: 'sys', m: 'Ya estás en un duelo.' }); return; }
+      if (this.duelOf(x.a.uid)[1]) { this.send(ws, { t: 'sys', m: x.a.s.n + ' ya está en un duelo.' }); return; }
+      this.dinv.set(x.a.uid, { from: a.uid, t: Date.now() });
+      this.send(x.ws, { t: 'duelinv', from: a.uid, n: a.s.n, L: a.s.L, c: a.s.c });
+      this.send(ws, { t: 'sys', m: 'Desafiaste a ' + x.a.s.n + ' a un duelo. Esperando que acepte…' });
+      return;
+    }
+    if (t === 'duelacc' || t === 'duelrej') {
+      const iv = this.dinv.get(a.uid); this.dinv.delete(a.uid);
+      const from = iv && this.byUid(iv.from);
+      if (!iv || !from || !from.a.s || !a.s || Date.now() - iv.t > 60000) { this.send(ws, { t: 'sys', m: 'El desafío ya venció.' }); return; }
+      if (t === 'duelrej') { this.send(from.ws, { t: 'sys', m: a.s.n + ' rechazó el duelo.' }); return; }
+      if (this.duelOf(a.uid)[1] || this.duelOf(from.a.uid)[1]) { this.send(ws, { t: 'sys', m: 'Uno de los dos ya está en otro duelo.' }); return; }
+      const k = 'duel#' + crypto.randomUUID().slice(0, 8), now = Date.now();
+      const d = { a: from.a.uid, b: a.uid, na: from.a.s.n, nb: a.s.n, la: from.a.s.L, lb: a.s.L, ca: from.a.s.c, cb: a.s.c, hp: {}, start: now + 9000, limit: now + 9000 + 180000, end: null };
+      this.duels.set(k, d);
+      d.timer = setTimeout(() => { // a los 3 minutos gana el que tenga más vida
+        const r = u => d.hp[u] ? d.hp[u][0] / d.hp[u][1] : 1, ha = r(d.a), hb = r(d.b);
+        this.duelEnd(k, Math.abs(ha - hb) < .001 ? null : ha > hb ? d.a : d.b, 'tiempo');
+      }, 9000 + 180000);
+      for (const [x, side] of [[from, 'a'], [this.byUid(a.uid), 'b']]) if (x) this.send(x.ws, { t: 'duelgo', key: k, side, room: this.roomInfo(k, d) });
+      return;
+    }
+    const [k, d] = this.duelOf(a.uid);
+    if (!d || a.zone !== k) return;
+    const other = d.a === a.uid ? d.b : d.a;
+    if (t === 'ph') { if (Date.now() < d.start) return; const x = this.byUid(other); if (x && x.a.zone === k) this.send(x.ws, { t: 'ph', d: Math.max(0, Math.min(1e6, +m.d || 0)), k: String(m.k || '').slice(0, 2), from: a.uid }); return; }
+    if (t === 'php') { d.hp[a.uid] = [Math.max(0, Math.round(+m.hp || 0)), Math.max(1, Math.round(+m.max || 1))]; this.roomSend(k, { t: 'php', key: k, id: a.uid, hp: d.hp[a.uid] }); return; }
+    if (t === 'pd') { if (Date.now() >= d.start) this.duelEnd(k, other, 'ko'); return; }
   }
   startRaid(ws, a) {
     const [pid, p] = this.partyOf(a.uid);
@@ -120,13 +173,6 @@ export class World {
     const lvl = Math.max(...ms.map(x => (x.a.s && x.a.s.L) || 1));
     this.sims.set(key, new Sim(key, { lvl: Math.max(10, lvl + 2), size: ms.length })); this.startLoop();
     for (const x of ms) this.send(x.ws, { t: 'raid', key, lvl: Math.max(10, lvl + 2), n: ms.length });
-  }
-  // anfitrión del mapa: el que entró primero (y sigue ahí)
-  hostOf(zone) { let best = null; for (const x of this.inZone(zone)) { if (!x.a.s) continue; if (!best || (x.a.jt || 0) < (best.a.jt || 0)) best = x; } return best ? best.a.uid : null; }
-  announceHost(zone) {
-    if (!zone) return; this.hosts = this.hosts || {};
-    const h = this.hostOf(zone); if (this.hosts[zone] === h) return; this.hosts[zone] = h;
-    const out = JSON.stringify({ t: 'host', zone, id: h }); for (const x of this.inZone(zone)) this.send(x.ws, out);
   }
 
   partyOf(uid) {
@@ -164,6 +210,14 @@ export class World {
     if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
     if (t === 'mreq') { const sim = a.zone && this.sims.get(a.zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: a.zone }); return; }
     if (t === 'raid') { this.startRaid(ws, a); return; }
+    if (t === 'sk') { // poder usado: los demás del mapa lo ven
+      if (!a.zone || !a.s) return; const now = Date.now(); if (now - (a.skT || 0) < 120) return; a.skT = now;
+      const o = { t: 'sk', id: a.uid, k: clip(m.k, 14), x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, tx: m.tx == null ? null : +m.tx || 0, tz: m.tz == null ? null : +m.tz || 0, tn: m.tn | 0, st: m.st ? 1 : 0 };
+      const out = JSON.stringify(o); for (const x of this.inZone(a.zone, ws)) this.send(x.ws, out); return;
+    }
+    if (t === 'dr' || t === 'dp') { this.dropMsg(ws, a, m); return; }
+    if (t === 'duel' || t === 'duelacc' || t === 'duelrej' || t === 'ph' || t === 'php' || t === 'pd' || t === 'rooms' || t === 'watch') { this.duelMsg(ws, a, m); return; }
+
 
     if (t === 'p') { // posición: x,z,ry,mv,ac (contador de ataques),d (muerto),f (vuela)
       a.p = { x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, mv: +m.mv || 0, ac: m.ac | 0, d: m.d ? 1 : 0 };
@@ -182,7 +236,10 @@ export class World {
       if (old !== zone) a.jt = Date.now();
       a.zone = zone; this.save(ws, a);
       if (old && old !== zone) for (const x of this.inZone(old, ws)) this.send(x.ws, { t: 'l', id: a.uid });
+      if (old && old.startsWith('duel#') && old !== zone) { const [k, d] = this.duelOf(a.uid); if (d && k === old) this.duelEnd(k, d.a === a.uid ? d.b : d.a, 'abandono'); }
+      if (zone && zone.startsWith('duel#') && this.duels && this.duels.get(zone)) { const d = this.duels.get(zone); this.send(ws, { t: 'room', room: this.roomInfo(zone, d) }); }
       if (old !== zone || t === 'hi') {
+        { const dz = this.zoneDrops(zone, false); if (dz && dz.size) this.send(ws, { t: 'dr', key: zone, init: 1, l: [...dz.values()] }); }
         this.send(ws, { t: 'w', you: a.uid, list: this.inZone(zone, ws).filter(x => x.a.s).map(x => this.pub(x.a)) });
         for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'j', ...this.pub(a) });
         const sim = this.ensureSim(zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: zone });
@@ -249,6 +306,7 @@ export class World {
   async webSocketError(ws) { this.gone(ws); }
   gone(ws) {
     const a = this.att(ws); if (!a) return;
+    { const [k, d] = this.duelOf(a.uid); if (d) this.duelEnd(k, d.a === a.uid ? d.b : d.a, 'abandono'); }
     if (a.zone) { for (const x of this.inZone(a.zone, ws)) this.send(x.ws, { t: 'l', id: a.uid }); }
     if (a.pid) {
       // el que se fue ya no figura entre las conexiones: avisar al resto del grupo
