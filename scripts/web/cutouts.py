@@ -84,17 +84,30 @@ for k in CLS:
     if ok(f):R[k]=trim(mainpart(Image.open(f)),.03)
 for k,im in R.items():
     c=canvas(max(im.width,int(im.height*3/4)),max(im.height,int(im.width*4/3)));c.paste(im,((c.width-im.width)//2,c.height-im.height));savew(c,'raza_'+k,720)
-def lineup(order,W,H,step,heights,name):
-    c=canvas(W,H);n=len(order);ims=[]
-    for i,k in enumerate(order):
-        im=fit(R[k],W,int(H*heights[i]));ims.append(im)
-    centre=sorted(range(n),key=lambda i:-abs(i-(n-1)/2))
-    for i in centre:
-        im=ims[i];x=int(W/2-im.width/2+(i-(n-1)/2)*step);y=H-im.height;c.alpha_composite(im,(max(0,x),y)) if 0<=x<=W-im.width else c.alpha_composite(im,(min(max(0,x),W-im.width),y))
-    savew(c,name,1400)
+def body(im):
+    """Columnas del cuerpo: el ancho ocupado en la franja de piernas y torso (las alas quedan más arriba)."""
+    a=np.asarray(im.getchannel('A'))>60;h=a.shape[0]
+    cols=np.where(a[int(h*.62):int(h*.97)].mean(0)>.04)[0]
+    return (int(cols[0]),int(cols[-1])+1) if len(cols) else (0,im.width)
+def lineup(order,H,scales,lift,name,gap=-.05,w=1600):
+    """Fila en V: el del medio adelante, los demás más chicos y atrás. Primero se pegan todos enteros (alas incluidas),
+       después solo los cuerpos encima, así las alas del vecino nunca tapan a un personaje."""
+    ims=[fit(R[k],10**5,int(H*s)) for k,s in zip(order,scales)];n=len(ims)
+    bs=[body(im) for im in ims];bw=[b[1]-b[0] for b in bs];cx=[0.0]
+    for i in range(1,n):cx.append(cx[-1]+bw[i-1]/2+bw[i]/2+max(bw)*gap)
+    mid=(cx[0]+cx[-1])/2;xs=[int(c-mid-(b[0]+b[1])/2) for c,b in zip(cx,bs)]
+    x0=min(xs);x1=max(x+im.width for x,im in zip(xs,ims));Hc=H+max(lift)
+    c=canvas(x1-x0,Hc);pos=[(x-x0,Hc-im.height-l) for x,im,l in zip(xs,ims,lift)]
+    back=sorted(range(n),key=lambda i:-abs(i-(n-1)/2))
+    for i in back:c.alpha_composite(ims[i],pos[i])
+    for i in back:
+        b=bs[i];m=int(bw[i]*.12);box=(max(0,b[0]-m),0,min(ims[i].width,b[1]+m),ims[i].height)
+        c.alpha_composite(ims[i].crop(box),(pos[i][0]+box[0],pos[i][1]))
+    savew(trim(c,.02),name,w)
+V5=([.62,.8,1,.8,.62],[230,110,0,110,230])
 if len(R)==5:
-    lineup(['hechicero','arquera','caballero','gladiador','mburuvicha'],1400,1250,300,[.86,.93,1,.93,.86],'hero_portadores')
-    lineup(['mburuvicha','gladiador','caballero','arquera','hechicero'],1500,1050,320,[.86,.92,1,.92,.86],'cut_razas')
+    lineup(['hechicero','arquera','caballero','gladiador','mburuvicha'],1100,*V5,'hero_portadores')
+    lineup(['mburuvicha','gladiador','caballero','arquera','hechicero'],1100,*V5,'cut_razas')
 # ---- sets: retratos de ficha y recorte del capítulo
 S={}
 for f in glob.glob(AS+'/*_[0-6].png'):
@@ -104,7 +117,7 @@ for f in glob.glob(AS+'/*_[0-6].png'):
     c=canvas(max(im.width,int(im.height*3/4)),max(im.height,int(im.width*4/3)));c.paste(im,((c.width-im.width)//2,c.height-im.height));savew(c,f'set_{cls}_{t}',720)
 if all((k,6) in S for k in CLS):
     R0=R;R={k:S[(k,6)] for k in CLS}
-    lineup(['hechicero','caballero','gladiador','mburuvicha','arquera'],1500,1050,330,[.86,.95,1,.95,.86],'cut_sets')
+    lineup(['hechicero','caballero','gladiador','mburuvicha','arquera'],1100,*V5,'cut_sets')
     R=R0
 # ---- ítems: armas en abanico, el escudo atrás
 names=['caballero_weapon','hechicero_weapon','arquera_weapon','gladiador_weapon','mburuvicha_weapon']
