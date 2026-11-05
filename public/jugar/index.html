@@ -1642,10 +1642,14 @@ function featherTex(P,shape){const key=P.key+(shape||'');if(WTEX[key])return WTE
     for(let i=0;i<260;i++){const y=S-(i/260)*S;const sideR=i%2;const dir=sideR?1:-1;x.strokeStyle=i%4<2?'rgba(255,255,255,.2)':'rgba(0,0,0,.28)';x.lineWidth=1.6;x.beginPath();x.moveTo(cx,y);x.quadraticCurveTo(cx+dir*S*.2,y-S*.05,cx+dir*S*.48,y-S*.16);x.stroke();}
     /* banda clara junto al raquis y franja oscura cerca del borde: volumen */const vb=x.createLinearGradient(cx-S*.45,0,cx+S*.45,0);vb.addColorStop(0,'rgba(0,0,0,.35)');vb.addColorStop(.3,'rgba(0,0,0,0)');vb.addColorStop(.47,'rgba(255,255,255,.18)');vb.addColorStop(.53,'rgba(255,255,255,.18)');vb.addColorStop(.7,'rgba(0,0,0,0)');vb.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=vb;x.fillRect(0,0,S,S);
     /* ocelo (ojo de pavo real) en las etapas altas */if(P.ei>=.3){x.save();x.translate(cx,S*.16);x.scale(1,1.5);const og=x.createRadialGradient(0,0,2,0,0,S*.1);og.addColorStop(0,P.shaft);og.addColorStop(.45,P.base);og.addColorStop(.75,P.tip);og.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=og;x.beginPath();x.arc(0,0,S*.1,0,TAU);x.fill();x.restore();}
+    /* venas finas desde el raquis y motas hacia la punta en las etapas altas */
+    x.strokeStyle='rgba(255,255,255,.1)';x.lineWidth=.8;for(let i=0;i<60;i++){const y=S-(i/60)*S*.95;for(const dir of[-1,1]){x.beginPath();x.moveTo(cx,y);x.quadraticCurveTo(cx+dir*S*.12,y-S*.04,cx+dir*S*.4,y-S*.2);x.stroke();}}
+    if(P.ei>=.12){x.fillStyle=P.shaft;x.globalAlpha=.35;for(let i=0;i<26;i++){const t=.05+Math.random()*.5,dir=Math.random()<.5?-1:1;x.beginPath();x.arc(cx+dir*S*(.06+Math.random()*.3)*(1-t),S*t+S*.02,1.5+Math.random()*2.2,0,TAU);x.fill();}x.globalAlpha=1;}
+    if(P.ei>=.5){/* glifo de luz en la pluma */x.strokeStyle=P.shaft;x.lineWidth=2.2;x.globalAlpha=.8;x.beginPath();x.moveTo(cx,S*.3);x.lineTo(cx+S*.1,S*.42);x.lineTo(cx,S*.54);x.lineTo(cx-S*.1,S*.42);x.closePath();x.stroke();x.beginPath();x.arc(cx,S*.42,S*.035,0,TAU);x.stroke();x.globalAlpha=1;}
     if(shape==='raven'){/* brillo tornasolado del cuervo */const ig=x.createLinearGradient(0,S*.6,S,S*.2);ig.addColorStop(0,'rgba(60,40,120,0)');ig.addColorStop(.5,'rgba(90,70,170,.35)');ig.addColorStop(1,'rgba(20,120,140,0)');x.fillStyle=ig;x.fillRect(0,0,S,S);}
     x.globalCompositeOperation='destination-out';for(let i=0;i<7;i++){const y=S*(.25+Math.random()*.6),dir=Math.random()<.5?-1:1;x.lineWidth=2.2;x.beginPath();x.moveTo(cx+dir*S*.12,y);x.lineTo(cx+dir*S*.5,y-S*.14);x.stroke();}
     x.globalCompositeOperation='source-over';const rg=x.createLinearGradient(0,S,0,S*.75);rg.addColorStop(0,'rgba(0,0,0,.45)');rg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=rg;x.fillRect(0,S*.75,S,S*.25);x.restore();
-    /* contorno oscuro de la pluma */x.beginPath();x.moveTo(cx,S);L.forEach(p=>x.lineTo(p[0],p[1]));x.lineTo(cx,0);for(let k=Rr.length-1;k>=0;k--)x.lineTo(Rr[k][0],Rr[k][1]);x.closePath();x.strokeStyle='rgba(0,0,0,.55)';x.lineWidth=5;x.stroke();
+    /* contorno oscuro y filete de filigrana del color del raquis en el borde de la pluma */x.beginPath();x.moveTo(cx,S);L.forEach(p=>x.lineTo(p[0],p[1]));x.lineTo(cx,0);for(let k=Rr.length-1;k>=0;k--)x.lineTo(Rr[k][0],Rr[k][1]);x.closePath();x.strokeStyle='rgba(0,0,0,.55)';x.lineWidth=6;x.stroke();x.strokeStyle=P.shaft;x.lineWidth=1.6;x.globalAlpha=.75;x.stroke();x.globalAlpha=1;
     x.strokeStyle=P.shaft;x.lineWidth=5;x.beginPath();x.moveTo(cx,S);x.quadraticCurveTo(cx+2,S*.5,cx,4);x.stroke();x.strokeStyle='rgba(0,0,0,.4)';x.lineWidth=1.6;x.beginPath();x.moveTo(cx+3,S);x.quadraticCurveTo(cx+5,S*.5,cx+2,6);x.stroke();x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=1.2;x.beginPath();x.moveTo(cx-2,S);x.quadraticCurveTo(cx-1,S*.5,cx-1,6);x.stroke();}
   const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);WTEX[key]=t;return t;}
 const FEATHER_G=(()=>{const g=new THREE.PlaneGeometry(1,1,1,6);g.translate(0,.5,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const y=p.getY(i);p.setZ(i,-.16*y*y+Math.abs(p.getX(i))*.06);}g.computeVertexNormals();return keep(g);})();
@@ -1662,6 +1666,8 @@ function wingFrame(cls,s,P,st,waveify){const g=new THREE.Group();const shape=WSH
   const tb=new THREE.Mesh(taperTube(pts,storm?.055:.05,.016,18,8),mm);g.add(tb);
   A.forEach((p,i)=>{if(i===0)return;const jg=storm?new THREE.Mesh(gcc('wjOct',()=>new THREE.OctahedronGeometry(1,0)),i===A.length-1?gm:mm):new THREE.Mesh(SPH(1,10,8),mm);jg.position.set(p[0]*s,p[1]+.02,.035);const r=.085-i*.015;jg.scale.set(r,r*(storm?1.8:1.15),r);g.add(jg);
     if(veil){const rg=new THREE.Mesh(gcc('wRing',()=>new THREE.TorusGeometry(1,.07,6,20)),gm);rg.position.copy(jg.position);rg.scale.setScalar(.1-i*.015);rg.rotation.y=PI/2;g.add(rg);}});
+  if(st>=1)A.forEach((p,i)=>{if(i===0||i===A.length-1)return;const kn=new THREE.Mesh(gcc('wKnot',()=>new THREE.TorusKnotGeometry(1,.3,48,8,2,3)),gm);kn.position.set(p[0]*s,p[1]+.02,.035);kn.scale.setScalar(.055);kn.rotation.x=PI/2;g.add(kn);});
+  if(st>=3)for(let i=1;i<=6;i++){const t=i/7,n=A.length-1,f=Math.min(n-1e-4,t*n),j=Math.floor(f),u=f-j;const x=(A[j][0]+(A[j+1][0]-A[j][0])*u)*s,y=A[j][1]+(A[j+1][1]-A[j][1])*u+.02;const gg=new THREE.Mesh(gcc('wGem',()=>new THREE.OctahedronGeometry(1,1)),gm);gg.position.set(x,y-.09,.05);gg.scale.set(.028,.04,.02);g.add(gg);}
   /* garra / punta */const L=A[A.length-1],Lp=A[A.length-2];const cl=new THREE.Mesh(CONE(.035,raven?.26:.2,6),raven?mm:gm);cl.position.set(L[0]*s+(L[0]-Lp[0])*s*.08,L[1]+.02+(L[1]-Lp[1])*.1,.035);cl.rotation.z=-s*(Math.atan2(L[1]-Lp[1],(L[0]-Lp[0])*s)*s-PI/2);g.add(cl);
   /* ornamento de la raíz */const root=new THREE.Group();root.position.set(.02*s,.06,.05);g.add(root);
   const ring=new THREE.Mesh(gcc('wRing',()=>new THREE.TorusGeometry(1,.07,6,20)),mm);ring.scale.setScalar(.14);root.add(ring);
@@ -1695,6 +1701,17 @@ function wingSideGeo(cls,s){const k=cls+s;if(WGEO[k])return WGEO[k];const parts=
     for(let r=0;r<3;r++)for(let i=0;i<8;i++){const f=i/7;add(.1+f*.85,(-215+f*85-r*6)*D,(1.0-r*.14)+Math.sin(f*Math.PI)*.12,.19,-.02*r,.1+f*.1);}
     for(let i=0;i<9;i++){const f=i/8;add(.06+f*.7,(-205+f*60)*D,.3+f*.03,.15,.012,.05);}/* coberteras */
     for(let i=0;i<5;i++){const f=i/4;add(.05+f*.25,(-150+f*40)*D,.5-f*.1,.15,.02,0);}}
+  /* plumón: plumas chicas y anchas que dan volumen a la raíz */
+  if(shape!=='veil'&&shape!=='storm')for(let i=0;i<14;i++){const a=Math.sin(i*9.7)*.5+.5,b=Math.sin(i*4.3)*.5+.5;add(.02+a*.2,(-150-b*70)*D,.12+a*.08,.16,.03+b*.02,(b-.5)*.3);}
+  WGEO[k]=keep(mergeGeos(parts));return WGEO[k];}
+/* extras por etapa: filamentos de luz entre las primarias (desde +4) y cintas largas que cuelgan de la punta (desde +8) */
+function wingExtraGeo(cls,s,st){const k=cls+s+st;if(WGEO[k])return WGEO[k];if(st<1)return null;const parts=[],M=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),v=new THREE.Vector3(),sc=new THREE.Vector3();const shape=WSHAPE[cls]||'eagle';const P=WARM[shape]||WARM.eagle;
+  const arm=t=>{const n=P.length-1,f=Math.min(n-1e-4,t*n),i=Math.floor(f),u=f-i;return[P[i][0]+(P[i+1][0]-P[i][0])*u,P[i][1]+(P[i+1][1]-P[i][1])*u];};
+  const add=(t,ang,len,w,z,tw)=>{const a=arm(t);e.set(0,s*tw,s*ang);q.setFromEuler(e);v.set(a[0]*s,a[1],z);sc.set(w,len,1);M.compose(v,q,sc);const g=FEATHER_G.clone();g.applyMatrix4(M);parts.push(g);};
+  const D=Math.PI/180;
+  for(let i=0;i<7;i++){const f=i/6;add(.55+f*.45,(-168+f*125)*D,(shape==='veil'?1.5:1.35)+Math.sin(f*Math.PI)*.3,.045,.02,.2+f*.1);}
+  if(st>=2){for(let i=0;i<3;i++){add(.92-i*.12,(-215-i*12)*D,1.5-i*.2,.05,-.05-i*.01,.05);}}
+  if(st>=3){for(let i=0;i<4;i++){const f=i/3;add(.2+f*.6,(-200+f*20)*D,1.2+f*.3,.035,-.06,.1);}}
   WGEO[k]=keep(mergeGeos(parts));return WGEO[k];}
 function wingsMesh(cls,lv,gen){const g=new THREE.Group();g.position.set(0,.8,-.2);const sides=[];lv=lv||0;const g2=(gen||1)>=2;const st=Math.min(3,wingStage(lv)+(g2?1:0));const P=(WPALS[cls]||WPALS.caballero)[st];
   const shape=WSHAPE[cls]||'eagle',veil=shape==='veil';const tex=featherTex(P,shape);const m=new MSM({map:tex,emissiveMap:tex,emissive:P.em,emissiveIntensity:(veil?.55:P.ei)+Math.min(15,lv)*.012,alphaTest:veil?.04:.42,transparent:veil,opacity:veil?.9:1,depthWrite:!veil,blending:THREE.NormalBlending,side:THREE.DoubleSide,roughness:P.rough,metalness:P.met});
@@ -1705,6 +1722,8 @@ function wingsMesh(cls,lv,gen){const g=new THREE.Group();g.position.set(0,.8,-.2
   m.customProgramCacheKey=()=>'wingwave';
   for(const s of[-1,1]){const W=new THREE.Group();W.position.x=.05*s;g.add(W);const me=new THREE.Mesh(wingSideGeo(cls,s),m);me.castShadow=true;me.scale.setScalar(S);W.add(me);
     me.scale.y*=1+st*.07;W.rotation.y=s*.42;sides.push(W);const fr=wingFrame(cls,s,P,st,waveify);fr.scale.copy(me.scale);W.add(fr);
+    const xg=wingExtraGeo(cls,s,st);if(xg){const xm=new MSM({map:tex,emissiveMap:tex,emissive:P.em,emissiveIntensity:.5+st*.25,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,roughness:.4,metalness:0});waveify(xm);const xe=new THREE.Mesh(xg,xm);xe.scale.copy(me.scale);W.add(xe);}
+    if(st===2){const au=glowSprite(P.em,1.9*S/.5,.16);au.position.set(s*.5*S/.5,.4*S/.5,-.15);W.add(au);}
     /* desde +8: brillo en la punta del ala; en +12, dos */
     if(st>=1){for(let k=0;k<st;k++){const sp=glowSprite(P.em,.45+k*.2,.45);sp.position.set(s*(.85+k*.22)*S/.5*(shape==='raven'?.6:1),(.7+k*.12)*S/.5*(shape==='raven'?-.3:1),0);W.add(sp);}}
     if(st>=3){const au=glowSprite(P.em,2.6*S/.5,.22);au.position.set(s*.5*S/.5,.4*S/.5,-.15);W.add(au);}
@@ -2790,7 +2809,7 @@ function emblemTex(cls,col){const key='emb'+cls+col;if(TXL[key])return TXL[key].
 function emblem(g,S,cls,w,h,U){const t=emblemTex(cls,S.t);const m=new MSM({map:t,emissiveMap:t,emissive:S.t,emissiveIntensity:.8,transparent:true,depthWrite:false,alphaTest:.1,polygonOffset:true,polygonOffsetFactor:-2});m.userData.forge=1;m.userData.gem=1;
   const e=part(gcc('embq',()=>new THREE.PlaneGeometry(1,1)),m,0,h*.0,.105*U,g,w*.55,w*.55,1);e.rotation.x=-.12;}
 function forgeChest(S,U,cls){const g=new THREE.Group();const M=fMetal(S.m,S.t),O=fOrnate(S.m,S.t,S.glow),L=fLeather(S.a);const w=.27*U,h=.2*U;
-  const plate=m=>{const p=part(gcc('plate',()=>{const q=new THREE.SphereGeometry(1,20,14,-PI*.42,PI*.84,PI*.22,PI*.56);return q;}),m,0,0,-.12*U,g,w,h*1.25,.21*U);p.material.side=THREE.DoubleSide;p.castShadow=true;return p;};
+  /* peto: casquete alto y chato que abraza el torso (antes era una esfera que parecía panza) */const plate=m=>{const p=part(gcc('plate2',()=>{const q=new THREE.SphereGeometry(1,22,16,-PI*.4,PI*.8,PI*.2,PI*.6);return q;}),m,0,.035*U,-.07*U,g,w*1.02,h*1.75,.135*U);p.material.side=THREE.DoubleSide;p.castShadow=true;return p;};
   switch(S.chest){
     case 'none':break;
     case 'straps':{for(const s of[-1,1]){const st=part(gcc('strap',()=>new THREE.BoxGeometry(.05,1,.02)),L,s*w*.35,0,.085*U,g,U*.7,h*2.4,U);st.rotation.z=s*.55;}const bk=part(gcc('buckle',()=>new THREE.TorusGeometry(1,.3,6,12)),O,0,0,.1*U,g,.02*U,.02*U,.02*U);break;}
