@@ -2387,6 +2387,13 @@ function demonTail(U,col){const g=new THREE.Group();const m=new MSM({color:col,r
 /* arma en la mano derecha: los objetos van a lo largo de +z desde el puño, como las armas de 0 A.D. */
 function weaponAt(body,U){const pt=oadPoint(body,'weapon_R');if(!pt)return null;const g=new THREE.Group();pt.add(g);g.userData.U=U;return g;}
 function shaftZ(len,r0,r1,m,parent,z0){const o=part(limbGeo(len,r0,r1,0),m,0,0,z0||0,parent);o.rotation.x=-PI/2;return o;}
+/* fuegos fatuos que orbitan alrededor (se giran en oadMobAnim) */
+function wisps(r,col,n,rad,y,size){const g=new THREE.Group();g.position.y=y;for(let i=0;i<n;i++){const a=i/n*TAU;const sp=glowSprite(col,size||.35,.8);sp.position.set(Math.cos(a)*rad,Math.sin(a*2)*.12,Math.sin(a)*rad);g.add(sp);}g.userData.orbit=1;r.orbitG=g;return g;}
+/* cadena colgando de un punto: eslabones (toros) alternados */
+function chain(parent,U,n,col){const m=mat(col||0x6a6a72,{metalness:.7,roughness:.4});for(let i=0;i<n;i++){const l=part(gcc('link',()=>new THREE.TorusGeometry(1,.3,6,10)),m,0,-i*.045*U,0,parent,.02*U,.028*U,.02*U);l.rotation.y=i%2?PI/2:0;l.rotation.x=PI/2;}}
+/* capa rota: tela con el borde desflecado */
+function tatteredCape(U,col,o){o=o||{};const w=.5*U,h=1.1*U;const geo=new THREE.PlaneGeometry(w,h,6,10);geo.translate(0,-h/2,0);const pa=geo.attributes.position;for(let i=0;i<pa.count;i++){const x=pa.getX(i),y=pa.getY(i);const t=-y/h;pa.setZ(i,-t*t*.12*U+Math.sin(x*18/U)*.01*U);if(t>.72)pa.setY(i,y+Math.sin(x*23/U+t*9)*.07*U*(t-.72)/.28);}geo.computeVertexNormals();
+  const m=new MSM({color:col,roughness:.9,side:THREE.DoubleSide,transparent:!!o.op,opacity:o.op||1,depthWrite:!o.op});m.userData.noGhost=o.noGhost?1:0;const mesh=new THREE.Mesh(geo,m);mesh.castShadow=true;return mesh;}
 /* pies grandes y peludos (para atrás en el Kurupí) */
 function bigFeet(A,U,T,back){for(const s of['L','R']){const b=A(['foot_'+s]);if(!b)continue;const f=part(SPH(1,10,8),tm(T),0,0,0,b);f.scale.set(.11*U,.07*U,.2*U);f.rotation.x=back?PI:0;f.position.set(0,.02*U,(back?-.06:.06)*U);
     for(let k=0;k<3;k++){const t=part(CONE(.012*U,.05*U,4),mat(0x2a1a10),(k-1)*.04*U,-.01*U,(back?-.2:.2)*U,b);t.rotation.x=back?PI/2:-PI/2;}}}
@@ -2398,16 +2405,21 @@ const MYTH={
   beast:'b_aguara',len:1.95,ts:{walk:1.4,run:1.15},tex:()=>peloTex('aguara',{base:0xc8642c,dark:0x7a3814,hi:0xf0a868,len:7,n:7000,amt:.45,S:512}),legs:[0.36,0x0a0806],
   extra(r,o,U,A){const nk=A(['Neck2','Neck1']);if(nk){const T=peloTex('aguaraMane',{base:0x1a100a,dark:0x050302,hi:0x4a2a16,len:18,n:3500});const m=tm(T);for(let i=0;i<5;i++){const s=part(SPH(1,8,6),m,0,.06*U+i*.02*U,-.03*U+i*.05*U,nk,.07*U,.09*U,.05*U);s.rotation.x=-.5+i*.1;}}
     const hd=A(['Head']);if(hd)for(const s of[-1,1]){const e=part(CONE(.045*U,.17*U,5),tm(peloTex('aguaraEar',{base:0x8a3a16,dark:0x2a1008,hi:0xd07a40,len:8,n:1500})),.07*U*s,.11*U,-.02*U,hd);e.rotation.z=-.35*s;e.rotation.x=-.25;}}},
- taitetu:{ficha:'Taitetu (pecarí de collar): cerdo de monte gris, pelaje áspero y una franja clara en el cuello.',beast:'b_taitetu',len:1.3,ts:{walk:.7,run:.85},tex:()=>peloTex('taitetu',{base:0x9a8a78,dark:0x3a3028,hi:0xe0d4c4,len:9,n:6000,amt:.5,S:512}),
-  extra(r,o,U,A){const nk=A(['Boar_Neck']);if(nk){const c=part(gcc('collar',()=>new THREE.TorusGeometry(1,.22,8,20)),tm(peloTex('taitetuC',{base:0xd8d0c0,dark:0x8a8070,hi:0xfff8e8,len:7,n:1500})),0,0,.02*U,nk,.19*U,.17*U,.1*U);c.rotation.x=PI/2;}}},
+ taitetu:{ficha:'Taitetu (pecarí de collar): cerdo de monte gris, pelaje áspero y una franja clara en el cuello.',beast:'b_taitetu',len:1.55,ts:{walk:.7,run:.85},eye:0xffb060,tex:()=>peloTex('taitetu',{base:0xa89888,dark:0x4a4038,hi:0xeee4d4,len:11,n:7000,amt:.5,S:512}),
+  extra(r,o,U,A){const nk=A(['Boar_Neck']);const T=tm(peloTex('taitetuM',{base:0x2a2420,dark:0x0a0806,hi:0x8a7a6a,len:16,n:3500}));
+    if(nk){const c=part(gcc('collar',()=>new THREE.TorusGeometry(1,.2,8,20)),tm(peloTex('taitetuC',{base:0xe8e0d0,dark:0x9a9080,hi:0xffffff,len:7,n:1500})),0,.0,.0,nk,.2*U,.18*U,.11*U);c.rotation.x=PI/2;for(let i=0;i<4;i++){const b=part(CONE(.03*U,.16*U,5),T,(i-1.5)*.03*U,.13*U,-.02*U+i*.03*U,nk);b.rotation.x=-.5;}
+      for(let i=0;i<6;i++){const c2=part(CONE(.028*U,.15*U,5),T,(Math.random()-.5)*.05*U,.12*U-i*.01*U,-.1*U-i*.09*U,nk);c2.rotation.x=-.45;}}
+    const hd=A(['Boar_Head']);if(hd){for(const s of[-1,1]){const t=part(CONE(.018*U,.09*U,5),mat(0xf2ead8),.06*s*U,-.08*U,.2*U,hd);t.rotation.x=PI-.5;t.rotation.z=s*.3;}for(let i=0;i<3;i++){const b=part(CONE(.025*U,.13*U,5),T,(i-1)*.035*U,.12*U,-.02*U,hd);b.rotation.x=-.6;}}}},
  jaguarete:{ficha:'Jaguareté: el jaguar, dorado con rosetas negras, cabeza ancha y cola larga.',beast:'b_jaguarete',len:2.35,ts:{walk:1.9,run:3.2}},
  luison:{ficha:'Luisón, séptimo hijo de Tau y Kerana: hombre-perro de los cementerios, flaco, negro y de ojos rojos; señor de la muerte.',
-  beast:'b_luison',len:2.45,ts:{walk:1.4,run:1.15},eye:0xff2a12,tex:()=>peloTex('luison',{base:0x1a1416,dark:0x050304,hi:0x5a4a50,len:16,n:3600}),aura:0x3a6a2a,auraS:2.6,
+  beast:'b_luison',len:2.6,ts:{walk:1.4,run:1.15},eye:0xff2a12,tex:()=>peloTex('luison',{base:0x1e181a,dark:0x060405,hi:0x6a5a60,len:18,n:5000,amt:.8,S:512}),aura:0x3a6a2a,auraS:2.8,sparkle:0x6aff6a,
   extra(r,o,U,A){const T=tm(peloTex('luisonB',{base:0x0a0808,dark:0x020202,hi:0x3a3036,len:14}));const sp=[['Neck1',0],['Neck2',0],['Neck3',0]];for(const [bn] of sp){const b=A([bn]);if(!b)continue;for(let i=0;i<3;i++){const c=part(CONE(.025*U,.14*U,5),T,(i-1)*.03*U,.1*U,0,b);c.rotation.x=-.6;}}
     const hd=A(['Head']);if(hd){for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.015*U,.07*U,4),mat(0xe8e0c8),(.05+k*.03)*s*U,-.09*U,(.22+k*.04)*U,hd);t.rotation.x=PI;}
       const bm=mat(0xd8d0b8,{roughness:.6});part(SPH(1,10,8),bm,0,-.02*U,.2*U,hd,.07*U,.05*U,.12*U);/* hocico descarnado */
       for(const s of[-1,1]){const r=part(SPH(1,8,6),mat(0x050303),.06*s*U,.0,.1*U,hd,.035*U,.035*U,.02*U);}}
-    const nk=A(['Neck1','Neck2']);if(nk){const bm=mat(0xd8d0b8,{roughness:.6});for(let i=0;i<7;i++){const a=(i/6-.5)*PI*1.3;const bn=part(limbGeo(.08*U,.012*U,.01*U,.3),bm,Math.sin(a)*.13*U,-.02*U-Math.cos(a)*.05*U,Math.cos(a)*.13*U*.3,nk);bn.rotation.z=Math.sin(a)*.5;}}}},
+    const nk=A(['Neck1','Neck2']);if(nk){const bm=mat(0xd8d0b8,{roughness:.6});for(let i=0;i<7;i++){const a=(i/6-.5)*PI*1.3;const bn=part(limbGeo(.08*U,.012*U,.01*U,.3),bm,Math.sin(a)*.13*U,-.02*U-Math.cos(a)*.05*U,Math.cos(a)*.13*U*.3,nk);bn.rotation.z=Math.sin(a)*.5;}}
+    const sp3=A(['Neck3']);if(sp3){const bm=mat(0xc8c0a8,{roughness:.7});for(let i=0;i<4;i++){const rb=part(gcc('rib',()=>new THREE.TorusGeometry(1,.09,6,14,PI*1.1)),bm,0,-.02*U,-.22*U-i*.1*U,sp3,.2*U,.17*U,.1*U);rb.rotation.set(PI/2,0,PI*.95);}}
+    const hd2=A(['Head']);if(hd2){const dm=new MSM({color:0x9aff8a,transparent:true,opacity:.7,emissive:0x3aff3a,emissiveIntensity:.5});for(let k=0;k<3;k++){part(SPH(1,6,5),dm,(k-1)*.03*U,-.15*U-k*.02*U,(.26-k*.02)*U,hd2,.012*U,.03*U,.012*U);}}}},
  teju:{ficha:'Teju Jagua, primogénito: lagarto enorme con siete cabezas de perro y ojos de fuego; señor de las cuevas y los frutos. Manso a pesar de su aspecto.',
   beast:'b_teju',len:3.6,ts:{walk:1.3,run:1.5},tex:()=>scalesTex('tejuS',{base:0x4a6a2a,dark:0x1a2a10,hi:0xa8c860,size:9,belly:0xc8b060,rep:1}),
   extra(r,o,U,A){const nk=A(['Neck','Spine2']);if(!nk)return;const fur=tm(peloTex('tejuDog',{base:0x3a2a1a,dark:0x120a06,hi:0x8a6a40,len:10})),dark=tm(peloTex('tejuDogD',{base:0x1a1008,dark:0x060302,hi:0x4a3020,len:8}));
@@ -2441,7 +2453,13 @@ const MYTH={
   snake:{head:'horned',skin:()=>scalesTex('monaiS',{base:0x3a2a7a,dark:0x120a2a,hi:0x9a7aff,size:12,belly:0xe8c870,spots:.08}),eye:0xffd23a,horn:[0xffd23a,0xff5a2a],crest:0xc84aff}},
  kaajary:{ficha:"Ka'a Jarýi: la dueña de la yerba mate, mujer de ojos verdes que cuida los yerbales y castiga a quien los maltrata.",
   human:{body:'f_dress',tex:()=>recolorTex('skeletal_celt_dress_female_01_01','kaaDress',tintRecolor(0x3a9a4a,.85,{gain:1.5})),props:['hd_f_bou'],team:0x2a6a2a,scale:1,anim:'w',
-   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const g=new THREE.Group();g.position.y=A.top-.06*U;hp.add(g);const lm=mtl(0x3a8a2a,'cloth');for(let i=0;i<12;i++){const a=i/12*TAU;const l=part(SPH(1,6,4),lm,Math.sin(a)*.17*U,Math.cos(i*2)*.01*U,Math.cos(a)*.17*U,g,.06*U,.015*U,.025*U);l.rotation.y=-a;l.rotation.x=-.5;}}},
+   extra(r,body,U,A){const lm=new MSM({color:0x3a9a3a,roughness:.85,side:THREE.DoubleSide});const lm2=new MSM({color:0x2a6a2a,roughness:.9,side:THREE.DoubleSide});
+    const leaf=(parent,x,y,z,L,rx,ry,rz,m)=>{const o=featherMesh(m||lm,L,L*.42);o.position.set(x,y,z);o.rotation.set(rx,ry,rz,'YXZ');parent.add(o);return o;};
+    const hp=A(['prop-helmet','helmet','head']);if(hp){for(let i=0;i<14;i++){const a=i/14*TAU;leaf(hp,Math.sin(a)*.12*U,A.top-.07*U,Math.cos(a)*.12*U,.13*U,-.9,a+PI,0,i%2?lm:lm2);}
+      part(SPH(1,8,6),new THREE.MeshBasicMaterial({color:0xfff0a0}),0,A.top-.02*U,.12*U,hp,.025*U,.02*U,.025*U);}
+    for(const s of[-1,1]){const sh=A([s<0?'arm_L':'arm_R']);if(sh)for(let i=0;i<7;i++){const a=(i/6-.5)*2.6;leaf(sh,s*.05*U+Math.sin(a)*.06*U,.06*U-Math.abs(a)*.03*U,Math.cos(a)*.08*U,.15*U,-.4,a+PI,s*1.2,i%2?lm:lm2);}
+      const fa=limbAnchor(body,s<0?'forearm_L':'forearm_R',s<0?'hand_L':'hand_R');if(fa){const vm=new MSM({color:0x3a6a2a,roughness:.9});for(let k=0;k<3;k++){const v=part(gcc('vine',()=>new THREE.TorusGeometry(1,.14,6,16)),vm,0,-fa.userData.len*(.25+k*.25),0,fa,.055*U,.055*U,.055*U);v.rotation.x=PI/2+.3*k;}}}
+    const w=weaponAt(body,U);if(w){const bm=mat(0x5a3a1a,{roughness:.9});shaftZ(.55*U,.012*U,.009*U,bm,w,-.1*U).rotation.x=PI/2;for(let i=0;i<8;i++){const l=featherMesh(i%2?lm:lm2,.09*U,.04*U);l.position.set((i%2?1:-1)*.02*U,0,-.15*U-i*.05*U);l.rotation.set(-PI/2,(i%2?1:-1)*.9,0,'YXZ');w.add(l);}}},
    aura:0x6aff7a,auraS:1.8,ghost:null,sparkle:0x9aff8a}},
  mboijagua:{ficha:'Mbói Jagua: serpiente de los esteros con cabeza de perro-jaguar, piel manchada y ladrido ronco; ronda los caminos al anochecer.',
   snake:{head:'jaguar',skin:()=>scalesTex('mboijS',{base:0xc89a3a,dark:0x3a2008,hi:0xf0d080,size:10,belly:0xf0e0b0,spots:.35}),eye:0xff8a2a}},
@@ -2452,12 +2470,20 @@ const MYTH={
     const w=weaponAt(body,U);if(w){const gm=mat(0xffd23a,{metalness:.9,roughness:.2});regMetal(gm);shaftZ(.55*U,.012*U,.012*U,gm,w,-.1*U);const tip=glowSprite(0xffe68a,.16*U,.95);tip.position.z=.47*U;w.add(tip);part(SPH(1,8,6),gm,0,0,.45*U,w,.028*U);}},
    aura:0xffe08a,auraS:2.4,tint:[0xffd060,.25],sparkle:0xffe68a}},
  ypo:{ficha:'Ypo: espíritu de las aguas, forma de hombre hecho de río, azul y transparente, que arrastra a los que nadan de noche.',
-  human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','ypoT',tintRecolor(0x3ab0ff,.9,{gain:1.8})),props:['hd_x_lime'],team:0x2a8ad0,scale:1,anim:'w',ghost:0x4ad8ff,op:.85,fly:.25,aura:0x5ae0ff,auraS:2,sparkle:0x8fe6ff}},
+  human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','ypoT',tintRecolor(0x3ab0ff,.9,{gain:1.8})),props:['hd_x_lime'],team:0x2a8ad0,scale:1,anim:'w',ghost:0x4ad8ff,op:.85,fly:.25,aura:0x5ae0ff,auraS:2,sparkle:0x8fe6ff,eyeGlow:0xdfffff,
+   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const rm=new MSM({color:0x2a6a3a,roughness:.9});rm.userData.noGhost=1;for(let i=0;i<9;i++){const a=i/9*TAU;const rd=part(limbGeo((.18+.08*Math.sin(i*2.3))*U,.012*U,.004*U,0),rm,Math.cos(a)*.1*U,A.top-.08*U,Math.sin(a)*.1*U,hp);rd.rotation.set(PI+Math.sin(a)*.35,0,-Math.cos(a)*.35);}
+      part(SPH(1,8,6),new THREE.MeshBasicMaterial({color:0xffe0f0}),.06*U,A.top-.04*U,.08*U,hp,.03*U,.02*U,.03*U);}
+    const g=new THREE.Group();g.position.y=1.0;for(let i=0;i<6;i++){const a=i/6*TAU;part(SPH(1,8,6),new MSM({color:0x9ae8ff,transparent:true,opacity:.75,roughness:.1,emissive:0x2a8ad0,emissiveIntensity:.5}),Math.cos(a)*.55,Math.sin(a*2)*.25,Math.sin(a)*.55,g,.04,.06,.04);}g.userData.orbit=1;r.orbitG=g;}}},
  yaguaru:{ficha:'Yaguarú: fiera de los lagos, como un jaguar azul de agua con aletas en el lomo; vuelca canoas y arrastra al fondo.',beast:'b_jaguarete',len:2.6,ts:{walk:1.9,run:3.2},eye:0x3af0ff,tint:[0x1a3a6a,.6],aura:0x4ad8ff,auraS:2.2,
   extra(r,o,U,A){const m=new MSM({color:0x2a6aaa,emissive:0x1a4a8a,emissiveIntensity:.6,transparent:true,opacity:.85,side:THREE.DoubleSide,roughness:.3});for(const bn of['spine_1','spine_2','neck_1']){const b=A([bn]);if(!b)continue;for(let i=0;i<3;i++){const f=part(CONE(.035*U,.16*U,4),m,0,.12*U,(i-1)*.08*U,b);f.rotation.x=-.4;f.scale.z=.3;}}
     for(const m2 of r.mats){crackGlow(m2,0x4ad8ff,.6,2.5);}}},
  pora:{ficha:'Póra: aparición, alma que vaga de noche como una sombra blanca y helada; anuncia desgracias.',
-  human:{body:'m_robe',tex:()=>recolorTex('skeletal_arab_robes_02_01','poraT',tintRecolor(0xe8f0ff,.6,{gain:1.9})),props:['hd_x_su3'],team:0xdfe8ff,scale:1.05,anim:'n',ghost:0xdfe8ff,op:.62,fly:.45,aura:0xdfe8ff,auraS:2.2,sparkle:0xffffff}},
+  human:{body:'m_robe',tex:()=>recolorTex('skeletal_arab_robes_02_01','poraT',tintRecolor(0xe8f0ff,.6,{gain:1.9})),props:['hd_x_su3'],team:0xdfe8ff,scale:1.05,anim:'n',ghost:0xdfe8ff,op:.62,fly:.45,aura:0xdfe8ff,auraS:2.2,sparkle:0xffffff,eyeGlow:0xffffff,
+   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const hm=new MSM({color:0xe8ecf4,roughness:.95,side:THREE.DoubleSide,transparent:true,opacity:.85,depthWrite:false});part(gcc('shroud',()=>new THREE.SphereGeometry(1,16,12,0,TAU,0,PI*.75)),hm,0,A.top-.18*U,-.03*U,hp,.17*U,.2*U,.19*U);
+      const veil=tatteredCape(U,0xe8ecf4,{op:.7});veil.scale.set(1.6,.6,1);veil.position.set(0,A.top-.22*U,-.02*U);hp.add(veil);}
+    const bk=A(['prop-back','chest']);if(bk){const c=tatteredCape(U,0xdfe8ff,{op:.6});c.position.set(0,.12*U,-.06*U);bk.add(c);}
+    const g=new THREE.Group();g.position.y=1.0;for(let i=0;i<5;i++){const a=i/5*TAU;part(gcc('candle',()=>new THREE.CylinderGeometry(.5,.5,1,8)),mat(0xf0e8d8,{roughness:.8}),Math.cos(a)*.75,Math.sin(a*3)*.1,Math.sin(a)*.75,g,.035,.14,.035);const f=glowSprite(0xffc070,.22,.9);f.position.set(Math.cos(a)*.75,Math.sin(a*3)*.1+.1,Math.sin(a)*.75);g.add(f);}
+    g.userData.orbit=1;r.orbitG=g;}}},
  tejuguasu:{ficha:'Teju Guasu: lagarto gigante del Chaco, oscuro, con una cresta de púas en el lomo y cola como látigo.',beast:'b_teju',len:5.2,ts:{walk:1.3,run:1.5},eye:0xffd23a,tex:()=>scalesTex('tejuG',{base:0x2a3a1a,dark:0x0a1006,hi:0x7a9a3a,size:8,belly:0x8a8a50,stripes:8,stripeC:0x060a04}),
   extra(r,o,U,A){const m=tm(scalesTex('tejuGs',{base:0x1a1a10,dark:0x050503,hi:0x5a5a30,size:6}));for(const bn of['Spine1','Spine2','Neck','Tail1','Tail2']){const b=A([bn]);if(!b)continue;for(let i=0;i<3;i++){const c=part(CONE(.035*U,.2*U,4),m,0,.11*U,(i-1)*.09*U,b);c.rotation.x=-.5;}}}},
  kuarahyjara:{ficha:'Kuarahy Jára: el dueño del sol, guerrero dorado de piel ardiente con un gran tocado solar; aparece al mediodía y ciega a quien lo mira.',
@@ -2466,7 +2492,11 @@ const MYTH={
       const disc=part(gcc('sunDisc',()=>new THREE.CylinderGeometry(1,1,.06,32)),gm,0,.1*U,-.05*U,g,.3*U,U*.1,.3*U);disc.rotation.x=PI/2+.2;for(let i=0;i<12;i++){const a=i/12*TAU;const ray=part(CONE(.03*U,.16*U,4),gm,Math.sin(a)*.33*U,.1*U+Math.cos(a)*.33*U*Math.cos(.2),-.05*U-Math.cos(a)*.33*U*Math.sin(.2),g);ray.rotation.z=-a;ray.rotation.x=.2;}
       const gl=glowSprite(0xffd060,.9*U,.75);gl.position.set(0,.1*U,-.06*U);g.add(gl);}}}},
  soldado:{ficha:'Alma de Soldado: fantasma de un combatiente caído en las guerras del Paraguay, con casco y sable, que sigue montando guardia.',
-  human:{body:'m_tunic',tex:'skeletal_imp_lorica_segmentata_02_01',props:['hd_x_veteran','kh2','ks2','kd1'],team:0x2a4a8a,scale:1.05,anim:'k',ghost:0x8ab0ff,op:.8,fly:.2,aura:0x6a8aff,auraS:2,sparkle:0x9ab8ff}},
+  human:{body:'m_tunic',tex:'skeletal_imp_lorica_segmentata_02_01',props:['hd_x_veteran','kh2','ks2','kd1'],team:0x2a4a8a,scale:1.05,anim:'k',ghost:0x8ab0ff,op:.8,fly:.2,aura:0x6a8aff,auraS:2,sparkle:0x9ab8ff,
+   extra(r,body,U,A){const bk=A(['prop-back','chest']);if(bk){const pm=mat(0x3a2a18,{roughness:.8});part(limbGeo(1.5*U,.014*U,.012*U,0),pm,0,.9*U,-.08*U,bk);const fm=new MSM({color:0x8a1a2a,roughness:.9,side:THREE.DoubleSide,transparent:true,opacity:.85,depthWrite:false});
+      const geo=new THREE.PlaneGeometry(.42*U,.55*U,5,6);geo.translate(.21*U,-.27*U,0);const pa=geo.attributes.position;for(let i=0;i<pa.count;i++){const x=pa.getX(i),y=pa.getY(i);pa.setZ(i,Math.sin(x*14/U)*.02*U);if(x>.3*U)pa.setY(i,y+Math.sin(y*20/U)*.05*U*(x-.3*U)/(.12*U));}geo.computeVertexNormals();
+      const flag=new THREE.Mesh(geo,fm);flag.position.set(0,.9*U,-.09*U);bk.add(flag);part(gcc('fstripe',()=>new THREE.PlaneGeometry(1,1)),new THREE.MeshBasicMaterial({color:0xe8e0d0,side:THREE.DoubleSide,transparent:true,opacity:.7}),.2*U,.72*U,-.085*U,bk,.38*U,.06*U,1);}
+    const hip=A(['hip']);if(hip){const g=new THREE.Group();g.position.set(.12*U,-.02*U,.05*U);hip.add(g);chain(g,U,5,0x7a8aa0);}}}},
  malavision:{ficha:'Mala Visión: mujer alta de blanco, con el pelo largo y negro tapándole la cara, que grita en el monte y mata al que le contesta tres veces; castiga a los infieles.',
   human:{body:'f_dress',tex:()=>recolorTex('skeletal_celt_dress_female_02_01','mvDress',tintRecolor(0xf0f0f4,.4,{gain:1.9})),props:['hd_f_short'],team:0xe8e8f0,scale:1.25,bulk:[.92,1,.92],anim:'n',ghost:0xd8d8ff,op:.88,fly:.3,aura:0xff3a2a,auraS:2.2,eyeGlow:0xff2a12,
    extra(r,body,U,A){const hd=A(['prop-helmet','helmet','head']);if(!hd)return;const hm=new MSM({color:0x050408,roughness:.95});hm.userData.noGhost=1;const T=peloTex('mvHair',{base:0x080608,dark:0x000000,hi:0x2a2230,len:26,n:2500});matTexture(hm,T,{col:0xffffff});
@@ -2480,7 +2510,10 @@ const MYTH={
     const t=weaponAt(body,U);if(t){const tm2=mat(0x2a1a14,{metalness:.7,roughness:.35});regMetal(tm2);shaftZ(1.5*U,.028*U,.022*U,tm2,t,.3*U).rotation.x=PI/2;for(const dx of[-1,0,1]){const pr=part(CONE(.028*U,.24*U,5),tm2,dx*.08*U,0,-1.3*U,t);pr.rotation.x=-PI/2;if(dx){const b=shaftZ(.14*U,.02*U,.02*U,tm2,t,-1.06*U);b.rotation.x=PI/2;b.position.x=dx*.08*U;}}
       const gl=glowSprite(0xff6a1a,.35*U,.8);gl.position.z=-1.3*U;t.add(gl);}}}},
  siervo:{ficha:'Siervo de Kerana: espectro violeta que sirve a la madre de los siete, con báculo y túnica rasgada.',
-  human:{body:'m_robe',tex:'skeletal_kush_robes_healer_01',props:['hd_xf_priest','ws1'],team:0x6a2aaa,scale:1.1,anim:'w',ghost:0xb06aff,op:.85,fly:.2,aura:0xa04aff,auraS:2.2,sparkle:0xd0a0ff}},
+  human:{body:'m_robe',tex:'skeletal_kush_robes_healer_01',props:['hd_xf_priest','ws1'],team:0x6a2aaa,scale:1.1,anim:'w',ghost:0xb06aff,op:.85,fly:.2,aura:0xa04aff,auraS:2.2,sparkle:0xd0a0ff,eyeGlow:0xd08aff,
+   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const hm=new MSM({color:0x2a0a3a,roughness:.95,side:THREE.DoubleSide});part(gcc('hood2',()=>new THREE.SphereGeometry(1,16,12,0,TAU,0,PI*.7)),hm,0,A.top-.17*U,-.04*U,hp,.165*U,.19*U,.18*U);}
+    const bk=A(['prop-back','chest']);if(bk){const c=tatteredCape(U,0x2a0a3a,{op:.8});c.position.set(0,.12*U,-.06*U);bk.add(c);}
+    const g=new THREE.Group();g.position.y=1.1;for(let i=0;i<3;i++){const a=i/3*TAU;const o=part(SPH(1,10,8),fGem(0xb04aff),Math.cos(a)*.6,0,Math.sin(a)*.6,g,.06);const sp=glowSprite(0xb04aff,.45,.7);sp.position.copy(o.position);g.add(sp);}g.userData.orbit=1;r.orbitG=g;}}},
  guardian:{ficha:'Guardián de Kerana: coloso de piedra encantada con armadura de escamas, escudo y espada, que custodia el altar de Kerana.',
   human:{body:'m_tunic',tex:'skeletal_cart_scale_01_01',props:['hd_x_veteran','kh4','ks4','kd4','pad_l','pad_r'],team:0x4a1a7a,scale:1.45,bulk:[1.15,1,1.15],anim:'k',tint:[0x3a2a4a,.55],crack:[0xb04aff,.8,2.8],aura:0xa04aff,auraS:3}},
  tau:{ficha:'Tau: el espíritu del mal, que tomó forma de hombre hermoso para raptar a Kerana; alto, de piel oscura como la noche, corona de plumas negras y fuego violeta.',
@@ -2496,7 +2529,12 @@ const MYTH={
     const hip=A(['hip']);if(hip){const t=demonTail(U,0x1a0a06);t.scale.setScalar(.8);t.position.set(0,-.02*U,-.08*U);hip.add(t);}
     const t=weaponAt(body,U);if(t){const tm2=mat(0x1a0a06,{roughness:.5});shaftZ(1.6*U,.04*U,.03*U,tm2,t,.3*U).rotation.x=PI/2;const hd=part(SPH(1,8,6),tm2,0,0,-1.35*U,t,.12*U,.12*U,.16*U);crackGlow(tm2,0xff5a0a,1.6,2);const gl=glowSprite(0xff6a1a,.55*U,.8);gl.position.z=-1.35*U;t.add(gl);}}}},
  alma:{ficha:'Alma en Pena: espectro azul de un viajero perdido, con túnica y espada vieja, condenado a vagar hasta que alguien rece por él.',
-  human:{body:'m_robe',tex:'skeletal_arab_robes_01_01',props:['hd_x_su3','ks1'],team:0x2a6a8a,scale:1.05,anim:'n',ghost:0x8fe6ff,op:.85,fly:.35,aura:0x5ad8ff,auraS:1.9,sparkle:0x8fe6ff}}
+  human:{body:'m_robe',tex:'skeletal_arab_robes_01_01',props:['hd_x_su3'],team:0x2a6a8a,scale:1.05,anim:'n',ghost:0x8fe6ff,op:.85,fly:.35,aura:0x5ad8ff,auraS:1.9,sparkle:0x8fe6ff,
+   extra(r,body,U,A){for(const s of['L','R']){const h=A(['hand_'+s]);if(h){const g=new THREE.Group();g.position.y=-.02*U;h.add(g);chain(g,U,7,0x8aa0b8);}}
+    const w=weaponAt(body,U);if(w){const lm=mat(0x3a4a5a,{metalness:.6,roughness:.4});part(gcc('lantB',()=>new THREE.CylinderGeometry(.5,.6,1,8,1,true)),lm,0,0,-.2*U,w,.07*U,.14*U,.07*U).material.side=THREE.DoubleSide;part(gcc('lantT',()=>new THREE.ConeGeometry(.7,.4,8)),lm,0,.08*U,-.2*U,w,.08*U,.08*U,.08*U);
+      const fl=glowSprite(0x6ad8ff,.4*U,.95);fl.position.set(0,0,-.2*U);w.add(fl);part(SPH(1,8,6),new THREE.MeshBasicMaterial({color:0xdff6ff}),0,0,-.2*U,w,.03*U);}
+    const bk=A(['prop-back','chest']);if(bk){const c=tatteredCape(U,0x1a3a4a,{op:.75});c.position.set(0,.12*U,-.06*U);bk.add(c);}
+    wisps(r,0x8fe6ff,4,.7,1.2,.3);}}}
 };
 /* escorpión: ya tiene modelo propio, queda como está */
 /* ---- armado ---- */
@@ -2537,7 +2575,7 @@ function mythHuman(def,gold,M){const B=M.human;const files=['anims','body_'+B.bo
   if(B.bulk)r0.model.scale.set(k*B.bulk[0],k*B.bulk[1],k*B.bulk[2]);
   const g=new THREE.Group(),rig=new THREE.Group();g.add(rig);rig.add(r0.model);const sc=(B.scale||1)/(def.scale||1);r0.model.scale.multiplyScalar(sc);
   const r={g,rig,mats,kind:'glb',B:{ts:{walk:1.2,run:1.1},fly:(B.fly||0)/(def.scale||1)},rad:.55*sc*(B.bulk?B.bulk[0]:1),hgt:1.9*sc,ghost:!!B.fly||B.ghost!=null,faceMats:r0.faceMats};
-  oadActs(r,r0.body,MYTH_ANIM[B.anim||'k']);oadPlay(r,'idle',0);r.mixer.update(Math.random()*2);r.wings=r0.wings||null;
+  oadActs(r,r0.body,MYTH_ANIM[B.anim||'k']);oadPlay(r,'idle',0);r.mixer.update(Math.random()*2);r.wings=r0.wings||null;if(r0.orbitG){r.orbit=r0.orbitG;rig.add(r0.orbitG);}
   if(B.eyeGlow){const hd=boneOf(body,['head']);if(hd){r.eyeBone=hd;r.eye=glowSprite(B.eyeGlow,.28,.9);rig.add(r.eye);}}
   if(B.aura&&!gold){const a=glowSprite(B.aura,B.auraS||2,.22);a.position.y=r.hgt*.45;rig.add(a);}
   r.sparkle=B.sparkle||null;return mythFinish(r,{},gold);}
@@ -2759,7 +2797,7 @@ function forgeGarment(S,U,kind){const sh=new THREE.Shape();if(kind==='armor'){sh
 
 function oadUpgradeMobs(){if(!zoneG)return;for(const e of enemies){if(e.kind==='glb')continue;const m=oadMob(e.def,e.golden);if(!m)continue;
   const scl=e.def.scale*(e.golden?1.15:1);m.g.scale.setScalar(scl);m.g.position.copy(e.g.position);m.g.rotation.y=e.g.rotation.y;m.g.visible=e.g.visible;m.g.traverse(o=>{if(o.isMesh)o.castShadow=true;});addBlob(m.g,m.rad*2.7);
-  zoneG.remove(e.g);disposeTree(e.g);zoneG.add(m.g);Object.assign(e,{g:m.g,rig:m.rig,mats:m.mats,kind:'glb',mixer:m.mixer,acts:m.acts,cur:m.cur,curK:m.curK,B:m.B,eye:m.eye,eyeBone:m.eyeBone,horn:m.horn,ghost:m.ghost,sparkle:m.sparkle||null,wings:m.wings||null,rad:m.rad*scl,hgt:m.hgt*scl});e.p=m.g.position;
+  zoneG.remove(e.g);disposeTree(e.g);zoneG.add(m.g);Object.assign(e,{g:m.g,rig:m.rig,mats:m.mats,kind:'glb',mixer:m.mixer,acts:m.acts,cur:m.cur,curK:m.curK,B:m.B,eye:m.eye,eyeBone:m.eyeBone,horn:m.horn,ghost:m.ghost,sparkle:m.sparkle||null,wings:m.wings||null,orbit:m.orbit||null,rad:m.rad*scl,hgt:m.hgt*scl});e.p=m.g.position;
   if(e.dead){e.g.visible=false;}}}
 function oadMobAnim(e,dt,sp){const lk=e.lunge>0?Math.sin((1-e.lunge/.35)*PI):0;
   if(!e.mixer){const w=Math.min(1,sp/2.5);e.rig.position.y=Math.abs(Math.sin(e.phase))*.07*w;e.rig.rotation.x=-lk*.14+Math.sin(T*1.3+e.hx)*.02;e.rig.position.z=lk*.55;return;}
@@ -2769,7 +2807,7 @@ function oadMobAnim(e,dt,sp){const lk=e.lunge>0?Math.sin((1-e.lunge/.35)*PI):0;
   else oadPlay(e,'idle',.3,1);
   /* LOD de animación: los mobs lejanos o fuera de cámara se animan con menos frecuencia */
   {const dd=Math.hypot(e.p.x-P.x,e.p.z-P.z);e.mAcc=(e.mAcc||0)+dt;const step=P.target===e||dd<22?0:dd<40?.05:.1;if(e.mAcc>=step&&(dd<26||inView(e.p))){e.mixer.update(e.mAcc);e.mAcc=0;}}
-  if(e.ghost)e.rig.position.y=(e.B&&e.B.fly?e.B.fly:.15)+Math.sin(T*2+e.hx)*.14;oadEye(e);if(e.sparkle)mythSparkle(e);if(e.wings)for(const w of e.wings.children){const s=w.userData.side||1;w.rotation.y=s*(.5+Math.sin(T*2.4+e.hx)*.4);w.rotation.z=s*(.3+Math.cos(T*2.4+e.hx)*.12);}}
+  if(e.ghost)e.rig.position.y=(e.B&&e.B.fly?e.B.fly:.15)+Math.sin(T*2+e.hx)*.14;oadEye(e);if(e.sparkle)mythSparkle(e);if(e.orbit){e.orbit.rotation.y+=dt*1.1;e.orbit.position.y=(e.orbit.userData.y0!=null?e.orbit.userData.y0:(e.orbit.userData.y0=e.orbit.position.y))+Math.sin(T*1.7+e.hx)*.08;}if(e.wings)for(const w of e.wings.children){const s=w.userData.side||1;w.rotation.y=s*(.5+Math.sin(T*2.4+e.hx)*.4);w.rotation.z=s*(.3+Math.cos(T*2.4+e.hx)*.12);}}
 const _frus=new THREE.Frustum(),_pm=new THREE.Matrix4(),_vs=new THREE.Sphere(new THREE.Vector3(),3);let _frusF=-1;
 function inView(p){if(_frusF!==T){_frusF=T;_pm.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_frus.setFromProjectionMatrix(_pm);}_vs.center.set(p.x,p.y+1,p.z);return _frus.intersectsSphere(_vs);}
 function oadMobDead(e,dt,k){if(e.mixer){if(e.curK!=='death')oadPlay(e,'death',.1,1,true);e.mixer.update(dt);}else e.rig.rotation.z=smooth(0,1,k)*PI/2;if(e.eye)e.eye.visible=false;}
