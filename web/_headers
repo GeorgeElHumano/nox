@@ -1,0 +1,5 @@
+# Caché: los modelos y las imágenes casi no cambian, así que el celular no los vuelve a bajar en cada visita
+/jugar/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

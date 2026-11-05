@@ -1,0 +1,88 @@
+<section class="vw view" data-view="mitologia" hidden>
+  <div class="wrap">
+    <div class="myth">
+      <div class="myth-text">
+        <span class="kicker">Por qué existe NOX</span>
+        <h2>Nuestra mitología, para jugarla</h2>
+        <p>Crecimos escuchando del Pombero, del Jasy Jateré y del Luisón, pero casi nunca los vimos en un juego. NOX nace de esas ganas: que las leyendas que nos contaron las abuelas se puedan recorrer, pelear y descubrir, con la misma dedicación que cualquier mundo de fantasía de afuera, y desde Paraguay.</p>
+        <p>Por eso cada criatura está hecha como la describe el mito y no como un monstruo genérico; por eso los mapas son lugares reales del país, los sets y las técnicas llevan nombres en guaraní, y los personajes te saludan con un <i>mba'éichapa</i>. Jugar NOX es una manera interactiva de acercarse a nuestra cultura, y de que los más chicos la conozcan jugando.</p>
+        <p class="quote">Cada bestia que cae es una página más de una crónica que es nuestra.</p>
+        <div class="cta"><button class="btn btn-gold" data-dl>Jugar gratis</button><button class="btn btn-line" data-go="bestiario">Ver el bestiario</button></div>
+      </div>
+      <div class="myth-grid">
+        <button data-go="bestiario/jasyjatere"><img src="img/w/mob_jasyjatere.webp" alt="Jasy Jateré" loading="lazy"><b>Fieles a la leyenda</b>Los siete hijos de Tau y Kerana aparecen con la forma que cuentan los mitos: Teju Jagua con sus siete cabezas de perro, Mbói Tu'i con cabeza de loro, Moñái con sus cuernos, Jasy Jateré con su bastón de oro.</button>
+        <button data-go="mapas/ybytyruzu"><img src="img/w/z_ybytyruzu.webp" alt="Cordillera del Ybytyruzú" loading="lazy"><b>Tierras reales</b>Ypacaraí, Trinidad, el Chaco Boreal, los Esteros del Ñeembucú, el Ybytyruzú, el Monday, el Mbaracayú, Cerro Corá y Bahía Negra, cada uno con su luz y su paisaje.</button>
+        <button data-go="historia"><img src="img/w/z_asuncion.webp" alt="Asunción, la capital del reino" loading="lazy"><b>El guaraní vivo</b>Kuarahy, Jasy, Tupã, Arasy y Ñamandu nombran sets y técnicas. El juego está escrito en el castellano del Paraguay, con la crónica de la Noche Larga que se cuenta a medida que avanzás.</button>
+        <button data-go="bestiario/kurupi"><img src="img/w/mob_kurupi.webp" alt="Kurupí" loading="lazy"><b>Para toda la familia</b>Las leyendas se cuentan con respeto y aptas para todas las edades, para que los chicos puedan conocer de dónde vienen el Kurupí o el Ao Ao mientras juegan.</button>
+      </div>
+    </div>
+    <div class="glos">
+      <div class="row"><h3>Pequeño glosario del reino</h3><input id="glosQ" type="search" placeholder="Buscar una palabra…" aria-label="Buscar en el glosario"></div>
+      <dl id="glos"></dl>
+    </div>
+  </div>
+</section>
+<section class="vw view" data-view="historia" hidden>
+  <div class="wrap">
+    <div class="story">
+      <div class="story-text">
+        <span class="kicker">La crónica</span>
+        <h2>NOX, la Noche Larga</h2>
+        <p>Hubo un tiempo en que el reino del Paraguay vivía bajo la luz de <b>Kuarahy</b>, el sol. Los pueblos caminaban hacia el poniente buscando <b>Yvy Marane'ỹ</b>, la Tierra Sin Mal, donde nadie enferma y nadie muere.</p>
+        <p>Eso se terminó la noche en que <b>Tau</b>, el espíritu del mal, se llevó a <b>Kerana</b>, la hija de Marangatu. Arasy, la madre del cielo, maldijo esa unión, y de ella nacieron siete hijos monstruosos. Cuando nació el séptimo, el sol siguió saliendo pero ya no alumbraba igual. Los escribas de Asunción anotaron lo que pasó con una sola palabra: NOX, la noche.</p>
+        <p class="quote">«Cuando caigan los siete hijos, la luz de Kuarahy va a volver a entrar en la tierra, y se va a abrir otra vez el camino a Yvy Marane'ỹ.»</p>
+        <p>Los libros llaman <b>portadores</b> a los que caminan con luz propia en medio de la noche. Vos sos uno de ellos.</p>
+      </div>
+      <aside class="sons" aria-label="Los siete hijos de Tau y Kerana">
+        <span class="kicker">Los siete hijos de Tau y Kerana</span>
+        <ol id="sons"></ol>
+        <p class="muted" style="font-size:var(--s-1)">Cada uno espera en su tierra, tal como lo cuenta la mitología guaraní. Tocá uno para ver su ficha.</p>
+      </aside>
+    </div>
+    <div class="book" id="book"><nav id="bookNav" aria-label="Capítulos"></nav><div class="page" id="bookPage"></div></div>
+  </div>
+</section>
+<section class="vw view" data-view="razas" hidden>
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">Elegí tu portador</span><h2>Cinco razas</h2><p class="lead">Tocá un retrato para conocer la raza, sus estadísticas y sus técnicas. Al final, un test rápido te dice cuál va con vos.</p></div>
+    <div class="rsel" id="rsel"></div>
+    <div id="razaPanel"></div>
+    <div class="quiz" id="quiz"></div>
+  </div>
+</section>
+<section class="vw view" data-view="sets" hidden>
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">La forja</span><h2>Siete sets por raza</h2><p class="lead">Elegí la raza, tocá una gema para cambiar de set y mové el nivel de +0 a +15 para ver cómo se enciende.</p></div>
+    <div class="chips" id="setTabs" role="tablist" style="margin-bottom:14px"></div>
+    <div id="forge"></div>
+  </div>
+</section>
+<section class="vw view" data-view="alas" hidden>
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">El sello de los que llegaron lejos</span><h2>Alas</h2><p class="lead">Cada raza tiene su propia forma de ala. Elegí la raza y recorré las etapas.</p></div>
+    <div class="chips" id="wingTabs" role="tablist" style="margin-bottom:14px"></div>
+    <div id="wingPanel"></div>
+  </div>
+</section>
+<section class="vw view" data-view="items" hidden>
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">La mesa de botín</span><h2>Ítems</h2></div>
+    <div class="chips" id="itemTabs"></div>
+    <div class="ipanel" id="itemPanel"></div>
+  </div>
+</section>
+<section class="vw view" data-view="mapas" hidden>
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">El reino</span><h2>Diez tierras, de Asunción a Bahía Negra</h2><p class="lead">Tocá un punto del mapa. Los portales se abren a medida que subís de nivel, siguiendo la ruta dorada.</p></div>
+    <div class="mapa"><div class="svgwrap" id="svgwrap"></div><div id="zoneCard"></div></div>
+    <h3 style="margin-top:34px;color:var(--gold-hi)">Eventos</h3>
+    <div class="events" id="events"></div>
+  </div>
+</section>
+<section class="vw view" data-view="bestiario" hidden>
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">Fieles a la mitología guaraní</span><h2>Bestiario</h2><p class="lead">Las 27 criaturas del reino, cada una como la describen las leyendas. Tocá una para abrir su ficha.</p></div>
+    <div class="chips" id="filters" style="margin-bottom:16px"></div>
+    <div class="codex" id="codex"></div>
+  </div>
+</section>

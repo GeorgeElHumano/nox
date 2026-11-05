@@ -19,6 +19,8 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS deliveries(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, oid INTEGER, item TEXT NOT NULL, label TEXT, created INTEGER)`,
   `CREATE TABLE IF NOT EXISTS resets(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, name TEXT, wa TEXT, created INTEGER, status TEXT NOT NULL, handled INTEGER)`,
   `CREATE TABLE IF NOT EXISTS imported(uid TEXT NOT NULL, id TEXT NOT NULL, t INTEGER, PRIMARY KEY(uid,id))`,
+  `CREATE TABLE IF NOT EXISTS downloads(id INTEGER PRIMARY KEY AUTOINCREMENT, plat TEXT NOT NULL, created INTEGER, ua TEXT)`,
+  `CREATE INDEX IF NOT EXISTS dl_created ON downloads(created)`,
   `CREATE INDEX IF NOT EXISTS orders_status ON orders(status)`,
   `CREATE INDEX IF NOT EXISTS orders_uid ON orders(uid)`,
   `CREATE INDEX IF NOT EXISTS deliv_uid ON deliveries(uid)`,
@@ -268,7 +270,40 @@ route('GET', 'game/count', async ({ db }) => {
 
 route('GET', 'game/deliveries', async ({ db, me }) => json({ items: await pendingDeliveries(db, me.id) }), { auth: true });
 
+/* descargas: cada clic en un botón de descarga o de jugar se anota acá */
+const PLATS = new Set(['android', 'windows', 'mac', 'macIntel', 'ios', 'web']);
+route('POST', 'dl/:plat', async ({ db, req, p }) => {
+  if (!PLATS.has(p.plat)) return fail('Plataforma desconocida.');
+  const ua = (req.headers.get('user-agent') || '').slice(0, 160);
+  await db.prepare('INSERT INTO downloads(plat,created,ua) VALUES(?,?,?)').bind(p.plat, now(), ua).run();
+  return new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } });
+});
+
 /* administración */
+let GH = { t: 0, data: null };
+async function githubCounts() {
+  if (GH.data && now() - GH.t < 10 * 60 * 1000) return GH.data;
+  try {
+    const r = await fetch('https://api.github.com/repos/GeorgeElHumano/nox/releases?per_page=30', { headers: { 'user-agent': 'noxparaguay-admin', accept: 'application/vnd.github+json' } });
+    if (!r.ok) throw new Error('github ' + r.status);
+    const rel = await r.json(); const by = {}; let total = 0;
+    for (const x of rel) for (const a of (x.assets || [])) { by[a.name] = (by[a.name] || 0) + (a.download_count || 0); total += a.download_count || 0; }
+    GH = { t: now(), data: { total, by, releases: rel.length, latest: rel[0] ? rel[0].tag_name : null } };
+  } catch (e) { GH = { t: now(), data: { total: 0, by: {}, releases: 0, latest: null, error: String(e && e.message || e) } }; }
+  return GH.data;
+}
+route('GET', 'admin/stats', async ({ db }) => {
+  const d7 = now() - 7 * 864e5, d30 = now() - 30 * 864e5;
+  const u = await db.prepare('SELECT COUNT(*) total, SUM(lastlogin>=?) a7, SUM(lastlogin>=?) a30, SUM(created>=?) n7, SUM(created>=?) n30 FROM users').bind(d7, d30, d7, d30).first();
+  const pl = await db.prepare("SELECT COUNT(*) n FROM players WHERE chars IS NOT NULL AND chars<>'' AND chars<>'[]'").first();
+  const dl = await db.prepare('SELECT COUNT(*) total, SUM(created>=?) d7, SUM(created>=?) d30 FROM downloads').bind(d7, d30).first();
+  const byp = (await db.prepare('SELECT plat, COUNT(*) n FROM downloads GROUP BY plat').all()).results || [];
+  const days = (await db.prepare('SELECT (created/86400000) d, COUNT(*) n FROM downloads WHERE created>=? GROUP BY d ORDER BY d').bind(d30).all()).results || [];
+  const udays = (await db.prepare('SELECT (created/86400000) d, COUNT(*) n FROM users WHERE created>=? GROUP BY d ORDER BY d').bind(d30).all()).results || [];
+  const byPlat = {}; for (const r of byp) byPlat[r.plat] = r.n;
+  return json({ users: { total: u.total || 0, active7: u.a7 || 0, active30: u.a30 || 0, new7: u.n7 || 0, new30: u.n30 || 0, withChars: pl.n || 0 },
+    downloads: { total: dl.total || 0, d7: dl.d7 || 0, d30: dl.d30 || 0, byPlat, days, udays }, github: await githubCounts(), t: now() });
+}, { admin: true });
 route('GET', 'admin/pending', async ({ db }) => {
   const o = await db.prepare("SELECT COUNT(*) n, MAX(created) t FROM orders WHERE status='pendiente'").first();
   const r = await db.prepare("SELECT COUNT(*) n, MAX(created) t FROM resets WHERE status='pendiente'").first();

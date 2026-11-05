@@ -763,7 +763,7 @@ const _setHex=THREE.Color.prototype.setHex;THREE.Color.prototype.setHex=function
 
 /* ================= motor ================= */
 const host=$('#game');
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:!!window.__ALPHA});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));
 renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;let SHF=0;
@@ -1260,7 +1260,7 @@ const MOBS={
  alma:{name:'Alma en Pena',lvl:23,model:'biped',m:{ghost:true,height:1.95,weapon:'sword',eye:0x8ff0ff},scale:1.05,speed:3.4,aggro:10},
  kurupi:{name:'Kurupí',lvl:30,boss:true,model:'biped',m:{goblin:true,height:2.1,weapon:'club',eye:0xffc22a},scale:1.9,speed:3.6,aggro:12},
  teju:{name:'Teju Jagua',lvl:34,model:'lizard',m:{col:0x5f7f36,dark:0x2f3f1a,heads:3,eye:0xff3a1a},scale:1.25,speed:3.8,aggro:10},
- escorpion:{name:'Escorpión del Chaco',lvl:40,model:'scorp',m:{col:0x6a3a1c,dark:0x2a160a,eye:0xff5a2a},scale:1.15,speed:4.2,aggro:10},
+ escorpion:{name:'Escorpión del Chaco',ficha:'Escorpión del Chaco: alacrán gigante de quitina parda, pinzas pesadas y aguijón que gotea veneno; vive bajo los médanos del norte.',lvl:40,model:'scorp',m:{col:0x6a3a1c,dark:0x2a160a,eye:0xff5a2a},scale:1.15,speed:4.2,aggro:10},
  aoao:{name:'Ao Ao',lvl:46,boss:true,model:'quad',m:{len:1.6,h:1.05,leg:.6,skin:'wool',dark:0x3a2a20,ears:'small',snout:.26,tusks:true,wool:true,tail:'stub',eye:0xff2a12,horns:true,headK:1.2},scale:2.1,speed:4,aggro:13},
  mboitui:{name:"Mbói Tu'i",lvl:54,model:'snake',m:{col:0x3e7a3c,belly:0xd8c25a,beak:0xd23a24,head:'parrot',eye:0xffe25a},scale:1.15,speed:3.6,aggro:10},
  pombero:{name:'Pombero',lvl:60,model:'biped',m:{hairy:true,height:1.6,eye:0xffe25a},scale:1.2,speed:4.6,aggro:11},
@@ -1279,7 +1279,7 @@ const MOBS={
  siervo:{name:'Siervo de Kerana',lvl:95,model:'biped',m:{ghost:true,height:1.9,weapon:'sword',eye:0xd07aff},scale:1.1,speed:4.1,aggro:12},
  guardian:{name:'Guardián de Kerana',lvl:98,model:'biped',m:{goblin:true,height:2.3,weapon:'club',eye:0xc07aff},scale:1.35,speed:4,aggro:12},
  tau:{name:'Tau',lvl:105,boss:true,model:'biped',m:{goblin:true,height:2.6,weapon:'club',eye:0xb04aff},scale:2.4,speed:4,aggro:16},
- anaretan:{name:'Añaretã',lvl:60,boss:true,model:'biped',m:{goblin:true,height:2.8,weapon:'club',eye:0xff2a12},scale:3.3,speed:4.2,aggro:60}
+ anaretan:{name:'Añaretã',lvl:60,boss:true,zone:'ev_raid',model:'biped',m:{goblin:true,height:2.8,weapon:'club',eye:0xff2a12},scale:3.3,speed:4.2,aggro:60}
 };
 function mobStats(def,golden){const L=def.lvl;let hp=15+L*10+L*L*.55,dmg=4+L*1.15,df=L*.55,xp=Math.pow(L,1.4)*8;
   if(def.boss){hp*=7;dmg*=1.6;xp*=10;}if(golden){hp*=3;xp*=4;dmg*=1.2;}return{hp:Math.round(hp),dmg,df,xp:Math.round(xp)};}
@@ -3149,7 +3149,7 @@ function irFrame(root,mode,region,cam,aspect){root.updateMatrixWorld(true);
   const dir=region?new THREE.Vector3(.35,.12,1).normalize():new THREE.Vector3(.15,.25,1).normalize();cam.position.copy(c).addScaledVector(dir,d*1.05);cam.lookAt(c);}
 function irRenderIcon(it){const R0=irObject(it);if(!R0)return null;let wait=false;R0.o.traverse(x=>{const m=x.material;if(m&&m.map&&!(m.map.image&&(m.map.image.complete===undefined||m.map.image.complete)&&(m.map.image.naturalWidth||m.map.image.width)))wait=true;});if(wait&&(IR.tries=(IR.tries||0)+1)<12){irDispose(R0.o);return 'WAIT';}IR.tries=0;
   const root=new THREE.Group();root.add(R0.o);irClean(root);if(R0.mode!=='obj')root.traverse(x=>{if(x.material&&x.material.userData&&x.material.userData.kind){x.material.emissive.setHex(0x2a2620);}});IR.iscene.add(root);try{return irShot(root,R0);}finally{IR.iscene.remove(root);irDispose(root);}}
-function irShot(root,R0){const N=112;
+function irShot(root,R0){const N=IR.N||112;
   irFrame(root,R0.mode,R0.region,IR.cam,1);const r=IR.r;r.toneMappingExposure=1.7;r.setScissorTest(true);r.setViewport(0,IR.H-N,N,N);r.setScissor(0,IR.H-N,N,N);r.setClearColor(0,0);r.clear();r.render(IR.iscene,IR.cam);r.setScissorTest(false);r.toneMappingExposure=1.15;
   const c=document.createElement('canvas');c.width=c.height=N;c.getContext('2d').drawImage(r.domElement,0,0,N,N,0,0,N,N);return c.toDataURL('image/png');}
 document.addEventListener('pointerdown',e=>{const pv=e.target.closest&&e.target.closest('#invPrev');if(!pv)return;IR.dragging=e.pointerId;IR.px=e.clientX;IR.vel=0;IR.lastT=performance.now();try{pv.setPointerCapture(e.pointerId);}catch(_){}},{passive:true});
@@ -3426,7 +3426,7 @@ function addPetals(G,col){const N=160,geo=new THREE.BufferGeometry(),a=new Float
   AMB.push(dt=>{for(let i=0;i<N;i++){a[i*3+1]-=dt*(.55+(i%5)*.08);a[i*3]+=Math.sin(T*1.2+i)*dt*.6+dt*.25;a[i*3+2]+=Math.cos(T*.9+i*1.3)*dt*.4;
     if(a[i*3+1]<H(a[i*3],a[i*3+2])){a[i*3+1]=9+Math.random()*2;}if(a[i*3]-P.x>30)a[i*3]-=60;if(a[i*3]-P.x<-30)a[i*3]+=60;if(a[i*3+2]-P.z>30)a[i*3+2]-=60;if(a[i*3+2]-P.z<-30)a[i*3+2]+=60;}geo.attributes.position.needsUpdate=true;});}
 const blobGeo=keep((()=>{const g=new THREE.PlaneGeometry(1,1);g.rotateX(-PI/2);return g;})()),blobMat=keep(new THREE.MeshBasicMaterial({map:blobTex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,fog:false}));
-function addBlob(parent,s){const b=new THREE.Mesh(blobGeo,blobMat);b.scale.set(s,1,s);b.position.y=.05;b.renderOrder=1;parent.add(b);return b;}
+function addBlob(parent,s){const b=new THREE.Mesh(blobGeo,blobMat);b.scale.set(s,1,s);b.position.y=.05;b.renderOrder=1;if(STUDIO.alphaOn)b.visible=false;parent.add(b);return b;}
 
 const BUILD={
  ev_raid(G,V){/* guarida de Añaretã: plataforma de piedra sobre un mar de fuego, con pilares y braseros */
@@ -5161,7 +5161,8 @@ const STUDIO={on:false,cam:new THREE.Vector3(),look:new THREE.Vector3(),walk:fal
   mob(type,gold){STUDIO.clear();const e=makeEnemy(type,0,0,!!gold,null);e.g.rotation.y=.55;e.aggro=0;e.speed=0;if(e.label)e.label.el.hidden=true;STUDIO.frame(e.hgt,e.rad);return e;},
   frame(h,r,yaw,pitch){const sz=Math.max(h,r*2.2,1.2);const d=sz*1.25+1.6,a=yaw==null?.55:yaw,pt=pitch==null?.3:pitch;STUDIO.cam.set(Math.sin(a)*d*Math.cos(pt),h*.55+d*Math.sin(pt),Math.cos(a)*d*Math.cos(pt));STUDIO.look.set(0,h*.5,0);},
   hero(){P.x=0;P.z=0;P.ry=.35;P.moveTo=null;if(HERO){HERO.g.visible=true;HERO.g.position.set(0,0,0);HERO.g.rotation.y=.35;}STUDIO.clear();STUDIO.frame(2.3,.5,.35,.2);},
-  off(){STUDIO.on=false;if(HERO)HERO.g.visible=true;}};
+  off(){STUDIO.on=false;if(HERO)HERO.g.visible=true;},
+  alpha(){/* fondo transparente para recortes: sin cielo, sin piso, sin niebla ni bloom */sky.visible=false;scene.fog=null;if(zoneG)zoneG.traverse(o=>{if(o.isMesh||o.isPoints||o.isSprite||o.isLine)o.visible=false;});if(composer){composer=null;bloom=null;}renderer.setClearColor(0x000000,0);STUDIO.alphaOn=true;}};
 /* ================= arena de duelos: 1 contra 1 con salas para mirar ================= */
 const DUEL={key:null,side:null,room:null,foe:null,inv:null,invT:0,goT:-99,rooms:null,roomsT:-99,hpS:-1,hpT:0,res:null,dead:false};
 const PVP_K=.38;
@@ -5326,7 +5327,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get HERO(){return HERO},rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get HERO(){return HERO},rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
@@ -5487,7 +5488,7 @@ function frame(now){
   if(FINAL)FINAL.uniforms.uTime.value=windT;
   /* rendimiento: el mapa de sombras se rehace un cuadro sí y otro no (la pasada más cara después de la escena) */
   SHF=(SHF+1)%2;renderer.shadowMap.needsUpdate=SHF===0||snapCam||mode!=='game';
-  if(composer)composer.render();else renderer.render(scene,camera);
+  if(composer&&!STUDIO.alphaOn)composer.render();else renderer.render(scene,camera);
 }
 
 /* ================= arranque ================= */

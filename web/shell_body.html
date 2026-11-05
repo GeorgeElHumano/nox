@@ -1,0 +1,228 @@
+<div id="intro" aria-hidden="true">
+  <div class="mark">
+    <svg viewBox="0 0 160 160" aria-hidden="true">
+      <g class="rays" stroke-linecap="round">
+        <line class="ray" style="--i:0" x1="80" y1="6" x2="80" y2="20"/><line class="ray" style="--i:1" x1="132.3" y1="27.7" x2="122.4" y2="37.6"/><line class="ray" style="--i:2" x1="154" y1="80" x2="140" y2="80"/><line class="ray" style="--i:3" x1="132.3" y1="132.3" x2="122.4" y2="122.4"/><line class="ray" style="--i:4" x1="80" y1="154" x2="80" y2="140"/><line class="ray" style="--i:5" x1="27.7" y1="132.3" x2="37.6" y2="122.4"/><line class="ray" style="--i:6" x1="6" y1="80" x2="20" y2="80"/><line class="ray" style="--i:7" x1="27.7" y1="27.7" x2="37.6" y2="37.6"/>
+      </g>
+      <circle class="ring" cx="80" cy="80" r="50"/>
+      <circle class="disc" cx="96" cy="72" r="46"/>
+    </svg>
+    <div class="nox">NOX</div>
+    <div class="sub">Crónicas del Paraguay</div>
+  </div>
+</div>
+<div class="wave" id="wave" aria-hidden="true"><svg viewBox="0 0 140 100" preserveAspectRatio="none"><path d="M0 0 H118 C 132 18, 128 34, 136 50 C 128 66, 132 82, 118 100 H0 Z" fill="#e2a83f"/><path d="M0 0 H104 C 118 18, 114 34, 122 50 C 114 66, 118 82, 104 100 H0 Z" fill="#1a1d47"/></svg></div>
+
+<header class="bar">
+  <button class="brand" data-go="inicio"><img src="img/icon-256.png" alt="" width="34" height="34">NOX</button>
+  <div class="mi"><button class="btn btn-gold" data-dl>Descargar</button><button class="mbtn" id="menuBtn" aria-label="Menú" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg></button></div>
+</header>
+<canvas id="fire" aria-hidden="true"></canvas>
+
+<main id="stage">
+  <!-- portada: tres paneles -->
+  <section class="ch home" data-ch="inicio" id="ch-inicio">
+    <div class="in">
+      <div class="pan main">
+        <div class="txt">
+        <span class="k">Un MMORPG hecho en Paraguay</span>
+          <h1>La Noche Larga cayó sobre el Paraguay. <i>Vos sos quien la enfrenta.</i></h1>
+          <p class="lead">La mitología guaraní, hecha juego. Cinco razas, siete sets por raza, alas y diez tierras reales del país, con los siete hijos de Tau y Kerana esperando en cada una.</p>
+          <div class="acts"><button class="btn btn-gold" data-dl>Descargar gratis</button><a class="btn btn-line" data-web data-track="web" href="jugar/">Jugar en el navegador</a></div>
+          <div class="plats"><span>Android</span><span>Windows</span><span>Mac</span><span>iPhone y iPad</span><span>Navegador</span></div>
+        </div>
+        <div class="pfig"><img src="img/w/hero_portadores.webp" alt="" width="1200" height="800" fetchpriority="high"></div>
+      </div>
+      <div class="pan myth" data-go="mitologia" role="link" tabindex="0">
+        <div class="pfig"><img src="img/w/cut_jasyjatere.webp" alt="" loading="lazy"></div>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        <span class="k">Mitología guaraní</span>
+        <h2>Las leyendas que nos contaron las abuelas, para jugarlas</h2>
+        <p class="tag">Pombero, Jasy Jateré, Luisón, Kurupí y los demás, como los describe el mito.</p>
+      </div>
+      <div class="pan dl" data-go="descargar" role="link" tabindex="0">
+        <div class="pfig"><img src="img/w/cut_app.webp" alt="" loading="lazy"></div>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        <span class="k">Gratis</span>
+        <h2>Jugalo en el celular, en la PC o en el navegador</h2>
+        <p class="tag">La misma cuenta en todos los dispositivos.</p>
+      </div>
+    </div>
+    <div class="scrollhint"><span>Recorrer</span><i></i></div>
+  </section>
+
+  <!-- capítulos -->
+  <section class="ch" data-ch="mitologia" id="ch-mitologia" style="--gl:#b57cff">
+    <span class="num" aria-hidden="true">I</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo I · Por qué existe NOX</span>
+        <h2 class="big">Nuestra mitología, <i>para jugarla</i></h2>
+        <p class="lead">Crecimos escuchando del Pombero, del Jasy Jateré y del Luisón, pero casi nunca los vimos en un juego. NOX nace de esas ganas: que las leyendas se puedan recorrer, pelear y descubrir, desde Paraguay y con respeto por el mito.</p>
+        <div class="acts"><button class="explore" data-open="mitologia"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Leer por qué lo hacemos</button></div>
+      </div>
+      <div class="fig float"><div class="glow"></div><img src="img/w/cut_jasyjatere.webp" alt="Jasy Jateré con su bastón de oro" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="razas" id="ch-razas" style="--gl:#4fb0ff">
+    <span class="num" aria-hidden="true">II</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo II · Los portadores</span>
+        <h2 class="big">Cinco razas, <i>cinco formas de pelear</i></h2>
+        <p class="lead">Caballero, Hechicero, Arquera, Gladiador y Mburuvicha. Cada uno con sus estadísticas, sus técnicas con nombre en guaraní y su evolución.</p>
+        <div class="meta"><span><b>5</b> razas</span><span><b>20</b> rostros</span><span><b>6</b> técnicas por raza</span></div>
+        <div class="acts"><button class="explore" data-open="razas"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Conocer las razas y hacer el test</button></div>
+      </div>
+      <div class="fig"><div class="glow"></div><img src="img/w/cut_razas.webp" alt="Los cinco portadores" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="sets" id="ch-sets" style="--gl:#ffb04a">
+    <span class="num" aria-hidden="true">III</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo III · La forja</span>
+        <h2 class="big">Siete sets por raza, <i>de +0 a +15</i></h2>
+        <p class="lead">Armaduras con nombres de dioses guaraníes: Kuarahy, Jasy, Tupã, Arasy, Ñamandu. Se forjan con gemas y a partir de +4 se encienden con el color de su set.</p>
+        <div class="meta"><span><b>35</b> sets</span><span><b>16</b> niveles de mejora</span><span><b>4</b> gemas</span></div>
+        <div class="acts"><button class="explore" data-open="sets"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Probar la forja</button></div>
+      </div>
+      <div class="fig"><div class="glow"></div><img src="img/w/cut_sets.webp" alt="Armaduras de los sets más altos" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="alas" id="ch-alas" style="--gl:#4ff0e0">
+    <span class="num" aria-hidden="true">IV</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo IV · El sello de los que llegaron lejos</span>
+        <h2 class="big">Alas con <i>forma propia</i> para cada raza</h2>
+        <p class="lead">Plumas, membranas, hojas de palma y cintas de ñandutí. Cuatro etapas de brillo y una segunda generación que se forja en el Caldero de Kerana.</p>
+        <div class="meta"><span><b>10</b> pares</span><span><b>4</b> etapas</span><span>desde nivel <b>20</b></span></div>
+        <div class="acts"><button class="explore" data-open="alas"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Ver las alas de cada raza</button></div>
+      </div>
+      <div class="fig float"><div class="glow"></div><img src="img/w/cut_alas.webp" alt="Alas de segunda generación" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="items" id="ch-items" style="--gl:#ff7a5a">
+    <span class="num" aria-hidden="true">V</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo V · La mesa de botín</span>
+        <h2 class="big">Armas, gemas y <i>piezas únicas</i></h2>
+        <p class="lead">Espadas, bastones, arcos y cetros, uno por set. Gemas que suben tus ítems, pociones de Ña Eusebia, mascotas que te siguen y las piezas únicas que suelta cada bestia.</p>
+        <div class="meta"><span><b>35</b> armas</span><span><b>7</b> escudos</span><span><b>27</b> piezas únicas</span></div>
+        <div class="acts"><button class="explore" data-open="items"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Abrir la mesa de botín</button></div>
+      </div>
+      <div class="fig float"><div class="glow"></div><img src="img/w/cut_items.webp" alt="Armas del reino" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="mapas" id="ch-mapas" style="--gl:#6fe08a">
+    <span class="num" aria-hidden="true">VI</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo VI · El reino</span>
+        <h2 class="big">Diez tierras reales, <i>de Asunción a Bahía Negra</i></h2>
+        <p class="lead">Ypacaraí, Trinidad, el Chaco Boreal, los Esteros del Ñeembucú, el Ybytyruzú, el Monday, el Mbaracayú, Cerro Corá y Bahía Negra, cada una con su luz, su paisaje y sus bestias.</p>
+        <div class="meta"><span><b>10</b> tierras</span><span><b>4</b> eventos</span><span><b>1</b> arena de duelos</span></div>
+        <div class="acts"><button class="explore" data-open="mapas"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Recorrer el mapa</button></div>
+      </div>
+      <div class="fig" id="mapfig"><div class="glow"></div><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="bestiario" id="ch-bestiario" style="--gl:#e2a83f">
+    <span class="num" aria-hidden="true">VII</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo VII · Fieles a la leyenda</span>
+        <h2 class="big">Veintisiete criaturas, <i>como las cuenta el mito</i></h2>
+        <p class="lead">Teju Jagua con sus siete cabezas de perro, Mbói Tu'i con cabeza de loro, Moñái con sus cuernos, el Pombero, la Ka'a Jarýi, el Yaguarú y el Luisón. Cada una espera en su tierra.</p>
+        <div class="meta"><span><b>27</b> criaturas</span><span><b>7</b> hijos de Tau</span><span><b>6</b> jefes</span></div>
+        <div class="acts"><button class="explore" data-open="bestiario"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Abrir el bestiario</button></div>
+      </div>
+      <div class="fig"><div class="glow"></div><img src="img/w/cut_teju.webp" alt="Teju Jagua, el lagarto de siete cabezas" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch" data-ch="historia" id="ch-historia" style="--gl:#ff6f9a">
+    <span class="num" aria-hidden="true">VIII</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo VIII · La crónica</span>
+        <h2 class="big">La noche en que Tau <i>se llevó a Kerana</i></h2>
+        <p class="lead">Arasy maldijo esa unión y de ella nacieron siete hijos monstruosos. Cuando nació el séptimo, el sol siguió saliendo pero ya no alumbraba igual. Los escribas lo anotaron con una sola palabra: NOX.</p>
+        <div class="acts"><button class="explore" data-open="historia"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i>Leer la crónica completa</button></div>
+      </div>
+      <div class="fig"><div class="glow"></div><img src="img/w/cut_tau.webp" alt="Tau, el espíritu del mal" loading="lazy"><div class="ola"></div></div>
+    </div>
+  </section>
+
+  <section class="ch dlch" data-ch="descargar" id="ch-descargar">
+    <span class="num" aria-hidden="true">IX</span>
+    <div class="in">
+      <div class="txt">
+        <span class="k">Capítulo IX · Gratis, en todos lados</span>
+        <h2 class="big">Descargá NOX <i>y entrá en la noche</i></h2>
+        <p class="lead">Elegí tu dispositivo para ver cómo instalarlo. Es el mismo juego y la misma cuenta en el celular, en la PC y en el navegador.</p>
+      </div>
+      <div class="platforms" id="platforms"></div>
+      <p class="alt">¿Ya tenés cuenta? <a class="btn btn-line" href="cuenta/#cuenta">Mi cuenta</a> <a class="btn btn-line" href="cuenta/#tienda">Tienda</a> <span class="muted" style="font-size:.85rem">· Un juego de GeorgeElHumano · The BnKr Media</span></p>
+    </div>
+  </section>
+</main>
+
+<nav class="dots" id="dots" aria-label="Capítulos"></nav>
+<div class="counter" id="counter" aria-hidden="true"></div>
+<div class="pline" aria-hidden="true"><i id="pline"></i></div>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <div class="l">
+    <span class="k">Gratis</span>
+    <h2>Jugá NOX donde quieras</h2>
+    <p>Android, Windows, Mac, iPhone y navegador. Tu cuenta y tus personajes te siguen a todos lados.</p>
+    <div class="acts"><button class="btn btn-gold" data-dl>Descargar</button><a class="btn btn-line" data-web data-track="web" href="jugar/">Jugar en el navegador</a><a class="btn btn-line" href="cuenta/#cuenta">Mi cuenta</a></div>
+  </div>
+  <div class="r">
+    <span class="k">Capítulos</span>
+    <nav id="menuNav"></nav>
+    <div class="links"><a href="cuenta/#tienda">Tienda</a><a href="cuenta/#cuenta">Mi cuenta</a><a href="https://play0ad.com" target="_blank" rel="noopener">Créditos del arte</a></div>
+  </div>
+  <button class="mbtn x2" id="menuClose" aria-label="Cerrar el menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+
+<div id="deep" aria-hidden="true">
+  <div class="dbar"><button class="back" id="deepBack"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></i>Volver al recorrido</button><span class="dtitle" id="deepTitle"></span><div class="dnext" id="deepNext"></div></div>
+  <div id="deepBody">
+__VIEWS__
+  </div>
+  <footer>
+    <div class="wrap">
+      <p class="credits">Personajes, bestias, animaciones, sonidos y música: arte de <a href="https://play0ad.com" target="_blank" rel="noopener">0 A.D.</a> © Wildfire Games, licencia <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (adaptado). Mascotas y monstruos nuevos de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a> (CC0). Hada de <a href="https://github.com/Hankx-Studio/wish-weaver" target="_blank" rel="noopener">Wish Weaver</a>, licencia MIT. Las criaturas, los sets y las alas de NOX son diseño propio inspirado en la mitología guaraní.</p>
+      <p>NOX · Crónicas del Paraguay · Un juego de GeorgeElHumano · The BnKr Media</p>
+    </div>
+  </footer>
+</div>
+
+<div class="dock"><button class="btn btn-gold" data-dl>Descargar gratis</button><a class="btn btn-line" data-web data-track="web" href="jugar/">Jugar</a></div>
+
+<div class="modal" id="modal" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="panel-head"><div class="plat-icon" id="mIcon"></div><div><span class="kicker" id="mReq"></span><h3 id="mTitle"></h3></div><button class="x" id="mClose" aria-label="Cerrar">×</button></div>
+    <ol class="steps" id="mSteps"></ol>
+    <div id="mExtra"></div>
+    <div class="panel-actions" id="mActions"></div>
+  </div>
+</div>
+<div class="modal" id="dlModal" hidden>
+  <div class="panel wide" role="dialog" aria-modal="true" aria-label="Descargar NOX">
+    <div class="panel-head" style="grid-template-columns:minmax(0,1fr) auto"><div><span class="kicker">Gratis</span><h3>¿Dónde querés jugar?</h3></div><button class="x" id="dlClose" aria-label="Cerrar">×</button></div>
+    <div class="platforms" id="platforms2"></div>
+  </div>
+</div>
+<div class="fmodal" id="fmodal" hidden><div id="fbox"></div><button class="x" id="fClose" aria-label="Cerrar">×</button></div>
+<figure class="viewer" id="viewer" hidden><img id="vImg" alt=""><figcaption id="vCap"></figcaption><button class="x" id="vClose" aria-label="Cerrar">×</button></figure>
