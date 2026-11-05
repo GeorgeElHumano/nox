@@ -1,7 +1,7 @@
 // Saca los datos de la web directamente del juego (window.__NOX.GAMEDATA) y escribe data.json
 // Uso: node extract.js SALIDA.json [BASE_URL]   (BASE por defecto http://localhost:8788/jugar/)
 const {chromium}=require('playwright');const fs=require('fs');const path=require('path');
-const path=require('path');const OUT=process.argv[2]||path.join(__dirname,'../../web/data.json');const BASE=process.argv[3]||'http://localhost:8788/jugar/';
+const OUT=process.argv[2]||path.join(__dirname,'../../web/data.json');const BASE=process.argv[3]||process.env.BASE||'http://localhost:8788/jugar/';
 const VENDOR=process.env.VENDOR||path.join(__dirname,'../../desktop/vendor');
 const MAP={'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js':VENDOR+'/three.min.js'};
 for(const f of ['loaders/GLTFLoader.js','utils/SkeletonUtils.js','shaders/CopyShader.js','shaders/LuminosityHighPassShader.js','postprocessing/EffectComposer.js','postprocessing/RenderPass.js','postprocessing/ShaderPass.js','postprocessing/UnrealBloomPass.js'])MAP['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/'+f]=VENDOR+'/examples/'+f;

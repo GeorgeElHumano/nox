@@ -26,9 +26,37 @@ def mainpart(im,thr=40,grow=.12):
     keep=np.isin(lab,keepids)
     arr=np.asarray(im).copy();arr[...,3]=np.where(keep,arr[...,3],0)
     return Image.fromarray(arr,'RGBA')
+STATS={'nuevas':0,'cambiadas':0,'iguales':0}
+FORCE=os.environ.get('FORCE')=='1'
+def same(a,b,tol=9.0,frac=.04):
+    """¿Son la misma imagen a ojo? Tolera el ruido de render (partículas, brillos) para no ensuciar el repo."""
+    if abs(a.width-b.width)>max(4,a.width*.03) or abs(a.height-b.height)>max(4,a.height*.03):return False
+    if a.size!=b.size:  # recortes que difieren por un par de píxeles: se centran en el mismo lienzo
+        W,H=max(a.width,b.width),max(a.height,b.height);ca=Image.new('RGBA',(W,H),(0,0,0,0));cb=Image.new('RGBA',(W,H),(0,0,0,0))
+        ca.paste(a.convert('RGBA'),((W-a.width)//2,(H-a.height)//2));cb.paste(b.convert('RGBA'),((W-b.width)//2,(H-b.height)//2));a,b=ca,cb
+    x=np.asarray(a.convert('RGBA')).astype(np.int16);y=np.asarray(b.convert('RGBA')).astype(np.int16)
+    best=None
+    for dy in (-1,0,1):  # un píxel de corrimiento no cuenta como cambio
+        for dx in (-1,0,1):
+            xs=x[max(0,dy):x.shape[0]+min(0,dy),max(0,dx):x.shape[1]+min(0,dx)];ys=y[max(0,-dy):y.shape[0]+min(0,-dy),max(0,-dx):y.shape[1]+min(0,-dx)]
+            d=np.abs(xs-ys).max(2);m=(d.mean(),(d>40).mean())
+            if best is None or m[0]<best[0]:best=m
+    return best[0]<tol and best[1]<frac
+def guard(path,im):
+    """Guarda solo si la imagen cambió de verdad respecto de la que ya está en el repo."""
+    if not FORCE and os.path.exists(path):
+        try:
+            old=Image.open(path);old.load()
+            if same(old,im):STATS['iguales']+=1;return False
+            STATS['cambiadas']+=1
+        except Exception:STATS['cambiadas']+=1
+    else:STATS['nuevas']+=1
+    return True
 def savew(im,name,w,q=86):
     if im.width>w:im=im.resize((w,round(im.height*w/im.width)),Image.LANCZOS)
-    im.save(f'{O}/{name}.webp','WEBP',quality=q,method=6)
+    path=f'{O}/{name}.webp'
+    if not guard(path,im):return
+    im.save(path,'WEBP',quality=q,method=6)
 def ok(f):return os.path.exists(f)
 def fit(im,w,h):
     s=min(w/im.width,h/im.height);return im.resize((max(1,int(im.width*s)),max(1,int(im.height*s))),Image.LANCZOS)
@@ -97,9 +125,10 @@ if os.path.isdir(IC):
     os.makedirs(O+'/ic',exist_ok=True)
     for f in glob.glob(IC+'/*.png'):
         im=Image.open(f).convert('RGBA');bg=Image.new('RGB',im.size,(31,23,19));bg.paste(im,mask=im.split()[3]);w,h=bg.size
-        bg=bg.crop((int(w*.1),int(h*.1),int(w*.9),int(h*.9))).resize((128,128),Image.LANCZOS);bg.save(f'{O}/ic/{os.path.basename(f)[:-4]}.webp','WEBP',quality=85)
+        bg=bg.crop((int(w*.1),int(h*.1),int(w*.9),int(h*.9))).resize((128,128),Image.LANCZOS);pth=f'{O}/ic/{os.path.basename(f)[:-4]}.webp'
+        if guard(pth,bg):bg.save(pth,'WEBP',quality=85)
 # ---- ícono de la app para el panel de descarga
 ic=Image.open(os.path.join(ROOT,'web/img/icon-512.png')).convert('RGBA');m=Image.new('L',ic.size,0)
 from PIL import ImageDraw;ImageDraw.Draw(m).rounded_rectangle((0,0,511,511),radius=110,fill=255);ic.putalpha(m)
 c=canvas(620,620);c.alpha_composite(ic,(54,54));savew(c,'cut_app',620)
-print('listo',len(os.listdir(O)))
+print('listo:',STATS['nuevas'],'nuevas,',STATS['cambiadas'],'cambiadas,',STATS['iguales'],'sin cambios (no se tocaron)')

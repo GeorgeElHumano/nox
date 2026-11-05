@@ -2247,7 +2247,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);r.wings.sides.forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
   if(!r.fb){r.fb={};r.fbq=[];['thigh_L','thigh_R','leg_L','leg_R','foot_L','foot_R','arm_L','arm_R','forearm_L','forearm_R','spine','chest','neck','head'].forEach(n=>{const o=r.body.getObjectByName(n);r.fb[n]=o;if(o)r.fbq.push([o,o.quaternion.clone(),n]);});}
   for(const [o,q] of r.fbq)o.quaternion.copy(q);/* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
-  r.mixer.update(dt);r.mixT=(r.mixT||0)+dt;
+  r.mixer.update(STUDIO.frozen?0:dt);r.mixT=(r.mixT||0)+dt;
   if((r.flyK||0)>.01){const k=r.flyK,ke=k*k*(3-2*k);
     const sw=Math.sin(T*1.1)*.03,mvk=Math.min(1,(P.mv||0)*1.2);
     /* pose absoluta de levitación (como en MU): parte del reposo del esqueleto y le suma la pose; se mezcla con la animación según ke */
@@ -3160,7 +3160,7 @@ function irDispose(o){o.traverse(x=>{if(x.material&&!x.material.userData.keep&&x
 function irPreview(dt){const pv=$('#invPrev');if(!pv||$('#pInv').hidden||!C||!irInit())return;if(IR.r.domElement.parentNode!==pv){pv.innerHTML='';pv.appendChild(IR.r.domElement);}
   const key=C.cls+JSON.stringify(EQK.map(k=>C.eq[k]?[C.eq[k].t,C.eq[k].lv]:0));if(key!==IR.prevKey||!IR.prev){const h=oadHero(C.cls,C.eq);if(h){if(IR.prev){IR.scene.remove(IR.prev.g);irDispose(IR.prev.g);}IR.prev=h;(h.faceMats||[]).forEach(m=>m.userData.npc=1);irClean(h.g);IR.scene.add(h.g);IR.prevKey=key;}else{oadWantHero(C.cls,C.eq);return;}}
   IR.t+=dt;if(IR.t<1/30)return;const step=IR.t;IR.t=0;const h=IR.prev;if(IR.rot==null)IR.rot=-.5;if(IR.dragging==null){IR.vel=(IR.vel||0)*.9;IR.rot+=IR.vel;if(performance.now()-(IR.lastT||0)>2500)IR.rot+=step*.35;}h.g.rotation.y=IR.rot;oadPlay(h,h.acts.calm?'calm':'idle',.2,1);h.mixer.update(step);if(h.chest&&!h.sock){h.chest.getWorldPosition(_iv);h.g.worldToLocal(_iv);h.anchor.position.set(_iv.x,_iv.y-.42,_iv.z);}if(h.cape)animCape(h.cape,T,0);
-  if(h.wings){h.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry+Math.sin(performance.now()/700)*.06);W.rotation.z=s*WG.rz;});if(h.wings.u){h.wings.u.uWT.value=performance.now()/1000;h.wings.u.uWP.value=performance.now()/700;h.wings.u.uWA.value=.05;}}
+  if(h.wings){h.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry+(STUDIO.frozen?0:Math.sin(performance.now()/700)*.06));W.rotation.z=s*WG.rz;});if(h.wings.u){h.wings.u.uWT.value=performance.now()/1000;h.wings.u.uWP.value=performance.now()/700;h.wings.u.uWA.value=.05;}}
   IR.cam.fov=24;const r=IR.r;r.setViewport(0,0,IR.W,IR.H);r.setScissorTest(false);IR.cam.aspect=IR.W/IR.H;IR.cam.updateProjectionMatrix();IR.cam.position.set(0,1.15,6.6);IR.cam.lookAt(0,.98,0);r.setClearColor(0,0);r.render(IR.scene,IR.cam);IR.cam.fov=26;}
 function heroApplyTex(r,cls,eq){if(!r||!r.oad||!r.body)return;const ids=heroTexIds(cls,eq);const body=cls==='hechicero'?'m_robe':cls==='arquera'?'f_tunic':'m_tunic';
   bodyComposite(body,ids).then(t=>{r.body.userData.mats.forEach(m=>{m.map=t;m.needsUpdate=true;});gearGlow(r);}).catch(()=>{});}
@@ -3804,7 +3804,7 @@ function animEnemy(e,dt,sp){const w=Math.min(1,sp/2.5);e.phase+=dt*(2+sp*2.2);co
   if(e.kind!=='glb'&&e.orbit){e.orbit.rotation.y+=dt*1.3;e.orbit.traverse(o=>{if(o.userData.wing)o.rotation.z=o.userData.wing*(1.1+Math.sin(T*18+o.parent.position.x)*.5);});}
   if(e.head&&e.head.children)for(const c of e.head.children)if(c.userData.flame!=null){const k=.7+Math.abs(Math.sin(T*9+c.userData.flame*1.3))*.45;if(c.isSprite)c.scale.setScalar(k*.7);else{c.scale.y=k;c.scale.x=c.scale.z=1.15-k*.25;c.rotation.z=Math.sin(T*7+c.userData.flame)*.2;}}}
 function updateEnemies(dt){
-  if(STUDIO.on){for(const e of enemies){if(e.pvp||e.dead)continue;e.lunge=Math.max(0,e.lunge-dt);e.flash-=dt;animEnemy(e,dt,STUDIO.walk?2.6:0);e.bar.visible=false;}return;}
+  if(STUDIO.on){for(const e of enemies){if(e.pvp||e.dead)continue;e.lunge=Math.max(0,e.lunge-dt);e.flash-=dt;animEnemy(e,STUDIO.frozen?0:dt,STUDIO.walk?2.6:0);e.bar.visible=false;}return;}
   for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.pvp)continue;
     if(e.dead){e.deadT+=dt;const k=Math.min(1,e.deadT/.6);if(e.kind==='glb')oadMobDead(e,dt,k);else if(e.kind==='biped')poseHuman(e,{t:T,dead:smooth(0,1,k),lean:e.hunch||0});else if(e.kind==='snake')e.rig.scale.y=1-k*.6;else e.rig.rotation.z=smooth(0,1,k)*PI/2;
       if(e.deadT>1.4)e.rig.position.y-=dt*.8;if(e.deadT>3)e.g.visible=false;if(e.deadT>e.respawn){if(e.golden||e.summon)removeEnemy(e);else respawnEnemy(e);}continue;}
@@ -4269,7 +4269,7 @@ function animHero(dt){if(!HERO)return;const r=HERO,cls=r.cls;const y=H(P.x,P.z);
   if(r.wings){const fk=r.flyK||0,ke=fk*fk*(3-2*fk),gl=Math.sin(T*1.3)*.06;const beat=r.beat||0;
     /* reposo: alas abiertas en V hacia atrás e inclinadas, para que se lean desde la cámara de arriba; en vuelo: aleteo con ola */
     r.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry*(1-ke)+ke*(WG.fy-beat*.06)+gl*(1-ke));W.rotation.z=s*(WG.rz*(1-ke)+ke*(.1+beat*.5));W.rotation.x=0;});r.wings.g.rotation.x=WG.rx*(1-ke)+WG.fx*ke;
-    const u=r.wings.u;if(u){u.uWT.value=T;u.uWP.value=ke>.02?(r.flyPh||0)+.35:T*1.4;u.uWA.value=.05*(1-ke)+.36*ke;u.uWR.value=.35+.65*ke;}}
+    const u=r.wings.u;if(u){const Tz=STUDIO.frozen?3:T;u.uWT.value=Tz;u.uWP.value=ke>.02?(r.flyPh||0)+.35:Tz*1.4;u.uWA.value=.05*(1-ke)+.36*ke;u.uWR.value=.35+.65*ke;}}
   if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);
   if(r.glowCol&&(r.glowLv||0)>=11&&mode==='game'&&r.g.parent===scene){r.spk=(r.spk||0)-dt;if(r.spk<=0){r.spk=.12;parts(r.g.position.x+(Math.random()-.5)*.8,r.g.position.y+.4+Math.random()*1.4,r.g.position.z+(Math.random()-.5)*.8,{n:2,col:r.glowCol,spd:.4,up:.8,grav:-.6,life:.8,size:.22});}}
   if(r.aura)r.aura.material.opacity=mode==='game'&&DS&&DS.set&&DS.setLv>=7?.4+Math.sin(T*4)*.15:0;}
@@ -5162,6 +5162,8 @@ const STUDIO={on:false,cam:new THREE.Vector3(),look:new THREE.Vector3(),walk:fal
   frame(h,r,yaw,pitch){const sz=Math.max(h,r*2.2,1.2);const d=sz*1.25+1.6,a=yaw==null?.55:yaw,pt=pitch==null?.3:pitch;STUDIO.cam.set(Math.sin(a)*d*Math.cos(pt),h*.55+d*Math.sin(pt),Math.cos(a)*d*Math.cos(pt));STUDIO.look.set(0,h*.5,0);},
   hero(){P.x=0;P.z=0;P.ry=.35;P.moveTo=null;if(HERO){HERO.g.visible=true;HERO.g.position.set(0,0,0);HERO.g.rotation.y=.35;}STUDIO.clear();STUDIO.frame(2.3,.5,.35,.2);},
   off(){STUDIO.on=false;if(HERO)HERO.g.visible=true;},
+  /* pose fija para que dos fotos del mismo modelo salgan iguales (así el repo solo registra cambios reales) */
+  freeze(on){STUDIO.frozen=on!==false;if(!STUDIO.frozen)return;for(const e of enemies){e.phase=0;if(e.mixer)try{e.mixer.setTime(1.1);}catch(x){}}if(HERO&&HERO.mixer)try{HERO.mixer.setTime(1.1);}catch(x){}},
   alpha(){/* fondo transparente para recortes: sin cielo, sin piso, sin niebla ni bloom */sky.visible=false;scene.fog=null;if(zoneG)zoneG.traverse(o=>{if(o.isMesh||o.isPoints||o.isSprite||o.isLine)o.visible=false;});if(composer){composer=null;bloom=null;}renderer.setClearColor(0x000000,0);STUDIO.alphaOn=true;}};
 /* ================= arena de duelos: 1 contra 1 con salas para mirar ================= */
 const DUEL={key:null,side:null,room:null,foe:null,inv:null,invT:0,goT:-99,rooms:null,roomsT:-99,hpS:-1,hpT:0,res:null,dead:false};
@@ -5477,7 +5479,7 @@ let last=performance.now(),HITSTOP=0;
 function frame(now){
   requestAnimationFrame(frame);
   const rdt=(now-last)/1000;const dt=Math.min(.05,rdt);last=now;if(rdt<1)dynRes(rdt);
-  if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;T+=mode==='select'?dt:gdt;windT+=dt;WIND_T.value=windT;dnTick(dt);petTick(dt);ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
+  if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
   try{
     if(mode==='game'&&C){updatePlayer(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}(MOBNET.role==='guest'?updateEnemiesGuest:updateEnemies)(gdt);mobNetTick(dt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}
     updNpcs(dt);faceTick(dt);updLife(mode==='select'?dt:gdt);if(!$('#pInv').hidden)irPreview(dt);animHero(mode==='select'?dt:gdt);liveTick(dt);if(mode==='game'){liveAnim(Math.min(.5,rdt));duelTick(dt);}updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);
