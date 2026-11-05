@@ -2,6 +2,9 @@
 // Un solo "mundo" reparte: posiciones de los jugadores de cada mapa, chat (general, mapa, grupo),
 // grupos de hasta 5 y la señalización WebRTC del chat de voz del grupo.
 
+import { Sim, RAID_KEY } from './sim.js';
+import { ZONES } from './data.js';
+
 const enc = new TextEncoder();
 const hex = u => [...u].map(b => b.toString(16).padStart(2, '0')).join('');
 async function sha256(s) { return hex(new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(s)))); }
@@ -30,6 +33,7 @@ export class World {
     this.state = state; this.env = env;
     // los grupos viven en los datos de cada conexión (pid, líder, voz): así sobreviven si el objeto se duerme
     this.invites = new Map();   // uid invitado -> {pid, from, t}
+    this.sims = new Map(); this.loop = null;
     this.state.setWebSocketAutoResponse(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}'));
   }
 
@@ -57,6 +61,66 @@ export class World {
   byName(name) { const k = String(name).toLowerCase(); return this.all().find(x => (x.a.s && String(x.a.s.n).toLowerCase() === k) || String(x.a.acc).toLowerCase() === k); }
   inZone(zone, except) { return this.all().filter(x => x.a.zone && x.a.zone === zone && x.ws !== except); }
   pub(a) { return { id: a.uid, s: a.s, p: a.p }; }
+  simZone(zone) { if (!zone) return false; if (zone.startsWith(RAID_KEY)) return this.sims.has(zone); const z = ZONES[zone]; return !!z && !z.safe && !z.event; }
+  ensureSim(zone) { if (!this.simZone(zone)) return null; let sim = this.sims.get(zone); if (!sim) { sim = new Sim(zone); this.sims.set(zone, sim); } this.startLoop(); return sim; }
+  startLoop() { if (this.loop) return; this.lastStep = Date.now(); this.loop = setInterval(() => { try { this.stepAll(); } catch (e) {} }, 100); }
+  stepAll() {
+    const now = Date.now(), dt = Math.min(.3, (now - this.lastStep) / 1000); this.lastStep = now;
+    for (const [key, sim] of this.sims) {
+      const pl = this.inZone(key).filter(x => x.a.s);
+      if (!pl.length) { sim.empty = (sim.empty || 0) + dt; if (sim.empty > (key.startsWith(RAID_KEY) ? 8 : 45)) this.sims.delete(key); continue; }
+      sim.empty = 0;
+      const players = pl.map(x => ({ uid: x.a.uid, p: x.a.p }));
+      sim.step(dt, players, (uid, o) => { const x = pl.find(y => y.a.uid === uid); if (x) this.send(x.ws, o); });
+      if (sim.out.length) { for (const o of sim.out) { const s = JSON.stringify(o); for (const x of pl) this.send(x.ws, s); if (o.t === 'mk' && o.raid) { const w = JSON.stringify({ t: 'raidwin' }); for (const x of pl) this.send(x.ws, w); } } sim.out = []; }
+      sim.snapT = (sim.snapT || 0) - dt; sim.keyT = (sim.keyT || 0) - dt;
+      if (sim.snapT <= 0) { sim.snapT = .15; const key3 = sim.keyT <= 0; if (key3) sim.keyT = 3; const l = [];
+        for (const mo of sim.mobs) { const e = sim.entry(mo), k = e.join(','); if (key3 || k !== mo._ns) { mo._ns = k; l.push(e); } }
+        if (l.length || key3) { const s = JSON.stringify({ t: 'ms', k: key3 ? 1 : 0, l, key }); for (const x of pl) this.send(x.ws, s); } }
+    }
+    if (!this.sims.size) { clearInterval(this.loop); this.loop = null; }
+  }
+  startRaid(ws, a) {
+    const [pid, p] = this.partyOf(a.uid);
+    if (!p) { this.send(ws, { t: 'sys', m: 'Necesitás un grupo para desafiar a Añaretã.' }); return; }
+    if (p.leader !== a.uid) { this.send(ws, { t: 'sys', m: 'Solo el líder del grupo puede iniciar el desafío.' }); return; }
+    if (p.members.size < 2) { this.send(ws, { t: 'sys', m: 'El desafío es para grupos de 2 a 5 jugadores.' }); return; }
+    const key = RAID_KEY + pid; if (this.sims.has(key)) { this.send(ws, { t: 'sys', m: 'Tu grupo ya está en la guarida.' }); return; }
+    const ms = [...p.members].map(uid => this.byUid(uid)).filter(Boolean);
+    const lvl = Math.max(...ms.map(x => (x.a.s && x.a.s.L) || 1));
+    this.sims.set(key, new Sim(key, { lvl: Math.max(10, lvl + 2), size: ms.length })); this.startLoop();
+    for (const x of ms) this.send(x.ws, { t: 'raid', key, lvl: Math.max(10, lvl + 2), n: ms.length });
+  }
+  simZone(zone) { if (!zone) return false; if (zone.startsWith(RAID_KEY)) return this.sims.has(zone); const z = ZONES[zone]; return !!z && !z.safe && !z.event; }
+  ensureSim(zone) { if (!this.simZone(zone)) return null; let sim = this.sims.get(zone); if (!sim) { sim = new Sim(zone); this.sims.set(zone, sim); } this.startLoop(); return sim; }
+  startLoop() { if (this.loop) return; this.lastStep = Date.now(); this.loop = setInterval(() => { try { this.stepAll(); } catch (e) {} }, 100); }
+  stepAll() {
+    const now = Date.now(), dt = Math.min(.3, (now - this.lastStep) / 1000); this.lastStep = now;
+    for (const [key, sim] of this.sims) {
+      const pl = this.inZone(key).filter(x => x.a.s);
+      if (!pl.length) { sim.empty = (sim.empty || 0) + dt; if (sim.empty > (key.startsWith(RAID_KEY) ? 8 : 45)) this.sims.delete(key); continue; }
+      sim.empty = 0;
+      const players = pl.map(x => ({ uid: x.a.uid, p: x.a.p }));
+      sim.step(dt, players, (uid, o) => { const x = pl.find(y => y.a.uid === uid); if (x) this.send(x.ws, o); });
+      if (sim.out.length) { for (const o of sim.out) { const s = JSON.stringify(o); for (const x of pl) this.send(x.ws, s); if (o.t === 'mk' && o.raid) { const w = JSON.stringify({ t: 'raidwin' }); for (const x of pl) this.send(x.ws, w); } } sim.out = []; }
+      sim.snapT = (sim.snapT || 0) - dt; sim.keyT = (sim.keyT || 0) - dt;
+      if (sim.snapT <= 0) { sim.snapT = .15; const key3 = sim.keyT <= 0; if (key3) sim.keyT = 3; const l = [];
+        for (const mo of sim.mobs) { const e = sim.entry(mo), k = e.join(','); if (key3 || k !== mo._ns) { mo._ns = k; l.push(e); } }
+        if (l.length || key3) { const s = JSON.stringify({ t: 'ms', k: key3 ? 1 : 0, l, key }); for (const x of pl) this.send(x.ws, s); } }
+    }
+    if (!this.sims.size) { clearInterval(this.loop); this.loop = null; }
+  }
+  startRaid(ws, a) {
+    const [pid, p] = this.partyOf(a.uid);
+    if (!p) { this.send(ws, { t: 'sys', m: 'Necesitás un grupo para desafiar a Añaretã.' }); return; }
+    if (p.leader !== a.uid) { this.send(ws, { t: 'sys', m: 'Solo el líder del grupo puede iniciar el desafío.' }); return; }
+    if (p.members.size < 2) { this.send(ws, { t: 'sys', m: 'El desafío es para grupos de 2 a 5 jugadores.' }); return; }
+    const key = RAID_KEY + pid; if (this.sims.has(key)) { this.send(ws, { t: 'sys', m: 'Tu grupo ya está en la guarida.' }); return; }
+    const ms = [...p.members].map(uid => this.byUid(uid)).filter(Boolean);
+    const lvl = Math.max(...ms.map(x => (x.a.s && x.a.s.L) || 1));
+    this.sims.set(key, new Sim(key, { lvl: Math.max(10, lvl + 2), size: ms.length })); this.startLoop();
+    for (const x of ms) this.send(x.ws, { t: 'raid', key, lvl: Math.max(10, lvl + 2), n: ms.length });
+  }
   // anfitrión del mapa: el que entró primero (y sigue ahí)
   hostOf(zone) { let best = null; for (const x of this.inZone(zone)) { if (!x.a.s) continue; if (!best || (x.a.jt || 0) < (best.a.jt || 0)) best = x; } return best ? best.a.uid : null; }
   announceHost(zone) {
@@ -96,23 +160,10 @@ export class World {
     const t = m.t;
     if (raw.length > 4000 && t !== 'ms' && t !== 'mr') return;
 
-    // monstruos compartidos: el anfitrión del mapa los mueve; los demás le mandan sus golpes
-    if (t === 'ms' || t === 'mk') { // estado de los monstruos o muerte con el reparto
-      if (!a.zone || this.hostOf(a.zone) !== a.uid) return;
-      const out = JSON.stringify({ ...m, from: a.uid });
-      for (const x of this.inZone(a.zone, ws)) this.send(x.ws, out);
-      return;
-    }
-    if (t === 'mh' || t === 'mreq') { // golpe a un monstruo, o pedido de la lista completa: van al anfitrión
-      if (!a.zone) return; const h = this.hostOf(a.zone); if (!h || h === a.uid) return;
-      const x = this.byUid(h); if (x) this.send(x.ws, { ...m, from: a.uid });
-      return;
-    }
-    if (t === 'mr' || t === 'pa') { // lista completa para un jugador, o un monstruo que le pega a un jugador
-      if (!a.zone || this.hostOf(a.zone) !== a.uid) return;
-      const x = this.byUid(m.to); if (x && x.a.zone === a.zone) this.send(x.ws, { ...m, from: a.uid });
-      return;
-    }
+    // monstruos: los mueve el servidor; los jugadores mandan sus golpes y piden la lista completa
+    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
+    if (t === 'mreq') { const sim = a.zone && this.sims.get(a.zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: a.zone }); return; }
+    if (t === 'raid') { this.startRaid(ws, a); return; }
 
     if (t === 'p') { // posición: x,z,ry,mv,ac (contador de ataques),d (muerto),f (vuela)
       a.p = { x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, mv: +m.mv || 0, ac: m.ac | 0, d: m.d ? 1 : 0 };
@@ -134,11 +185,10 @@ export class World {
       if (old !== zone || t === 'hi') {
         this.send(ws, { t: 'w', you: a.uid, list: this.inZone(zone, ws).filter(x => x.a.s).map(x => this.pub(x.a)) });
         for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'j', ...this.pub(a) });
-        this.hosts = this.hosts || {}; if (old && old !== zone) this.announceHost(old);
-        this.hosts[zone] = null; this.announceHost(zone);
+        const sim = this.ensureSim(zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: zone });
       } else for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'eq', id: a.uid, s: a.s });
       const [pid, p] = this.partyOf(a.uid); if (p) this.partyBroadcast(pid, p);
-      if (t === 'hi') this.send(ws, { t: 'online', n: this.all().filter(x => x.a.s).length });
+      if (t === 'hi') this.send(ws, { t: 'online', n: this.all().filter(x => x.a.s).length, ts: Date.now() });
       return;
     }
     if (t === 'c') { // chat
@@ -199,7 +249,7 @@ export class World {
   async webSocketError(ws) { this.gone(ws); }
   gone(ws) {
     const a = this.att(ws); if (!a) return;
-    if (a.zone) { for (const x of this.inZone(a.zone, ws)) this.send(x.ws, { t: 'l', id: a.uid }); this.announceHost(a.zone); }
+    if (a.zone) { for (const x of this.inZone(a.zone, ws)) this.send(x.ws, { t: 'l', id: a.uid }); }
     if (a.pid) {
       // el que se fue ya no figura entre las conexiones: avisar al resto del grupo
       const ms = this.all().filter(y => y.ws !== ws && y.a.pid === a.pid);
