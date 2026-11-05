@@ -1,7 +1,7 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0d0a09"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style><title>NOX · Crónicas del Paraguay — MMORPG gratis de leyendas guaraníes</title>
 <meta name="description" content="NOX es un juego de rol online gratis ambientado en el Paraguay de las leyendas guaraníes: 5 razas, 7 sets por raza, alas, 10 mapas y los siete hijos de Tau. Para Android, Windows, Mac, iPhone y navegador.">
 <meta property="og:title" content="NOX · Crónicas del Paraguay">
-<meta property="og:description" content="MMORPG gratis de leyendas guaraníes. Descargalo para Android, Windows, Mac, iPhone o jugá en el navegador.">
+<meta property="og:description" content="La mitología guaraní, hecha juego. MMORPG gratis para Android, Windows, Mac, iPhone y navegador.">
 <meta property="og:image" content="https://noxparaguay.com/img/w/og.jpg">
 <link rel="icon" type="image/png" href="img/icon-256.png">
 <link rel="apple-touch-icon" href="img/icon-256.png">
@@ -9,39 +9,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap">
 <style>
-/* NOX · códice del reino: noche cálida, oro de ñandutí y tierra colorada. Las imágenes del juego mandan; el texto acompaña. */
+/* NOX · códice interactivo del reino: portada corta y una pantalla por tema, cada una con sus propios controles. */
 :root{
   --ink:#0b0908;--ink-2:#15100e;--ink-3:#1f1713;--line:#372719;--line-2:#4e3823;
-  --gold:#e2a83f;--gold-hi:#f6d892;--gold-dim:#8a6526;
-  --paper:#efe4cc;--muted:#a8977c;--earth:#b4472b;--earth-hi:#e07a52;
+  --gold:#e2a83f;--gold-hi:#f6d892;--paper:#efe4cc;--muted:#a8977c;--earth:#b4472b;--earth-hi:#e07a52;
   --display:"Cinzel","Trajan Pro",Georgia,serif;--body:"Alegreya Sans","Segoe UI",system-ui,sans-serif;
-  --s-1:clamp(.86rem,.82rem + .15vw,.94rem);--s0:clamp(1rem,.96rem + .2vw,1.12rem);--s1:clamp(1.2rem,1.1rem + .45vw,1.5rem);--s2:clamp(1.55rem,1.3rem + 1.1vw,2.3rem);--s3:clamp(2.1rem,1.5rem + 2.6vw,3.8rem);
+  --s-1:clamp(.86rem,.82rem + .15vw,.94rem);--s0:clamp(1rem,.96rem + .2vw,1.12rem);--s1:clamp(1.2rem,1.1rem + .45vw,1.5rem);--s2:clamp(1.55rem,1.3rem + 1.1vw,2.3rem);--s3:clamp(2.1rem,1.5rem + 2.6vw,3.6rem);
   --r:14px;color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-behavior:smooth;background:var(--ink)}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
-body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:var(--s0);line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
+html{background:var(--ink)}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:var(--s0);line-height:1.55;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--ink)}
 img{max-width:100%;display:block}
 a{color:var(--gold-hi)}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px;border-radius:6px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px;border-radius:6px}
 h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.12;margin:0;text-wrap:balance}
-h2{font-size:var(--s3);color:var(--gold-hi);letter-spacing:.01em}
+h2{font-size:var(--s3);color:var(--gold-hi)}
 h3{font-size:var(--s1)}
 p{margin:0}
+button{font-family:inherit}
 .wrap{max-width:1240px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
 .kicker{font-style:italic;color:var(--gold);font-size:var(--s0)}
 .lead{font-size:var(--s1);line-height:1.45;max-width:58ch}
 .muted{color:var(--muted)}
-.sec{padding-block:clamp(60px,8vw,110px)}
-.sec-head{display:grid;gap:12px;max-width:72ch;margin-bottom:clamp(26px,4vw,44px)}
-.sec-head .kicker{margin-bottom:-4px}
-.band{background:var(--ink-2);border-block:1px solid var(--line)}
-.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line-2),transparent);margin:0 auto;max-width:1240px}
+.view{padding-block:clamp(34px,5vw,60px) clamp(60px,8vw,100px);animation:in .35s ease both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view{animation:none}*{transition:none!important}}
+.vhead{display:grid;gap:10px;max-width:72ch;margin-bottom:clamp(20px,3vw,32px)}
 
-/* botones */
+/* botones y chips */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:14px 26px;font:700 1rem/1 var(--body);letter-spacing:.02em;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:transform .15s,background .15s,border-color .15s;white-space:nowrap}
 .btn-gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1d1208;box-shadow:0 0 0 1px #0006,0 10px 30px -12px var(--gold)}
 .btn-gold:hover{transform:translateY(-1px)}
@@ -49,218 +47,291 @@ p{margin:0}
 .btn-line:hover{border-color:var(--gold);color:var(--gold-hi)}
 .btn[aria-disabled="true"]{background:var(--ink-3);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;border-color:var(--line)}
 .btn svg{width:18px;height:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{all:unset;cursor:pointer;padding:8px 15px;border-radius:999px;border:1px solid var(--line-2);font-weight:700;color:var(--muted);font-size:.92rem;transition:border-color .15s,color .15s,background .15s}
+.chip:hover{color:var(--paper);border-color:var(--gold-dim,#8a6526)}
+.chip[aria-pressed="true"],.chip[aria-selected="true"]{border-color:var(--c,var(--gold));color:var(--paper);background:color-mix(in srgb,var(--c,var(--gold)) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c,var(--gold)) 40%,transparent)}
+.chip:focus-visible{outline:2px solid var(--gold-hi)}
 
 /* barra superior */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--ink) 86%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.top .wrap{display:flex;align-items:center;gap:18px;min-height:62px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--paper);font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.14em}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--ink) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:62px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--paper);font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.14em;cursor:pointer;background:none;border:0;padding:0}
 .brand img{width:34px;height:34px;border-radius:9px}
-.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
-.nav a{color:var(--muted);text-decoration:none;font-weight:500;padding:8px 10px;border-radius:8px;font-size:.95rem}
-.nav a:hover,.nav a.on{color:var(--gold-hi);background:#fff1}
+.nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav button{all:unset;cursor:pointer;color:var(--muted);font-weight:500;padding:8px 10px;border-radius:8px;font-size:.95rem}
+.nav button:hover{color:var(--gold-hi);background:#fff1}
+.nav button[aria-current="page"]{color:var(--gold-hi);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.nav button:focus-visible{outline:2px solid var(--gold-hi)}
 .top .btn{padding:10px 18px;font-size:.92rem}
 .menu-btn{all:unset;cursor:pointer;margin-left:auto;width:42px;height:42px;display:none;place-items:center;border:1px solid var(--line-2);border-radius:10px;color:var(--paper)}
 .menu-btn svg{width:22px;height:22px}
-@media (max-width:1000px){.nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--ink-2);border-bottom:1px solid var(--line);padding:10px 14px 16px;flex-direction:column;gap:2px}.nav.open{display:flex}.nav a{padding:12px 10px;font-size:1.05rem}.menu-btn{display:grid}.top .btn{margin-left:0}.top .wrap{gap:10px}}
+@media (max-width:1060px){.nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--ink-2);border-bottom:1px solid var(--line);padding:10px 14px 16px;flex-direction:column;gap:2px}.nav.open{display:flex}.nav button{padding:12px 10px;font-size:1.05rem}.menu-btn{display:grid}.top .btn{margin-left:0}.top .wrap{gap:10px}}
 
 /* portada */
-.hero{position:relative;isolation:isolate;overflow:hidden;min-height:min(92vh,860px);display:grid;align-items:end;border-bottom:1px solid var(--line)}
-.hero-bg{position:absolute;inset:0;z-index:-2;background:var(--ink) center 35%/cover no-repeat}
-.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--ink) 4%,#0b0908cc 36%,#0b090855 62%,#0b090822),linear-gradient(90deg,#0b0908aa,transparent 55%)}
-.hero .wrap{padding-block:clamp(70px,10vw,120px) clamp(44px,6vw,80px);display:grid;gap:22px;justify-items:start;width:100%}
-.hero-logo{width:min(520px,92%);height:auto;filter:drop-shadow(0 12px 40px #000c)}
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:min(86vh,780px);display:grid;align-items:end;border-bottom:1px solid var(--line)}
+.hero-bg{position:absolute;inset:0;z-index:-2;background:var(--ink) center 35%/cover no-repeat;transition:opacity 1.2s ease}
+.hero-bg.b2{opacity:0}
+.hero-bg.b2.on{opacity:1}
+.hero-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,var(--ink) 4%,#0b0908cc 36%,#0b090855 62%,#0b090822),linear-gradient(90deg,#0b0908aa,transparent 55%)}
+.hero .wrap{padding-block:clamp(60px,9vw,110px) clamp(40px,5vw,64px);display:grid;gap:20px;justify-items:start;width:100%}
+.hero-logo{width:min(500px,92%);height:auto;filter:drop-shadow(0 12px 40px #000c)}
 .tagline{font-family:var(--display);font-size:var(--s2);color:var(--gold-hi);letter-spacing:.03em;text-shadow:0 2px 20px #000}
 .hero .lead{text-shadow:0 1px 12px #000;max-width:54ch}
 .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.plats{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.plats{display:flex;flex-wrap:wrap;gap:8px}
 .plats button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:#0009;color:var(--paper);font-weight:500;font-size:.92rem;backdrop-filter:blur(6px)}
 .plats button:hover{border-color:var(--gold);color:var(--gold-hi)}
 .plats svg{width:16px;height:16px;color:var(--gold)}
-.facts{display:flex;flex-wrap:wrap;gap:8px 26px;margin:4px 0 0;padding:0;list-style:none;color:var(--muted);font-size:var(--s-1)}
-.facts b{color:var(--paper);font-family:var(--display);font-size:1.3rem;margin-right:6px;font-variant-numeric:tabular-nums}
+.plats button:focus-visible{outline:2px solid var(--gold-hi)}
+.hero .where{position:absolute;right:18px;bottom:14px;font-size:.78rem;color:var(--muted);text-shadow:0 1px 6px #000;z-index:1}
 
-/* tira de descarga que se repite entre secciones */
-.strip{background:linear-gradient(90deg,var(--ink-3),var(--ink-2));border-block:1px solid var(--line)}
-.strip .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;padding-block:18px}
-.strip p{font-family:var(--display);font-size:var(--s1);color:var(--gold-hi)}
-.strip span{color:var(--muted);font-family:var(--body);font-size:var(--s-1);display:block;margin-top:2px}
-.strip .cta{gap:8px}
+/* portada: explorá el reino (mosaico de accesos) */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{all:unset;box-sizing:border-box;cursor:pointer;position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3;background:var(--ink-3);display:grid;align-items:end;transition:transform .2s,border-color .2s}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.tile:hover{transform:translateY(-3px);border-color:var(--gold)}
+.tile:hover img{transform:scale(1.05)}
+.tile:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.tile div{position:relative;padding:14px 16px;background:linear-gradient(0deg,#000d,#0000);width:100%}
+.tile b{display:block;font-family:var(--display);font-size:1.15rem;color:var(--gold-hi)}
+.tile span{font-size:.85rem;color:var(--paper);opacity:.85}
+.tile.big{grid-column:span 2}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:460px){.tile{aspect-ratio:16/10}}
 
 /* mitología */
 .myth{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,5vw,64px);align-items:start}
 .myth-text{display:grid;gap:16px;max-width:60ch}
-.myth-text p{font-size:var(--s0)}
+.quote{font-family:var(--display);font-size:var(--s1);line-height:1.45;border-left:2px solid var(--gold);padding-left:18px}
 .myth-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.myth-grid div{background:var(--ink);border:1px solid var(--line);border-radius:var(--r);padding:12px;color:var(--muted);font-size:.93rem;line-height:1.45;display:grid;gap:8px;align-content:start}
+.myth-grid button{all:unset;box-sizing:border-box;cursor:pointer;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:12px;color:var(--muted);font-size:.93rem;line-height:1.45;display:grid;gap:8px;align-content:start;transition:border-color .15s,transform .15s}
+.myth-grid button:hover{border-color:var(--gold);transform:translateY(-2px)}
+.myth-grid button:focus-visible{outline:2px solid var(--gold-hi)}
 .myth-grid img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:10px;background:var(--ink-3)}
 .myth-grid b{color:var(--gold-hi);font-family:var(--display);font-size:.95rem;font-weight:600}
-.glos{margin-top:clamp(30px,5vw,54px);border-top:1px solid var(--line);padding-top:26px}
-.glos h3{color:var(--gold-hi);margin-bottom:14px}
-.glos dl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 18px}
-.glos div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline;padding:8px 0;border-bottom:1px dashed var(--line)}
+.glos{margin-top:clamp(26px,4vw,40px);border-top:1px solid var(--line);padding-top:22px}
+.glos .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.glos h3{color:var(--gold-hi)}
+.glos input{all:unset;box-sizing:border-box;border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;color:var(--paper);background:var(--ink);min-width:220px;font-size:.95rem}
+.glos dl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 18px}
+.glos div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--line)}
 .glos dt{font-family:var(--display);font-weight:600;color:var(--paper);font-size:.92rem}
 .glos dd{margin:0;color:var(--muted);font-size:.88rem}
 @media (max-width:900px){.myth{grid-template-columns:1fr}}
 @media (max-width:480px){.myth-grid{grid-template-columns:1fr}}
+
 /* historia */
 .story{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,5vw,72px);align-items:start}
 .story-text{display:grid;gap:16px;max-width:62ch}
 .story-text b{color:var(--gold-hi);font-weight:500}
-.quote{font-family:var(--display);font-size:var(--s1);line-height:1.45;border-left:2px solid var(--gold);padding-left:18px}
 .sons{display:grid;gap:12px}
-.sons ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;counter-reset:s}
-.sons li{display:grid;gap:6px;padding:10px;border:1px solid var(--line);border-radius:var(--r);background:var(--ink-2);counter-increment:s;text-decoration:none;color:inherit}
-.sons li img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:var(--ink-3)}
-.sons .n{font-family:var(--display);font-weight:600;font-size:.95rem}
+.sons ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;counter-reset:s}
+.sons li{counter-increment:s}
+.sons button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;padding:10px;border:1px solid var(--line);border-radius:var(--r);background:var(--ink-2);width:100%;transition:border-color .15s,transform .15s}
+.sons button:hover{border-color:var(--gold);transform:translateY(-2px)}
+.sons button:focus-visible{outline:2px solid var(--gold-hi)}
+.sons img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:var(--ink-3)}
+.sons .n{font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--paper)}
 .sons .w{color:var(--muted);font-size:.8rem}
-.sons li::before{content:counter(s,upper-roman);font-family:var(--display);color:var(--gold);font-size:.8rem}
+.sons button::before{content:counter(s,upper-roman);font-family:var(--display);color:var(--gold);font-size:.8rem}
 @media (max-width:900px){.story{grid-template-columns:1fr}}
-.chapters{display:grid;gap:8px;max-width:900px;margin-top:30px}
-.chapters details{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r)}
-.chapters summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px}
-.chapters summary::-webkit-details-marker{display:none}
-.chapters .no{font-family:var(--display);color:var(--gold);font-size:.85rem}
-.chapters .ct{font-family:var(--display);font-weight:600;font-size:1.05rem}
-.chapters .lk{font-size:.8rem;color:var(--muted);text-align:right}
-.chapters .tx{padding:0 18px 18px 84px;display:grid;gap:10px;max-width:72ch}
-.chapters .tx b{color:var(--gold-hi);font-weight:500}
-@media (max-width:560px){.chapters summary{grid-template-columns:40px minmax(0,1fr)}.chapters .lk{display:none}.chapters .tx{padding:0 16px 16px}}
+.book{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;margin-top:30px;background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.book nav{display:grid;gap:2px;padding:12px;border-right:1px solid var(--line);background:var(--ink)}
+.book nav button{all:unset;cursor:pointer;display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:center;padding:9px 10px;border-radius:10px;color:var(--muted);font-size:.92rem}
+.book nav button:hover{background:#fff1;color:var(--paper)}
+.book nav button[aria-current="true"]{background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold-hi)}
+.book nav .no{font-family:var(--display);font-size:.8rem;color:var(--gold)}
+.book nav button:focus-visible{outline:2px solid var(--gold-hi)}
+.page{padding:clamp(18px,3vw,32px);display:grid;gap:12px;align-content:start;max-width:70ch}
+.page h3{font-size:var(--s2);color:var(--gold-hi)}
+.page .lk{font-size:.85rem;color:var(--muted)}
+.page p b{color:var(--gold-hi);font-weight:500}
+.page .pn{display:flex;gap:8px;margin-top:8px}
+@media (max-width:760px){.book{grid-template-columns:1fr}.book nav{border-right:0;border-bottom:1px solid var(--line);grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 
-/* razas: paneles partidos, imagen grande a un lado */
-.razas{display:grid;gap:18px}
-.raza{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
-.raza:nth-child(even){grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
-.raza:nth-child(even) .rimg{order:2}
-.rimg{position:relative;background:radial-gradient(60% 50% at 50% 70%,color-mix(in srgb,var(--c) 28%,transparent),transparent 70%),var(--ink-3);min-height:360px}
-.rimg img{width:100%;height:100%;object-fit:cover;object-position:center 20%;aspect-ratio:3/4;cursor:zoom-in}
-.rimg::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--ink-2) 0%,transparent 22%),linear-gradient(180deg,var(--ink-2),transparent 14%);pointer-events:none}
-.rbody{padding:clamp(20px,3vw,36px);display:grid;gap:14px;align-content:center}
+/* razas: selector de retratos + panel */
+.rsel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.rsel button{all:unset;box-sizing:border-box;cursor:pointer;position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--line);aspect-ratio:3/4;background:var(--ink-3);transition:border-color .15s,transform .15s}
+.rsel button img{width:100%;height:100%;object-fit:cover;object-position:center 12%}
+.rsel button span{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;background:linear-gradient(0deg,#000d,#0000);font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--gold-hi);text-align:center}
+.rsel button:hover{transform:translateY(-3px)}
+.rsel button[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 24px -6px var(--c)}
+.rsel button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.raza{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.rimg{position:relative;background:radial-gradient(60% 50% at 50% 70%,color-mix(in srgb,var(--c) 28%,transparent),transparent 70%),var(--ink-3)}
+.rimg img{width:100%;height:100%;object-fit:cover;object-position:center 18%;aspect-ratio:3/4;cursor:zoom-in}
+.rimg::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--ink-2) 0%,transparent 20%),linear-gradient(180deg,var(--ink-2),transparent 14%);pointer-events:none}
+.rbody{padding:clamp(20px,3vw,34px);display:grid;gap:14px;align-content:start}
 .rbody h3{font-size:var(--s2);color:var(--gold-hi)}
-.rbody .evo{color:var(--muted)}
-.rbody .evo b{color:var(--paper);font-weight:500}
-.stats{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
-.stats li{font-size:.85rem;border:1px solid var(--line-2);border-radius:999px;padding:4px 11px;color:var(--muted)}
-.stats b{color:var(--paper);font-weight:600;margin-left:4px}
-.skills{margin:0;padding:0;list-style:none;display:grid;gap:8px}
-.skills li{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:start}
-.skills .sl{font-family:var(--display);color:var(--gold);font-size:.78rem;padding-top:4px;border-top:1px solid var(--line-2)}
-.skills .sn{font-weight:700}
-.skills .sd{color:var(--muted);font-size:.95rem}
+.rbody .evo{color:var(--muted)}.rbody .evo b{color:var(--paper);font-weight:500}
+.bars{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.bars li{display:grid;grid-template-columns:84px minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:.88rem;color:var(--muted)}
+.bars i{display:block;height:8px;border-radius:999px;background:var(--ink);border:1px solid var(--line);overflow:hidden}
+.bars i::after{content:"";display:block;height:100%;width:var(--w);background:linear-gradient(90deg,color-mix(in srgb,var(--c) 60%,#000),var(--c));transition:width .6s ease}
+.bars b{color:var(--paper);font-variant-numeric:tabular-nums;text-align:right}
+.skills{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.skills button{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:start;padding:8px 10px;border-radius:10px;border:1px solid transparent}
+.skills button:hover{border-color:var(--line-2);background:#fff0a}
+.skills button[aria-expanded="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 8%,transparent)}
+.skills .sl{font-family:var(--display);color:var(--gold);font-size:.78rem;padding-top:3px}
+.skills .sn{font-weight:700;color:var(--paper)}
+.skills .sd{color:var(--muted);font-size:.93rem;display:none}
+.skills button[aria-expanded="true"] .sd{display:block}
 .unlock{justify-self:start;font-size:.8rem;font-weight:700;color:var(--earth-hi);border:1px solid color-mix(in srgb,var(--earth) 60%,transparent);border-radius:999px;padding:3px 10px}
-@media (max-width:860px){.raza,.raza:nth-child(even){grid-template-columns:1fr}.raza:nth-child(even) .rimg{order:0}.rimg{min-height:0}.rimg img{aspect-ratio:4/4.4}}
+@media (max-width:860px){.raza{grid-template-columns:1fr}.rimg img{aspect-ratio:4/4.4}.rsel{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.rsel button span{font-size:.72rem;padding:12px 4px 6px}}
 
-/* pestañas de clase */
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
-.tabs button{all:unset;cursor:pointer;padding:9px 16px;border-radius:999px;border:1px solid var(--line-2);font-weight:700;color:var(--muted)}
-.tabs button[aria-selected="true"]{border-color:var(--c,var(--gold));color:var(--paper);background:color-mix(in srgb,var(--c,var(--gold)) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c,var(--gold)) 40%,transparent)}
+/* test: qué portador sos */
+.quiz{margin-top:26px;background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,30px);display:grid;gap:14px}
+.quiz h3{color:var(--gold-hi);font-size:var(--s2)}
+.quiz .q{font-size:var(--s1)}
+.quiz .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.quiz .opts button{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;color:var(--paper);transition:border-color .15s,background .15s}
+.quiz .opts button:hover{border-color:var(--gold);background:#fff1}
+.quiz .opts button:focus-visible{outline:2px solid var(--gold-hi)}
+.quiz .prog{display:flex;gap:6px}.quiz .prog i{flex:1;height:4px;border-radius:999px;background:var(--line)}.quiz .prog i.on{background:var(--gold)}
+.quiz .res{display:grid;grid-template-columns:160px minmax(0,1fr);gap:18px;align-items:center}
+.quiz .res img{width:160px;aspect-ratio:3/4;object-fit:cover;object-position:center 15%;border-radius:14px;border:1px solid var(--line)}
+@media (max-width:560px){.quiz .res{grid-template-columns:1fr}}
 
-/* sets: tira de 7 figuras */
-.sets{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
-.set{display:grid;gap:8px;text-align:center;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:8px 8px 12px;position:relative}
-.set img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;background:radial-gradient(60% 40% at 50% 80%,color-mix(in srgb,var(--c) 30%,transparent),transparent 70%),var(--ink-3);cursor:zoom-in}
-.set .tn{font-family:var(--display);font-weight:600;font-size:.86rem;line-height:1.25;color:var(--gold-hi)}
-.set .tl{font-size:.74rem;color:var(--muted)}
-.set .gem{position:absolute;top:14px;right:14px;width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c)}
-.setinfo{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:16px}
-.setinfo div{border-top:1px solid var(--line);padding-top:12px;font-size:.95rem;color:var(--muted)}
-.setinfo b{color:var(--paper);font-weight:600;display:block;font-family:var(--display);font-size:.9rem;margin-bottom:4px}
-@media (max-width:1000px){.sets{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:560px){.sets{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.plus{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-.plus span{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
-.plus i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+/* forja de sets */
+.forge{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.fimg{position:relative;background:radial-gradient(55% 45% at 50% 72%,color-mix(in srgb,var(--c) var(--g,25%),transparent),transparent 70%),var(--ink-3);display:grid;place-items:center;padding:18px}
+.fimg img{width:min(100%,420px);aspect-ratio:3/4;object-fit:cover;border-radius:14px;cursor:zoom-in;filter:drop-shadow(0 0 calc(var(--lv) * 2px) color-mix(in srgb,var(--c) 80%,transparent)) saturate(calc(1 + var(--lv) / 18));transition:filter .3s}
+.fimg .lvtag{position:absolute;top:16px;left:16px;font-family:var(--display);font-weight:700;color:var(--gold-hi);background:#000b;border:1px solid var(--line-2);border-radius:10px;padding:5px 10px}
+.fbody{padding:clamp(18px,3vw,30px);display:grid;gap:14px;align-content:start}
+.fbody h3{font-size:var(--s2);color:var(--gold-hi)}
+.gems{display:flex;flex-wrap:wrap;gap:8px}
+.gems button{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8 0 8%,var(--c) 30%,color-mix(in srgb,var(--c) 40%,#000) 100%);box-shadow:0 0 14px -2px var(--c),0 0 0 1px #0006 inset;transition:transform .15s;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:.8rem;color:#000c}
+.gems button:hover{transform:scale(1.1)}
+.gems button[aria-pressed="true"]{outline:2px solid var(--paper);outline-offset:3px}
+.gems button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:.95rem;margin:0}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.slider{display:grid;gap:6px}
+.slider label{display:flex;justify-content:space-between;font-size:.9rem;color:var(--muted)}
+.slider label b{color:var(--gold-hi);font-family:var(--display)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.slider .hint{font-size:.88rem;color:var(--muted)}
+.fnav{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:860px){.forge{grid-template-columns:1fr}}
 
 /* alas */
-.wings{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.wing{display:grid;gap:6px;text-align:center}
-.wing img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:center 15%;border-radius:var(--r);border:1px solid var(--line);background:var(--ink-3);cursor:zoom-in}
-.wing .tn{font-family:var(--display);font-weight:600;font-size:.86rem;color:var(--gold-hi)}
-.wing .tl{font-size:.76rem;color:var(--muted)}
-@media (max-width:760px){.wings{grid-template-columns:repeat(3,minmax(0,1fr))}.wing:nth-child(n+4){grid-column:span 1}}
-@media (max-width:460px){.wings{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.wingtxt{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
-.wingtxt div{border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:.95rem}
-.wingtxt b{color:var(--paper);font-weight:600;display:block;font-family:var(--display);font-size:.9rem;margin-bottom:4px}
+.wview{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.wimg{display:grid;place-items:center;padding:18px;background:var(--ink-3)}
+.wimg img{width:min(100%,460px);aspect-ratio:3/4;object-fit:cover;object-position:center 15%;border-radius:14px;cursor:zoom-in}
+.wbody{padding:clamp(18px,3vw,26px);display:grid;gap:12px;align-content:start}
+.wbody h3{color:var(--gold-hi)}
+.steps2{display:grid;gap:6px}
+.steps2 button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:.92rem}
+.steps2 button img{width:56px;aspect-ratio:3/4;object-fit:cover;object-position:center 15%;border-radius:8px}
+.steps2 button[aria-pressed="true"]{border-color:var(--c);color:var(--paper);background:color-mix(in srgb,var(--c) 10%,transparent)}
+.steps2 button:focus-visible{outline:2px solid var(--gold-hi)}
+.wbody .note{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:860px){.wview{grid-template-columns:1fr}}
 
-/* ítems: mesa de botín */
-.items{display:grid;gap:30px}
-.igroup h3{color:var(--gold-hi);margin-bottom:4px}
-.igroup .muted{margin-bottom:12px;max-width:70ch}
+/* ítems */
 .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .item{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:8px 10px 8px 8px}
-.item img{width:56px;height:56px;object-fit:contain;border-radius:10px;background:var(--ink-3);border:1px solid var(--line)}
+.item img,.item .pet{width:56px;height:56px;object-fit:contain;border-radius:10px;background:var(--ink-3);border:1px solid var(--line)}
+.item .pet{display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.4rem;color:var(--c);background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--c) 35%,transparent),var(--ink-3) 70%)}
 .item .n{font-weight:700;font-size:.9rem;line-height:1.2;color:var(--c,var(--paper))}
 .item .d{font-size:.78rem;color:var(--muted);line-height:1.3}
 .igrid.wide{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
-.item .pet{width:56px;height:56px;border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.4rem;color:var(--c);background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--c) 35%,transparent),var(--ink-3) 70%);border:1px solid color-mix(in srgb,var(--c) 40%,var(--line))}
 .rars{display:flex;flex-wrap:wrap;gap:8px}
 .rars span{border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;font-weight:700;font-size:.9rem;color:var(--c)}
+.info2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}
+.info2 div{border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:.95rem}
+.info2 b{color:var(--paper);font-weight:600;display:block;font-family:var(--display);font-size:.9rem;margin-bottom:4px}
 .uniq{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
-.uniq>div{display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:8px}
+.uniq>button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:8px;text-align:left}
+.uniq>button:hover{border-color:var(--gold)}
+.uniq>button:focus-visible{outline:2px solid var(--gold-hi)}
 .uniq img{width:56px;height:56px;object-fit:cover;border-radius:10px;background:var(--ink-3)}
 .uniq .n{font-weight:700;color:#ff9a3c;font-size:.92rem}
 .uniq .d{font-size:.8rem;color:var(--muted);line-height:1.3}
+.ipanel{margin-top:16px}
 
-/* mapas: ruta vertical con fotos anchas */
-.route{display:grid;gap:14px}
-.zone{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
-.zone img.big{width:100%;height:100%;object-fit:cover;aspect-ratio:16/9;cursor:zoom-in}
-.zbody{padding:clamp(18px,2.6vw,30px);display:grid;gap:12px;align-content:center}
+/* mapa interactivo */
+.mapa{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.svgwrap{background:radial-gradient(70% 60% at 50% 50%,#1d1510,var(--ink) 80%);border:1px solid var(--line);border-radius:20px;padding:10px;position:sticky;top:76px}
+.svgwrap svg{width:100%;height:auto;display:block}
+.land{fill:#1f1711;stroke:var(--gold-dim,#8a6526);stroke-width:.06;stroke-linejoin:round}
+.river{fill:none;stroke:#3a5a7a;stroke-width:.07;stroke-linecap:round;opacity:.9}
+.route{fill:none;stroke:var(--gold);stroke-width:.05;stroke-dasharray:.18 .14;opacity:.75}
+.pin{cursor:pointer}
+.pin circle{fill:var(--ink);stroke:var(--gold);stroke-width:.07;transition:r .15s}
+.pin text{font-family:var(--display);font-size:.34px;fill:var(--gold-hi);text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:700}
+.pin .lbl{font-family:var(--body);font-size:.3px;fill:var(--paper);text-anchor:start;dominant-baseline:central;paint-order:stroke;stroke:#000;stroke-width:.1;font-weight:500}
+.pin:hover circle,.pin.on circle{fill:var(--gold);r:.42}
+.pin:hover text:not(.lbl),.pin.on text:not(.lbl){fill:#1d1208}
+.pin.safe circle{stroke:var(--earth-hi)}
+.pin.safe.on circle{fill:var(--earth-hi)}
+.zcard{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;overflow:hidden;animation:in .3s ease both}
+.zcard img{width:100%;aspect-ratio:16/9;object-fit:cover;cursor:zoom-in}
+.zbody{padding:clamp(18px,2.6vw,26px);display:grid;gap:12px}
 .zbody h3{font-size:var(--s2);color:var(--gold-hi)}
 .zbody .zr{color:var(--muted)}
 .lv{display:inline-flex;align-items:baseline;gap:6px;font-family:var(--display);font-weight:700;color:var(--gold-hi);font-variant-numeric:tabular-nums;border:1px solid var(--line-2);border-radius:10px;padding:5px 10px;font-size:.9rem;justify-self:start}
 .lv small{font-family:var(--body);font-weight:500;font-size:.7rem;letter-spacing:.08em;color:var(--muted)}
 .lv.safe{color:var(--earth-hi)}
 .crit{display:flex;flex-wrap:wrap;gap:6px}
-.crit a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--paper);border:1px solid var(--line-2);border-radius:999px;padding:3px 10px 3px 3px;font-size:.85rem}
-.crit a:hover{border-color:var(--gold)}
+.crit button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--paper);border:1px solid var(--line-2);border-radius:999px;padding:3px 10px 3px 3px;font-size:.85rem}
+.crit button:hover{border-color:var(--gold)}
+.crit button:focus-visible{outline:2px solid var(--gold-hi)}
 .crit img{width:26px;height:26px;border-radius:50%;object-fit:cover;background:var(--ink-3)}
 .crit .boss{border-color:color-mix(in srgb,var(--earth) 70%,transparent);color:var(--earth-hi)}
 .zbody .q{font-size:.92rem;color:var(--muted);border-left:2px solid var(--line-2);padding-left:10px}
 .zbody .q b{color:var(--paper);font-weight:500}
-@media (max-width:860px){.zone{grid-template-columns:1fr}}
-.events{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:22px}
+.zbody .pn{display:flex;gap:8px;flex-wrap:wrap}
+.events{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:22px}
 .ev{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .ev img{width:100%;aspect-ratio:16/9;object-fit:cover;cursor:zoom-in}
 .ev div{padding:12px 14px 16px;display:grid;gap:4px}
-.ev h4{font-size:1rem;color:var(--gold-hi)}
-.ev p{font-size:.9rem;color:var(--muted)}
+.ev h4{font-size:1rem;color:var(--gold-hi)}.ev p{font-size:.9rem;color:var(--muted)}
+@media (max-width:900px){.mapa{grid-template-columns:1fr}.svgwrap{position:static}}
 
-/* bestiario */
-.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.filters button{all:unset;cursor:pointer;padding:7px 14px;border-radius:999px;border:1px solid var(--line-2);font-weight:600;color:var(--muted);font-size:.9rem}
-.filters button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-hi);background:color-mix(in srgb,var(--gold) 12%,transparent)}
-.mobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
-.mob{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:grid;grid-template-rows:auto 1fr}
-.mob.boss{border-color:color-mix(in srgb,var(--earth) 55%,var(--line))}
-.mob .pic{position:relative}
-.mob img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--ink-3);cursor:zoom-in}
-.mob .lvb{position:absolute;left:10px;top:10px;font-family:var(--display);font-weight:700;font-size:.8rem;color:var(--gold-hi);background:#000b;border:1px solid var(--line-2);border-radius:8px;padding:3px 8px}
-.mob.boss .lvb{color:var(--earth-hi)}
-.mob .bt{position:absolute;right:10px;top:10px;font-size:.72rem;font-weight:700;color:var(--earth-hi);background:#000b;border:1px solid color-mix(in srgb,var(--earth) 70%,transparent);border-radius:8px;padding:3px 8px}
-.mob .mb{padding:12px 14px 14px;display:grid;gap:6px;align-content:start}
-.mob h4{font-size:1.05rem;color:var(--gold-hi)}
-.mob .z{font-size:.8rem;color:var(--muted)}
-.mob .z a{color:var(--muted)}
-.mob p{font-size:.9rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-.mob p.open{display:block;-webkit-line-clamp:unset}
-.mob .more{all:unset;cursor:pointer;font-size:.82rem;color:var(--gold);justify-self:start}
-.mob .more:hover{text-decoration:underline}
-.mob .lt{font-size:.8rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:4px}
-.mob .lt b{color:#ff9a3c;font-weight:600}
+/* bestiario: códice */
+.codex{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.codex button{all:unset;box-sizing:border-box;cursor:pointer;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--ink-2);aspect-ratio:1;transition:transform .15s,border-color .15s}
+.codex button img{width:100%;height:100%;object-fit:cover}
+.codex button:hover{transform:translateY(-3px);border-color:var(--gold)}
+.codex button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.codex button.boss{border-color:color-mix(in srgb,var(--earth) 55%,var(--line))}
+.codex .lvb{position:absolute;left:6px;top:6px;font-family:var(--display);font-weight:700;font-size:.72rem;color:var(--gold-hi);background:#000b;border-radius:6px;padding:2px 6px}
+.codex .nm{position:absolute;left:0;right:0;bottom:0;padding:16px 8px 6px;background:linear-gradient(0deg,#000d,#0000);font-size:.8rem;font-weight:700;color:var(--paper);text-align:center;line-height:1.2}
+.codex .bt{position:absolute;right:6px;top:6px;font-size:.62rem;font-weight:700;color:var(--earth-hi);background:#000b;border-radius:6px;padding:2px 6px}
+.ficha{width:min(820px,100%);background:var(--ink-2);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);box-shadow:0 30px 80px -20px #000;max-height:100%;overflow:auto}
+.ficha img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--ink-3)}
+.ficha .fb{padding:clamp(18px,3vw,28px);display:grid;gap:10px;align-content:start}
+.ficha h3{font-size:var(--s2);color:var(--gold-hi)}
+.ficha .tags{display:flex;flex-wrap:wrap;gap:6px}
+.ficha .tags span{font-size:.8rem;border:1px solid var(--line-2);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.ficha .tags span.b{color:var(--earth-hi);border-color:color-mix(in srgb,var(--earth) 60%,transparent)}
+.ficha p{color:var(--paper);font-size:.98rem}
+.ficha .lt{font-size:.88rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.ficha .lt b{color:#ff9a3c;font-weight:600}
+.ficha .pn{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+@media (max-width:640px){.ficha{grid-template-columns:1fr}.ficha img{aspect-ratio:4/3}}
 
-/* npc */
-.npcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
-.npc{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.npc img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:center 10%;background:var(--ink-3);cursor:zoom-in}
-.npc div{padding:12px 14px 16px;display:grid;gap:5px}
-.npc h4{font-size:1.05rem;color:var(--gold-hi)}
-.npc .r{font-size:.82rem;color:var(--earth-hi);font-weight:700}
-.npc q{font-size:.9rem;color:var(--muted);font-style:italic;quotes:"«" "»"}
-.npc .g{font-size:.8rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+/* npc: plaza */
+.npcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.npcs button{all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--ink-2);position:relative;aspect-ratio:3/4;transition:transform .15s,border-color .15s}
+.npcs button img{width:100%;height:100%;object-fit:cover;object-position:center 10%}
+.npcs button:hover{transform:translateY(-3px);border-color:var(--gold)}
+.npcs button[aria-pressed="true"]{border-color:var(--gold)}
+.npcs button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.npcs .nm{position:absolute;left:0;right:0;bottom:0;padding:18px 8px 8px;background:linear-gradient(0deg,#000d,#0000);text-align:center}
+.npcs .nm b{display:block;font-family:var(--display);font-size:.9rem;color:var(--gold-hi)}
+.npcs .nm span{font-size:.75rem;color:var(--earth-hi);font-weight:700}
+.talk{margin-top:16px;display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:16px}
+.talk img{width:120px;aspect-ratio:3/4;object-fit:cover;object-position:center 10%;border-radius:12px}
+.talk h3{color:var(--gold-hi)}
+.talk q{font-size:var(--s1);font-style:italic;color:var(--paper);quotes:"«" "»"}
+.talk .g{font-size:.88rem;color:var(--muted)}
+@media (max-width:560px){.talk{grid-template-columns:1fr}}
 
 /* descargas */
-.dl{background:radial-gradient(1100px 520px at 50% 0%,color-mix(in srgb,var(--gold) 13%,transparent),transparent 70%),var(--ink);border-top:1px solid var(--line)}
 .platforms{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
 .plat{all:unset;box-sizing:border-box;cursor:pointer;background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:22px 20px;display:grid;gap:14px;align-content:start;transition:border-color .15s,transform .15s,background .15s}
 .plat:hover{border-color:var(--gold);transform:translateY(-2px);background:var(--ink-3)}
@@ -280,14 +351,18 @@ p{margin:0}
 .req{margin-top:26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;color:var(--muted);font-size:.92rem}
 .req div{border-top:1px solid var(--line);padding-top:10px}
 .req b{color:var(--paper);font-weight:600;display:block;font-family:var(--display);font-size:.88rem;margin-bottom:3px}
+.dlband{margin-top:clamp(30px,5vw,50px);background:linear-gradient(90deg,var(--ink-3),var(--ink-2));border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,28px);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px}
+.dlband p{font-family:var(--display);font-size:var(--s1);color:var(--gold-hi)}
+.dlband span{color:var(--muted);font-family:var(--body);font-size:var(--s-1);display:block;margin-top:2px}
 
-/* ventana de instrucciones y visor */
+/* ventanas */
 .modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:#000c;backdrop-filter:blur(5px)}
 .panel{width:min(620px,100%);max-height:100%;overflow:auto;background:var(--ink-2);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,32px);display:grid;gap:20px;box-shadow:0 30px 80px -20px #000}
+.panel.wide{width:min(1000px,100%)}
 .panel-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
 .panel-head .plat-icon{width:60px;height:60px}.panel-head .plat-icon img{width:60px;height:60px;border-radius:15px}
 .panel-head h3{font-size:var(--s2);color:var(--gold-hi)}
-.x{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line-2);color:var(--paper);font-size:1.4rem;line-height:1;background:#000a}
+.x{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line-2);color:var(--paper);font-size:1.4rem;line-height:1;background:#000a;flex:none}
 .x:hover{border-color:var(--gold)}
 .steps{margin:0;padding:0;list-style:none;counter-reset:st;display:grid;gap:14px}
 .steps li{counter-increment:st;display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px;align-items:start}
@@ -302,15 +377,20 @@ p{margin:0}
 .viewer img{max-width:min(96vw,1200px);max-height:84vh;object-fit:contain;border-radius:12px;box-shadow:0 30px 80px #000}
 .viewer figcaption{position:absolute;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom,0px));text-align:center;font-family:var(--display);color:var(--gold-hi);font-size:var(--s1);text-shadow:0 2px 10px #000}
 .viewer .x{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:16px}
+.fmodal{position:fixed;inset:0;z-index:55;background:#000c;backdrop-filter:blur(5px);display:grid;place-items:center;padding:16px}
+.fmodal .x{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:16px}
 
-/* barra fija de descarga en el celular */
+/* barra fija en celular */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:35;display:none;gap:8px;padding:10px max(12px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--ink) 90%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
 .dock .btn{flex:1;padding:13px 12px;font-size:.95rem}
 @media (max-width:760px){.dock{display:flex}body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}}
 
-footer{border-top:1px solid var(--line);padding-block:40px 48px;color:var(--muted);font-size:var(--s-1)}
-footer .wrap{display:grid;gap:18px}
+footer{border-top:1px solid var(--line);padding-block:34px 44px;color:var(--muted);font-size:var(--s-1)}
+footer .wrap{display:grid;gap:14px}
 footer .row{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;justify-content:space-between}
+footer .links{display:flex;flex-wrap:wrap;gap:4px 14px}
+footer .links button{all:unset;cursor:pointer;color:var(--muted)}
+footer .links button:hover{color:var(--gold-hi)}
 footer .credits{max-width:92ch;line-height:1.55}
 footer a{color:var(--muted)}
 .maker{font-size:.82rem;letter-spacing:.04em;opacity:.85}
@@ -318,34 +398,41 @@ footer a{color:var(--muted)}
 
 </head><body><header class="top">
   <div class="wrap">
-    <a class="brand" href="#inicio"><img src="img/icon-256.png" alt="" width="34" height="34">NOX</a>
+    <button class="brand" data-go="inicio"><img src="img/icon-256.png" alt="" width="34" height="34">NOX</button>
     <button class="menu-btn" id="menuBtn" aria-label="Menú" aria-expanded="false" aria-controls="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <nav class="nav" id="nav" aria-label="Secciones">
-      <a href="#mitologia">Mitología</a><a href="#historia">Historia</a><a href="#razas">Razas</a><a href="#sets">Sets</a><a href="#alas">Alas</a><a href="#items">Ítems</a><a href="#mapas">Mapas</a><a href="#bestiario">Bestiario</a><a href="#npc">NPC</a><a href="cuenta/#tienda">Tienda</a><a href="cuenta/#cuenta">Mi cuenta</a>
+      <button data-go="mitologia">Mitología</button><button data-go="historia">Historia</button><button data-go="razas">Razas</button><button data-go="sets">Sets</button><button data-go="alas">Alas</button><button data-go="items">Ítems</button><button data-go="mapas">Mapas</button><button data-go="bestiario">Bestiario</button><button data-go="npc">NPC</button><a href="cuenta/#tienda" style="color:var(--muted);text-decoration:none;font-weight:500;padding:8px 10px">Tienda</a><a href="cuenta/#cuenta" style="color:var(--muted);text-decoration:none;font-weight:500;padding:8px 10px">Mi cuenta</a>
     </nav>
-    <a class="btn btn-gold" href="#descargar">Descargar</a>
+    <button class="btn btn-gold" data-dl>Descargar</button>
   </div>
 </header>
 
-<main>
-<section class="hero" id="inicio">
-  <div class="hero-bg" style="background-image:url(img/w/hero.webp)"></div>
+<main id="main">
+
+<!-- INICIO -->
+<section class="vw" data-view="inicio">
+<div class="hero">
+  <div class="hero-bg b1" id="bg1"></div><div class="hero-bg b2" id="bg2"></div><div class="hero-shade"></div>
   <div class="wrap">
     <h1 style="margin:0"><img class="hero-logo" src="img/logo.webp" alt="NOX, Crónicas del Paraguay" width="1200" height="600" fetchpriority="high"></h1>
     <p class="tagline">Cuando cae la noche, nacen las leyendas.</p>
-    <p class="lead">La mitología guaraní, hecha juego. Un MMORPG gratis al estilo MU donde los siete hijos de Tau y Kerana, el Pombero, la Ka'a Jarýi y el Yaguarú viven en las tierras reales del Paraguay. Elegí tu raza, forjá tus sets y tus alas, y abrí otra vez el camino a Yvy Marane'ỹ.</p>
-    <div class="cta">
-      <a class="btn btn-gold" href="#descargar">Descargar gratis</a>
-      <a class="btn btn-line" data-web href="#descargar">Jugar en el navegador</a>
-    </div>
+    <p class="lead">La mitología guaraní, hecha juego. Un MMORPG gratis al estilo MU donde los siete hijos de Tau y Kerana, el Pombero, la Ka'a Jarýi y el Yaguarú viven en las tierras reales del Paraguay.</p>
+    <div class="cta"><button class="btn btn-gold" data-dl>Descargar gratis</button><a class="btn btn-line" data-web href="jugar/">Jugar en el navegador</a></div>
     <div class="plats" id="heroPlats" aria-label="Plataformas"></div>
-    <ul class="facts">
-      <li><b>5</b>razas</li><li><b>35</b>sets</li><li><b>10</b>mapas</li><li><b>27</b>criaturas</li><li><b>12</b>capítulos</li>
-    </ul>
   </div>
+  <span class="where" id="where"></span>
+</div>
+<div class="view" style="padding-top:clamp(26px,4vw,44px)">
+  <div class="wrap">
+    <div class="vhead"><span class="kicker">Explorá el reino</span><h2>Todo lo que te espera en NOX</h2></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="dlband"><p>Es gratis y se juega en todos lados<span>Android, Windows, Mac, iPhone y navegador. La misma cuenta en todos.</span></p><div class="cta"><button class="btn btn-gold" data-dl>Descargar</button><a class="btn btn-line" data-web href="jugar/">Jugar ahora</a></div></div>
+  </div>
+</div>
 </section>
 
-<section class="sec band" id="mitologia">
+<!-- MITOLOGÍA -->
+<section class="vw view" data-view="mitologia" hidden>
   <div class="wrap">
     <div class="myth">
       <div class="myth-text">
@@ -354,22 +441,24 @@ footer a{color:var(--muted)}
         <p>Crecimos escuchando del Pombero, del Jasy Jateré y del Luisón, pero casi nunca los vimos en un juego. NOX nace de esas ganas: que las leyendas que nos contaron las abuelas se puedan recorrer, pelear y descubrir, con la misma dedicación que cualquier mundo de fantasía de afuera, y desde Paraguay.</p>
         <p>Por eso cada criatura está hecha como la describe el mito y no como un monstruo genérico; por eso los mapas son lugares reales del país, los sets y las técnicas llevan nombres en guaraní, y los NPC te saludan con un <i>mba'éichapa</i>. Jugar NOX es una manera interactiva de acercarse a nuestra cultura, y de que los más chicos la conozcan jugando.</p>
         <p class="quote">Cada bestia que cae es una página más de una crónica que es nuestra.</p>
+        <div class="cta"><button class="btn btn-gold" data-dl>Jugar gratis</button><button class="btn btn-line" data-go="bestiario">Ver el bestiario</button></div>
       </div>
       <div class="myth-grid">
-        <div><img src="img/w/mob_jasyjatere.webp" alt="Jasy Jateré" loading="lazy"><b>Fieles a la leyenda</b>Los siete hijos de Tau y Kerana aparecen con la forma que cuentan los mitos: Teju Jagua con sus siete cabezas de perro, Mbói Tu'i con cabeza de loro, Moñái con sus cuernos, Jasy Jateré con su bastón de oro.</div>
-        <div><img src="img/w/z_ybytyruzu.webp" alt="Cordillera del Ybytyruzú" loading="lazy"><b>Tierras reales</b>Ypacaraí, Trinidad, el Chaco Boreal, los Esteros del Ñeembucú, el Ybytyruzú, el Monday, el Mbaracayú, Cerro Corá y Bahía Negra, cada uno con su luz y su paisaje.</div>
-        <div><img src="img/w/npc_cronista.webp" alt="Karaí Arandu, el cronista" loading="lazy"><b>El guaraní vivo</b>Kuarahy, Jasy, Tupã, Arasy y Ñamandu nombran sets y técnicas. Karaí Arandu, el cronista, escribe la historia a medida que avanzás, en el castellano del Paraguay.</div>
-        <div><img src="img/w/mob_kurupi.webp" alt="Kurupí" loading="lazy"><b>Para toda la familia</b>Las leyendas se cuentan con respeto y aptas para todas las edades, para que los chicos puedan conocer de dónde vienen el Kurupí o el Ao Ao mientras juegan.</div>
+        <button data-go="bestiario/jasyjatere"><img src="img/w/mob_jasyjatere.webp" alt="Jasy Jateré" loading="lazy"><b>Fieles a la leyenda</b>Los siete hijos de Tau y Kerana aparecen con la forma que cuentan los mitos: Teju Jagua con sus siete cabezas de perro, Mbói Tu'i con cabeza de loro, Moñái con sus cuernos, Jasy Jateré con su bastón de oro.</button>
+        <button data-go="mapas/ybytyruzu"><img src="img/w/z_ybytyruzu.webp" alt="Cordillera del Ybytyruzú" loading="lazy"><b>Tierras reales</b>Ypacaraí, Trinidad, el Chaco Boreal, los Esteros del Ñeembucú, el Ybytyruzú, el Monday, el Mbaracayú, Cerro Corá y Bahía Negra, cada uno con su luz y su paisaje.</button>
+        <button data-go="npc/cronista"><img src="img/w/npc_cronista.webp" alt="Karaí Arandu, el cronista" loading="lazy"><b>El guaraní vivo</b>Kuarahy, Jasy, Tupã, Arasy y Ñamandu nombran sets y técnicas. Karaí Arandu, el cronista, escribe la historia a medida que avanzás, en el castellano del Paraguay.</button>
+        <button data-go="bestiario/kurupi"><img src="img/w/mob_kurupi.webp" alt="Kurupí" loading="lazy"><b>Para toda la familia</b>Las leyendas se cuentan con respeto y aptas para todas las edades, para que los chicos puedan conocer de dónde vienen el Kurupí o el Ao Ao mientras juegan.</button>
       </div>
     </div>
     <div class="glos">
-      <h3>Pequeño glosario del reino</h3>
+      <div class="row"><h3>Pequeño glosario del reino</h3><input id="glosQ" type="search" placeholder="Buscar una palabra…" aria-label="Buscar en el glosario"></div>
       <dl id="glos"></dl>
     </div>
   </div>
 </section>
 
-<section class="sec" id="historia">
+<!-- HISTORIA -->
+<section class="vw view" data-view="historia" hidden>
   <div class="wrap">
     <div class="story">
       <div class="story-text">
@@ -383,74 +472,82 @@ footer a{color:var(--muted)}
       <aside class="sons" aria-label="Los siete hijos de Tau y Kerana">
         <span class="kicker">Los siete hijos de Tau y Kerana</span>
         <ol id="sons"></ol>
-        <p class="muted" style="font-size:var(--s-1)">Cada uno espera en su tierra, tal como lo cuenta la mitología guaraní. Tocá uno para verlo en el bestiario.</p>
+        <p class="muted" style="font-size:var(--s-1)">Cada uno espera en su tierra, tal como lo cuenta la mitología guaraní. Tocá uno para ver su ficha.</p>
       </aside>
     </div>
-    <div class="chapters" id="chapters"></div>
+    <div class="book" id="book"><nav id="bookNav" aria-label="Capítulos"></nav><div class="page" id="bookPage"></div></div>
   </div>
 </section>
 
-<div class="strip"><div class="wrap"><p>Es gratis y se juega en todos lados<span>Android, Windows, Mac, iPhone y navegador. La misma cuenta en todos.</span></p><div class="cta"><a class="btn btn-gold" href="#descargar">Descargar</a><a class="btn btn-line" data-web href="#descargar">Jugar ahora</a></div></div></div>
-
-<section class="sec" id="razas">
+<!-- RAZAS -->
+<section class="vw view" data-view="razas" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">Elegí tu portador</span><h2>Cinco razas</h2><p class="lead">Cada raza tiene sus propios sets, armas, alas y cuatro técnicas. Con la prueba del Pa'i Antonio evoluciona a su forma mayor.</p></div>
-    <div class="razas" id="razasList"></div>
+    <div class="vhead"><span class="kicker">Elegí tu portador</span><h2>Cinco razas</h2><p class="lead">Tocá un retrato para conocer la raza, sus estadísticas y sus técnicas. Al final, un test rápido te dice cuál va con vos.</p></div>
+    <div class="rsel" id="rsel"></div>
+    <div id="razaPanel"></div>
+    <div class="quiz" id="quiz"></div>
   </div>
 </section>
 
-<section class="sec band" id="sets">
+<!-- SETS -->
+<section class="vw view" data-view="sets" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">Lo que vas a perseguir</span><h2>Siete sets por raza</h2><p class="lead">Cada set tiene cinco piezas, su arma y su color propio. Desde +0 ya se nota la diferencia, y con las gemas brilla cada vez más fuerte.</p></div>
-    <div class="tabs" role="tablist" id="setTabs"></div>
-    <div id="setPanel" role="tabpanel"></div>
+    <div class="vhead"><span class="kicker">La forja</span><h2>Siete sets por raza</h2><p class="lead">Elegí la raza, tocá una gema para cambiar de set y mové el nivel de +0 a +15 para ver cómo se enciende.</p></div>
+    <div class="chips" id="setTabs" role="tablist" style="margin-bottom:14px"></div>
+    <div id="forge"></div>
   </div>
 </section>
 
-<section class="sec" id="alas">
+<!-- ALAS -->
+<section class="vw view" data-view="alas" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">El sello de los que llegaron lejos</span><h2>Alas</h2><p class="lead">Cada raza tiene su propia forma de ala y cambia de color y de brillo en +0, +4, +8 y +12. Las de segunda generación se forjan en el Caldero de Kerana y suman un segundo par.</p></div>
-    <div class="tabs" role="tablist" id="wingTabs"></div>
-    <div id="wingPanel" role="tabpanel"></div>
+    <div class="vhead"><span class="kicker">El sello de los que llegaron lejos</span><h2>Alas</h2><p class="lead">Cada raza tiene su propia forma de ala. Elegí la raza y recorré las etapas.</p></div>
+    <div class="chips" id="wingTabs" role="tablist" style="margin-bottom:14px"></div>
+    <div id="wingPanel"></div>
   </div>
 </section>
 
-<section class="sec band" id="items">
+<!-- ÍTEMS -->
+<section class="vw view" data-view="items" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">La mesa de botín</span><h2>Ítems</h2><p class="lead">Armas, escudos, gemas, pociones, mascotas y las piezas únicas que solo sueltan las bestias.</p></div>
-    <div class="items" id="itemsList"></div>
+    <div class="vhead"><span class="kicker">La mesa de botín</span><h2>Ítems</h2></div>
+    <div class="chips" id="itemTabs"></div>
+    <div class="ipanel" id="itemPanel"></div>
   </div>
 </section>
 
-<section class="sec" id="mapas">
+<!-- MAPAS -->
+<section class="vw view" data-view="mapas" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">El reino</span><h2>Diez tierras, de Asunción a Bahía Negra</h2><p class="lead">Los portales se abren a medida que subís de nivel. Cada tierra tiene sus criaturas, su jefe y la misión del Capitán Cabañas.</p></div>
-    <div class="route" id="route"></div>
+    <div class="vhead"><span class="kicker">El reino</span><h2>Diez tierras, de Asunción a Bahía Negra</h2><p class="lead">Tocá un punto del mapa. Los portales se abren a medida que subís de nivel, siguiendo la ruta dorada.</p></div>
+    <div class="mapa"><div class="svgwrap" id="svgwrap"></div><div id="zoneCard"></div></div>
     <h3 style="margin-top:34px;color:var(--gold-hi)">Eventos</h3>
     <div class="events" id="events"></div>
   </div>
 </section>
 
-<div class="strip"><div class="wrap"><p>Empezá hoy en los Campos de Ypacaraí<span>Sin instalar nada: el juego también corre en el navegador del celular y de la PC.</span></p><div class="cta"><a class="btn btn-gold" href="#descargar">Descargar</a><a class="btn btn-line" data-web href="#descargar">Jugar ahora</a></div></div></div>
-
-<section class="sec band" id="bestiario">
+<!-- BESTIARIO -->
+<section class="vw view" data-view="bestiario" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">Fieles a la mitología guaraní</span><h2>Bestiario</h2><p class="lead">Las 27 criaturas del reino, cada una como la describen las leyendas guaraníes: los siete hijos de Tau y Kerana, los espíritus del monte y del agua, los fantasmas de nuestra historia y los jefes que cierran cada tierra. Tocá «Leer la ficha completa» para conocer el mito de cada una.</p></div>
-    <div class="filters" id="filters"></div>
-    <div class="mobs" id="mobs"></div>
+    <div class="vhead"><span class="kicker">Fieles a la mitología guaraní</span><h2>Bestiario</h2><p class="lead">Las 27 criaturas del reino, cada una como la describen las leyendas. Tocá una para abrir su ficha.</p></div>
+    <div class="chips" id="filters" style="margin-bottom:16px"></div>
+    <div class="codex" id="codex"></div>
   </div>
 </section>
 
-<section class="sec" id="npc">
+<!-- NPC -->
+<section class="vw view" data-view="npc" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">Asunción</span><h2>Los NPC de la capital</h2><p class="lead">Guerreros de cada raza con los sets y las alas más altos del reino. Ellos forjan, curan, enseñan, guardan y escriben.</p></div>
+    <div class="vhead"><span class="kicker">Asunción</span><h2>Los NPC de la capital</h2><p class="lead">Guerreros de cada raza con los sets y las alas más altos del reino. Tocá uno para hablarle.</p></div>
     <div class="npcs" id="npcs"></div>
+    <div class="talk" id="talk"></div>
   </div>
 </section>
 
-<section class="sec dl" id="descargar">
+<!-- DESCARGAR -->
+<section class="vw view" data-view="descargar" hidden>
   <div class="wrap">
-    <div class="sec-head"><span class="kicker">Gratis</span><h2>Descargá NOX</h2><p class="lead">Elegí tu dispositivo para ver cómo instalarlo. Es el mismo juego y la misma cuenta en todos.</p></div>
+    <div class="vhead"><span class="kicker">Gratis</span><h2>Descargá NOX</h2><p class="lead">Elegí tu dispositivo para ver cómo instalarlo. Es el mismo juego y la misma cuenta en todos.</p></div>
     <div class="platforms" id="platforms"></div>
     <p class="alt">¿Ya tenés cuenta? <a class="btn btn-line" href="cuenta/#cuenta">Mi cuenta</a> <a class="btn btn-line" href="cuenta/#tienda">Tienda</a></p>
     <div class="req">
@@ -465,14 +562,15 @@ footer a{color:var(--muted)}
 <footer>
   <div class="wrap">
     <div class="row">
-      <a class="brand" href="#inicio"><img src="img/icon-256.png" alt="" width="34" height="34">NOX <span class="muted" style="font-family:var(--body);font-weight:500;letter-spacing:.04em;font-size:.9rem">Crónicas del Paraguay</span></a>
+      <button class="brand" data-go="inicio"><img src="img/icon-256.png" alt="" width="34" height="34">NOX <span class="muted" style="font-family:var(--body);font-weight:500;letter-spacing:.04em;font-size:.9rem">Crónicas del Paraguay</span></button>
       <span class="maker">Un juego de GeorgeElHumano · The BnKr Media</span>
     </div>
+    <div class="links"><button data-go="mitologia">Mitología</button><button data-go="historia">Historia</button><button data-go="razas">Razas</button><button data-go="sets">Sets</button><button data-go="alas">Alas</button><button data-go="items">Ítems</button><button data-go="mapas">Mapas</button><button data-go="bestiario">Bestiario</button><button data-go="npc">NPC</button><button data-go="descargar">Descargar</button></div>
     <p class="credits">Personajes, bestias, animaciones, sonidos y música: arte de <a href="https://play0ad.com" target="_blank" rel="noopener">0 A.D.</a> © Wildfire Games, licencia <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (adaptado). Mascotas y monstruos nuevos de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a> (CC0). Hada de <a href="https://github.com/Hankx-Studio/wish-weaver" target="_blank" rel="noopener">Wish Weaver</a>, licencia MIT. Las criaturas, los sets y las alas de NOX son diseño propio inspirado en la mitología guaraní.</p>
   </div>
 </footer>
 
-<div class="dock"><a class="btn btn-gold" href="#descargar">Descargar gratis</a><a class="btn btn-line" data-web href="#descargar">Jugar</a></div>
+<div class="dock"><button class="btn btn-gold" data-dl>Descargar gratis</button><a class="btn btn-line" data-web href="jugar/">Jugar</a></div>
 
 <div class="modal" id="modal" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -482,6 +580,13 @@ footer a{color:var(--muted)}
     <div class="panel-actions" id="mActions"></div>
   </div>
 </div>
+<div class="modal" id="dlModal" hidden>
+  <div class="panel wide" role="dialog" aria-modal="true" aria-label="Descargar NOX">
+    <div class="panel-head" style="grid-template-columns:minmax(0,1fr) auto"><div><span class="kicker">Gratis</span><h3>¿Dónde querés jugar?</h3></div><button class="x" id="dlClose" aria-label="Cerrar">×</button></div>
+    <div class="platforms" id="platforms2"></div>
+  </div>
+</div>
+<div class="fmodal" id="fmodal" hidden><div id="fbox"></div><button class="x" id="fClose" aria-label="Cerrar">×</button></div>
 <figure class="viewer" id="viewer" hidden><img id="vImg" alt=""><figcaption id="vCap"></figcaption><button class="x" id="vClose" aria-label="Cerrar">×</button></figure>
 
 <script>
@@ -516,96 +621,181 @@ const PLAT=[
   steps:['Abrí la dirección del juego en <b>Safari</b>.','Tocá el botón <b>Compartir</b>, el cuadrado con una flecha hacia arriba.','Bajá en el menú y tocá <b>Agregar a inicio</b>.','Tocá <b>Agregar</b>. El ícono de NOX queda en tu pantalla de inicio.','Abrí NOX desde ese ícono: se ve a pantalla completa y se actualiza solo.'],
   note:'Por ahora NOX no está en la App Store, así que en iPhone y iPad se instala de esta forma. Tiene que ser desde Safari: Chrome en iPhone no muestra la opción.',copy:true}
 ];
+
 const ready=p=>p.id==='ios'||p.id==='web'?true:!!LINKS[p.id];
 const iconHTML=p=>'<img src="img/icon-256.png" alt="" width="72" height="72">'+ICONS[p.id];
-const $=s=>document.querySelector(s);
-$('#platforms').innerHTML=PLAT.map(p=>`<button class="plat" type="button" data-p="${p.id}" aria-haspopup="dialog"><div class="plat-icon">${iconHTML(p)}</div><div><div class="pn">${p.name}</div><div class="pr">${p.req}<br>${p.sub}${['android','windows','mac'].includes(p.id)?'<br>Versión '+VERSION:''}</div></div><div class="go"><span>Cómo instalarlo</span><span class="state ${ready(p)?'ok':''}">${ready(p)?'Disponible':'Pronto'}</span></div></button>`).join('');
+const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
+const platHTML=PLAT.map(p=>`<button class="plat" type="button" data-p="${p.id}" aria-haspopup="dialog"><div class="plat-icon">${iconHTML(p)}</div><div><div class="pn">${p.name}</div><div class="pr">${p.req}<br>${p.sub}${['android','windows','mac'].includes(p.id)?'<br>Versión '+VERSION:''}</div></div><div class="go"><span>Cómo instalarlo</span><span class="state ${ready(p)?'ok':''}">${ready(p)?'Disponible':'Pronto'}</span></div></button>`).join('');
+$('#platforms').innerHTML=platHTML;$('#platforms2').innerHTML=platHTML;
 $('#heroPlats').innerHTML=PLAT.map(p=>`<button type="button" data-p="${p.id}">${ICONS[p.id]}${p.name}</button>`).join('');
-const M=$('#modal');let lastFocus=null;
-function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=document.activeElement;
+const M=$('#modal'),DL=$('#dlModal');let lastFocus=null;
+function lock(on){document.body.style.overflow=on?'hidden':'';}
+function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=document.activeElement;DL.hidden=true;
   $('#mIcon').innerHTML=iconHTML(p);$('#mReq').textContent=p.req+(['android','windows','mac'].includes(p.id)?' · versión '+VERSION:'');$('#mTitle').textContent='NOX para '+p.name;
   $('#mSteps').innerHTML=p.steps.map(s=>'<li><span>'+s+'</span></li>').join('');
   let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button></div>';extra+='<p class="note">'+p.note+'</p>';$('#mExtra').innerHTML=extra;
   const href=p.id==='ios'||p.id==='web'?webURL():LINKS[p.id];
   $('#mActions').innerHTML=href?'<a class="btn btn-gold" href="'+href+'" target="_blank" rel="noopener">'+p.btn+'</a>'+(p.btn2?'<a class="btn btn-line" href="'+LINKS.macIntel+'" target="_blank" rel="noopener">'+p.btn2+'</a>':''):'<span class="btn btn-gold" aria-disabled="true">'+p.btn+' · disponible pronto</span><a class="btn btn-line" href="'+webURL()+'" target="_blank" rel="noopener">Mientras tanto, jugar en el navegador</a>';
-  M.hidden=false;document.body.style.overflow='hidden';$('#mClose').focus();
+  M.hidden=false;lock(true);$('#mClose').focus();
   const c=$('#mCopy');if(c)c.onclick=()=>{const i=$('#mUrl');const done=()=>{c.textContent='Copiado';setTimeout(()=>c.textContent='Copiar',1600);};try{navigator.clipboard.writeText(i.value).then(done,()=>{i.select();done();});}catch(e){i.select();done();}};}
-function closePlat(){M.hidden=true;document.body.style.overflow='';if(lastFocus)lastFocus.focus();}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b)openPlat(b.dataset.p);});
-$('#mClose').onclick=closePlat;M.addEventListener('click',e=>{if(e.target===M)closePlat();});
-document.querySelectorAll('[data-web]').forEach(a=>{a.href=webURL();a.target='_blank';a.rel='noopener';});
-/* menú del celular y sección activa */
-const nav=$('#nav'),mb=$('#menuBtn');mb.onclick=()=>{const o=nav.classList.toggle('open');mb.setAttribute('aria-expanded',o);};nav.addEventListener('click',e=>{if(e.target.tagName==='A'){nav.classList.remove('open');mb.setAttribute('aria-expanded','false');}});
-const secs=[...document.querySelectorAll('main section[id]')];const links=[...nav.querySelectorAll('a[href^="#"]')];
-if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+en.target.id));});},{rootMargin:'-40% 0px -55% 0px'});secs.forEach(s=>io.observe(s));}
-/* visor de imágenes */
-const V=$('#viewer');document.addEventListener('click',e=>{const im=e.target.closest('img[data-zoom]');if(!im)return;$('#vImg').src=im.dataset.zoom||im.src;$('#vImg').alt=im.alt;$('#vCap').textContent=im.dataset.cap||im.alt;V.hidden=false;document.body.style.overflow='hidden';});
-const closeV=()=>{V.hidden=true;document.body.style.overflow='';};V.onclick=closeV;$('#vClose').onclick=closeV;
-addEventListener('keydown',e=>{if(e.key==='Escape'){if(!V.hidden)closeV();else if(!M.hidden)closePlat();}});
+function closeAll(){M.hidden=true;DL.hidden=true;$('#fmodal').hidden=true;$('#viewer').hidden=true;lock(false);if(lastFocus&&lastFocus.focus)lastFocus.focus();}
+function openDl(){lastFocus=document.activeElement;DL.hidden=false;lock(true);$('#dlClose').focus();}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){openPlat(b.dataset.p);return;}if(e.target.closest('[data-dl]')){openDl();return;}
+  const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return;}
+  const im=e.target.closest('img[data-zoom]');if(im){lastFocus=document.activeElement;$('#vImg').src=im.dataset.zoom||im.src;$('#vImg').alt=im.alt;$('#vCap').textContent=im.dataset.cap||im.alt;$('#viewer').hidden=false;lock(true);}});
+$('#mClose').onclick=closeAll;$('#dlClose').onclick=closeAll;$('#fClose').onclick=closeAll;$('#vClose').onclick=closeAll;
+[M,DL,$('#fmodal'),$('#viewer')].forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeAll();}));
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+$$('[data-web]').forEach(a=>{a.href=webURL();a.target='_blank';a.rel='noopener';});
+const nav=$('#nav'),mb=$('#menuBtn');mb.onclick=()=>{const o=nav.classList.toggle('open');mb.setAttribute('aria-expanded',o);};nav.addEventListener('click',e=>{if(e.target.closest('button,a')){nav.classList.remove('open');mb.setAttribute('aria-expanded','false');}});
 
 /* ===== datos del juego ===== */
 const W={"zones":{"asuncion":{"name":"Asunción","sub":"Capital del reino","lvl":1,"cost":0,"spots":[],"portals":["campos"]},"campos":{"name":"Campos de Ypacaraí","sub":"Cordillera","lvl":1,"cost":2000,"spots":[["Madriguera de los Aguara","aguara"],["Lomada de los Aguara","aguara"],["Mandiocal abandonado","taitetu"],["Monte de los Taitetu","taitetu"],["Orilla del Ypacaraí","jaguarete"],["Cueva del Jaguareté","jaguarete"]],"portals":["asuncion","ruinas"]},"ruinas":{"name":"Ruinas de Trinidad","sub":"Itapúa","lvl":15,"cost":10000,"spots":[["Cementerio de la misión","alma"],["Patio de los arcos","alma"],["Madriguera de Luisones","luison"],["Bosque de los Luisones","luison"]],"portals":["campos","chaco"]},"ev_ana":{"name":"Arena de Añá","sub":"Evento","lvl":1,"cost":0,"spots":[],"portals":[]},"ev_raid":{"name":"Guarida de Añaretã","sub":"Desafío de grupo","lvl":1,"cost":0,"spots":[],"portals":[]},"ev_duel":{"name":"Arena de Duelos","sub":"Uno contra uno","lvl":1,"cost":0,"spots":[],"portals":[]},"studio":{"name":"Estudio","sub":"Galería","lvl":1,"cost":0,"spots":[],"portals":[]},"ev_tuguy":{"name":"Fortaleza de Tuguy","sub":"Evento","lvl":1,"cost":0,"spots":[],"portals":[]},"chaco":{"name":"Chaco Boreal","sub":"Alto Paraguay","lvl":30,"cost":25000,"spots":[["Salitral del Teju","teju"],["Cañadón seco","teju"],["Nido de escorpiones","escorpion"],["Médanos del norte","escorpion"]],"portals":["ruinas","esteros"]},"esteros":{"name":"Esteros del Ñeembucú","sub":"Pilar","lvl":48,"cost":50000,"spots":[["Riacho Hondo","mboitui"],["Monte de los Pomberos","pombero"],["Isla del Pombero","pombero"]],"portals":["chaco","ybytyruzu"]},"ybytyruzu":{"name":"Cordillera del Ybytyruzú","sub":"Guairá","lvl":62,"cost":80000,"spots":[["Niebla del Ybytyruzú","kaajary"],["Pastizal del Mbói Tata","mboijagua"],["Barranco del Tapé","mboijagua"]],"portals":["esteros","monday"]},"monday":{"name":"Saltos del Monday","sub":"Alto Paraná","lvl":70,"cost":120000,"spots":[["Pozo del Ypo","ypo"],["Remanso del Monday","ypo"],["Selva del Yaguarú","yaguaru"],["Peñón del Yaguarú","yaguaru"]],"portals":["ybytyruzu","mbaracayu"]},"mbaracayu":{"name":"Selva del Mbaracayú","sub":"Canindeyú","lvl":78,"cost":180000,"spots":[["Claro de los Póra","pora"],["Árbol Hueco","pora"],["Pantano del Teju Guasu","tejuguasu"],["Altar del Sol Caído","kuarahyjara"]],"portals":["monday","cerrocora"]},"cerrocora":{"name":"Cerro Corá","sub":"Amambay","lvl":86,"cost":260000,"spots":[["Trincheras del Aquidabán","soldado"],["Campo de los Caídos","soldado"],["Paso de la Mala Visión","malavision"]],"portals":["mbaracayu","bahianegra"]},"bahianegra":{"name":"Bahía Negra","sub":"Pantanal del norte","lvl":94,"cost":350000,"spots":[["Embalsado de Kerana","siervo"],["Isla de los Siervos","siervo"],["Puerta de Kerana","guardian"]],"portals":["cerrocora"]}},"mobs":{"aguara":{"name":"Aguara Guasu","lvl":2,"boss":false,"ficha":"Aguara guasu: zorro de patas largas y negras, pelaje rojizo, crin oscura sobre el cuello y orejas grandes.","zones":["campos"]},"taitetu":{"name":"Taitetu","lvl":6,"boss":false,"ficha":"Taitetu (pecarí de collar): cerdo de monte gris, pelaje áspero y una franja clara en el cuello.","zones":["campos"]},"jaguarete":{"name":"Jaguareté","lvl":11,"boss":false,"ficha":"Jaguareté: el jaguar, dorado con rosetas negras, cabeza ancha y cola larga.","zones":["campos"]},"luison":{"name":"Luisón","lvl":18,"boss":false,"ficha":"Luisón, séptimo hijo de Tau y Kerana: hombre-perro de los cementerios, flaco, negro y de ojos rojos; señor de la muerte.","zones":["ruinas"]},"alma":{"name":"Alma en Pena","lvl":23,"boss":false,"ficha":"Alma en Pena: espectro azul de un viajero perdido, con túnica y espada vieja, condenado a vagar hasta que alguien rece por él.","zones":["ruinas"]},"kurupi":{"name":"Kurupí","lvl":30,"boss":true,"ficha":"Kurupí, quinto hijo: enano feo y peludo de piel curtida, pies al revés y una soga gruesa enrollada en la cintura; señor de la fertilidad. Acecha a las mujeres en el monte.","zones":["ruinas"]},"teju":{"name":"Teju Jagua","lvl":34,"boss":false,"ficha":"Teju Jagua, primogénito: lagarto enorme con siete cabezas de perro y ojos de fuego; señor de las cuevas y los frutos. Manso a pesar de su aspecto.","zones":["chaco"]},"escorpion":{"name":"Escorpión del Chaco","lvl":40,"boss":false,"ficha":"Escorpión del Chaco: alacrán gigante de quitina parda, pinzas pesadas y cola con aguijón; anida en los médanos y cañadones secos del norte.","zones":["chaco"]},"aoao":{"name":"Ao Ao","lvl":46,"boss":true,"ficha":"Ao Ao: bestia lanuda parecida a una oveja grande, con colmillos y garras; caza en manada por los cerros. Solo se salva quien trepa a una palmera pindó.","zones":["chaco"]},"mboitui":{"name":"Mbói Tu'i","lvl":54,"boss":false,"ficha":"Mbói Tu'i, segundo hijo: serpiente gigante con cabeza de loro, plumas verdes, pico enorme y lengua roja como la sangre; señor de las aguas.","zones":["esteros"]},"pombero":{"name":"Pombero","lvl":60,"boss":false,"ficha":"Pombero: hombrecito del monte, bajo y fornido, oscurísimo y muy peludo, con sombrero de paja grande y manos y pies enormes. Camina sin hacer ruido, imita a los pájaros y le gustan el tabaco y la miel.","zones":["esteros"]},"monai":{"name":"Moñái","lvl":68,"boss":true,"ficha":"Moñái, tercer hijo: serpiente enorme, color de tierra y pasto, con dos cuernos rectos y coloridos que usa como antenas para hipnotizar a las aves; señor de los campos abiertos, trepa a los árboles y roba en los pueblos. Lo venció el sacrificio de Porâsý.","zones":["esteros"]},"kaajary":{"name":"Ka'a Jarýi","lvl":64,"boss":false,"ficha":"Ka'a Jarýi: la dueña de la yerba mate, mujer de ojos verdes que cuida los yerbales y castiga a quien los maltrata.","zones":["ybytyruzu"]},"mboijagua":{"name":"Mbói Tata","lvl":68,"boss":false,"ficha":"Mbói Tata: la serpiente de fuego de los esteros; de noche se la ve como una llamarada que corre entre los pastizales y quema a quien la sigue. Nace de los huesos de los muertos en los pantanos.","zones":["ybytyruzu"]},"jasyjatere":{"name":"Jasy Jateré","lvl":74,"boss":true,"ficha":"Jasy Jateré, cuarto hijo: niño rubio de ojos azules, sombrero de paja y una varita de oro que le da su poder; señor de la siesta y la yerba. No es un monstruo, pero se lleva a los chicos que no duermen la siesta.","zones":["ybytyruzu"]},"ypo":{"name":"Ypo","lvl":72,"boss":false,"ficha":"Ypo: espíritu de las aguas, forma de hombre hecho de río, azul y transparente, que arrastra a los que nadan de noche.","zones":["monday"]},"yaguaru":{"name":"Yaguarú","lvl":76,"boss":false,"ficha":"Yaguarú: fiera de los lagos, como un jaguar azul de agua con aletas en el lomo; vuelca canoas y arrastra al fondo.","zones":["monday"]},"pora":{"name":"Póra","lvl":80,"boss":false,"ficha":"Póra: aparición, alma que vaga de noche como una sombra blanca y helada; anuncia desgracias.","zones":["mbaracayu"]},"tejuguasu":{"name":"Teju Guasu","lvl":84,"boss":false,"ficha":"Teju Guasu: lagarto gigante del Chaco, oscuro, con una cresta de púas en el lomo y cola como látigo.","zones":["mbaracayu"]},"kuarahyjara":{"name":"Kuarahy Jára","lvl":86,"boss":false,"ficha":"Kuarahy Jára: el dueño del sol, guerrero dorado de piel ardiente con un gran tocado solar; aparece al mediodía y ciega a quien lo mira.","zones":["mbaracayu"]},"soldado":{"name":"Alma de Soldado","lvl":88,"boss":false,"ficha":"Alma de Soldado: fantasma de un combatiente caído en las guerras del Paraguay, con casco y sable, que sigue montando guardia.","zones":["cerrocora"]},"malavision":{"name":"Mala Visión","lvl":92,"boss":false,"ficha":"Mala Visión: mujer alta de blanco, con el pelo largo y negro tapándole la cara, que grita en el monte y mata al que le contesta tres veces; castiga a los infieles.","zones":["cerrocora"]},"anaboss":{"name":"Añá","lvl":96,"boss":true,"ficha":"Añá: el demonio, señor del mal; gigante de piel roja agrietada por brasas, cuernos de toro, alas de murciélago y ojos de fuego.","zones":["cerrocora"]},"siervo":{"name":"Siervo de Kerana","lvl":95,"boss":false,"ficha":"Siervo de Kerana: espectro violeta que sirve a la madre de los siete, con báculo y túnica rasgada.","zones":["bahianegra"]},"guardian":{"name":"Guardián de Kerana","lvl":98,"boss":false,"ficha":"Guardián de Kerana: coloso de piedra encantada con armadura de escamas, escudo y espada, que custodia el altar de Kerana.","zones":["bahianegra"]},"tau":{"name":"Tau","lvl":105,"boss":true,"ficha":"Tau: el espíritu del mal, que tomó forma de hombre hermoso para raptar a Kerana; alto, de piel oscura como la noche, corona de plumas negras y fuego violeta.","zones":["bahianegra"]},"anaretan":{"name":"Añaretã","lvl":60,"boss":true,"ficha":"Añaretã: el infierno hecho bestia; demonio colosal de basalto negro partido por ríos de lava, cuernos de toro, alas quemadas y aliento de fuego.","zones":["ev_raid"]}},"cls":{"caballero":{"name":"Caballero","evo":"Caballero de Tau","base":{"fue":28,"agi":20,"vit":25,"ene":10},"desc":"Espada y escudo. Mucha vida y gran daño cuerpo a cuerpo.","hint":"Fuerza sube el daño. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida (3 por punto). Energía sube el maná.","unlock":null,"skills":[{"cls":"caballero","name":"Giro de Acero","lvl":1,"evo":false,"mp":8,"desc":"Girás con la espada y golpeás a todos a tu alrededor."},{"cls":"caballero","name":"Estocada Triple","lvl":12,"evo":false,"mp":14,"desc":"Tres estocadas en línea recta frente a vos."},{"cls":"caballero","name":"Grito de Guerra","lvl":25,"evo":false,"mp":30,"desc":"Tu vida máxima sube 25% durante 90 segundos."},{"cls":"caballero","name":"Furia de Tau","lvl":50,"evo":true,"mp":40,"desc":"Golpeás el suelo y el fuego quema a todos alrededor. Requiere evolución."}],"sets":[{"n":"de Cuero","col":"#8a5226"},{"n":"de Bronce","col":"#d8642a"},{"n":"de Misión","col":"#cfe2ff"},{"n":"del Guardián","col":"#2aff9a"},{"n":"de Tau","col":"#ff1a10"},{"n":"del Yvága","col":"#9a3aff"},{"n":"de Yvy Marane'ỹ","col":"#fff0a0"}],"w":["Espada Corta","Espada Larga","Espada de Misión","Espada del Guardián","Espada de Tau","Espada del Yvága","Espada de Yvy Marane'ỹ"],"slots":{"helm":"Yelmo","armor":"Coraza","pants":"Grebas","gloves":"Guanteletes","boots":"Botas"},"wn":"Alas de Guyra Pytã","wn2":"Alas de Tau Pytã","wings":[{"b":"#2a0a08","m":"#7a2a1a","t":"#c08a4a"},{"b":"#3a0508","m":"#c0141a","t":"#f2b23a"},{"b":"#5a1200","m":"#ff5a10","t":"#ffd23a"},{"b":"#050204","m":"#2a0608","t":"#ff1a10"}]},"hechicero":{"name":"Hechicero","evo":"Gran Paje","base":{"fue":18,"agi":18,"vit":15,"ene":30},"desc":"Fuego y espíritus del monte. Daño mágico a distancia.","hint":"Energía sube el daño mágico y el maná. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida. Fuerza casi no le sirve.","unlock":null,"skills":[{"cls":"hechicero","name":"Bola de Fuego","lvl":1,"evo":false,"mp":3,"desc":"Lanzás una bola de fuego al enemigo."},{"cls":"hechicero","name":"Salto de Jasy","lvl":12,"evo":false,"mp":18,"desc":"Te teletransportás unos metros hacia adelante."},{"cls":"hechicero","name":"Espíritus del Monte","lvl":25,"evo":false,"mp":28,"desc":"Espíritus giran a tu alrededor y dañan a todos."},{"cls":"hechicero","name":"Rayos de Tupã","lvl":50,"evo":true,"mp":45,"desc":"Caen rayos sobre el enemigo y todo lo que lo rodea. Requiere evolución."}],"sets":[{"n":"de Lino","col":"#b08a5a"},{"n":"de Ñandutí","col":"#f6f2ff"},{"n":"de Paje","col":"#3ae07a"},{"n":"de Jasy","col":"#4a52ff"},{"n":"de Tupã","col":"#ffe22a"},{"n":"de Arandu","col":"#ff2a4a"},{"n":"de Ñamandu","col":"#7af8ff"}],"w":["Vara de Palo Santo","Bastón de Lapacho","Bastón de Paje","Bastón de Jasy","Bastón de Tupã","Bastón de Arandu","Bastón de Ñamandu"],"slots":{"helm":"Capucha","armor":"Túnica","pants":"Faldón","gloves":"Guantes","boots":"Sandalias"},"wn":"Alas de Jasy","wn2":"Alas de Ñamandu","wings":[{"b":"#5a5a62","m":"#a8a8b0","t":"#e0e0e8"},{"b":"#7f90c8","m":"#e6ecff","t":"#ffffff"},{"b":"#1a3aa0","m":"#5a9aff","t":"#cfe8ff"},{"b":"#a07a2a","m":"#fff0c0","t":"#ffffff"}]},"gladiador":{"name":"Gladiador","evo":"Gladiador de Tupã","base":{"fue":26,"agi":26,"vit":26,"ene":26},"desc":"Espada y magia a la vez. Pelea sin casco y lanza rayos con la espada.","hint":"Fuerza sube el daño con la espada y Energía el de sus técnicas mágicas: conviene repartir entre las dos. Gana 7 puntos por nivel. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida.","unlock":40,"skills":[{"cls":"gladiador","name":"Tajo de Fuego","lvl":1,"evo":false,"mp":6,"desc":"Un tajo encendido que quema todo lo que tenés enfrente."},{"cls":"gladiador","name":"Relámpago","lvl":12,"evo":false,"mp":14,"desc":"Un rayo cae sobre el enemigo y los que lo rodean."},{"cls":"gladiador","name":"Torbellino de Acero","lvl":25,"evo":false,"mp":22,"desc":"Girás con la espada y golpeás a todos a tu alrededor."},{"cls":"gladiador","name":"Espada de Poder","lvl":50,"evo":true,"mp":40,"desc":"Clavás la espada y una ola de fuego mágico quema todo alrededor. Requiere evolución."}],"sets":[{"n":"de Ñandu","col":"#8a6a4a"},{"n":"de Kurusu","col":"#ff6a1a"},{"n":"de Ara","col":"#2ae6ff"},{"n":"del Tembetá","col":"#ff2aa0"},{"n":"de Tupã Rendy","col":"#f4f8ff"},{"n":"de Karai Ru","col":"#2aff8a"},{"n":"de Ñamandu Ru","col":"#ffd23a"}],"w":["Espada de Ñandu","Espada de Kurusu","Espada Rúnica","Espada del Tembetá","Espada de Tupã Rendy","Espada de Karai Ru","Espada de Ñamandu Ru"],"slots":{"helm":"Yelmo","armor":"Peto","pants":"Faldar","gloves":"Brazales","boots":"Grebas"},"wn":"Alas de Tupã","wn2":"Alas de la Tormenta","wings":[{"b":"#0a1430","m":"#1a3a7a","t":"#4a7ac8"},{"b":"#06304a","m":"#1ab0e0","t":"#a0f0ff"},{"b":"#2a3a6a","m":"#cfe8ff","t":"#ffffff"},{"b":"#1a0630","m":"#6a2aff","t":"#ff6af0"}]},"mburuvicha":{"name":"Mburuvicha","evo":"Mburuvicha Guasu","base":{"fue":26,"agi":20,"vit":20,"ene":25},"desc":"Señor de guerra guaraní. Cetro, capa y el cuervo Guyra Hũ, que caza por él.","hint":"Fuerza sube el daño del cetro. Energía hace más fuerte al cuervo Guyra Hũ. Gana 7 puntos por nivel. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida.","unlock":50,"skills":[{"cls":"mburuvicha","name":"Fuerza del Cetro","lvl":1,"evo":false,"mp":5,"desc":"Tu cetro lanza un golpe de fuerza oscura."},{"cls":"mburuvicha","name":"Estallido Oscuro","lvl":12,"evo":false,"mp":16,"desc":"La tierra estalla en fuego oscuro bajo el enemigo."},{"cls":"mburuvicha","name":"Voz del Mburuvicha","lvl":25,"evo":false,"mp":30,"desc":"Tu probabilidad de golpe crítico sube 15% durante 90 segundos."},{"cls":"mburuvicha","name":"Picada del Guyra Hũ","lvl":50,"evo":true,"mp":35,"desc":"Tu cuervo se lanza sobre el enemigo y destroza a todos los que lo rodean. Requiere evolución."}],"sets":[{"n":"de Tuja","col":"#6a5a4a"},{"n":"de Yvyrapã","col":"#9a2a2a"},{"n":"del Cacique","col":"#8a3aff"},{"n":"de Guyra Hũ","col":"#2a2a3a"},{"n":"del Mburuvicha Guasu","col":"#ffd23a"},{"n":"del Tuvicha Guasu","col":"#ff1a3a"},{"n":"de Ñanderu","col":"#e8f0ff"}],"w":["Cetro de Tuja","Cetro de Yvyrapã","Cetro del Cacique","Cetro de Guyra Hũ","Cetro del Mburuvicha","Cetro del Tuvicha Guasu","Cetro de Ñanderu"],"slots":{"helm":"Corona","armor":"Coraza","pants":"Quijotes","gloves":"Guanteletes","boots":"Botas"},"wn":"Capa de Guyra Hũ","wn2":"Alas de Guyra Hũ Guasu","wings":[{"b":"#050508","m":"#1a1a22","t":"#3a3a48"},{"b":"#08040e","m":"#2a1040","t":"#6a2aa0"},{"b":"#14062a","m":"#6a1aff","t":"#d08aff"},{"b":"#050404","m":"#1a1408","t":"#ffcf3a"}]},"arquera":{"name":"Arquera","evo":"Kuña Guerrera","base":{"fue":22,"agi":25,"vit":20,"ene":15},"desc":"Tiradora ágil del monte. Ataca de lejos y se cura sola.","hint":"Agilidad sube el daño y la velocidad. Fuerza suma algo de daño. Vitalidad sube la vida. Energía potencia la curación y el escudo.","unlock":null,"skills":[{"cls":"arquera","name":"Flecha Triple","lvl":1,"evo":false,"mp":5,"desc":"Disparás tres flechas en abanico."},{"cls":"arquera","name":"Curación","lvl":12,"evo":false,"mp":20,"desc":"Recuperás vida según tu energía."},{"cls":"arquera","name":"Escudo del Monte","lvl":25,"evo":false,"mp":30,"desc":"Tu defensa sube según tu energía durante 90 segundos."},{"cls":"arquera","name":"Lluvia de Flechas","lvl":50,"evo":true,"mp":40,"desc":"Una lluvia de flechas cae sobre el enemigo. Requiere evolución."}],"sets":[{"n":"de Ao Po'i","col":"#c8a070"},{"n":"de Plumas","col":"#ff4a1a"},{"n":"de Selva","col":"#46f040"},{"n":"de Kuarahy","col":"#ffb020"},{"n":"de Arasy","col":"#ff3ad0"},{"n":"de Jasy Porã","col":"#6ad0ff"},{"n":"del Yvága","col":"#f4fbff"}],"w":["Arco Corto","Arco de Lapacho","Arco de Guyra","Arco de Kuarahy","Arco de Arasy","Arco de Jasy Porã","Arco del Yvága"],"slots":{"helm":"Diadema","armor":"Chaleco","pants":"Calzas","gloves":"Guantes","boots":"Botas"},"wn":"Alas de Mainumby","wn2":"Alas de Arasy","wings":[{"b":"#1a3a12","m":"#3a7a2a","t":"#8ac04a"},{"b":"#063a30","m":"#1fb88c","t":"#9a5cff"},{"b":"#2a0a5a","m":"#1ae0c0","t":"#ff5af0"},{"b":"#a0306a","m":"#ffb0d8","t":"#ffe28a"}]}},"lv":[1,10,24,38,52,70,88],"sh":["Escudo de Madera","Escudo de Bronce","Escudo de Misión","Escudo del Guardián","Escudo de Tau","Escudo del Yvága","Escudo de Yvy Marane'ỹ"],"lore":[{"t":"NOX, la Noche Larga","p":["Sentate un rato, viajero. Antes de levantar un arma tenés que saber por qué peleás.","Hubo un tiempo en que el reino del Paraguay vivía bajo la luz de Kuarahy, el sol. Los pueblos caminaban hacia el poniente buscando <b>Yvy Marane'ỹ<\/b>, la Tierra Sin Mal, donde nadie enferma y nadie muere.","Eso se terminó la noche en que <b>Tau<\/b>, el espíritu del mal, se llevó a <b>Kerana<\/b>, la hija más hermosa de la tierra colorada."],"lock":null},{"t":"Los siete hijos","p":["De esa unión nacieron siete hijos malditos: <b>Teju Jagua<\/b>, <b>Mbói Tu'i<\/b>, <b>Moñái<\/b>, <b>Jasy Jateré<\/b>, <b>Kurupí<\/b>, <b>Ao Ao<\/b> y <b>Luisón<\/b>.","Cuando nació el séptimo, Kuarahy siguió saliendo, pero ya no alumbraba igual. La oscuridad se metió en la tierra, en los montes y en la gente. Los escribas de Asunción la anotaron con una sola palabra en la lengua vieja de los libros: <b>NOX<\/b>. La noche.","Desde entonces cada crónica de este reino empieza igual: <i>cuando cae la noche, nacen las leyendas<\/i>."],"lock":null},{"t":"El reino sitiado","p":["Asunción resiste detrás de sus murallas. Afuera, los <b>Campos de Ypacaraí<\/b> están llenos de aguara y jaguaretés que bajan de los cerros.","En las <b>Ruinas de Trinidad<\/b> vagan almas en pena, y en su altar espera el Kurupí. El <b>Chaco Boreal<\/b> es tierra del Teju Jagua y del Ao Ao, que nunca caza solo.","Y en los <b>Esteros del Ñeembucú<\/b>, entre el barro y los embalsados, mandan el Mbói Tu'i y el Moñái, rey de las serpientes. De Jasy Jateré nadie sabe nada todavía. Eso es lo que más me preocupa."],"lock":null},{"t":"La profecía","p":["En los libros de la catedral hay una profecía que el Pa'i Antonio y yo cuidamos desde hace años:","<i>«Cuando caigan los siete hijos, la luz de Kuarahy va a volver a entrar en la tierra, y se va a abrir otra vez el camino a Yvy Marane'ỹ.»<\/i>","Los libros llaman <b>portadores<\/b> a los que caminan con luz propia en medio de la noche. Te vi entrar por el portón. Vos sos uno de ellos."],"lock":null},{"t":"Tu camino","p":["El Capitán Cabañas te va a dar trabajo, y cada bestia que caiga es una página más de esta crónica. Don Ramón forja tus armas y Ña Eusebia prepara tus pociones.","El Pa'i Antonio enseña técnicas y pone a prueba a los que quieren evolucionar. Jarýi Kuña te ofrece el caldero de Kerana, pero cuidado con lo que le pedís.","Lo que no puedas cargar dejalo en el baúl de Ña Chela: lo ven todos tus personajes. Y cuando vuelvas, contame lo que viste. Alguien tiene que escribirlo."],"lock":null},{"t":"El rey de las serpientes","p":["Así que el Moñái cayó. Los pescadores de Pilar volvieron a tirar sus redes y en el estero se escuchan otra vez los sapos.","Pero mientras escribía tu hazaña noté algo raro: la noche no aflojó. Al contrario. Desde el norte, desde la <b>Cordillera del Ybytyruzú<\/b>, baja una niebla que no se levanta ni al mediodía.","Abrí un portal en el estero, cerca de la choza. Llevá cuidado: la siesta en esos cerros tiene dueño."],"lock":"Derrotá al Moñái en los Esteros"},{"t":"El dueño de la siesta","p":["<b>Jasy Jateré<\/b>, el pequeño de cabellos de oro, era el último hijo que nadie había visto. Con su bastón dorado se llevaba a los niños que no dormían la siesta.","Con él caen los siete. Según la profecía, Kuarahy debería volver a alumbrar como antes… y sin embargo el cielo del norte se puso violeta.","Los viejos dicen que cuando un padre pierde a todos sus hijos, sale a buscarlos. Si es así, <b>Tau<\/b> ya está en camino."],"lock":"Derrotá a Jasy Jateré en el Ybytyruzú"},{"t":"Las aguas del Monday","p":["En los <b>Saltos del Monday<\/b> el agua cae con tanta fuerza que la bruma se ve desde lejos. Ahí viven los <b>Ypo<\/b>, espíritus del agua que arrastran a los que se acercan demasiado.","El <b>Yaguarú<\/b>, el tigre del agua, caza entre las piedras. Los guaraníes decían que nadaba más rápido de lo que corría.","Alguien los despertó a todos al mismo tiempo. Las crónicas hablan de una mujer de tierra colorada que canta en el norte. Ya sabés de quién hablo."],"lock":"Cazá en los Saltos del Monday"},{"t":"La selva que respira","p":["En el <b>Mbaracayú<\/b> los árboles son tan altos que la luz llega verde. Ahí los <b>Póra<\/b>, almas sin descanso, se mezclan con la niebla.","Los <b>Kuarahy Jára<\/b> robaron pedazos del sol para su señor y ahora arden en el altar caído. Si recuperás esa luz, la noche va a pesar menos.","El <b>Teju Guasu<\/b>, abuelo de todos los lagartos, cuida el pantano. No le gustan las visitas."],"lock":"Seguí cazando en la Selva del Mbaracayú"},{"t":"Cerro Corá","p":["En <b>Cerro Corá<\/b> terminó la Guerra Grande. Las almas de los soldados siguen en sus trincheras, esperando una orden que nunca llegó.","Ahí se escondía <b>Añá<\/b>, el espíritu del mal menor, el que abre las puertas para Tau. Lo derrotaste junto al arroyo, y las almas por fin pudieron descansar.","Antes de desaparecer, Añá dijo una sola palabra: <i>Bahía Negra<\/i>. Ahí, en el pantanal del norte, está el trono de Tau. Y a su lado, Kerana."],"lock":"Derrotá a Añá en Cerro Corá"},{"t":"La última noche","p":["Lo que voy a escribir ahora no lo escribió nadie antes: <b>Tau cayó<\/b>.","Kerana no peleó. Cuando su esposo se deshizo en humo violeta, ella cerró los ojos y se volvió tierra colorada otra vez. Los siervos se apagaron uno por uno, como fogatas bajo la lluvia.","Esa mañana Kuarahy salió sobre el Chaco como en los cuentos de mi abuela. No te digo que la noche se terminó para siempre: la noche vuelve todos los días. Pero ya no es <b>NOX<\/b>. Es solo la noche."],"lock":"Derrotá a Tau en Bahía Negra"},{"t":"Yvy Marane'ỹ","p":["Los pueblos vuelven a caminar hacia el poniente, buscando la Tierra Sin Mal. Algunos dicen que la vieron brillar detrás del Ybytyruzú.","Yo creo otra cosa, portador. Creo que <b>Yvy Marane'ỹ<\/b> no es un lugar al que se llega, sino lo que queda cuando alguien se anima a caminar en medio de la noche con luz propia.","Esta crónica es tuya. Pero no la cierres todavía: dicen que en los libros viejos de la catedral hay páginas que nadie leyó. Y que hablan de otras noches."],"lock":"Terminá la crónica"}],"gems":{"tupa":{"name":"Gema de Tupã","col":"#3cc8ff","desc":"Sube un ítem de +0 a +6. Nunca falla."},"jasy":{"name":"Gema de Jasy","col":"#c77dff","desc":"Sube un ítem de +6 a +9. 50% de éxito (75% si el ítem tiene Suerte). Si falla y el ítem es +7 o más, vuelve a +0; si no, baja un nivel."},"yvy":{"name":"Gema de Yvy","col":"#33f07e","desc":"Agrega +4 de opción adicional, hasta +16. 50% de éxito. Si falla, se pierde la opción."},"kerana":{"name":"Gema de Kerana","col":"#ff7a2e","desc":"Se usa en el Caldero de Kerana para subir de +10 a +15 o para crear alas."}},"pots":{"hp1":{"name":"Poción de vida chica","kind":"hp","pct":0.2,"add":20,"price":200},"hp2":{"name":"Poción de vida mediana","kind":"hp","pct":0.35,"add":60,"price":900},"hp3":{"name":"Poción de vida grande","kind":"hp","pct":0.55,"add":150,"price":2400},"mp1":{"name":"Poción de maná chica","kind":"mp","pct":0.2,"add":15,"price":200},"mp2":{"name":"Poción de maná mediana","kind":"mp","pct":0.35,"add":40,"price":900},"mp3":{"name":"Poción de maná grande","kind":"mp","pct":0.55,"add":90,"price":2400}},"pets":{"imp":{"name":"Imp","col":"#ff6a4a","desc":"Te acompaña y aumenta tu daño un 8%."},"hada":{"name":"Hada del Monte","col":"#bff0ff","desc":"Te acompaña y aumenta tu defensa un 12%."},"rudolf":{"name":"Rudolf","col":"#e2b27a","desc":"Te acompaña y aumenta el oro de las bestias un 50%."}},"loot":{"kaajary":{"t1":"Hoja de Ka'a Jarýi","t2":"Ojo verde de Ka'a Jarýi","slot":"gloves","uniq":"Guantes del Ka'a Jarýi","flavor":"Tejidos con la niebla del Ybytyruzú."},"mboijagua":{"t1":"Escama ardiente de Mbói Tata","t2":"Colmillo de brasa de Mbói Tata","slot":"boots","uniq":"Botas del Mbói Tata","flavor":"Todavía tibias: la serpiente de fuego no se apaga nunca del todo."},"jasyjatere":{"t1":"Mechón dorado de Jasy Jateré","t2":"Astilla del bastón de oro","slot":"helm","uniq":"Corona de la Siesta","flavor":"El que la lleva nunca se pierde en el monte."},"ypo":{"t1":"Agua viva del Ypo","t2":"Ojo del Ypo","slot":"pants","uniq":"Faldón del Ypo","flavor":"Fresco como el agua que cae del Monday."},"yaguaru":{"t1":"Piel mojada de Yaguarú","t2":"Garra de Yaguarú","slot":"gloves","uniq":"Garras del Yaguarú","flavor":"El agua no frena al que las lleva."},"pora":{"t1":"Velo de Póra","t2":"Mirada de Póra","slot":"armor","uniq":"Mortaja del Póra","flavor":"Pesa menos que el aire y aguanta como el hierro."},"tejuguasu":{"t1":"Escama de Teju Guasu","t2":"Diente de Teju Guasu","slot":"boots","uniq":"Botas del Teju Guasu","flavor":"Pisan firme en cualquier pantano."},"kuarahyjara":{"t1":"Brasa de Kuarahy Jára","t2":"Cuerno del sol caído","slot":"helm","uniq":"Yelmo del Sol Caído","flavor":"Arde sin quemar al que lo lleva."},"soldado":{"t1":"Medalla de soldado","t2":"Hueso de Cerro Corá","slot":"armor","uniq":"Coraza de Cerro Corá","flavor":"La llevó alguien que no se rindió nunca."},"malavision":{"t1":"Sombra de Mala Visión","t2":"Ojo de Mala Visión","slot":"pants","uniq":"Grebas de la Mala Visión","flavor":"Nadie las ve venir."},"anaboss":{"t1":"Cuerno de Añá","t2":"Corazón de Añá","slot":"armor","uniq":"Coraza de Añá","flavor":"Forjada con el odio del espíritu del mal menor."},"siervo":{"t1":"Ceniza de Kerana","t2":"Cráneo de siervo","slot":"gloves","uniq":"Guantes del Siervo","flavor":"Todavía tiemblan con la voz de Kerana."},"guardian":{"t1":"Espora del Guardián","t2":"Corona rota del Guardián","slot":"boots","uniq":"Botas del Guardián","flavor":"Hechas para cuidar una puerta para siempre."},"tau":{"t1":"Cuerno de Tau","t2":"Corazón de Tau","slot":"helm","uniq":"Corona de Tau","flavor":"La noche entera cabe en esta corona."},"aguara":{"t1":"Cuero de Aguara","t2":"Colmillo de Aguara Guasu","slot":"boots","uniq":"Botas del Aguara Guasu","flavor":"Livianas como el trote del zorro de crin."},"taitetu":{"t1":"Cuero de Taitetu","t2":"Colmillo curvo de Taitetu","slot":"gloves","uniq":"Guantes del Taitetu","flavor":"Cosidos con cuero de la manada del mandiocal."},"jaguarete":{"t1":"Piel manchada de Jaguareté","t2":"Garra de Jaguareté","slot":"helm","uniq":"Yelmo del Jaguareté","flavor":"El que lo lleva ve en la oscuridad del monte."},"luison":{"t1":"Pelaje de Luisón","t2":"Ojo rojo de Luisón","slot":"armor","uniq":"Coraza del Luisón","flavor":"Huele a cementerio y a luna llena."},"alma":{"t1":"Ceniza de alma","t2":"Lágrima de alma en pena","slot":"pants","uniq":"Grebas del Cementerio","flavor":"Frías al tacto, aun bajo el sol."},"kurupi":{"t1":"Piel de Kurupí","t2":"Amuleto del Kurupí","slot":"armor","uniq":"Peto del Kurupí","flavor":"Arrancado al señor de la selva en su propio altar."},"teju":{"t1":"Escama de Teju Jagua","t2":"Piedra de los ojos del Teju","slot":"helm","uniq":"Corona del Teju Jagua","flavor":"Siete cabezas, siete brillos de piedra preciosa."},"escorpion":{"t1":"Placa de quitina","t2":"Aguijón del Chaco","slot":"gloves","uniq":"Guanteletes de Quitina","flavor":"Duros como la sal del salitral."},"aoao":{"t1":"Lana de Ao Ao","t2":"Cuerno de Ao Ao","slot":"boots","uniq":"Botas del Ao Ao","flavor":"Nadie escapa del Ao Ao: ahora nadie escapa de vos."},"mboitui":{"t1":"Pluma de Mbói Tu'i","t2":"Pico de Mbói Tu'i","slot":"pants","uniq":"Calzas de escamas de Mbói","flavor":"Protegen de las aguas y de quien vive en ellas."},"pombero":{"t1":"Mechón del Pombero","t2":"Silbato del Pombero","slot":"gloves","uniq":"Manos del Pombero","flavor":"Nadie te oye llegar."},"monai":{"t1":"Escama de Moñái","t2":"Cuerno del Rey Moñái","slot":"armor","uniq":"Coraza del Rey de las Serpientes","flavor":"La piel dorada del que dominaba los caminos."}},"rar":{"normal":{"n":"Común","c":"#efe9dc"},"opt":{"n":"Con opciones","c":"#6ab8ff"},"exc":{"n":"Excelente","c":"#5cf08a"},"anc":{"n":"Antiguo","c":"#ffc94a"},"epic":{"n":"Épico","c":"#c98cff"},"uniq":{"n":"Único","c":"#ff9a3c"}},"ancs":{"humaita":{"n":"Humaitá","b":["2 piezas: Daño +6%","3: Crítico +4%","4: Daño +10%","5: Velocidad de ataque +8%"]},"cerrocora":{"n":"Cerro Corá","b":["2 piezas: Defensa +8%","3: Vida máxima +8%","4: Defensa +12%","5: Daño recibido −6%"]}},"npcs":{"herrero":{"name":"Don Ramón","role":"Herrero","greet":"¿Buscás algo que corte o que aguante golpes? Todo forjado acá mismo, con hierro de Ybycuí.","cls":"caballero","t":6,"wg":2,"lv":11},"boticaria":{"name":"Ña Eusebia","role":"Pociones","greet":"Mba'éichapa. Pociones frescas, hechas con yuyos del monte. Llevá bastantes antes de salir.","cls":"arquera","t":6,"wg":2,"lv":13},"pai":{"name":"Pa'i Antonio","role":"Técnicas y evolución","greet":"Que Tupã te guíe. Te enseño técnicas nuevas cuando estés listo, y te pongo a prueba para evolucionar.","cls":"hechicero","t":6,"wg":2,"lv":11},"capitan":{"name":"Capitán Cabañas","role":"Misiones","greet":"Las bestias del Kurupí no dan tregua. Necesito gente con coraje.","cls":"gladiador","t":6,"wg":2,"lv":13},"chamana":{"name":"Jarýi Kuña","role":"Caldero de Kerana","greet":"El caldero de Kerana da poder… o se traga todo. Vos elegís.","cls":"arquera","t":5,"wg":1,"lv":9},"baqueano":{"name":"Baqueano Tito","role":"Viajes","greet":"Conozco cada camino del reino. Decime adónde y te llevo, por unos guaraníes.","cls":"mburuvicha","t":6,"wg":2,"lv":11},"baul":{"name":"Ña Chela","role":"Baúl de la cuenta","greet":"Lo que guardes acá lo ven todos tus personajes. Y nadie más, si le ponés candado.","cls":"arquera","t":4,"wg":1,"lv":4},"cronista":{"name":"Karaí Arandu","role":"Cronista del reino","greet":"Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?","cls":"hechicero","t":5,"wg":1,"lv":9}},"quests":[{"mob":"aguara","n":8,"gold":3000,"txt":"Los aguara guasu atacan las chacras de la Cordillera."},{"mob":"taitetu","n":10,"gold":8000,"txt":"Las manadas de taitetu destrozan los mandiocales."},{"mob":"jaguarete","n":10,"gold":20000,"txt":"Un jaguareté hambriento acecha a los viajeros del lago."},{"mob":"luison","n":15,"gold":60000,"txt":"Los luisones salieron de las ruinas de Trinidad."},{"mob":"alma","n":15,"gold":90000,"txt":"Almas en pena vagan entre los arcos de la misión."},{"mob":"kurupi","n":1,"gold":250000,"txt":"El Kurupí despierta a los hijos de Tau y Kerana. Derrotalo en las ruinas."},{"mob":"teju","n":20,"gold":300000,"txt":"El Teju Jagua y sus cabezas de perro cuidan el Chaco."},{"mob":"escorpion","n":20,"gold":350000,"txt":"Los escorpiones gigantes rodean el fortín."},{"mob":"aoao","n":1,"gold":900000,"txt":"El Ao Ao devora todo lo que encuentra. Cazalo."},{"mob":"mboitui","n":25,"gold":1200000,"txt":"El Mbói Tu'i domina los esteros del sur."},{"mob":"pombero","n":20,"gold":1500000,"txt":"Los pomberos roban de noche en Pilar."},{"mob":"monai","n":1,"gold":5000000,"txt":"El Moñái, rey de las serpientes, espera en lo profundo del estero."},{"mob":"kaajary","n":25,"gold":6000000,"txt":"En la niebla del Ybytyruzú, los Ka'a Jarýi pierden a los viajeros. Limpiá el bosque."},{"mob":"mboijagua","n":25,"gold":7000000,"txt":"El Mbói Tata, la serpiente de fuego, ronda el barranco del Tapé y quema a los viajeros que se pierden de noche."},{"mob":"jasyjatere","n":1,"gold":10000000,"txt":"Jasy Jateré, el sexto hijo de Tau, se esconde en el Cerro de la Siesta. Es el único que faltaba."},{"mob":"ypo","n":30,"gold":11000000,"txt":"Los Ypo arrastran a los pescadores al fondo de los Saltos del Monday."},{"mob":"yaguaru","n":30,"gold":12000000,"txt":"El Yaguarú, el tigre del agua, caza en la selva del Monday."},{"mob":"pora","n":30,"gold":14000000,"txt":"Los Póra, fantasmas de la selva, no dejan dormir a nadie en el Mbaracayú."},{"mob":"tejuguasu","n":30,"gold":15000000,"txt":"El Teju Guasu, abuelo de todos los lagartos, pisa el pantano del Mbaracayú."},{"mob":"kuarahyjara","n":30,"gold":17000000,"txt":"Los Kuarahy Jára robaron la luz del sol para Tau. Hay que recuperarla."},{"mob":"soldado","n":35,"gold":19000000,"txt":"Las almas de los soldados de Cerro Corá no descansan. Liberalas."},{"mob":"malavision","n":35,"gold":21000000,"txt":"La Mala Visión vigila el paso. El que la mira a los ojos no vuelve."},{"mob":"anaboss","n":1,"gold":30000000,"txt":"Añá, el espíritu del mal menor, abre el camino a Tau. Derrotalo en el paso del Aquidabán-Niguí."},{"mob":"siervo","n":40,"gold":33000000,"txt":"Los siervos de Kerana cuidan los embalsados de Bahía Negra."},{"mob":"guardian","n":40,"gold":36000000,"txt":"Los Guardianes de Kerana cierran la puerta del trono. Abrila."},{"mob":"tau","n":1,"gold":60000000,"txt":"Tau, el espíritu del mal y padre de los siete, espera en su trono. Es la última noche."}]};
 const CK=['caballero','hechicero','arquera','gladiador','mburuvicha'];const ZK=['asuncion','campos','ruinas','chaco','esteros','ybytyruzu','monday','mbaracayu','cerrocora','bahianegra'];
-const IMG=(n)=>'img/w/'+n+'.webp';const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-const zoom=(src,cap,cls,extra)=>`<img src="${src}" data-zoom="${src}" data-cap="${esc(cap)}" alt="${esc(cap)}" loading="lazy" ${extra||''}>`;
+const IMG=n=>'img/w/'+n+'.webp';const ic=n=>'img/w/ic/'+n+'.webp';const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const zoom=(src,cap,extra)=>`<img src="${src}" data-zoom="${src}" data-cap="${esc(cap)}" alt="${esc(cap)}" loading="lazy" ${extra||''}>`;
 const CCOL={caballero:'#ff5a3a',hechicero:'#7ad0ff',arquera:'#5aff9a',gladiador:'#3ac8ff',mburuvicha:'#c080ff'};
 const SONS=['teju','mboitui','monai','jasyjatere','kurupi','aoao','luison'];
-$('#sons').innerHTML=SONS.map(k=>{const m=W.mobs[k];return `<li><a href="#m-${k}" style="display:contents;color:inherit;text-decoration:none"><img src="${IMG('mob_'+k)}" alt="${esc(m.name)}" loading="lazy"><span class="n">${m.name}</span><span class="w">${W.zones[m.zones[0]].name}</span></a></li>`;}).join('');
+const BOSSZ={};Object.entries(W.mobs).forEach(([k,m])=>{if(m.boss&&m.zones)m.zones.forEach(z=>{(BOSSZ[z]=BOSSZ[z]||[]).push(k);});});
+
+/* ===== vistas (una pantalla por tema) ===== */
+const VIEWS=$$('[data-view]');let curView='inicio';
+function go(path,push=true){const [v,...rest]=path.split('/');const arg=rest.join('/');if(!VIEWS.some(s=>s.dataset.view===v))return;
+  VIEWS.forEach(s=>{s.hidden=s.dataset.view!==v;});curView=v;
+  $$('.nav [data-go]').forEach(b=>{if(b.dataset.go===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  if(push)history.pushState(null,'','#'+path);document.title=(v==='inicio'?'':({mitologia:'Mitología',historia:'Historia',razas:'Razas',sets:'Sets',alas:'Alas',items:'Ítems',mapas:'Mapas',bestiario:'Bestiario',npc:'NPC',descargar:'Descargar'}[v]||'')+' · ')+'NOX · Crónicas del Paraguay';
+  closeAll();scrollTo({top:0,behavior:'instant'});
+  if(v==='razas'&&arg)setRaza(arg);if(v==='sets'&&arg){const [c,t]=arg.split('/');setForge(c,t);}if(v==='alas'&&arg){const [c,i]=arg.split('/');setWing(c,i);}
+  if(v==='mapas')setZone(arg||curZ);if(v==='bestiario'&&arg&&W.mobs[arg])openFicha(arg);if(v==='npc'&&arg)setNpc(arg);if(v==='items'&&arg)setItems(arg);if(v==='historia'&&arg)setChapter(+arg);}
+addEventListener('popstate',()=>go(location.hash.slice(1)||'inicio',false));
+
+/* portada: fondo que va cambiando y mosaico */
+const HBG=['hero','z_campos','z_esteros','z_ruinas','z_bahianegra','z_chaco'];const HBGN=['Ruinas de Trinidad','Campos de Ypacaraí','Esteros del Ñeembucú','Ruinas de Trinidad','Bahía Negra','Chaco Boreal'];let hb=0,hbOn=false;
+const b1=$('#bg1'),b2=$('#bg2');b1.style.backgroundImage=`url(${IMG(HBG[0])})`;$('#where').textContent=HBGN[0];
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(()=>{if(curView!=='inicio')return;hb=(hb+1)%HBG.length;const im=new Image();im.src=IMG(HBG[hb]);im.onload=()=>{(hbOn?b1:b2).style.backgroundImage=`url(${im.src})`;hbOn=!hbOn;b2.classList.toggle('on',hbOn);$('#where').textContent=HBGN[hb];};},6500);
+$('#tiles').innerHTML=[['razas','raza_arquera','Razas','5 portadores, cada uno con sus técnicas','big'],['bestiario','mob_teju','Bestiario','27 criaturas de la mitología guaraní','big'],['sets','set_caballero_5','Sets','7 por raza, de +0 a +15'],['alas','wing_gladiador_2_12','Alas','4 etapas y 2ª generación'],['mapas','z_esteros','Mapas','10 tierras reales del Paraguay'],['items','set_mburuvicha_6','Ítems','armas, gemas, piezas únicas'],['historia','npc_cronista','Historia','la crónica de la Noche Larga','big'],['npc','npc_pai','NPC','los guerreros de Asunción','big']].map(([v,im,t,d,b])=>`<button class="tile ${b||''}" data-go="${v}"><img src="${IMG(im)}" alt="" loading="lazy"><div><b>${t}</b><span>${d}</span></div></button>`).join('');
+
+/* mitología: glosario con buscador */
 const GLOS=[["Yvy Marane'ỹ","la Tierra Sin Mal, el paraíso que buscaban los guaraníes"],["Kuarahy","el sol"],["Jasy","la luna"],["Tupã","el dios del trueno"],["Arasy","la madre del cielo"],["Ñamandu","el padre primero, el creador"],["Tau","el espíritu del mal"],["Kerana","la hija de Marangatu, madre de los siete"],["Añá","el demonio"],["Pa'i","sacerdote"],["Mburuvicha","jefe, cacique"],["Karaí","señor, hombre respetado"],["Jarýi","abuela, dueña"],["Kuña","mujer"],["Guyra","pájaro (Guyra Pytã, pájaro rojo; Guyra Hũ, pájaro negro)"],["Mbói","víbora"],["Teju","lagarto"],["Jagua","perro"],["Ka'a","yerba, monte"],["Ypo","el que vive en el agua"],["Ñandutí","tela de araña, el encaje paraguayo"],["Ao Po'i","tela fina, bordado típico"],["Mba'éichapa","¿cómo estás?"],["Porã","lindo, bueno"],["Pytã","rojo"],["Hũ","negro"],["Guasu","grande"]];
 $('#glos').innerHTML=GLOS.map(([t,d])=>`<div><dt>${t}</dt><dd>${d}</dd></div>`).join('');
-const ROM=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-$('#chapters').innerHTML=W.lore.map((c,i)=>`<details><summary><span class="no">${ROM[i]}</span><span class="ct">${c.t}</span><span class="lk">${c.lock?'Se abre al '+c.lock.charAt(0).toLowerCase()+c.lock.slice(1):'Desde el inicio'}</span></summary><div class="tx">${c.p.map(x=>'<p>'+x+'</p>').join('')}</div></details>`).join('');
-/* razas */
-const STN={fue:'Fuerza',agi:'Agilidad',vit:'Vitalidad',ene:'Energía'};
-$('#razasList').innerHTML=CK.map(k=>{const c=W.cls[k];return `<article class="raza" id="r-${k}" style="--c:${CCOL[k]}"><div class="rimg">${zoom(IMG('raza_'+k),c.name+' con el set '+c.sets[6].n+' y '+c.wn2)}</div><div class="rbody"><h3>${c.name}</h3><p class="evo">Evoluciona a <b>${c.evo}</b>${c.unlock?' · se desbloquea con un personaje nivel '+c.unlock:''}</p><p>${c.desc}</p><p class="muted" style="font-size:.95rem">${c.hint}</p><ul class="stats">${Object.entries(c.base).map(([s,v])=>`<li>${STN[s]}<b>${v}</b></li>`).join('')}</ul><ul class="skills">${c.skills.map(s=>`<li><span class="sl">NV ${s.lvl}</span><div><div class="sn">${s.name}${s.evo?' <span class="muted" style="font-weight:400;font-size:.8rem">(evolución)</span>':''}</div><div class="sd">${s.desc}</div></div></li>`).join('')}</ul></div></article>`;}).join('');
-/* sets */
-let curS='caballero';
-function tabs(el,cur,fn){el.innerHTML=CK.map(k=>`<button type="button" role="tab" aria-selected="${k===cur}" data-k="${k}" style="--c:${CCOL[k]}">${W.cls[k].name}</button>`).join('');el.onclick=e=>{const b=e.target.closest('[data-k]');if(b)fn(b.dataset.k);};}
-function renderSets(){const c=W.cls[curS];tabs($('#setTabs'),curS,k=>{curS=k;renderSets();});
-  const slots=Object.entries(c.slots).filter(([k])=>!(curS==='gladiador'&&k==='helm')).map(([,v])=>v).join(', ');
-  $('#setPanel').innerHTML=`<div class="sets">${c.sets.map((t,i)=>`<div class="set" style="--c:${t.col}"><span class="gem"></span>${zoom(IMG('set_'+curS+'_'+i),'Set '+t.n+' · '+c.name)}<span class="tn">Set ${t.n}</span><span class="tl">Nivel ${W.lv[i]} · ${c.w[i]}${curS==='caballero'?' · '+W.sh[i]:''}</span></div>`).join('')}</div>
-  <div class="setinfo"><div><b>Piezas</b>${slots}${curS==='gladiador'?'. El Gladiador pelea sin casco':''}.</div><div><b>Armas</b>${c.w.join(', ')}.</div>${curS==='caballero'?'<div><b>Escudos</b>'+W.sh.join(', ')+'.</div>':''}<div><b>Mejoras</b>Con gemas cada pieza sube de +0 a +15: desde +4 brilla, y en +7, +9, +11 y +13 el brillo cambia de color.</div></div>
-  <div class="plus">${c.sets.map(t=>`<span><i style="--c:${t.col}"></i>${t.n}</span>`).join('')}</div>`;}
-renderSets();
+
+function renderGlos(q){q=(q||'').toLowerCase();$('#glos').innerHTML=GLOS.filter(([t,d])=>!q||(t+' '+d).toLowerCase().includes(q)).map(([t,d])=>`<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')||'<p class="muted">No hay palabras con eso.</p>';}
+renderGlos('');$('#glosQ').addEventListener('input',e=>renderGlos(e.target.value));
+
+/* historia: los siete hijos y el libro de capítulos */
+$('#sons').innerHTML=SONS.map(k=>{const m=W.mobs[k];return `<li><button data-go="bestiario/${k}"><img src="${IMG('mob_'+k)}" alt="${esc(m.name)}" loading="lazy"><span class="n">${m.name}</span><span class="w">${W.zones[m.zones[0]].name}</span></button></li>`;}).join('');
+const ROM=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];let curCh=0;
+function setChapter(i){curCh=Math.max(0,Math.min(W.lore.length-1,i|0));const c=W.lore[curCh];
+  $('#bookNav').innerHTML=W.lore.map((x,k)=>`<button type="button" data-ch="${k}" aria-current="${k===curCh}"><span class="no">${ROM[k]}</span><span>${x.t}</span></button>`).join('');
+  $('#bookPage').innerHTML=`<span class="kicker">Capítulo ${ROM[curCh]} · Karaí Arandu, cronista del reino</span><h3>${c.t}</h3><span class="lk">${c.lock?'En el juego se abre al '+c.lock.charAt(0).toLowerCase()+c.lock.slice(1)+'.':'Disponible desde el inicio.'}</span>${c.p.map(x=>'<p>'+x+'</p>').join('')}<div class="pn">${curCh>0?'<button class="btn btn-line" data-ch="'+(curCh-1)+'">Anterior</button>':''}${curCh<W.lore.length-1?'<button class="btn btn-gold" data-ch="'+(curCh+1)+'">Siguiente capítulo</button>':'<button class="btn btn-gold" data-dl>Empezar a jugar</button>'}</div>`;}
+$('#book').addEventListener('click',e=>{const b=e.target.closest('[data-ch]');if(b)setChapter(+b.dataset.ch);});setChapter(0);
+
+/* razas: selector, barras y técnicas */
+const STN={fue:'Fuerza',agi:'Agilidad',vit:'Vitalidad',ene:'Energía'};let curR='caballero';
+function setRaza(k){if(!W.cls[k])return;curR=k;const c=W.cls[k];
+  $('#rsel').innerHTML=CK.map(x=>`<button type="button" data-r="${x}" aria-pressed="${x===k}" style="--c:${CCOL[x]}"><img src="${IMG('raza_'+x)}" alt="" loading="lazy"><span>${W.cls[x].name}</span></button>`).join('');
+  $('#razaPanel').innerHTML=`<article class="raza" style="--c:${CCOL[k]}"><div class="rimg">${zoom(IMG('raza_'+k),c.name+' con el set '+c.sets[6].n+' y '+c.wn2)}</div><div class="rbody"><h3>${c.name}</h3><p class="evo">Evoluciona a <b>${c.evo}</b>${c.unlock?' · se desbloquea con un personaje nivel '+c.unlock:''}</p><p>${c.desc}</p><p class="muted" style="font-size:.95rem">${c.hint}</p>
+  <ul class="bars">${Object.entries(c.base).map(([s,v])=>`<li>${STN[s]}<i style="--w:${Math.round(v/32*100)}%"></i><b>${v}</b></li>`).join('')}</ul>
+  <ul class="skills">${c.skills.map((s,i)=>`<li><button type="button" aria-expanded="${i===0}"><span class="sl">NV ${s.lvl}</span><div><div class="sn">${s.name}${s.evo?' <span class="muted" style="font-weight:400;font-size:.8rem">(evolución)</span>':''}</div><div class="sd">${s.desc} · ${s.mp} MP</div></div></button></li>`).join('')}</ul>
+  <div class="cta"><button class="btn btn-gold" data-dl>Jugar con ${c.name==='Arquera'?'la':'el'} ${c.name}</button><button class="btn btn-line" data-go="sets/${k}/6">Ver sus sets</button><button class="btn btn-line" data-go="alas/${k}/4">Ver sus alas</button></div></div></article>`;}
+$('#rsel').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(b){setRaza(b.dataset.r);history.replaceState(null,'','#razas/'+b.dataset.r);}});
+$('#razaPanel').addEventListener('click',e=>{const b=e.target.closest('.skills button');if(b){$$('.skills button').forEach(x=>x.setAttribute('aria-expanded',x===b));}});
+setRaza('caballero');
+/* test: qué portador sos */
+const QZ=[['¿Cómo te gusta pelear?',[['Cuerpo a cuerpo, aguantando golpes','caballero'],['De lejos, con magia','hechicero'],['Rápido y a distancia','arquera'],['Con espada y rayos a la vez','gladiador']]],['¿Qué preferís en una pelea de grupo?',[['Ser el escudo del grupo','caballero'],['Hacer el daño más grande','hechicero'],['Curar y apoyar','arquera'],['Mandar y que un cuervo cace por mí','mburuvicha']]],['¿Qué paisaje te llama más?',[['Las murallas de Asunción','caballero'],['La niebla del Ybytyruzú','hechicero'],['La selva del Mbaracayú','arquera'],['Las trincheras de Cerro Corá','gladiador']]],['¿Qué te gusta coleccionar?',[['Sets pesados que se noten','caballero'],['Bastones y gemas','hechicero'],['Alas livianas y plumas','arquera'],['Cetros y coronas','mburuvicha']]]];
+let qi=0,qs={};
+function renderQuiz(){const Q=$('#quiz');if(qi<QZ.length){const [q,opts]=QZ[qi];Q.innerHTML=`<h3>¿Qué portador sos?</h3><div class="prog">${QZ.map((_,i)=>`<i class="${i<=qi?'on':''}"></i>`).join('')}</div><p class="q">${q}</p><div class="opts">${opts.map(([t,c])=>`<button type="button" data-q="${c}">${t}</button>`).join('')}</div>`;}
+  else{const best=Object.entries(qs).sort((a,b)=>b[1]-a[1])[0][0];const c=W.cls[best];Q.innerHTML=`<h3>Sos ${c.name==='Arquera'?'una':'un'} ${c.name}</h3><div class="res"><img src="${IMG('raza_'+best)}" alt="${c.name}"><div><p class="q">${c.desc}</p><p class="muted">Evoluciona a ${c.evo}${c.unlock?'. Se desbloquea con un personaje nivel '+c.unlock+', así que podés empezar con otra raza y llegar':''}.</p><div class="cta" style="margin-top:12px"><button class="btn btn-gold" data-dl>Crear mi ${c.name}</button><button class="btn btn-line" data-r="${best}" id="qSee">Ver la raza</button><button class="btn btn-line" id="qAgain">Repetir el test</button></div></div></div>`;}}
+$('#quiz').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(b){qs[b.dataset.q]=(qs[b.dataset.q]||0)+1;qi++;renderQuiz();return;}if(e.target.id==='qAgain'){qi=0;qs={};renderQuiz();}if(e.target.id==='qSee'){setRaza(e.target.dataset.r);scrollTo({top:0,behavior:'smooth'});}});
+renderQuiz();
+
+/* sets: la forja */
+let curS='caballero',curT=0,curLv=0;
+function chipTabs(el,cur,attr){el.innerHTML=CK.map(k=>`<button type="button" class="chip" role="tab" aria-selected="${k===cur}" data-${attr}="${k}" style="--c:${CCOL[k]}">${W.cls[k].name}</button>`).join('');}
+const LVTXT=lv=>lv===0?'Como cae de la bestia o sale de la forja.':lv<4?'Mejorado con gemas de Tupã. Todavía no brilla.':lv<7?'Desde +4 la pieza empieza a brillar con el color de su set.':lv<9?'A +7 el brillo cambia de color. Con gema de Jasy, 50% de éxito.':lv<11?'+9: el máximo con gemas. De acá en más, solo el Caldero de Kerana.':lv<13?'+11: brillo nuevo. Pocos en el servidor llegan hasta acá.':lv<15?'+13: casi el límite. Se ve desde la otra punta del mapa.':'+15: el máximo del reino.';
+function setForge(c,t,lv){if(W.cls[c])curS=c;if(t!=null&&!isNaN(+t))curT=Math.max(0,Math.min(6,+t));if(lv!=null)curLv=+lv;chipTabs($('#setTabs'),curS,'s');const C=W.cls[curS],S=C.sets[curT];
+  const slots=Object.entries(C.slots).filter(([k])=>!(curS==='gladiador'&&k==='helm')).map(([,v])=>v).join(', ');
+  $('#forge').innerHTML=`<div class="forge" style="--c:${S.col};--lv:${curLv};--g:${25+curLv*3}%"><div class="fimg">${zoom(IMG('set_'+curS+'_'+curT),'Set '+S.n+' · '+C.name)}<span class="lvtag">+${curLv}</span></div><div class="fbody"><span class="kicker">${C.name} · set ${curT+1} de 7</span><h3>Set ${S.n}</h3>
+  <div class="gems">${C.sets.map((s,i)=>`<button type="button" data-t="${i}" aria-pressed="${i===curT}" style="--c:${s.col}" title="Set ${s.n}">${i+1}</button>`).join('')}</div>
+  <dl class="kv"><dt>Nivel</dt><dd>${W.lv[curT]}</dd><dt>Piezas</dt><dd>${slots}${curS==='gladiador'?' (pelea sin casco)':''}</dd><dt>Arma</dt><dd><img src="${ic(curS+'_'+curT+'_weapon')}" alt="" style="width:28px;height:28px;display:inline-block;vertical-align:middle;border-radius:6px;margin-right:6px">${C.w[curT]}</dd>${curS==='caballero'?`<dt>Escudo</dt><dd><img src="${ic('shield_'+curT)}" alt="" style="width:28px;height:28px;display:inline-block;vertical-align:middle;border-radius:6px;margin-right:6px">${W.sh[curT]}</dd>`:''}</dl>
+  <div class="slider"><label for="lvr"><span>Nivel de mejora</span><b>+${curLv}</b></label><input id="lvr" type="range" min="0" max="15" value="${curLv}" aria-label="Nivel de mejora"><span class="hint">${LVTXT(curLv)}</span></div>
+  <div class="fnav">${curT>0?`<button class="btn btn-line" data-t="${curT-1}">Set anterior</button>`:''}${curT<6?`<button class="btn btn-gold" data-t="${curT+1}">Siguiente set</button>`:`<button class="btn btn-gold" data-dl>Conseguirlo jugando</button>`}<button class="btn btn-line" data-go="alas/${curS}/0">Ver alas</button></div></div></div>`;}
+$('#setTabs').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b){setForge(b.dataset.s,curT);history.replaceState(null,'','#sets/'+curS+'/'+curT);}});
+$('#forge').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){setForge(curS,b.dataset.t);history.replaceState(null,'','#sets/'+curS+'/'+curT);}});
+$('#forge').addEventListener('input',e=>{if(e.target.id==='lvr'){curLv=+e.target.value;const f=$('#forge .forge');f.style.setProperty('--lv',curLv);f.style.setProperty('--g',(25+curLv*3)+'%');$('#forge .lvtag').textContent='+'+curLv;$('#forge label b').textContent='+'+curLv;$('#forge .hint').textContent=LVTXT(curLv);}});
+setForge('caballero',0,0);
+
 /* alas */
-let curW='caballero';
-function renderWings(){const c=W.cls[curW];tabs($('#wingTabs'),curW,k=>{curW=k;renderWings();});const L=[[1,0,'+0','Etapa 1'],[1,4,'+4','Etapa 2'],[1,8,'+8','Etapa 3'],[1,12,'+12','Etapa 4'],[2,12,'','2ª generación']];
-  $('#wingPanel').innerHTML=`<div class="wings">${L.map(([g,lv,p,et])=>`<div class="wing">${zoom(IMG('wing_'+curW+'_'+g+'_'+lv),(g===2?c.wn2:c.wn+' '+p)+' · '+c.name)}<span class="tn">${g===2?c.wn2:c.wn+(p?' '+p:'')}</span><span class="tl">${et}</span></div>`).join('')}</div>
-  <div class="wingtxt"><div><b>Cómo se consiguen</b>Las alas se forjan en el Caldero de Kerana de Jarýi Kuña, con gemas de Kerana. Se usan desde el nivel 20.</div><div><b>Qué dan</b>Suman daño y absorben golpes: la segunda generación da bastante más, y cada +1 suma.</div><div><b>Armazón</b>Hueso, cristal o luz según la raza, con una gema en la raíz que se enciende en las etapas altas.</div></div>`;}
-renderWings();
-/* ítems */
+let curWc='caballero',curWi=0;const WST=[[1,0,'+0','Etapa 1'],[1,4,'+4','Etapa 2'],[1,8,'+8','Etapa 3'],[1,12,'+12','Etapa 4'],[2,12,'','2ª generación']];
+function setWing(c,i){if(W.cls[c])curWc=c;if(i!=null&&!isNaN(+i))curWi=Math.max(0,Math.min(4,+i));chipTabs($('#wingTabs'),curWc,'w');const C=W.cls[curWc];const [g,lv,p,et]=WST[curWi];const name=g===2?C.wn2:C.wn+(p?' '+p:'');
+  $('#wingPanel').innerHTML=`<div class="wview" style="--c:${CCOL[curWc]}"><div class="wimg">${zoom(IMG('wing_'+curWc+'_'+g+'_'+lv),name+' · '+C.name)}</div><div class="wbody"><span class="kicker">${C.name} · ${et}</span><h3>${name}</h3>
+  <div class="steps2">${WST.map(([g2,lv2,p2,et2],k)=>`<button type="button" data-wi="${k}" aria-pressed="${k===curWi}"><img src="${IMG('wing_'+curWc+'_'+g2+'_'+lv2)}" alt="" loading="lazy"><span><b style="color:var(--paper)">${et2}</b><br>${g2===2?C.wn2:C.wn+' '+p2}</span></button>`).join('')}</div>
+  <p class="note">${g===2?'Se forja en el Caldero de Kerana con gemas de Kerana y un par de primera generación. Lleva un segundo par más chico y da bastante más daño y absorción.':curWi===0?'Las alas se usan desde el nivel 20. Se forjan en el Caldero de Kerana de Jarýi Kuña.':'A +'+lv+' cambian el color, el brillo del armazón y las gemas de la raíz. Cada +1 suma daño y absorción.'}</p></div></div>`;}
+$('#wingTabs').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(b){setWing(b.dataset.w,curWi);history.replaceState(null,'','#alas/'+curWc+'/'+curWi);}});
+$('#wingPanel').addEventListener('click',e=>{const b=e.target.closest('[data-wi]');if(b){setWing(curWc,b.dataset.wi);history.replaceState(null,'','#alas/'+curWc+'/'+curWi);}});
+setWing('caballero',0);
+
+/* ítems por pestañas */
 const item=(img,n,d,col)=>`<div class="item" style="${col?'--c:'+col:''}"><img src="${img}" alt="${esc(n)}" loading="lazy"><div><div class="n">${n}</div><div class="d">${d}</div></div></div>`;
-const ic=n=>'img/w/ic/'+n+'.webp';
-let itemsHTML='';
-itemsHTML+=`<div class="igroup"><h3>Armas</h3><p class="muted">Siete por raza, una por set. Espadas para Caballero y Gladiador, bastones para Hechicero, arcos para la Arquera y cetros para el Mburuvicha.</p><div class="igrid">${CK.map(k=>W.cls[k].w.map((w,i)=>item(ic(k+'_'+i+'_weapon'),w,W.cls[k].name+' · nivel '+W.lv[i])).join('')).join('')}</div></div>`;
-itemsHTML+=`<div class="igroup"><h3>Escudos del Caballero</h3><p class="muted">Solo el Caballero lleva escudo. Suma defensa y acompaña a cada set.</p><div class="igrid">${W.sh.map((s,i)=>item(ic('shield_'+i),s,'Nivel '+W.lv[i])).join('')}</div></div>`;
-itemsHTML+=`<div class="igroup"><h3>Gemas</h3><p class="muted">Las gemas suben tus ítems y abren el camino a las alas. Caen de las bestias y se dan de premio en las misiones.</p><div class="igrid wide">${Object.entries(W.gems).map(([k,g])=>item(ic('gem_'+k),g.name,g.desc,g.col)).join('')}</div></div>`;
-itemsHTML+=`<div class="igroup"><h3>Pociones y pergaminos</h3><p class="muted">Ña Eusebia las vende en Asunción. Las de vida son rojas y las de maná, azules.</p><div class="igrid">${Object.entries(W.pots).map(([k,p])=>item(ic('pot_'+k),p.name,'Recupera '+Math.round(p.pct*100)+'% + '+p.add+' · '+p.price.toLocaleString('es-PY')+' G',p.kind==='hp'?'#ff8a7a':'#8ec2ff')).join('')}</div></div>`;
-itemsHTML+=`<div class="igroup"><h3>Mascotas</h3><p class="muted">Te siguen a todos lados y te dan una ventaja permanente mientras las llevás.</p><div class="igrid wide">${Object.entries(W.pets).map(([k,p])=>`<div class="item" style="--c:${p.col}"><span class="pet">${p.name[0]}</span><div><div class="n">${p.name}</div><div class="d">${p.desc}</div></div></div>`).join('')}</div></div>`;
-itemsHTML+=`<div class="igroup"><h3>Alas</h3><p class="muted">Un par por raza, en dos generaciones. Las de segunda generación llevan un segundo par más chico debajo.</p><div class="igrid">${CK.map(k=>[1,2].map(g=>item(ic('wings_'+k+'_g'+g),g===1?W.cls[k].wn:W.cls[k].wn2,W.cls[k].name+' · '+(g===1?'1ª':'2ª')+' generación')).join('')).join('')}</div></div>`;
-itemsHTML+=`<div class="igroup"><h3>Rarezas</h3><p class="muted">El color del nombre dice qué tan bueno es un ítem. Los antiguos arman los sets de Humaitá y Cerro Corá, que dan bonificaciones al juntar piezas.</p><div class="rars">${Object.values(W.rar).map(r=>`<span style="--c:${r.c}">${r.n}</span>`).join('')}</div><div class="setinfo">${Object.values(W.ancs).map(a=>`<div><b>Set antiguo de ${a.n}</b>${a.b.join(' · ')}</div>`).join('')}</div></div>`;
-const uniqKeys=Object.keys(W.loot).filter(k=>W.mobs[k]);
-itemsHTML+=`<div class="igroup"><h3>Piezas únicas</h3><p class="muted">Cada bestia suelta sus trofeos y, muy de vez en cuando, una pieza única con historia propia. Existe también una versión épica, rarísima.</p><div class="uniq">${uniqKeys.map(k=>{const l=W.loot[k];return `<div><img src="${IMG('mob_'+k)}" alt="" loading="lazy"><div><div class="n">${l.uniq}</div><div class="d">${l.flavor} <span style="opacity:.8">Lo suelta ${W.mobs[k].name}.</span></div></div></div>`;}).join('')}</div></div>`;
-$('#itemsList').innerHTML=itemsHTML;
-/* mapas */
-const BOSSZ={};Object.entries(W.mobs).forEach(([k,m])=>{if(m.boss&&m.zones)m.zones.forEach(z=>{(BOSSZ[z]=BOSSZ[z]||[]).push(k);});});
-const mobChip=k=>{const m=W.mobs[k];return `<a href="#m-${k}" class="${m.boss?'boss':''}"><img src="${IMG('mob_'+k)}" alt="" loading="lazy">${m.name}${m.boss?' · jefe':''}</a>`;};
-$('#route').innerHTML=ZK.map(k=>{const z=W.zones[k];const mobs=[...new Set(z.spots.map(s=>s[1]))].concat(BOSSZ[k]||[]);const q=W.quests.filter(x=>mobs.includes(x.mob));
-  return `<article class="zone" id="z-${k}"><img class="big" src="${IMG('z_'+k)}" data-zoom="${IMG('z_'+k)}" data-cap="${esc(z.name)}" alt="${esc(z.name)}" loading="lazy"><div class="zbody"><span class="lv ${k==='asuncion'?'safe':''}">${k==='asuncion'?'Ciudad segura':'<small>NIVEL</small>'+z.lvl}</span><h3>${z.name}</h3><p class="zr">${z.sub}${z.cost?' · viaje: '+z.cost.toLocaleString('es-PY')+' G con el Baqueano':''}</p>${mobs.length?`<div class="crit">${mobs.map(mobChip).join('')}</div>`:'<p class="muted">Herrero, pociones, técnicas, caldero, baúl, misiones y la crónica del reino. Acá no hay bestias.</p>'}${q.length?`<p class="q"><b>Misión:</b> ${q[0].txt}</p>`:''}</div></article>`;}).join('');
+const ITABS=[['armas','Armas'],['escudos','Escudos'],['gemas','Gemas'],['pociones','Pociones'],['mascotas','Mascotas'],['alas','Alas'],['rarezas','Rarezas'],['unicas','Piezas únicas']];let curI='armas',curIc='caballero';
+function setItems(k){if(ITABS.some(t=>t[0]===k))curI=k;$('#itemTabs').innerHTML=ITABS.map(([k2,n])=>`<button type="button" class="chip" aria-pressed="${k2===curI}" data-i="${k2}">${n}</button>`).join('');let h='';
+  if(curI==='armas')h=`<p class="muted" style="margin-bottom:12px">Siete por raza, una por set. Espadas para Caballero y Gladiador, bastones para Hechicero, arcos para la Arquera y cetros para el Mburuvicha.</p><div class="chips" style="margin-bottom:12px">${CK.map(c=>`<button type="button" class="chip" aria-pressed="${c===curIc}" data-ic="${c}" style="--c:${CCOL[c]}">${W.cls[c].name}</button>`).join('')}</div><div class="igrid">${W.cls[curIc].w.map((w,i)=>item(ic(curIc+'_'+i+'_weapon'),w,'Nivel '+W.lv[i]+' · set '+W.cls[curIc].sets[i].n)).join('')}</div>`;
+  else if(curI==='escudos')h=`<p class="muted" style="margin-bottom:12px">Solo el Caballero lleva escudo. Suma defensa y acompaña a cada set.</p><div class="igrid">${W.sh.map((s,i)=>item(ic('shield_'+i),s,'Nivel '+W.lv[i])).join('')}</div>`;
+  else if(curI==='gemas')h=`<p class="muted" style="margin-bottom:12px">Las gemas suben tus ítems y abren el camino a las alas. Caen de las bestias y se dan de premio en las misiones.</p><div class="igrid wide">${Object.entries(W.gems).map(([k,g])=>item(ic('gem_'+k),g.name,g.desc,g.col)).join('')}</div>`;
+  else if(curI==='pociones')h=`<p class="muted" style="margin-bottom:12px">Ña Eusebia las vende en Asunción. Las de vida son rojas y las de maná, azules.</p><div class="igrid">${Object.entries(W.pots).map(([k,p])=>item(ic('pot_'+k),p.name,'Recupera '+Math.round(p.pct*100)+'% + '+p.add+' · '+p.price.toLocaleString('es-PY')+' G',p.kind==='hp'?'#ff8a7a':'#8ec2ff')).join('')}</div>`;
+  else if(curI==='mascotas')h=`<p class="muted" style="margin-bottom:12px">Te siguen a todos lados y te dan una ventaja permanente mientras las llevás.</p><div class="igrid wide">${Object.entries(W.pets).map(([k,p])=>`<div class="item" style="--c:${p.col}"><span class="pet">${p.name[0]}</span><div><div class="n">${p.name}</div><div class="d">${p.desc}</div></div></div>`).join('')}</div>`;
+  else if(curI==='alas')h=`<p class="muted" style="margin-bottom:12px">Un par por raza, en dos generaciones.</p><div class="igrid">${CK.map(k=>[1,2].map(g=>item(ic('wings_'+k+'_g'+g),g===1?W.cls[k].wn:W.cls[k].wn2,W.cls[k].name+' · '+(g===1?'1ª':'2ª')+' generación')).join('')).join('')}</div><div class="cta" style="margin-top:14px"><button class="btn btn-line" data-go="alas">Ver las alas en 3D</button></div>`;
+  else if(curI==='rarezas')h=`<p class="muted" style="margin-bottom:12px">El color del nombre dice qué tan bueno es un ítem. Los antiguos arman los sets de Humaitá y Cerro Corá, que dan bonificaciones al juntar piezas.</p><div class="rars">${Object.values(W.rar).map(r=>`<span style="--c:${r.c}">${r.n}</span>`).join('')}</div><div class="info2">${Object.values(W.ancs).map(a=>`<div><b>Set antiguo de ${a.n}</b>${a.b.join(' · ')}</div>`).join('')}</div>`;
+  else h=`<p class="muted" style="margin-bottom:12px">Cada bestia suelta sus trofeos y, muy de vez en cuando, una pieza única con historia propia. Tocá una para ver quién la suelta.</p><div class="uniq">${Object.keys(W.loot).filter(k=>W.mobs[k]).map(k=>{const l=W.loot[k];return `<button type="button" data-go="bestiario/${k}"><img src="${IMG('mob_'+k)}" alt="" loading="lazy"><div><div class="n">${l.uniq}</div><div class="d">${l.flavor}</div></div></button>`;}).join('')}</div>`;
+  $('#itemPanel').innerHTML=h;}
+$('#itemTabs').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){setItems(b.dataset.i);history.replaceState(null,'','#items/'+curI);}});
+$('#itemPanel').addEventListener('click',e=>{const b=e.target.closest('[data-ic]');if(b){curIc=b.dataset.ic;setItems(curI);}});
+setItems('armas');
+
+/* mapa del Paraguay: contorno simplificado (lon, lat) y pines */
+const PY=[[-62.65,-22.23],[-62.28,-21.0],[-62.2,-20.55],[-61.9,-19.98],[-61.5,-19.65],[-60.5,-19.3],[-59.3,-19.3],[-58.4,-19.6],[-58.16,-20.16],[-57.9,-20.9],[-57.85,-21.6],[-57.95,-22.1],[-57.3,-22.2],[-56.6,-22.25],[-56.0,-22.1],[-55.7,-22.55],[-55.55,-23.3],[-55.4,-23.95],[-54.6,-24.0],[-54.3,-24.1],[-54.55,-25.0],[-54.6,-25.6],[-54.75,-26.5],[-55.4,-27.1],[-55.9,-27.4],[-56.6,-27.5],[-57.3,-27.45],[-58.0,-27.3],[-58.62,-27.28],[-58.45,-26.8],[-58.0,-26.2],[-57.6,-25.5],[-57.65,-25.3],[-58.1,-24.9],[-58.9,-24.4],[-59.7,-23.9],[-60.5,-23.5],[-61.5,-23.0],[-62.65,-22.23]];
+const RIO=[[-58.16,-20.16],[-57.9,-20.9],[-57.85,-21.6],[-57.95,-22.1],[-57.75,-22.9],[-57.85,-23.8],[-57.65,-25.3],[-57.6,-25.5],[-58.0,-26.2],[-58.45,-26.8],[-58.62,-27.28]];
+const PINS={asuncion:[-57.63,-25.28],campos:[-57.2,-25.33],ruinas:[-55.7,-27.12],chaco:[-60.6,-21.4],esteros:[-58.0,-26.9],ybytyruzu:[-56.3,-25.9],monday:[-54.75,-25.6],mbaracayu:[-55.3,-24.15],cerrocora:[-56.05,-22.65],bahianegra:[-58.17,-20.22]};
+const LBLPOS={asuncion:[-.45,.05,'end'],campos:[.42,-.42,'start'],ruinas:[.42,.1,'start'],chaco:[.45,0,'start'],esteros:[-.45,.12,'end'],ybytyruzu:[0,.62,'middle'],monday:[.45,0,'start'],mbaracayu:[.45,-.1,'start'],cerrocora:[.45,0,'start'],bahianegra:[.45,0,'start']};
+const X=p=>(p[0]+63.2).toFixed(2),Y=p=>(-p[1]-18.9).toFixed(2);
+$('#svgwrap').innerHTML=`<svg viewBox="-.3 0 12.4 9.2" role="img" aria-label="Mapa del reino con las diez tierras"><defs><radialGradient id="gl"><stop offset="0" stop-color="#e2a83f" stop-opacity=".35"/><stop offset="1" stop-color="#e2a83f" stop-opacity="0"/></radialGradient></defs>
+<path class="land" d="M${PY.map(p=>X(p)+','+Y(p)).join('L')}Z"/><path class="river" d="M${RIO.map(p=>X(p)+','+Y(p)).join('L')}"/>
+<path class="route" d="M${ZK.map(k=>X(PINS[k])+','+Y(PINS[k])).join('L')}"/>
+${ZK.map((k,i)=>`<g class="pin ${k==='asuncion'?'safe':''}" data-z="${k}" tabindex="0" role="button" aria-label="${esc(W.zones[k].name)}"><circle cx="${X(PINS[k])}" cy="${Y(PINS[k])}" r=".55" fill="url(#gl)" stroke="none"/><circle cx="${X(PINS[k])}" cy="${Y(PINS[k])}" r=".32"/><text x="${X(PINS[k])}" y="${Y(PINS[k])}">${i===0?'A':i}</text><text class="lbl" style="text-anchor:${LBLPOS[k][2]}" x="${(+X(PINS[k])+LBLPOS[k][0]).toFixed(2)}" y="${(+Y(PINS[k])+LBLPOS[k][1]).toFixed(2)}">${esc(W.zones[k].name)}</text></g>`).join('')}</svg>`;
+let curZ='asuncion';
+const mobChip=k=>{const m=W.mobs[k];return `<button type="button" class="${m.boss?'boss':''}" data-go="bestiario/${k}"><img src="${IMG('mob_'+k)}" alt="" loading="lazy">${m.name}${m.boss?' · jefe':''}</button>`;};
+function setZone(k){if(!W.zones[k]||!ZK.includes(k))k='asuncion';curZ=k;const z=W.zones[k];const i=ZK.indexOf(k);const mobs=[...new Set(z.spots.map(s=>s[1]))].concat(BOSSZ[k]||[]);const q=W.quests.filter(x=>mobs.includes(x.mob));
+  $$('.pin').forEach(p=>p.classList.toggle('on',p.dataset.z===k));
+  $('#zoneCard').innerHTML=`<article class="zcard">${zoom(IMG('z_'+k),z.name)}<div class="zbody"><span class="lv ${k==='asuncion'?'safe':''}">${k==='asuncion'?'Ciudad segura':'<small>NIVEL</small>'+z.lvl}</span><h3>${z.name}</h3><p class="zr">${z.sub}${z.cost?' · viaje: '+z.cost.toLocaleString('es-PY')+' G con el Baqueano':''}</p>${mobs.length?`<div class="crit">${mobs.map(mobChip).join('')}</div>`:'<p class="muted">Herrero, pociones, técnicas, caldero, baúl, misiones y la crónica del reino. Acá no hay bestias.</p>'}${q.length?`<p class="q"><b>Misión del Capitán Cabañas:</b> ${q[0].txt}</p>`:''}<div class="pn">${i>0?`<button class="btn btn-line" data-z="${ZK[i-1]}">← ${W.zones[ZK[i-1]].name}</button>`:''}${i<ZK.length-1?`<button class="btn btn-gold" data-z="${ZK[i+1]}">${W.zones[ZK[i+1]].name} →</button>`:'<button class="btn btn-gold" data-dl>Llegar hasta acá</button>'}</div></div></article>`;}
+$('#svgwrap').addEventListener('click',e=>{const p=e.target.closest('.pin');if(p){setZone(p.dataset.z);history.replaceState(null,'','#mapas/'+curZ);}});
+$('#svgwrap').addEventListener('keydown',e=>{const p=e.target.closest('.pin');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();setZone(p.dataset.z);}});
+$('#zoneCard').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(b){setZone(b.dataset.z);history.replaceState(null,'','#mapas/'+curZ);}});
+setZone('asuncion');
 const EV=[['ev_ana','Arena de Añá','Evento por tiempo. Oleadas de bestias y un guardián al final; abre cada tanto y da premios que no caen cazando.'],['ev_tuguy','Fortaleza de Tuguy','Evento de asedio: defendé la fortaleza contra las bestias del Kurupí, del Ao Ao o del Moñái según tu nivel.'],['ev_duel','Arena de Duelos','Desafiá a otro portador a un 1 contra 1. Los demás pueden entrar a mirar desde la galería.'],['ev_raid','Guarida de Añaretã','Desafío de grupo contra Añaretã, el infierno hecho bestia. Para partidas de varios jugadores.']];
 $('#events').innerHTML=EV.map(([k,n,d])=>`<div class="ev">${zoom(IMG('z_'+k),n)}<div><h4>${n}</h4><p>${d}</p></div></div>`).join('');
-/* bestiario */
+
+/* bestiario: códice y ficha */
 const ORDER=Object.keys(W.mobs).sort((a,b)=>W.mobs[a].lvl-W.mobs[b].lvl);let curF='todos';
 const FL=[['todos','Todos'],['hijos','Los siete hijos'],['jefes','Jefes']].concat(ZK.filter(z=>z!=='asuncion').map(z=>[z,W.zones[z].name]));
-function renderMobs(){$('#filters').innerHTML=FL.map(([k,n])=>`<button type="button" aria-pressed="${k===curF}" data-f="${k}">${n}</button>`).join('');
+function renderCodex(){$('#filters').innerHTML=FL.map(([k,n])=>`<button type="button" class="chip" aria-pressed="${k===curF}" data-f="${k}">${n}</button>`).join('');
   const list=ORDER.filter(k=>{const m=W.mobs[k];if(curF==='todos')return true;if(curF==='hijos')return SONS.includes(k);if(curF==='jefes')return m.boss;return (m.zones||[]).includes(curF);});
-  $('#mobs').innerHTML=list.map(k=>{const m=W.mobs[k];const zs=(m.zones||[]).map(z=>W.zones[z]?`<a href="#z-${z}">${W.zones[z].name}</a>`:z).join(', ');const l=W.loot[k];
-    return `<article class="mob ${m.boss?'boss':''}" id="m-${k}"><div class="pic">${zoom(IMG('mob_'+k),m.name)}<span class="lvb">NV ${m.lvl}</span>${SONS.includes(k)?'<span class="bt">Hijo de Tau</span>':m.boss?'<span class="bt">Jefe</span>':''}</div><div class="mb"><h4>${m.name}</h4><span class="z">${zs||'Evento'}</span><p class="f">${m.ficha}</p><button type="button" class="more">Leer la ficha completa</button>${l?`<div class="lt">Suelta ${l.t1}, ${l.t2} y, rara vez, <b>${l.uniq}</b>.</div>`:''}</div></article>`;}).join('');
-}
-$('#mobs').addEventListener('click',e=>{const b=e.target.closest('.more');if(b){b.previousElementSibling.classList.add('open');b.remove();}});
-$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b){curF=b.dataset.f;renderMobs();}});
-renderMobs();
-/* npc */
-$('#npcs').innerHTML=Object.entries(W.npcs).map(([k,n])=>{const c=W.cls[n.cls];return `<article class="npc">${zoom(IMG('npc_'+k),n.name+', '+n.role)}<div><h4>${n.name}</h4><span class="r">${n.role}</span><q>${n.greet}</q><span class="g">${c.name} con el set ${c.sets[n.t].n} y ${n.wg===2?c.wn2:c.wn}</span></div></article>`;}).join('');
+  $('#codex').innerHTML=list.map(k=>{const m=W.mobs[k];return `<button type="button" class="${m.boss?'boss':''}" data-m="${k}"><img src="${IMG('mob_'+k)}" alt="${esc(m.name)}" loading="lazy"><span class="lvb">NV ${m.lvl}</span>${SONS.includes(k)?'<span class="bt">Hijo de Tau</span>':m.boss?'<span class="bt">Jefe</span>':''}<span class="nm">${m.name}</span></button>`;}).join('');}
+function openFicha(k){const m=W.mobs[k];if(!m)return;const i=ORDER.indexOf(k);const l=W.loot[k];const q=W.quests.find(x=>x.mob===k);const zs=(m.zones||[]).map(z=>W.zones[z]?`<span>${W.zones[z].name}</span>`:'').join('');
+  lastFocus=document.activeElement;$('#fbox').innerHTML=`<div class="ficha" role="dialog" aria-modal="true" aria-label="${esc(m.name)}">${zoom(IMG('mob_'+k),m.name)}<div class="fb"><span class="kicker">${SONS.includes(k)?'Hijo de Tau y Kerana':m.boss?'Jefe':'Criatura del reino'} · nivel ${m.lvl}</span><h3>${m.name}</h3><div class="tags">${zs}${m.boss?'<span class="b">Jefe</span>':''}</div><p>${m.ficha}</p>${l?`<div class="lt">Suelta ${l.t1}, ${l.t2} y, rara vez, <b>${l.uniq}</b>: ${l.flavor}</div>`:''}${q?`<div class="lt">Misión: ${q.txt} (${q.n} ${q.n>1?'cazas':'caza'}, ${q.gold.toLocaleString('es-PY')} G)</div>`:''}<div class="pn">${i>0?`<button class="btn btn-line" data-m="${ORDER[i-1]}">← ${W.mobs[ORDER[i-1]].name}</button>`:''}${i<ORDER.length-1?`<button class="btn btn-line" data-m="${ORDER[i+1]}">${W.mobs[ORDER[i+1]].name} →</button>`:''}${m.zones&&W.zones[m.zones[0]]&&ZK.includes(m.zones[0])?`<button class="btn btn-gold" data-go="mapas/${m.zones[0]}">Ver su tierra</button>`:''}</div></div></div>`;
+  $('#fmodal').hidden=false;lock(true);$('#fClose').focus();}
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b){curF=b.dataset.f;renderCodex();}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)openFicha(b.dataset.m);});
+renderCodex();
+
+/* npc: la plaza */
+let curN='herrero';
+function setNpc(k){if(!W.npcs[k])return;curN=k;const n=W.npcs[k],c=W.cls[n.cls];
+  $('#npcs').innerHTML=Object.entries(W.npcs).map(([id,x])=>`<button type="button" data-n="${id}" aria-pressed="${id===k}"><img src="${IMG('npc_'+id)}" alt="" loading="lazy"><span class="nm"><b>${x.name}</b><span>${x.role}</span></span></button>`).join('');
+  $('#talk').innerHTML=`${zoom(IMG('npc_'+k),n.name+', '+n.role)}<div><span class="kicker">${n.role}</span><h3>${n.name}</h3><q>${n.greet}</q><p class="g">${c.name} con el set ${c.sets[n.t].n} y ${n.wg===2?c.wn2:c.wn}.</p></div>`;}
+$('#npcs').addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b){setNpc(b.dataset.n);history.replaceState(null,'','#npc/'+curN);}});
+setNpc('herrero');
+
+/* arranque según el enlace */
+go(location.hash.slice(1)||'inicio',false);
 </script>
 </body></html>
