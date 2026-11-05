@@ -2809,7 +2809,7 @@ function emblemTex(cls,col){const key='emb'+cls+col;if(TXL[key])return TXL[key].
 function emblem(g,S,cls,w,h,U){const t=emblemTex(cls,S.t);const m=new MSM({map:t,emissiveMap:t,emissive:S.t,emissiveIntensity:.8,transparent:true,depthWrite:false,alphaTest:.1,polygonOffset:true,polygonOffsetFactor:-2});m.userData.forge=1;m.userData.gem=1;
   const e=part(gcc('embq',()=>new THREE.PlaneGeometry(1,1)),m,0,h*.0,.105*U,g,w*.55,w*.55,1);e.rotation.x=-.12;}
 function forgeChest(S,U,cls){const g=new THREE.Group();const M=fMetal(S.m,S.t),O=fOrnate(S.m,S.t,S.glow),L=fLeather(S.a);const w=.27*U,h=.2*U;
-  /* peto: casquete alto y chato que abraza el torso (antes era una esfera que parecía panza) */const plate=m=>{const p=part(gcc('plate2',()=>{const q=new THREE.SphereGeometry(1,22,16,-PI*.4,PI*.8,PI*.2,PI*.6);return q;}),m,0,.035*U,-.07*U,g,w*1.02,h*1.75,.135*U);p.material.side=THREE.DoubleSide;p.castShadow=true;return p;};
+  /* peto: casquete alto y chato que abraza el torso (antes era una esfera que parecía panza) */const plate=m=>{const p=part(gcc('plate2',()=>{/* phi=π/2 mira a +z (al frente); antes el casquete salía hacia −x, o sea hacia el costado, y parecía una panza */const q=new THREE.SphereGeometry(1,22,16,PI*.18,PI*.64,PI*.22,PI*.56);return q;}),m,0,.055*U,-.045*U,g,w*.78,h*1.35,.1*U);p.material.side=THREE.DoubleSide;p.castShadow=true;return p;};
   switch(S.chest){
     case 'none':break;
     case 'straps':{for(const s of[-1,1]){const st=part(gcc('strap',()=>new THREE.BoxGeometry(.05,1,.02)),L,s*w*.35,0,.085*U,g,U*.7,h*2.4,U);st.rotation.z=s*.55;}const bk=part(gcc('buckle',()=>new THREE.TorusGeometry(1,.3,6,12)),O,0,0,.1*U,g,.02*U,.02*U,.02*U);break;}
