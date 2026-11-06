@@ -2345,7 +2345,11 @@ function oadNpc(id){const G=NPC_GEAR[id];if(G&&OAD.on&&!OAD.failed){const eq=npc
   const d=OAD_NPC[id];if(!d||!OAD.on||OAD.failed)return null;const s={body:d.body,tex:OAD_PLAN.tex.npc[id],props:d.props};
   const files=['anims','body_'+d.body].concat(d.props.map(p=>'p_'+p));if(!oadHave(files)){oadNeed(files,oadUpgradeNpcs);return null;}
   const r=oadHuman(s,{team:d.team});if(!r)return null;(r.faceMats||[]).forEach(m=>m.userData.npc=1);if(d.col)r.body.userData.mats.forEach(m=>m.color.setHex(d.col));oadActs(r,r.body,{idle:d.anim});oadPlay(r,'idle',0);r.mixer.update(Math.random()*3);return r;}
-function oadUpgradeNpcs(){for(const n of npcs){if(n.m.oad)continue;const m=oadNpc(n.id);if(!m)continue;const par=n.m.g.parent;m.g.position.copy(n.m.g.position);m.g.rotation.copy(n.m.g.rotation);addBlob(m.g,1.3);
+/* PNJ de la plaza: muchos están bajo el techo de su puesto. No reciben la sombra del techo (si no, la cara queda negra)
+   y la piel lleva un relleno suave de luz, como un farol de feria */
+function npcLit(m){if(!m||!m.g)return m;m.g.traverse(o=>{if(!o.isMesh)return;o.receiveShadow=false;const mt=o.material;if(!mt||Array.isArray(mt)||mt.userData.npcLit)return;
+    if(/Superhero|Regular|Eyes|skin|face|head/i.test(mt.name||'')&&mt.emissive&&mt.emissive.getHex()===0){mt.userData.npcLit=1;mt.emissive.copy(mt.color||new THREE.Color(1,1,1)).multiplyScalar(.16);}});return m;}
+function oadUpgradeNpcs(){for(const n of npcs){if(n.m.oad)continue;const m=oadNpc(n.id);if(!m)continue;npcLit(m);const par=n.m.g.parent;m.g.position.copy(n.m.g.position);m.g.rotation.copy(n.m.g.rotation);addBlob(m.g,1.3);
   if(par){par.remove(n.m.g);par.add(m.g);}disposeTree(n.m.g);n.m=m;}}
 /* --- bestias --- */
 function oadMeasure(f,root){if(OAD.meas[f])return OAD.meas[f];const g=OAD.ok[f];const tmp=THREE.SkeletonUtils.clone(g.scene);const c=g.animations.find(a=>a.name==='idle')||g.animations[0];
@@ -4097,7 +4101,7 @@ const BUILD={
   scatter(30,42,(x,z)=>addRock(V,x,z,.3+srnd()*1));
   grassField(V,2400,[0x6e8f34,0x9a9a4a,0x5a7a2a],(x,z)=>Math.hypot(x,z)>37);
   // NPCs
-  for(const id in NPCS){const d=NPCS[id],m=npcModel(id),y=H(d.pos[0],d.pos[1]);m.g.position.set(d.pos[0],y,d.pos[1]);m.g.rotation.y=Math.atan2(-d.pos[0],-d.pos[1]);addBlob(m.g,1.3);G.add(m.g);
+  for(const id in NPCS){const d=NPCS[id],m=npcLit(npcModel(id)),y=H(d.pos[0],d.pos[1]);m.g.position.set(d.pos[0],y,d.pos[1]);m.g.rotation.y=Math.atan2(-d.pos[0],-d.pos[1]);addBlob(m.g,1.3);G.add(m.g);
     const n={id,def:d,m,x:d.pos[0],z:d.pos[1],ry0:m.g.rotation.y,ph:srnd()*6};n.label=addLabel(`${esc(d.name)}<small>${esc(d.role)}</small>`,'npc',()=>[n.x,y+2.35,n.z]);npcs.push(n);colliders.push({x:n.x,z:n.z,r:.45});}
  },
  campos(G,V){
