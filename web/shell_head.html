@@ -293,4 +293,36 @@ button{font-family:inherit}
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   #fire{display:none}.ch .txt>*,.ch .fig img,.ch .fig .glow,.ch.home .pan>*,.ch.home .pfig img,.ch.dlch .plat,.ch.dlch .alt{opacity:1;transform:none}.ch .fig .ola{display:none}
 }
+
+/* ===== pantallas: la portada en dos pisos (foto ancha arriba, texto abajo) y ajustes de tablet y laptop ===== */
+@media (min-width:861px){
+  .pan.main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;align-content:stretch;row-gap:clamp(8px,2vh,22px)}
+  .pan.main .pfig{min-height:0;order:-1;align-self:stretch}
+  .pan.myth,.pan.dl{grid-template-columns:minmax(0,1fr)}.pan.myth>*,.pan.dl>*{grid-column:1}
+  .pan.main .pfig img{width:min(100%,1100px);height:100%;left:50%}
+  .pan.main .txt{max-width:640px}
+  .pan.myth{padding-top:calc(78px + env(safe-area-inset-top,0px))}
+}
+@media (min-width:861px) and (max-width:1279px){
+  .ch.home .in{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+  .pan h2{font-size:clamp(1.2rem,.7rem + 1.2vw,1.6rem);max-width:58%}
+  .pan .tag{max-width:58%}
+  .ch .in{gap:clamp(20px,3vw,44px);padding-inline:max(36px,env(safe-area-inset-left,0px))}
+}
+@media (max-height:860px) and (min-width:861px){.pan h1{font-size:clamp(1.9rem,1rem + 2.4vw,3.2rem);margin-bottom:10px}.pan .lead{font-size:.95rem;margin-bottom:12px}.pan .plats{display:none}.pan .tag{display:none}}
+/* tablet vertical (iPad): más grande que el celular, con la figura protagonista */
+@media (min-width:600px) and (max-width:860px){
+  .ch .in{padding-inline:max(48px,env(safe-area-inset-left,0px));gap:22px}
+  .ch .fig{width:min(100%,640px);max-height:42svh}
+  .ch .txt{gap:16px;max-width:60ch}
+  .ch h1,.ch h2.big{font-size:clamp(3rem,1.6rem + 4vw,4.4rem)}
+  .ch .lead{font-size:1.12rem;line-height:1.5}
+  .ch .meta{font-size:.95rem}
+  .pan{padding-inline:48px}
+  .pan.main .pfig{min-height:40svh}.pan.main .pfig img{width:min(100%,780px)}
+  .pan h1{font-size:clamp(3rem,1.6rem + 4vw,4.4rem);max-width:14ch}
+  .pan .lead{font-size:1.1rem}
+  .pan h2{font-size:2rem}
+  .pan.myth,.pan.dl{min-height:36svh}
+}
 </style>
