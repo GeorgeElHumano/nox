@@ -13,6 +13,17 @@ js=rd('shell_js.js').replace('/* ===== arranque: el sol de NOX','/* ===== fichas
 data=json.dumps(json.load(open(os.path.join(W,'data.json'),encoding='utf-8')),ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
 js=js.replace('__DATA__',data).replace('__GLOS__',rd('glos.js'))
 page=head+'\n'+body+'\n<script>\n'+rd('dl_block.js')+'\n'+js+'\n</script>\n'
+# versión de cada imagen en la dirección (?v=huella): cuando una foto cambia, el celular y la caché de Cloudflare la bajan de nuevo en vez de mostrar la vieja
+import hashlib,re
+VER={}
+for dp,_,fs in os.walk(os.path.join(W,'img','w')):
+    for f in fs:
+        if f.endswith('.webp'):
+            rel=os.path.relpath(os.path.join(dp,f),os.path.join(W,'img','w'))[:-5].replace(os.sep,'/')
+            VER[rel]=hashlib.md5(open(os.path.join(dp,f),'rb').read()).hexdigest()[:8]
+page=re.sub(r'img/w/([a-z0-9_/]+)\.webp(?!\?)',lambda m:'img/w/'+m.group(1)+'.webp'+('?v='+VER[m.group(1)] if m.group(1) in VER else ''),page)
+page=page.replace("const IMG=n=>'img/w/'+n+'.webp';const ic=n=>'img/w/ic/'+n+'.webp';","const IMGV="+json.dumps(VER,separators=(',',':'))+";const IMG=n=>'img/w/'+n+'.webp'+(IMGV[n]?'?v='+IMGV[n]:'');const ic=n=>'img/w/ic/'+n+'.webp'+(IMGV['ic/'+n]?'?v='+IMGV['ic/'+n]:'');",1)
+assert 'IMGV=' in page
 top='<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1a1d47"><style>img{max-width:100%}[hidden]{display:none!important}</style>'
 i=page.index('<div id="intro"')
 os.makedirs(P,exist_ok=True)
