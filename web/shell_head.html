@@ -362,4 +362,13 @@ html{transition:background .35s ease}
   .pan .go{width:40px;height:40px}
 }
 @media (max-width:860px) and (min-width:761px){.pan.dl{padding-bottom:22px}.pan.dl .pfig img{top:50%}}
+/* celular: Safari no respeta un punto de snap dentro de un capítulo más alto que la pantalla (salta al capítulo siguiente).
+   Por eso en la portada los puntos de snap son la tarjeta principal y el par mitología+descargas, no el capítulo entero; y la principal entra justo en la pantalla */
+@media (max-width:860px){
+  #ch-inicio{scroll-snap-align:none;overflow:clip}  /* overflow:hidden convertía al capítulo en contenedor de scroll y Safari ignoraba los puntos de snap de adentro */
+  .pan.main{height:100svh;min-height:0;scroll-snap-align:start;scroll-snap-stop:always;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));overflow:hidden}
+  .pan.main .pfig{min-height:0}
+}
+@media (max-width:860px) and (max-height:760px){.pan.main .plats{display:none}.pan.main .lead{font-size:.92rem;margin-bottom:12px}.pan.main h1{font-size:clamp(1.8rem,8vw,2.4rem);margin-bottom:8px}}
+@media (min-width:761px) and (max-width:860px){.pan.main{padding-bottom:28px}}
 </style>
