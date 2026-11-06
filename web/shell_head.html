@@ -351,4 +351,15 @@ html{transition:background .35s ease}
 .ch .fig::after{content:"";position:absolute;left:24%;right:24%;bottom:5%;height:9%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.3),transparent);z-index:-1;pointer-events:none}
 #ch-alas .fig::after,#ch-items .fig::after,#ch-mapas .fig::after{display:none}
 .ch .fig{isolation:isolate}
+/* celular: mitología y descargas forman juntas una sola pantalla (mitad y mitad), con lugar para la barra de arriba y la de abajo; así la tarjeta de descargas nunca queda tapada ni se saltea */
+@media (max-width:860px){
+  .pan.myth,.pan.dl{min-height:0;height:50svh;scroll-snap-align:none}
+  .pan.myth{scroll-snap-align:start;scroll-snap-stop:always;padding-top:calc(76px + env(safe-area-inset-top,0px));padding-bottom:18px}
+  .pan.dl{padding-top:18px;padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+  .pan.myth .pfig img{top:calc(50% + 30px);height:60%}
+  .pan.dl .pfig img{top:calc(50% - 32px);height:52%}
+  .pan.myth .go{top:calc(70px + env(safe-area-inset-top,0px))}
+  .pan .go{width:40px;height:40px}
+}
+@media (max-width:860px) and (min-width:761px){.pan.dl{padding-bottom:22px}.pan.dl .pfig img{top:50%}}
 </style>

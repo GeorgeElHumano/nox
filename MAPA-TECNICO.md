@@ -112,6 +112,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
   - Cada `#ch-X` tiene su propio fondo `var(--c-X)`, porque en iPhone el fondo de `html` no se repinta.
   - El bloque de color `.ola` está desactivado.
   - Las fotos van **sin** `filter: drop-shadow`, porque Safari dibuja un rectángulo. En su lugar hay una sombra de piso con `.fig::after`.
+- Portada en celular (≤860px): las tarjetas de mitología y descargas forman juntas una sola pantalla (50svh cada una, con aire para el encabezado y la barra de abajo). Solo mitología tiene punto de snap; así la de descargas no se saltea ni queda tapada.
 - `_headers`: `/img/*` se guarda 1 día en caché, por eso existe la huella en la dirección.
 
 ## Herramientas de prueba (`/home/claude/tools`)
