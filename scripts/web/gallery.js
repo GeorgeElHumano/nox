@@ -72,7 +72,7 @@ let shot=null;
       for(const g of [1,2,3])await shot(`wings_${cls}_g${g}`,{u:1,k:'wings',c:cls,t:0,lv:0,g});
       console.log('iconos',cls);}
     for(let t=0;t<7;t++){const it=await p.evaluate(t=>window.__NOX.newEquip('caballero','shield',t,{}),t);if(it)await shot(`shield_${t}`,it);}
-    for(const g of ['tupa','jasy','yvy','kerana'])await shot('gem_'+g,{u:1,k:'gem',sub:g});
+    for(const g of ['tupa','jasy','yvy','mainumby','kerana'])await shot('gem_'+g,{u:1,k:'gem',sub:g});
     for(const q of ['hp1','hp2','hp3','mp1','mp2','mp3'])await shot('pot_'+q,{u:1,k:'pot',sub:q});
     console.log('iconos listos');}
   if(MODE==='bigicons'){const shot=async(name,mk)=>{let d=null;for(let i=0;i<40;i++){d=await p.evaluate(mk);if(d&&d!=='WAIT')break;await wait(500);}

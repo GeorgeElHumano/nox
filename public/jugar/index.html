@@ -1196,6 +1196,10 @@ const GEMGEO={};function gemGeoOf(sub){if(GEMGEO[sub])return GEMGEO[sub];let g;
   else{g=new THREE.TetrahedronGeometry(.3,0);g.rotateX(.62);g.rotateZ(.6);}
   g.computeVertexNormals();GEMGEO[sub]=keep(g);return g;}
 function gemMesh(sub,glow){const G=GEMS[sub],g=new THREE.Group();
+  /* la pluma de mainumby es una pluma de verdad: verde tornasol, punta violeta, con su raquis */
+  if(sub==='mainumby'){const f=cc0Feather(.62,.17,cc0FeatherTex('#07463e','#22e0c0','#a83aff'));f.position.set(.1,-.3,0);f.rotation.z=.45;g.add(f);
+    f.traverse(o=>{if(o.material){o.material=o.material.clone();o.material.emissive=new THREE.Color(0x04382e);o.material.emissiveIntensity=.35;o.material.roughness=.35;o.material.metalness=.25;o.material.side=THREE.DoubleSide;}});
+    if(glow){const sp=glowSprite(G.hex,1.1,.6);g.add(sp);g.userData.sp=sp;}return g;}
   const m=new THREE.Mesh(gemGeoOf(sub),new MSM({color:G.hex,emissive:G.hex,emissiveIntensity:.95,roughness:.06,metalness:.15,flatShading:true}));g.add(m);
   const core=new THREE.Mesh(gemGeoOf(sub),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));core.scale.setScalar(.5);g.add(core);
   if(glow){const sp=glowSprite(G.hex,1.25,.75);g.add(sp);g.userData.sp=sp;}return g;}
