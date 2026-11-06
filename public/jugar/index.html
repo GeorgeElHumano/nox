@@ -2318,6 +2318,7 @@ const NPC_GEAR={herrero:{cls:'caballero',t:6,wg:2,lv:11,face:3},boticaria:{cls:'
 function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.lv,g:G.wg};return eq;}
 function oadNpc(id){const G=NPC_GEAR[id];if(G&&OAD.on&&!OAD.failed){const eq=npcGear(G);const hf=HERO_FACE;HERO_FACE=G.face;let r=null;try{if(CC0.on){if(cc0Want(G.cls,eq,oadUpgradeNpcs))r=cc0Hero(G.cls,eq);}else{const sp=oadHeroSpec(G.cls,eq);if(!oadHave(sp.files)){oadNeed(sp.files,oadUpgradeNpcs);}else r=oadHero(G.cls,eq);}}catch(e){console.error(e);}finally{HERO_FACE=hf;}
     if(r){(r.faceMats||[]).forEach(m=>m.userData.npc=1);r.npcP={mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false,flyK:0};return r;}return null;}
+  if(CC0.on&&!OAD.failed&&CC0_NPC[id])return cc0Npc(id);
   const d=OAD_NPC[id];if(!d||!OAD.on||OAD.failed)return null;const s={body:d.body,tex:OAD_PLAN.tex.npc[id],props:d.props};
   const files=['anims','body_'+d.body].concat(d.props.map(p=>'p_'+p));if(!oadHave(files)){oadNeed(files,oadUpgradeNpcs);return null;}
   const r=oadHuman(s,{team:d.team});if(!r)return null;(r.faceMats||[]).forEach(m=>m.userData.npc=1);if(d.col)r.body.userData.mats.forEach(m=>m.color.setHex(d.col));oadActs(r,r.body,{idle:d.anim});oadPlay(r,'idle',0);r.mixer.update(Math.random()*3);return r;}
@@ -2664,7 +2665,7 @@ const MYTH={
 /* escorpión: ya tiene modelo propio, queda como está */
 /* ---- armado ---- */
 function mythMob(def,gold,M){if(!OAD.on||OAD.failed)return null;
-  if(CC0.on){if(CC0_BEAST_ON[def.key]&&CC0_BEAST[def.key])return cc0Beast(def,gold,CC0_BEAST[def.key]);if(M.human)return cc0MythHuman(def,gold,M);}
+  if(CC0.on){if(M.beast&&CC0_BEAST_SRC[def.key])return cc0MythBeast(def,gold,M,CC0_BEAST_SRC[def.key]);if(CC0_BEAST_ON[def.key]&&CC0_BEAST[def.key])return cc0Beast(def,gold,CC0_BEAST[def.key]);if(M.human)return cc0MythHuman(def,gold,M);}
   if(M.custom)return M.custom(def,gold);if(M.beast)return mythBeast(def,gold,M);if(M.human)return mythHuman(def,gold,M);if(M.qm)return mythQm(def,gold,M);return null;}
 function mythFinish(r,M,gold){if(M.aura&&!gold){const a=glowSprite(M.aura,M.auraS||2,.22);a.position.y=r.hgt*.45;r.rig.add(a);r.auraSp=a;}
   if(gold)r.mats.forEach(m=>{m.color.setHex(0xffd36a);m.metalness=.65;m.roughness=.32;regMetal(m);if(m.emissive)m.emissive.setHex(0x2a1a00);m.map=null;m.needsUpdate=true;});
@@ -3203,6 +3204,49 @@ function cc0MythHuman(def,gold,M){const B=M.human,fem=/^f_/.test(B.body||'');con
   if(B.eyeGlow){const hd=boneOf(body,['head']);if(hd){r.eyeBone=hd;r.eye=glowSprite(B.eyeGlow,.28,.9);rig.add(r.eye);}}
   if(B.aura&&!gold){const a=glowSprite(B.aura,B.auraS||2,.22);a.position.y=r.hgt*.45;rig.add(a);}
   r.sparkle=B.sparkle||null;return mythFinish(r,{},gold);}
+/* ---- personas con el cuerpo CC0 (PNJ sin equipo, pobladores): ropa de aldeano o explorador con sus colores ---- */
+function cc0Cloth(r0,main,dark){r0.body.traverse(m=>{if(!m.isSkinnedMesh||!m.userData.slot||m.userData.slot==='hair'||/Regular/.test(m.material.name||''))return;let src=null;const g=OAD.ok[m.userData.file];if(g)g.scene.traverse(x=>{if(!src&&x.isMesh&&x.material.name===m.material.name)src=x.material;});
+  if(src&&src.map){m.material.map=cc0Recolor(src.map,/Peasant/.test(m.material.name)?'peasant':'ranger',main,dark);m.material.needsUpdate=true;}});}
+function cc0Person(P){const save=CC0_CLS.__p;CC0_CLS.__p={base:P.base,keep:P.base==='f'&&P.arms?CC0_HEAD.concat(CC0_ARMS):CC0_HEAD,keepW:.6,outfit:P.outfit,hide:P.hide||[],kind:'peasant',scale:P.scale||1};
+  let r;try{r=cc0Human('__p',{armor:{t:0},pants:{t:0},gloves:{t:0},boots:{t:0},helm:{t:0}},{face:P.face});}finally{CC0_CLS.__p=save;}cc0Cloth(r,P.main,P.dark);return r;}
+const CC0_NPC={
+ herrero:{base:'m',outfit:'male_peasant',main:'#7a5a3a',dark:'#3a2414',scale:1.04,anim:'Idle_FoldArms_Loop',face:{f:{width:.06,jaw:.4,nose:.5,brow:.5,len:-.15},skin:'#c99a76',hair:[['buzzed','#2a1a10'],['beard','#2a1a10']],brow:'#2a1a10'},hand:['c_w_hammer_small',.16]},
+ boticaria:{base:'f',outfit:'female_peasant',hide:['Arms'],arms:1,main:'#3a8aa8',dark:'#5a2a14',anim:'Idle_Talking_Loop',face:{f:{cheek:.25,nose:-.1,lips:.3,jaw:-.1,len:.1},skin:'#e8c0a0',hair:[['buns','#5a2a14']],brow:'#5a2a14'}},
+ pai:{base:'m',outfit:'male_peasant',main:'#1c1a1a',dark:'#0c0a0a',anim:'Idle_Loop',face:{f:{sunken:.4,nose:.35,noseLen:.4,len:.35,jaw:-.15,cheek:.1},skin:'#e8c8b0',hair:[['simpleparted','#8a8580']],brow:'#8a8580'},book:'c_k_spellbook_closed'},
+ capitan:{base:'m',outfit:'male_ranger',hide:['Hood'],main:'#8a1a1a',dark:'#3a0a0a',anim:'Sword_Idle',face:{f:{jaw:.25,chin:.5,brow:.5,nose:.2},skin:'#d8ae8a',hair:[['beard','#3a2010']],brow:'#3a2010'},hand:['c_w_claymore',.2]},
+ chamana:{base:'f',outfit:'female_peasant',hide:['Arms'],arms:1,main:'#2d6a3a',dark:'#143a1a',anim:'Spell_Simple_Idle_Loop',face:{f:{cheek:.45,nose:.2,lips:.2,width:.03,sunken:.3},skin:'#9a6a48',hair:[['long','#141010']],brow:'#141010'},jeguaka:1,cetro:1},
+ baqueano:{base:'m',outfit:'male_ranger',main:'#6a4a2a',dark:'#2a1a0a',anim:'Idle_Loop',face:{f:{cheek:.3,jaw:.1,nose:.3,len:.1},skin:'#b8865e',hair:[['beard','#1a1210']],brow:'#1a1210'}},
+ baul:{base:'f',outfit:'female_peasant',hide:['Arms'],arms:1,main:'#23365e',dark:'#3a2414',anim:'Idle_Loop',face:{f:{chin:.2,nose:-.2,cheek:.1,lips:.4},skin:'#f0d0b8',hair:[['long','#8a6a30']],brow:'#6a4a20'}},
+ cronista:{base:'m',outfit:'male_peasant',main:'#4a2a6a',dark:'#2a1a3a',anim:'Idle_Talking_Loop',face:{f:{nose:.6,noseLen:.5,len:.2,sunken:.5,brow:.3},skin:'#e0b898',hair:[['simpleparted','#d0ccc4'],['beard','#d0ccc4']],brow:'#d0ccc4'},book:'c_k_spellbook_open'}};
+function cc0NpcFiles(P){const f=['c_anim1','c_anim2','c_body_'+P.base,'c_o_'+P.outfit].concat(P.face.hair.map(h=>'c_h_'+h[0]));if(P.hand)f.push(P.hand[0]);if(P.book)f.push(P.book);return f;}
+function cc0Npc(id){const P=CC0_NPC[id];if(!P)return null;const f=cc0NpcFiles(P);if(!oadHave(f)){oadNeed(f,oadUpgradeNpcs);return null;}
+  const r=cc0Person(P),body=r.body;try{bodyShape(body,'hechicero');}catch(e){}
+  const clips={};['c_anim1','c_anim2'].forEach(k=>(OAD.ok[k].animations||[]).forEach(c=>clips[c.name]=c));const ref=clips[P.anim]||clips.Idle_Loop;
+  if(P.hand){const o=cc0Model(P.hand[0],null,true);if(o){const h=cc0Grip2(body,ref,.5,'hand_r',o,[0,-.8,.6],[1,0,0],P.hand[1]);cc0Grip(body,'r',1);}}
+  if(P.book){const o=cc0Model(P.book);if(o){const h=cc0Grip2(body,ref,.5,'hand_l',o,[0,.3,1],[0,1,0],.35);}}
+  if(P.jeguaka){const j=cc0Jeguaka(.118);cc0Hold(body,'Head',j,[0,.17,-.01],[0,0,0],1);}
+  if(P.cetro){const S={m:0xd4a640,g:0x5aff8a};const o=cc0Cetro(S,1.5);o.position.y=-.9;const w=new THREE.Group();w.add(o);cc0Grip2(body,ref,.5,'hand_r',w,[0,1,.1],[1,0,0],1);cc0Grip(body,'r',1);}
+  oadActs(r,body,{idle:ref});oadPlay(r,'idle',0);r.mixer.update(Math.random()*3);return r;}
+/* pelaje sin depender de las UV: la textura de pelo se proyecta desde tres lados en el espacio del modelo (sigue al cuerpo al animarse) */
+function triFur(m,ts){const prev=m.onBeforeCompile,pk=m.customProgramCacheKey&&m.customProgramCacheKey.bind(m);
+  m.onBeforeCompile=(sh,rd)=>{if(prev)prev.call(m,sh,rd);sh.uniforms.uTS={value:ts};
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vTP;varying vec3 vTN;uniform float uTS;').replace('#include <begin_vertex>','#include <begin_vertex>\nvTP=position*uTS;vTN=normal;');
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vTP;varying vec3 vTN;').replace('#include <map_fragment>','#ifdef USE_MAP\nvec3 bw=pow(abs(normalize(vTN)),vec3(4.));bw/=(bw.x+bw.y+bw.z);vec4 tx=texture2D(map,vTP.zy)*bw.x+texture2D(map,vTP.xz)*bw.y+texture2D(map,vTP.xy)*bw.z;tx=mapTexelToLinear(tx);diffuseColor*=tx;\n#endif');};
+  m.customProgramCacheKey=()=>'trifur|'+(pk?pk():'');m.needsUpdate=true;}
+const CC0_BEAST_SRC={aguara:{f:'c_a_fox',legs:1.35},luison:{f:'c_a_wolf'},aoao:{f:'c_a_alpaca',alias:{Ursidae_Head:'Head'}}};
+function cc0MythBeast(def,gold,M,S){if(!oadHave([S.f])){oadNeed([S.f],oadUpgradeMobs);return null;}const g0=OAD.ok[S.f];const o=THREE.SkeletonUtils.clone(g0.scene);if(S.alias)o.userData.alias=S.alias;
+  const mats=[];o.traverse(x=>{if(x.isMesh){x.castShadow=true;x.frustumCulled=false;if(!x.geometry.attributes.normal)x.geometry.computeVertexNormals();const m=x.material=new MSM({color:0xffffff,roughness:.85,metalness:0,skinning:!!x.isSkinnedMesh});mats.push(m);rimify(m,1.15);}});
+  if(S.legs)o.traverse(b=>{if(b.isBone&&/UpperLeg|LowerLeg/.test(b.name))b.scale.y*=Math.pow(S.legs,.5);});
+  o.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(o),sz=bb.getSize(new THREE.Vector3());const ds=def.scale||1,k=M.len/ds/Math.max(sz.z,sz.x),U=1/k;
+  const g=new THREE.Group(),rig=new THREE.Group(),model=new THREE.Group();g.add(rig);rig.add(model);model.add(o);model.scale.setScalar(k);model.position.set(-(bb.min.x+sz.x/2)*k,-bb.min.y*k,-(bb.min.z+sz.z/2)*k);
+  if(!gold){if(M.tex){const T=M.tex();mats.forEach(m=>{m.map=T.t||T;m.needsUpdate=true;triFur(m,6/Math.max(sz.x,sz.y,sz.z));});}if(M.tint)mats.forEach(m=>m.color.lerp(C3(M.tint[0]),M.tint[1]));if(M.legs)tintBelow(o,M.legs[0],M.legs[1]);}
+  else mats.forEach(m=>{m.color.setHex(0xffd36a);m.metalness=.65;m.roughness=.32;regMetal(m);m.emissive.setHex(0x2a1a00);});
+  const r={g,rig,mats,kind:'glb',B:{ts:M.ts,len:M.len},rad:Math.max(sz.x*k*.55,M.len/ds*.28),hgt:sz.y*k};
+  const head=o.getObjectByName('Head');if(M.eye&&head){r.eyeBone=head;r.eye=glowSprite(M.eye,.32,.95);rig.add(r.eye);}
+  if(M.horns&&!gold&&head){const hd=anchorFn(o)(['Head']);if(hd){const hm=new MSM({color:0x3a2c20,roughness:.5,metalness:.1});for(const sd of[-1,1]){const h=new THREE.Mesh(taperTube([[0,0,0],[sd*.18,.12,-.05],[sd*.32,.05,.08],[sd*.3,-.12,.2],[sd*.2,-.16,.28]],.075,.012,16,8),hm);h.position.set(sd*.1*U,.2*U,-.02*U);h.scale.set(.6*U,.7*U,.6*U);hd.add(h);}}}
+  if(M.extra&&!gold)try{M.extra(r,o,U,anchorFn(o));}catch(e){console.error(e);}
+  const cl={};g0.animations.forEach(c=>cl[c.name]=c);oadActs(r,o,{idle:cl.Idle,walk:cl.Walk,run:cl.Gallop,attack:cl.Attack||cl.Attack_Headbutt,death:cl.Death});oadPlay(r,'idle',0);r.mixer.update(Math.random()*2);
+  return mythFinish(r,M,gold);}
 /* brillo por +nivel sobre la ropa (como MU): cada prenda toma la capa de su pieza; el arma y la forja ya brillan con forgeGlow */
 function cc0Glow(r){const eq=r.eq||{},cls=r.cls;r.glowMats=r.glowMats||[];r.body.traverse(m=>{if(!m.isSkinnedMesh||!m.userData.slot||m.userData.slot==='hair'||/Superhero|Regular/.test(m.material.name||''))return;const it=eq[m.userData.slot];const g=coatSpec(cls,it);if(!g)return;coatInject(m.material,{col:g.col,a:g.op*.32,sh:g.sh});r.glowMats.push(m.material);});}
 
