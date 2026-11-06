@@ -87,14 +87,17 @@ for k,im in R.items():
 def body(im):
     """Columnas del cuerpo: el ancho ocupado en la franja de piernas y torso (las alas quedan más arriba)."""
     a=np.asarray(im.getchannel('A'))>60;h=a.shape[0]
-    cols=np.where(a[int(h*.62):int(h*.97)].mean(0)>.04)[0]
+    # piernas y pies: franja baja y densa, donde las puntas de las alas casi no llegan
+    cols=np.where(a[int(h*.8):int(h*.97)].mean(0)>.18)[0]
     return (int(cols[0]),int(cols[-1])+1) if len(cols) else (0,im.width)
 def lineup(order,H,scales,lift,name,gap=-.05,w=1600):
     """Fila en V: el del medio adelante, los demás más chicos y atrás. Primero se pegan todos enteros (alas incluidas),
        después solo los cuerpos encima, así las alas del vecino nunca tapan a un personaje."""
     ims=[fit(R[k],10**5,int(H*s)) for k,s in zip(order,scales)];n=len(ims)
     bs=[body(im) for im in ims];bw=[b[1]-b[0] for b in bs];cx=[0.0]
-    for i in range(1,n):cx.append(cx[-1]+bw[i-1]/2+bw[i]/2+max(bw)*gap)
+    # paso fijo según la altura: los cuerpos quedan parejos y separados; las alas se cruzan solo por detrás
+    step=H*(.36+gap*.5)
+    for i in range(1,n):cx.append(cx[-1]+step*(scales[i-1]+scales[i])/2)
     mid=(cx[0]+cx[-1])/2;xs=[int(c-mid-(b[0]+b[1])/2) for c,b in zip(cx,bs)]
     x0=min(xs);x1=max(x+im.width for x,im in zip(xs,ims));Hc=H+max(lift)
     c=canvas(x1-x0,Hc);pos=[(x-x0,Hc-im.height-l) for x,im,l in zip(xs,ims,lift)]
