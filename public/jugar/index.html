@@ -2495,7 +2495,7 @@ function bullHorns(U,col,k){const g=new THREE.Group();const hm=new MSM({color:co
 function demonTail(U,col){const g=new THREE.Group();const m=new MSM({color:col,roughness:.7});const t=new THREE.Mesh(taperTube([[0,0,0],[0,-.1,-.2],[0,-.35,-.42],[0,-.6,-.5],[0,-.85,-.4],[0,-1,-.2]],.06,.015,18,8),m);t.scale.setScalar(U);g.add(t);
   const tip=part(CONE(.045*U,.14*U,4),m,0,-1.02*U,-.16*U,g);tip.rotation.x=.9;return g;}
 /* arma en la mano derecha: los objetos van a lo largo de +z desde el puño, como las armas de 0 A.D. */
-function weaponAt(body,U){const pt=oadPoint(body,'weapon_R');if(!pt)return null;const g=new THREE.Group();pt.add(g);g.userData.U=U;return g;}
+function weaponAt(body,U){if(body&&body.userData.cc0){const g=cc0WeaponAt(body);if(g)g.userData.U=U;return g;}const pt=oadPoint(body,'weapon_R');if(!pt)return null;const g=new THREE.Group();pt.add(g);g.userData.U=U;return g;}
 function shaftZ(len,r0,r1,m,parent,z0){const o=part(limbGeo(len,r0,r1,0),m,0,0,z0||0,parent);o.rotation.x=-PI/2;return o;}
 /* fuegos fatuos que orbitan alrededor (se giran en oadMobAnim) */
 function wisps(r,col,n,rad,y,size){const g=new THREE.Group();g.position.y=y;for(let i=0;i<n;i++){const a=i/n*TAU;const sp=glowSprite(col,size||.35,.8);sp.position.set(Math.cos(a)*rad,Math.sin(a*2)*.12,Math.sin(a)*rad);g.add(sp);}g.userData.orbit=1;r.orbitG=g;return g;}
@@ -2664,6 +2664,7 @@ const MYTH={
 /* escorpión: ya tiene modelo propio, queda como está */
 /* ---- armado ---- */
 function mythMob(def,gold,M){if(!OAD.on||OAD.failed)return null;
+  if(CC0.on){if(CC0_BEAST_ON[def.key]&&CC0_BEAST[def.key])return cc0Beast(def,gold,CC0_BEAST[def.key]);if(M.human)return cc0MythHuman(def,gold,M);}
   if(M.custom)return M.custom(def,gold);if(M.beast)return mythBeast(def,gold,M);if(M.human)return mythHuman(def,gold,M);if(M.qm)return mythQm(def,gold,M);return null;}
 function mythFinish(r,M,gold){if(M.aura&&!gold){const a=glowSprite(M.aura,M.auraS||2,.22);a.position.y=r.hgt*.45;r.rig.add(a);r.auraSp=a;}
   if(gold)r.mats.forEach(m=>{m.color.setHex(0xffd36a);m.metalness=.65;m.roughness=.32;regMetal(m);if(m.emissive)m.emissive.setHex(0x2a1a00);m.map=null;m.needsUpdate=true;});
@@ -3155,6 +3156,53 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
   if(eq.boots){const S=forjaOf(cls,eq.boots.t);if(S.greave!=='none'){const sh=cc0Shell(r,CC0_SIDES('foot').concat(CC0_SIDES('ball')),{src:slotIs('boots'),minW:.6,inflate:.007,mat:cc0ArmorMat(S,S.greave==='ornate'?'ornate':'metal',cls),uvk:6});grp(sh,eq.boots);}}}
 /* frente de una placa (z más adelante, en ejes del personaje, relativo al hueso del pecho o la cadera) */
 function cc0Front(sh,bone){let z=-1e9;const v=new THREE.Vector3();for(const m of sh){const pa=m.geometry.attributes.position,idx=m.geometry.index.array;for(let i=0;i<idx.length;i+=6){v.fromBufferAttribute(pa,idx[i]).applyMatrix4(m.bindMatrix);if(Math.abs(v.x)<.06)z=Math.max(z,v.z);}}const bp=bone&&sh[0]?cc0BindPos(sh[0],bone):null;return (z>-1e8?z:.12)-(bp?bp.z:0);}
+/* ================= criaturas CC0: animales de Quaternius (Ultimate Animated Animals) y seres míticos con el cuerpo CC0 ================= */
+/* los animales CC0 disponibles son facetados y sin pelaje: por ahora quedan los de la forja de bestias (pelaje propio); se activan agregando la clave a CC0_BEAST_ON */
+const CC0_BEAST_ON={};
+const CC0_BEAST={aguara:{f:'c_a_fox',len:1.95,tint:[0xc8642c,.35],legs:1.38,run:'Gallop',atk:'Attack'},
+ luison:{f:'c_a_wolf',len:2.25,tint:[0x26242a,.75],eye:0xff2a12,run:'Gallop',atk:'Attack',k:1.05},
+ aoao:{f:'c_a_alpaca',len:2.6,tint:[0x3a2a20,.7],eye:0xff2a12,horns:1,run:'Gallop',atk:'Attack_Headbutt'}};
+function cc0Beast(def,gold,B){if(!oadHave([B.f])){oadNeed([B.f],oadUpgradeMobs);return null;}const g0=OAD.ok[B.f];const o=THREE.SkeletonUtils.clone(g0.scene);const mats=[];
+  o.traverse(x=>{if(x.isMesh){x.castShadow=true;x.frustumCulled=false;if(!x.geometry.attributes.normal){x.geometry.computeVertexNormals();}const m=x.material=x.material.clone();m.flatShading=false;m.needsUpdate=true;mats.push(m);if(B.tint&&!gold)m.color.lerp(new THREE.Color(B.tint[0]),B.tint[1]);if(gold){m.color.setHex(0xffd36a);m.metalness=.65;m.roughness=.32;regMetal(m);m.emissive.setHex(0x2a1a00);}rimify(m,1.15);}});
+  if(B.legs)o.traverse(b=>{if(b.isBone&&/(Leg|leg|Thigh|Calf|Shin)/.test(b.name)&&!/Foot|foot|Toe|toe/.test(b.name))b.scale.y*=Math.pow(B.legs,.5);});
+  o.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(o),sz=bb.getSize(new THREE.Vector3());const k=B.len/Math.max(sz.x,sz.z);
+  const g=new THREE.Group(),rig=new THREE.Group(),model=new THREE.Group();g.add(rig);rig.add(model);model.add(o);model.scale.setScalar(k);const zf=sz.z>=sz.x;
+  model.position.set(-(bb.min.x+sz.x/2)*k,-bb.min.y*k,-(bb.min.z+sz.z/2)*k);
+  const r={g,rig,mats,kind:'glb',B:{ts:{walk:1.2,run:1.1}},rad:Math.max(sz.x*k*.55,B.len*.28),hgt:sz.y*k};
+  const cl={};g0.animations.forEach(c=>cl[c.name]=c);oadActs(r,o,{idle:cl.Idle,walk:cl.Walk,run:cl[B.run]||cl.Gallop,attack:cl[B.atk]||cl.Attack,death:cl.Death});oadPlay(r,'idle',0);r.mixer.update(Math.random()*2);
+  let head=null;o.traverse(b=>{if(!head&&b.isBone&&/Head/i.test(b.name))head=b;});
+  if(head&&B.horns&&!gold){const hm=mtl(0x2a2018,'wood');const A=new THREE.Group();head.add(A);const hs=1/(new THREE.Vector3().setFromMatrixScale(head.matrixWorld).x||1);A.scale.setScalar(hs);for(const sd of[-1,1]){const h=part(CONE(.06,.42,7),hm,sd*.12,.16,.02,A);h.rotation.z=-sd*.6;h.rotation.x=-.4;}}
+  if(head&&B.eye){r.eyeBone=head;r.eye=glowSprite(B.eye,.32,.9);rig.add(r.eye);}
+  return mythFinish(r,{},gold);}
+const CC0_MYANI={idle:'Sword_Idle',walk:'Walk_Loop',run:'Jog_Fwd_Loop',attack:'Sword_Regular_A',death:'Death01'};
+function cc0WeaponAt(body){const b=body.getObjectByName('hand_r');if(!b)return null;const clips={};['c_anim1','c_anim2'].forEach(f=>((OAD.ok[f]&&OAD.ok[f].animations)||[]).forEach(c=>clips[c.name]=c));
+  const inner=new THREE.Group();inner.rotation.x=-PI/2;const h=cc0Grip2(body,clips.Sword_Idle,.5,'hand_r',inner,[-.15,.62,.77],[1,0,0],1);return h?inner:null;}
+function cc0MythHuman(def,gold,M){const B=M.human,fem=/^f_/.test(B.body||'');const files=['c_anim1','c_anim2',fem?'c_body_f':'c_body_m',fem?'c_o_female_peasant':'c_o_male_peasant','c_h_long','c_h_beard'];
+  if(!oadHave(files)){oadNeed(files,oadUpgradeMobs);return null;}
+  const team='#'+new THREE.Color(B.team||0x5a3a1a).getHexString(),dark='#'+new THREE.Color(B.team||0x5a3a1a).multiplyScalar(.45).getHexString();
+  const sk=B.tint?'#'+new THREE.Color(0x9a7458).lerp(new THREE.Color(B.tint[0]),Math.min(.8,B.tint[1]+.2)).getHexString():'#9a7458';
+  const face={f:B.face||{jaw:.45,brow:1.1,nose:.7,sunken:.45,cheek:.3,width:.04},skin:sk,hair:fem?[['long','#2a1a10']]:[['long','#1a120c'],['beard','#1a120c']],brow:'#1a120c'};
+  const S0=CC0_CLS.hechicero,save=CC0_CLS.__myth;CC0_CLS.__myth={base:fem?'f':'m',keep:CC0_HEAD,outfit:fem?'female_peasant':'male_peasant',kind:'peasant',scale:1};
+  let r0;try{r0=cc0Human('__myth',{armor:{t:0},pants:{t:0},gloves:{t:0},boots:{t:0}},{face});}finally{CC0_CLS.__myth=save;}
+  /* tela del color del ser */r0.body.traverse(m=>{if(m.isSkinnedMesh&&m.userData.slot&&m.userData.slot!=='hair'&&!/Regular/.test(m.material.name||'')){const src=OAD.ok[m.userData.file]&&(()=>{let mm=null;OAD.ok[m.userData.file].scene.traverse(x=>{if(!mm&&x.isMesh&&x.material.name===m.material.name)mm=x.material;});return mm;})();if(src&&src.map){m.material.map=cc0Recolor(src.map,'peasant',team,dark);m.material.needsUpdate=true;}}});
+  const body=r0.body,U=1;try{bodyShape(body,'gladiador');}catch(e){}
+  if(B.tint&&!gold)r0.mats.forEach(m=>{if(m.color&&!/Hair/.test(m.name||''))m.color.lerp(C3(B.tint[0]),B.tint[1]*.6);});
+  if(B.em&&!gold)r0.mats.forEach(m=>{if(m.emissive){m.emissive.setHex(B.em[0]);m.emissiveIntensity=B.em[1];}});
+  if(B.headK){const hd=boneOf(body,['head']);if(hd)hd.scale.setScalar(B.headK);}
+  const A=anchorFn(body);{r0.g.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(body);const hp=boneOf(body,['head']);const v=new THREE.Vector3();if(hp)hp.getWorldPosition(v);A.top=Math.max(.05,bb.max.y-v.y);A.topW=bb.max.y;}
+  CC0.weaponBody=body;try{cc0APose(body,true);if(B.extra&&!gold)B.extra(r0,body,U,A);}catch(e){console.error(e);}finally{cc0APose(body,false);CC0.weaponBody=null;}
+  const mats=[];r0.g.traverse(x=>{if(x.isMesh&&x.material&&!(x.material instanceof THREE.MeshBasicMaterial)&&!mats.includes(x.material))mats.push(x.material);});
+  if(B.crack&&!gold)r0.mats.forEach(m=>crackGlow(m,B.crack[0],B.crack[1],B.crack[2]));
+  if(B.ghost!=null&&B.ghost!==false&&!gold)ghostify(mats,B.ghost,B.op);
+  if(B.bulk)r0.model.scale.set(B.bulk[0],B.bulk[1],B.bulk[2]);
+  if(gold)mats.forEach(m=>{if(m.color)m.color.lerp(new THREE.Color(0xffd060),.5);if(m.emissive){m.emissive.setHex(0x3a2a00);m.emissiveIntensity=.6;}});
+  const g=new THREE.Group(),rig=new THREE.Group();g.add(rig);rig.add(r0.model);const sc=(B.scale||1)/(def.scale||1);r0.model.scale.multiplyScalar(sc);
+  const r={g,rig,mats,kind:'glb',B:{ts:{walk:1.2,run:1.1},fly:(B.fly||0)/(def.scale||1)},rad:.55*sc*(B.bulk?B.bulk[0]:1),hgt:1.9*sc,ghost:!!B.fly||B.ghost!=null,faceMats:[]};
+  const clips={};['c_anim1','c_anim2'].forEach(f=>(OAD.ok[f].animations||[]).forEach(c=>clips[c.name]=c));const AN=B.anim==='w'?{idle:'Spell_Simple_Idle_Loop',attack:'Spell_Simple_Shoot'}:B.anim==='a'?{idle:'Idle_Loop',attack:'OverhandThrow'}:{};
+  const map={};for(const k in CC0_MYANI)map[k]=clips[AN[k]||CC0_MYANI[k]];oadActs(r,body,map);oadPlay(r,'idle',0);r.mixer.update(Math.random()*2);
+  if(B.eyeGlow){const hd=boneOf(body,['head']);if(hd){r.eyeBone=hd;r.eye=glowSprite(B.eyeGlow,.28,.9);rig.add(r.eye);}}
+  if(B.aura&&!gold){const a=glowSprite(B.aura,B.auraS||2,.22);a.position.y=r.hgt*.45;rig.add(a);}
+  r.sparkle=B.sparkle||null;return mythFinish(r,{},gold);}
 /* brillo por +nivel sobre la ropa (como MU): cada prenda toma la capa de su pieza; el arma y la forja ya brillan con forgeGlow */
 function cc0Glow(r){const eq=r.eq||{},cls=r.cls;r.glowMats=r.glowMats||[];r.body.traverse(m=>{if(!m.isSkinnedMesh||!m.userData.slot||m.userData.slot==='hair'||/Superhero|Regular/.test(m.material.name||''))return;const it=eq[m.userData.slot];const g=coatSpec(cls,it);if(!g)return;coatInject(m.material,{col:g.col,a:g.op*.32,sh:g.sh});r.glowMats.push(m.material);});}
 
