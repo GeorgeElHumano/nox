@@ -2906,7 +2906,7 @@ function forgeGlow(g,cls,it){const lv=it.lv||0,col=new THREE.Color(forjaOf(cls,i
 /* ---- íconos: la pieza sola ---- */
 function forgeIcon(it){const cls=it.c,S=forjaOf(cls,it.t);const U=2.2;/* unidades libres: el encuadre se adapta */const g=new THREE.Group();
   if(it.k==='helm'){const h=forgeHelm(S,U,.3*U,cls);if(!h.children.length)return null;g.add(h);}
-  else if(it.k==='armor'){const c=forgeChest(S,U,cls);c.position.set(0,0,.05*U);g.add(c);for(const s of[-1,1]){const p=forgePad(S,U,s,cls);p.position.set(s*.23*U,.12*U,0);g.add(p);}
+  else if(it.k==='armor'){const c=forgeChest(S,U,cls);c.position.set(0,0,.05*U);g.add(c);for(const s of[-1,1]){const p=forgePad(S,U,s,cls);p.position.set(s*.21*U,.1*U,0);p.rotation.z=-s*.42;g.add(p);}
     if(['none','straps','gem','bones'].includes(S.chest)){const ga=forgeGarment(S,U,'armor');ga.position.z=-.06*U;g.add(ga);}}
   else if(it.k==='pants'){const b=forgeBelt(S,U);b.position.y=.3*U;g.add(b);if(S.greave!=='none')for(const s of[-1,1]){const l=forgeLimb(S,U,'greave',.36*U,.055*U,s);l.position.set(s*.08*U,.2*U,0);g.add(l);}else g.add(forgeGarment(S,U,'pants'));}
   else if(it.k==='gloves'){for(const s of[-1,1]){const l=forgeLimb(S,U,'brace',.3*U,.045*U,s);l.position.set(s*.09*U,.15*U,0);l.rotation.z=s*.12;g.add(l);}if(S.brace==='none')return null;}

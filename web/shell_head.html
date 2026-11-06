@@ -300,7 +300,9 @@ button{font-family:inherit}
   .pan.main .pfig{min-height:0;order:-1;align-self:stretch}
   .pan.myth,.pan.dl{grid-template-columns:minmax(0,1fr)}.pan.myth>*,.pan.dl>*{grid-column:1}
   .pan.main .pfig img{width:min(100%,1100px);height:100%;left:50%}
-  .pan.main .txt{max-width:640px}
+  .pan.main .txt{max-width:760px}
+  .pan.main h1{max-width:20ch}
+  .pan.main .pfig img{width:min(118%,1300px)}
   .pan.myth{padding-top:calc(78px + env(safe-area-inset-top,0px))}
 }
 @media (min-width:861px) and (max-width:1279px){
@@ -325,4 +327,5 @@ button{font-family:inherit}
   .pan h2{font-size:2rem}
   .pan.myth,.pan.dl{min-height:36svh}
 }
+@media (max-width:860px){.pan.main .pfig{min-height:0;aspect-ratio:1600/629;align-self:end}.pan.main .pfig img{width:112%;height:auto;left:50%}}
 </style>
