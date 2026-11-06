@@ -332,6 +332,20 @@ button{font-family:inherit}
 .plat{position:relative}.plat.mine{border-color:var(--gold)!important;box-shadow:0 0 0 1px var(--gold),0 10px 30px #0006}
 .mine-tag{position:absolute;top:-10px;left:14px;background:var(--gold);color:#1d1208;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px;z-index:2}
 .dock .btn{white-space:nowrap;font-size:clamp(.82rem,3.4vw,1rem)}
+
+/* ===== cada capítulo trae su propio color (no depende del fondo de la página, que en iPhone no siempre se repinta) y entra rápido, sin el bloque de color que tapaba la figura ===== */
+#ch-inicio{background:var(--c-inicio)}#ch-mitologia{background:var(--c-mitologia)}#ch-razas{background:var(--c-razas)}#ch-sets{background:var(--c-sets)}#ch-alas{background:var(--c-alas)}#ch-items{background:var(--c-items)}#ch-mapas{background:var(--c-mapas)}#ch-bestiario{background:var(--c-bestiario)}#ch-historia{background:var(--c-historia)}#ch-descargar{background:var(--c-descargar)}
+html{transition:background .35s ease}
+.ch .fig .ola{display:none!important}
+.ch .txt>*{transition:opacity .45s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.ch.on .txt>:nth-child(1){transition-delay:0s}.ch.on .txt>:nth-child(2){transition-delay:.05s}.ch.on .txt>:nth-child(3){transition-delay:.1s}.ch.on .txt>:nth-child(4){transition-delay:.15s}.ch.on .txt>:nth-child(5){transition-delay:.2s}
+.ch .fig img{transform:translateY(18px) scale(.98);transition:opacity .5s .05s ease,transform .6s .05s cubic-bezier(.2,.8,.2,1)}
+.ch .fig .glow{transition:opacity .6s .1s ease}
+.ch .num{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.ch.home .pan>:where(:not(.pfig):not(.go):not(.txt)),.ch.home .pan .txt>*{transition:opacity .45s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.ch.home .pfig img{transition:opacity .5s .05s ease,transform .25s ease}
+/* la figura del panel de mitología no choca con el botón de la esquina ni con el borde de arriba */
+.pan.myth .pfig img{height:70%;top:57%}
 /* fichas interactivas de cada capítulo (razas, sets, alas, ítems, mapa, bestiario, historia, mitología) */
 /* mitología */
 .myth{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,5vw,64px);align-items:start}
