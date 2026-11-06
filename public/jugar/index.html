@@ -1177,12 +1177,14 @@ const SETN={gladiador:['de Ñandu','de Kurusu','de Ara','del Tembetá','de Tupã
 const SLOTN={gladiador:{helm:'Yelmo',armor:'Peto',pants:'Faldar',gloves:'Brazales',boots:'Grebas'},mburuvicha:{helm:'Corona',armor:'Coraza',pants:'Quijotes',gloves:'Guanteletes',boots:'Botas'},caballero:{helm:'Yelmo',armor:'Coraza',pants:'Grebas',gloves:'Guanteletes',boots:'Botas'},hechicero:{helm:'Capucha',armor:'Túnica',pants:'Faldón',gloves:'Guantes',boots:'Sandalias'},arquera:{helm:'Diadema',armor:'Chaleco',pants:'Calzas',gloves:'Guantes',boots:'Botas'}};
 const WNAME={gladiador:['Espada de Ñandu','Espada de Kurusu','Espada Rúnica','Espada del Tembetá','Espada de Tupã Rendy','Espada de Karai Ru','Espada de Ñamandu Ru'],mburuvicha:['Cetro de Tuja','Cetro de Yvyrapã','Cetro del Cacique','Cetro de Guyra Hũ','Cetro del Mburuvicha','Cetro del Tuvicha Guasu','Cetro de Ñanderu'],caballero:['Espada Corta','Espada Larga','Espada de Misión','Espada del Guardián','Espada de Tau','Espada del Yvága',"Espada de Yvy Marane'ỹ"],hechicero:['Vara de Palo Santo','Bastón de Lapacho','Bastón de Paje','Bastón de Jasy','Bastón de Tupã','Bastón de Arandu','Bastón de Ñamandu'],arquera:['Arco Corto','Arco de Lapacho','Arco de Guyra','Arco de Kuarahy','Arco de Arasy','Arco de Jasy Porã','Arco del Yvága']};
 const SHNAME=['Escudo de Madera','Escudo de Bronce','Escudo de Misión','Escudo del Guardián','Escudo de Tau','Escudo del Yvága',"Escudo de Yvy Marane'ỹ"];
+const WINGN3={caballero:'Alas de Kuarahy',hechicero:'Alas de Jasy Ñamandu',arquera:'Alas de Mainumby',gladiador:'Alas de Ára Pytã',mburuvicha:'Alas de Ñanderuvusu'};
 const WINGN2={gladiador:'Alas de la Tormenta',mburuvicha:'Alas de Guyra Hũ Guasu',caballero:'Alas de Tau Pytã',hechicero:'Alas de Ñamandu',arquera:'Alas de Arasy'};
 const WINGN={gladiador:'Alas de Tupã',mburuvicha:'Capa de Guyra Hũ',caballero:'Alas de Guyra Pytã',hechicero:'Alas de Jasy',arquera:'Alas de Mainumby'};
 const GEMS={
  tupa:{name:'Gema de Tupã',col:'#3cc8ff',hex:0x1fb4ff,sell:9000,desc:'Sube un ítem de +0 a +6. Nunca falla.'},
  jasy:{name:'Gema de Jasy',col:'#c77dff',hex:0xa83cff,sell:7000,desc:'Sube un ítem de +6 a +9. 50% de éxito (75% si el ítem tiene Suerte). Si falla y el ítem es +7 o más, vuelve a +0; si no, baja un nivel.'},
  yvy:{name:'Gema de Yvy',col:'#33f07e',hex:0x14e060,sell:15000,desc:'Agrega +4 de opción adicional, hasta +16. 50% de éxito. Si falla, se pierde la opción.'},
+ mainumby:{name:'Pluma de Mainumby',col:'#39f0c8',hex:0x2ae0b0,sell:60000,desc:'Pluma del mainumby, el colibrí mensajero de Ñamandu. Se usa en el Caldero de Kerana para crear las alas de tercera generación. La sueltan los jefes y los élites de nivel 50 o más.'},
  kerana:{name:'Gema de Kerana',col:'#ff7a2e',hex:0xff5a10,sell:5000,desc:'Se usa en el Caldero de Kerana para subir de +10 a +15 o para crear alas.'}
 };
 /* cada gema tiene forma y color propios, bien saturados, para reconocerla de un vistazo */
@@ -1190,6 +1192,7 @@ const GEMGEO={};function gemGeoOf(sub){if(GEMGEO[sub])return GEMGEO[sub];let g;
   if(sub==='tupa'){g=new THREE.OctahedronGeometry(.25,0);g.scale(1,1.35,1);}
   else if(sub==='jasy'){g=new THREE.OctahedronGeometry(.2,0);g.scale(.85,2,.85);}
   else if(sub==='yvy'){g=new THREE.DodecahedronGeometry(.24,0);}
+  else if(sub==='mainumby'){g=new THREE.OctahedronGeometry(.2,1);g.scale(.42,1.9,.12);g.rotateZ(.5);}
   else{g=new THREE.TetrahedronGeometry(.3,0);g.rotateX(.62);g.rotateZ(.6);}
   g.computeVertexNormals();GEMGEO[sub]=keep(g);return g;}
 function gemMesh(sub,glow){const G=GEMS[sub],g=new THREE.Group();
@@ -1387,7 +1390,7 @@ const PETS={imp:{n:'Imp',col:'#ff6a4a',desc:'Te acompaña y aumenta tu daño un 
 const newPet=()=>({u:++UID,k:'pet',sub:pick(['imp','hada','rudolf']),n:1});
 function itemName(it){
   if(it.k==='pet')return PETS[it.sub].n;  if(it.k==='gem')return GEMS[it.sub].name;if(it.k==='pot')return POTS[it.sub].name;if(it.k==='scroll')return SCROLLS[it.sub].name;if(it.k==='quest')return QITEMS[it.sub].name;if(it.k==='mat')return MATS[it.sub]?MATS[it.sub].name:'Trofeo';
-  let n;if(it.uq&&UNIQ[it.uq])return(it.epic?'Épico ':'')+UNIQ[it.uq].n+(it.lv?' +'+it.lv:'');if(it.k==='weapon')n=WNAME[it.c][it.t];else if(it.k==='shield')n=SHNAME[it.t];else if(it.k==='wings')n=((it.g||1)>=2?WINGN2:WINGN)[it.c];else n=SLOTN[it.c][it.k]+' '+SETN[it.c][it.t];
+  let n;if(it.uq&&UNIQ[it.uq])return(it.epic?'Épico ':'')+UNIQ[it.uq].n+(it.lv?' +'+it.lv:'');if(it.k==='weapon')n=WNAME[it.c][it.t];else if(it.k==='shield')n=SHNAME[it.t];else if(it.k==='wings')n=((it.g||1)>=3?WINGN3:(it.g||1)>=2?WINGN2:WINGN)[it.c];else n=SLOTN[it.c][it.k]+' '+SETN[it.c][it.t];
   return(it.epic?'Épico ':it.anc?ANCS[it.anc].n+' · ':it.ex&&it.ex.length?'Excelente ':'')+n+(it.lv?' +'+it.lv:'');
 }
 function itemQ(it){if(!isEq(it))return 0;if(it.ex&&it.ex.length)return 3;if(it.lv>=7)return 2;if(it.lv>=4||it.luck||it.op)return 1;return 0;}
@@ -1400,8 +1403,8 @@ function iconOf(it){return it.k==='weapon'?'weapon_'+it.c:it.k==='pet'?'pet':it.
 const lvAdd=lv=>lv<=9?lv*3:27+(lv-9)*4;
 function itemDmg(it){const b=WDMG[it.c][it.t],a=lvAdd(it.lv)+it.op*4,e=it.epic?1.2:1;return[Math.round((b[0]+a)*e),Math.round((b[1]+a)*e)];}
 /* alas: la segunda generación da bastante más */
-function wingStats(it){const g2=(it.g||1)>=2;return{dmg:(g2?.22:.12)+it.lv*(g2?.012:.01),abs:(g2?.22:.12)+it.lv*(g2?.006:.005)};}
-function itemDef(it){if(it.k==='wings')return ((it.g||1)>=2?30+it.lv*4:10+it.lv*3)+it.op*4;return Math.round((Math.round(ADEF[it.t]*SLOTF[it.k])+lvAdd(it.lv)+it.op*4)*(it.epic?1.2:1));}
+function wingStats(it){const g=it.g||1;if(g>=3)return{dmg:.32+it.lv*.014,abs:.3+it.lv*.007};const g2=g>=2;return{dmg:(g2?.22:.12)+it.lv*(g2?.012:.01),abs:(g2?.22:.12)+it.lv*(g2?.006:.005)};}
+function itemDef(it){if(it.k==='wings')return ((it.g||1)>=3?55+it.lv*5:(it.g||1)>=2?30+it.lv*4:10+it.lv*3)+it.op*4;return Math.round((Math.round(ADEF[it.t]*SLOTF[it.k])+lvAdd(it.lv)+it.op*4)*(it.epic?1.2:1));}
 function reqOf(it){if(!isEq(it))return null;const main=CLASSES[it.c].main;if(it.k==='wings')return{lvl:20,stat:0,main};return{lvl:TREQ_LVL[it.t],stat:Math.round(TREQ_STAT[it.t]*(it.k==='weapon'?1:.85)),main};}
 function canEquip(it){
   if(!isEq(it))return 'Este objeto no se equipa';
@@ -1413,7 +1416,7 @@ function canEquip(it){
 function itemPrice(it){
   if(it.k==='pet')return 400000;
   if(it.k==='gem')return GEMS[it.sub].sell*3;if(it.k==='pot')return POTS[it.sub].price;if(it.k==='scroll')return SCROLLS[it.sub].price;if(it.k==='quest')return 0;if(it.k==='mat')return(MATS[it.sub]?MATS[it.sub].sell:50)*3;
-  if(it.k==='wings')return 3000000*(1+it.lv*.5)*((it.g||1)>=2?4:1);
+  if(it.k==='wings')return 3000000*(1+it.lv*.5)*((it.g||1)>=3?14:(it.g||1)>=2?4:1);
   return Math.round(TPRICE[it.t]*PRICEF[it.k]*(1+it.lv*it.lv*.18)*(it.ex&&it.ex.length?3:1)*(it.luck?1.3:1)*(1+it.op*.3)/10)*10;
 }
 function sellPrice(it){if(it.k==='gem')return GEMS[it.sub].sell*(it.n||1);if(it.k==='quest')return 0;return Math.round(itemPrice(it)/3/10)*10*(it.n||1);}
@@ -1713,9 +1716,9 @@ function wingExtraGeo(cls,s,st){const k=cls+s+st;if(WGEO[k])return WGEO[k];if(st
   if(st>=2){for(let i=0;i<3;i++){add(.92-i*.12,(-215-i*12)*D,1.5-i*.2,.05,-.05-i*.01,.05);}}
   if(st>=3){for(let i=0;i<4;i++){const f=i/3;add(.2+f*.6,(-200+f*20)*D,1.2+f*.3,.035,-.06,.1);}}
   WGEO[k]=keep(mergeGeos(parts));return WGEO[k];}
-function wingsMesh(cls,lv,gen){const g=new THREE.Group();g.position.set(0,.62,-.24);const sides=[];lv=lv||0;const g2=(gen||1)>=2;const st=Math.min(3,wingStage(lv)+(g2?1:0));const P=(WPALS[cls]||WPALS.caballero)[st];
+function wingsMesh(cls,lv,gen){const g=new THREE.Group();g.position.set(0,.62,-.24);const sides=[];lv=lv||0;const g2=(gen||1)>=2,g3=(gen||1)>=3;const st=g3?3:Math.min(3,wingStage(lv)+(g2?1:0));const P=(WPALS[cls]||WPALS.caballero)[st];
   const shape=WSHAPE[cls]||'eagle',veil=shape==='veil';const tex=featherTex(P,shape);const m=new MSM({map:tex,emissiveMap:tex,emissive:P.em,emissiveIntensity:(veil?.55:P.ei)+Math.min(15,lv)*.012,alphaTest:veil?.04:.42,transparent:veil,opacity:veil?.9:1,depthWrite:!veil,blending:THREE.NormalBlending,side:THREE.DoubleSide,roughness:P.rough,metalness:P.met});
-  const S=(.44+st*.06+Math.min(15,lv)*.003)*(g2?1.16:1);g.rotation.x=-.32;
+  const S=(.44+st*.06+Math.min(15,lv)*.003)*(g3?1.36:g2?1.16:1);g.rotation.x=-.32;
   /* ola del ala: la punta va retrasada respecto de la raíz y las plumas ondean */
   const wu={uWP:{value:0},uWA:{value:0},uWT:{value:0},uWR:{value:.4}};const waveify=mt=>{mt.onBeforeCompile=m.onBeforeCompile;mt.customProgramCacheKey=()=>'wingwave'+(mt.isMeshPhysicalMaterial?'p':'s');};m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,wu);
     sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nuniform float uWP;uniform float uWA;uniform float uWT;uniform float uWR;').replace('#include <begin_vertex>','#include <begin_vertex>\n{float sx=abs(transformed.x);transformed.z-=0.42*pow(max(0.0,sx-0.3),1.25);float w=smoothstep(0.12,1.7,sx);float wv=sin(uWP-sx*1.9)*uWA*w;transformed.y+=wv*sx*0.55;transformed.z+=-abs(wv)*0.3*sx+0.03*sin(uWT*7.0+sx*9.0+transformed.y*6.0)*w*uWR;}');};
@@ -1728,6 +1731,9 @@ function wingsMesh(cls,lv,gen){const g=new THREE.Group();g.position.set(0,.62,-.
     if(st>=1){for(let k=0;k<st;k++){const sp=glowSprite(P.em,.45+k*.2,.45);sp.position.set(s*(.85+k*.22)*S/.5*(shape==='raven'?.6:1),(.7+k*.12)*S/.5*(shape==='raven'?-.3:1),0);W.add(sp);}}
     if(st>=3){const au=glowSprite(P.em,2.6*S/.5,.22);au.position.set(s*.5*S/.5,.4*S/.5,-.15);W.add(au);}
     if(g2){/* segundo par, más chico y debajo: la silueta de cuatro alas se reconoce de lejos */const W2=new THREE.Group();W2.position.set(.05*s,-.22,.02);g.add(W2);const m2=new THREE.Mesh(wingSideGeo(cls,s),m);m2.scale.setScalar(S*.62);m2.rotation.z=-s*.55;W2.add(m2);W2.rotation.y=s*.5;sides.push(W2);}}
+  /* tercera generación: un tercer par de alas chico y un halo de luz del color de las plumas */
+  if(g3){for(const s of[-1,1]){const W3=new THREE.Group();W3.position.set(.04*s,.16,.04);g.add(W3);const m3=new THREE.Mesh(wingSideGeo(cls,s),m);m3.scale.setScalar(S*.48);m3.rotation.z=s*.35;W3.add(m3);W3.rotation.y=s*.35;}
+    const hc=new THREE.Color(m.color).lerp(new THREE.Color(0xffffff),.35);const sp=glowSprite(hc.getHex(),S*5.5,.3);sp.position.set(0,.15,-.12);g.add(sp);m.emissive=hc.clone().multiplyScalar(.35);m.emissiveIntensity=1;}
   return{g,sides,u:wu,P};}
 
 /* ---------- héroe ---------- */
@@ -4423,6 +4429,7 @@ function rewardKill0(e,S){if(!S||(!S.xp&&!S.quest&&!S.top))return;
   const gemRoll=[['tupa',.016,8],['jasy',.011,15],['yvy',.007,25],['kerana',.014,5]];
   for(const[g,ch,ml]of gemRoll){if(L>=ml&&Math.random()<ch*(gold?20:eli?6:1)){const s=scat();dropAt(s[0],s[1],{item:stackItem('gem',g,1)});}}
   if(boss){for(let i=0;i<3;i++){const s=scat();dropAt(s[0],s[1],{item:stackItem('gem',pick(['tupa','jasy','yvy','kerana']),1)});}}
+  if(L>=50&&Math.random()<(boss?.05:eli?.008:gold?.02:0)){const s=scat();dropAt(s[0],s[1],{item:stackItem('gem','mainumby',1)});toast('<em style="color:#39f0c8">¡Cayó una Pluma de Mainumby!</em>');}
   if(Math.random()<(boss?.12:eli?.03:0)){const s=scat(),pe=newPet();dropAt(s[0],s[1],{item:pe});toast(`<em style="color:${PETS[pe.sub].col}">¡Cayó ${PETS[pe.sub].n}!</em> Llevalo desde el inventario`);if(!snd('mu_rare',{vol:.9,jit:0,min:.3}))sfx('rare');}
   {const D=LOOTDEF[e.type];if(D){const mul=boss?1:gold?5:eli?3:1,chm=(b,x)=>boss?b:x*mul;
     if(Math.random()<chm(1,LOOTCH.mat)){const s=scat();dropAt(s[0],s[1],{item:stackItem('mat',D[0][0],boss?3:1)});}
@@ -4937,7 +4944,7 @@ function itemCard(it,ctx){ICTX=ctx;const L=[];const iu=iconURL(it);if(iu)L.push(
   else if(ctx.src==='eq'){B.push(`<button class="btn" data-act="unequip">Quitar</button>`);}
   else{if(isEq(it)){const why=canEquip(it);B.push(`<button class="btn" data-act="equip" ${why?'disabled':''}>Equipar</button>`);if(why)L.push(`<div class="it-l req bad">${why}</div>`);}
     if(it.k==='quest'&&EVQ[it.sub])B.push(`<button class="btn" data-act="use">Entrar al evento</button>`);if(it.k==='pot'||it.k==='scroll')B.push(`<button class="btn" data-act="use">Usar</button>`);
-    if(it.k==='gem'&&it.sub!=='kerana')B.push(`<button class="btn" data-act="gem">Usar en un ítem</button>`);
+    if(it.k==='gem'&&it.sub!=='kerana'&&it.sub!=='mainumby')B.push(`<button class="btn" data-act="gem">Usar en un ítem</button>`);
     if(it.k==='pet')B.push(`<button class="btn" data-act="petOn">${C.pet?'Cambiar por este':'Llevar'}</button>`);
     B.push(`<button class="btn ghost" data-act="drop">${ctx.confirm?'Sí, tirarlo':'Tirar'}</button>`);}
   B.push(`<button class="btn ghost" data-act="closeItem">Cerrar</button>`);
@@ -5016,6 +5023,8 @@ function renderCaldero(){const b=$('#npcBody');const it=CALD.sel!=null?C.inv[CAL
       h+=`<div class="recipe"><h4>Subir a +${tgt}</h4><ul><li class="${have.k?'ok':'no'}">1 Gema de Kerana</li><li class="${have.t?'ok':'no'}">${n} Gema${n>1?'s':''} de Tupã</li><li class="${have.j?'ok':'no'}">${n} Gema${n>1?'s':''} de Jasy</li><li class="${have.g?'ok':'no'}">₲ ${fmt(cost)}</li></ul><div>Probabilidad: <span class="chance">${ch}%</span></div><p class="hint">Si falla, el ítem se destruye.</p><button class="btn full danger" data-act="cauldGo" data-r="up" ${have.k&&have.t&&have.j&&have.g?'':'disabled'}>Combinar</button></div>`;}
     if(it.k!=='wings'&&it.lv>=4){const ch=Math.min(80,25+it.lv*5+(it.ex&&it.ex.length?15:0)+it.op*5),cost=500000,have={k:countItem('gem','kerana')>=1,g:C.gold>=cost};
       h+=`<div class="recipe"><h4>Crear ${WINGN[C.cls]}</h4><ul><li class="ok">El ítem elegido se consume</li><li class="${have.k?'ok':'no'}">1 Gema de Kerana</li><li class="${have.g?'ok':'no'}">₲ ${fmt(cost)}</li></ul><div>Probabilidad: <span class="chance">${ch}%</span></div><p class="hint">Más nivel, opción adicional o calidad excelente suben la probabilidad.</p><button class="btn full danger" data-act="cauldGo" data-r="wings" ${have.k&&have.g?'':'disabled'}>Combinar</button></div>`;}
+    if(it.k==='wings'&&(it.g||1)===2&&it.lv>=9){const ch=Math.min(65,30+(it.lv-9)*7+(it.luck?10:0)),cost=20000000,have={m:countItem('gem','mainumby')>=1,k:countItem('gem','kerana')>=5,j:countItem('gem','jasy')>=5,y:countItem('gem','yvy')>=1,g:C.gold>=cost};
+      h+=`<div class="recipe"><h4>Crear ${WINGN3[C.cls]}</h4><ul><li class="ok">Tus alas +${it.lv} se consumen</li><li class="${have.m?'ok':'no'}">1 Pluma de Mainumby</li><li class="${have.k?'ok':'no'}">5 Gemas de Kerana</li><li class="${have.j?'ok':'no'}">5 Gemas de Jasy</li><li class="${have.y?'ok':'no'}">1 Gema de Yvy</li><li class="${have.g?'ok':'no'}">₲ ${fmt(cost)}</li></ul><div>Probabilidad: <span class="chance">${ch}%</span></div><p class="hint">Alas de tercera generación: más grandes, con luz propia y mucho más daño, absorción y defensa. Si falla, el caldero se traga tus alas.</p><button class="btn full danger" data-act="cauldGo" data-r="wings3" ${have.m&&have.k&&have.j&&have.y&&have.g?'':'disabled'}>Combinar</button></div>`;}
     if(it.k==='wings'&&(it.g||1)<2&&it.lv>=9){const ch=Math.min(75,30+(it.lv-9)*8+(it.luck?10:0)),cost=5000000,have={k:countItem('gem','kerana')>=3,j:countItem('gem','jasy')>=3,g:C.gold>=cost};
       h+=`<div class="recipe"><h4>Crear ${WINGN2[C.cls]}</h4><ul><li class="ok">Tus alas +${it.lv} se consumen</li><li class="${have.k?'ok':'no'}">3 Gemas de Kerana</li><li class="${have.j?'ok':'no'}">3 Gemas de Jasy</li><li class="${have.g?'ok':'no'}">₲ ${fmt(cost)}</li></ul><div>Probabilidad: <span class="chance">${ch}%</span></div><p class="hint">Alas de segunda generación: cuatro alas y mucho más daño, absorción y defensa. Si falla, el caldero se traga tus alas.</p><button class="btn full danger" data-act="cauldGo" data-r="wings2" ${have.k&&have.j&&have.g?'':'disabled'}>Combinar</button></div>`;}
     if(!(it.lv>=9&&it.lv<15)&&!(it.k!=='wings'&&it.lv>=4)&&!(it.k==='wings'&&it.lv>=9))h+='<p class="it-d">El caldero acepta ítems +9 a +14 para subirlos, ítems +4 o más para crear alas, o alas +9 para la segunda generación.</p>';}
@@ -5024,6 +5033,8 @@ function renderCaldero(){const b=$('#npcBody');const it=CALD.sel!=null?C.inv[CAL
 function cauldGo(r){const it=C.inv[CALD.sel];if(!it)return;let ok=false,msg;
   if(r==='up'){const tgt=it.lv+1,n=tgt-9,ch=Math.min(95,[60,55,50,45,40,35][n-1]+(it.luck?15:0)),cost=300000*n;if(C.gold<cost||!takeItem('gem','kerana',1))return;takeItem('gem','tupa',n);takeItem('gem','jasy',n);C.gold-=cost;
     ok=Math.random()*100<ch;if(ok){it.lv=tgt;msg=`¡Éxito! ${itemName(it)}`;}else{C.inv[CALD.sel]=null;CALD.sel=null;msg='El caldero se tragó el ítem.';}}
+  else if(r==='wings3'){if((it.g||1)!==2||it.lv<9)return;const ch=Math.min(65,30+(it.lv-9)*7+(it.luck?10:0)),cost=20000000;if(C.gold<cost||countItem('gem','mainumby')<1||countItem('gem','kerana')<5||countItem('gem','jasy')<5||countItem('gem','yvy')<1)return;takeItem('gem','mainumby',1);takeItem('gem','kerana',5);takeItem('gem','jasy',5);takeItem('gem','yvy',1);C.gold-=cost;C.inv[CALD.sel]=null;CALD.sel=null;ok=Math.random()*100<ch;
+    if(ok){const w=newEquip(C.cls,'wings',0,{luck:Math.random()<.5});w.g=3;addItem(w);msg=`¡Éxito! Creaste ${itemName(w)}`;}else msg='El caldero se tragó tus alas.';}
   else if(r==='wings2'){const ch=Math.min(75,30+(it.lv-9)*8+(it.luck?10:0)),cost=5000000;if(C.gold<cost||countItem('gem','kerana')<3||countItem('gem','jasy')<3)return;takeItem('gem','kerana',3);takeItem('gem','jasy',3);C.gold-=cost;C.inv[CALD.sel]=null;CALD.sel=null;ok=Math.random()*100<ch;
     if(ok){const w=newEquip(C.cls,'wings',0,{luck:Math.random()<.4});w.g=2;addItem(w);msg=`¡Éxito! Creaste ${itemName(w)}`;}else msg='El caldero se tragó tus alas.';}
   else{const ch=Math.min(80,25+it.lv*5+(it.ex&&it.ex.length?15:0)+it.op*5),cost=500000;if(C.gold<cost||!takeItem('gem','kerana',1))return;C.gold-=cost;C.inv[CALD.sel]=null;CALD.sel=null;ok=Math.random()*100<ch;
@@ -5388,7 +5399,7 @@ function liveEqObj(s){const e={};EQK.forEach(k=>e[k]=null);const q=s.eq||{};for(
 function liveModel(o){const old=o.m;const eq=liveEqObj(o.s),hf=HERO_FACE;HERO_FACE=o.s.face|0;let r,sp=null;try{r=buildHero(o.s.c,eq);sp=oadHeroSpec(o.s.c,eq);}catch(e){console.error(e);}HERO_FACE=hf;if(!r)return;
   if(old){scene.remove(old.g);disposeTree(old.g);}o.m=r;addBlob(r.g,1.3);scene.add(r.g);r.g.position.set(o.x,H(o.x,o.z),o.z);r.g.rotation.y=o.ry;
   /* si faltan los modelos de esa clase (o de esa cara), se bajan y se rearma con el modelo completo */
-  if(!r.oad&&sp)try{(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!o.waitOad){o.waitOad=true;oadNeed(sp.files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o&&!(o.m&&o.m.oad))liveModel(o);});}}catch(e){}}
+  if(!r.oad&&sp)try{const files=CC0.on&&CC0_CLS[o.s.c]?cc0Files(o.s.c,eq):sp.files;if(!CC0.on)(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!o.waitOad){o.waitOad=true;oadNeed(files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o&&!(o.m&&o.m.oad))liveModel(o);});}}catch(e){}}
 function liveLabel(o){const cls=CLASSES[o.s.c];const h=`${o.bub?`<span class="bub">${esc(o.bub)}</span>`:''}${esc(o.s.n)}<small>Nv ${o.s.L|0} · ${cls?(o.s.evo?cls.evo:cls.name):''}${o.inParty?' · grupo':''}</small>`;
   if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>[o.x,(o.m?o.m.g.position.y:0)+2.35,o.z]);else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
 function liveAdd(d){if(!d||!d.s||d.id===LIVE.me)return;let o=LIVE.others.get(d.id);
