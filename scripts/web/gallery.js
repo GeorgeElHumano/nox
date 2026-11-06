@@ -33,8 +33,8 @@ let shot=null;
         /* encuadre por la caja real del modelo, en tres cuartos: se ve el cuerpo entero (cuernos, cola, cuello) y no solo la cara */
         e.g.updateMatrixWorld(true);const bb=new THREE.Box3();e.g.traverse(o=>{if(o.isMesh&&o.visible&&o.geometry){o.geometry.computeBoundingBox();const b2=o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);bb.union(b2);}});
         const c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());const low=['snake','lizard','scorp'].includes(e.kind)||e.B&&e.B.len>3;
-        const rear=e.rear||e.m&&e.m.rear;const a=rear?1.45:1.25,pt=rear?.12:low?.42:.22,D=(Math.max(sz.y,Math.hypot(sz.x,sz.z)*.8)*1.25+1.0)*(+(window.__ZOOM||.8))*1.12;
-        S.look.copy(c);S.cam.set(c.x+Math.sin(a)*Math.cos(pt)*D,c.y+Math.sin(pt)*D,c.z+Math.cos(a)*Math.cos(pt)*D);window.__GB=[c.toArray(),sz.toArray()];}});await wait(1500);console.log('caja',k,JSON.stringify(await p.evaluate(()=>window.__GB)));
+        const rear=e.rear||e.m&&e.m.rear;const a=rear?1.45:1.25,pt=rear?.12:low?.42:.22,D=(Math.max(sz.y,Math.hypot(sz.x,sz.z)*.95)*1.3+1.0)*(+(window.__ZOOM||.8))*1.12;
+        S.look.copy(c);S.cam.set(c.x+Math.sin(a)*Math.cos(pt)*D,c.y+Math.sin(pt)*D,c.z+Math.cos(a)*Math.cos(pt)*D);}});await wait(1500);
       await shot(`${OUT}/${k}.png`);console.log('foto',k);}}
   if(MODE==='sets'){const LV=+(process.argv[5]||0);const classes=ONLY.length?ONLY:['caballero','hechicero','arquera','gladiador','mburuvicha'];
     await p.evaluate(()=>{window.__NOX.STUDIO.hero();});

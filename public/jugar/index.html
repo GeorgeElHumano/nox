@@ -2699,7 +2699,7 @@ const MYTH={
  mboitui:{ficha:"Mbói Tu'i, segundo hijo: serpiente gigante con cabeza de loro, plumas verdes, pico enorme y lengua roja como la sangre; señor de las aguas.",snake:{head:'parrot',skin:()=>scalesTex('mboituiS',{base:0x2a7a2a,dark:0x0a2a10,hi:0x9ae860,size:11,belly:0xe0d890,stripes:6,stripeC:0x0a3a14}),eye:0xffe25a,beak:0x6a6a70}},
  pombero:{ficha:'Pombero: hombrecito del monte, bajo y fornido, oscurísimo y muy peludo, con sombrero de paja grande y manos y pies enormes. Camina sin hacer ruido, imita a los pájaros y le gustan el tabaco y la miel.',
   human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','pomberoFur',furRecolor(0x060403,0x1a1410,0x4a3a2a)),props:['hd_m_wide'],team:0x1a1410,scale:.78,bulk:[1.35,1,1.35],anim:'n',
-   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const h=strawHat(.42*U,{col:0xd8b870,band:0x3a1a0c});h.position.y=A.top-.06*U;hp.add(h);}
+   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const h=strawHat(.42*U,{col:0xd8b870,band:0x3a1a0c});h.position.set(0,A.top-.125*U,.03*U);hp.add(h);}
     const T=peloTex('pomberoB',{base:0x120e0a,dark:0x030202,hi:0x3a2e22,len:14});bigFeet(A,U,T,false);
     for(const s of['L','R']){const b=A(['hand_'+s]);if(b){const m=part(SPH(1,8,6),tm(T),0,-.02*U,0,b,.07*U,.05*U,.09*U);}}
     const hd=A(['head']);if(hd){const bd=part(SPH(1,10,8),tm(T),0,.02*U,.07*U,hd,.11*U,.1*U,.06*U);const cg=part(limbGeo(.1*U,.012*U,.01*U,0),mat(0x8a6a40),.05*U,.08*U,.14*U,hd);cg.rotation.x=-PI/2-.3;cg.rotation.z=-.4;const gl=glowSprite(0xff8a3a,.06*U,.9);gl.position.set(.08*U,.1*U,.23*U);hd.add(gl);}},
