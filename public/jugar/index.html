@@ -729,7 +729,7 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
 </g></svg><div class="slogan">Cuando cae la noche, nacen las leyendas.</div><p>Un MMORPG de aventuras en el Paraguay medieval. Elegí tu clase, repartí tus puntos, mejorá tu equipo con gemas y enfrentá a los siete hijos de Tau y Kerana.</p></div>
   <div id="acctBar"></div>
   <div id="selBody"></div>
-  <div class="credits">Personajes, ropa, pelo, animaciones y armas de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a>; suelos de <a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a>: CC0 (dominio público). Caras, armaduras, jeguaka, yvyra'i y bastones hechos para NOX. Bestias, criaturas míticas, árboles, sonidos y música: arte de <a href="https://play0ad.com" target="_blank" rel="noopener">0 A.D.</a> © Wildfire Games, licencia <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (adaptado: texturas y colores modificados). Mascotas y monstruos nuevos: Ultimate Monsters y Ultimate Animated Animals de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y Skeletons de <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a> (CC0); hada de <a href="https://github.com/Hankx-Studio/wish-weaver" target="_blank" rel="noopener">Wish Weaver</a> © 2026 Chengyang Tu y Hongyang Xu, licencia MIT (simplificada).</div>
+  <div class="credits">Personajes, ropa, pelo, animaciones y armas de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a>; suelos de <a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a>: CC0 (dominio público). Caras, armaduras, jeguaka, yvyra'i y bastones hechos para NOX. Bestias, criaturas míticas, árboles, sonidos y música: arte de <a href="https://play0ad.com" target="_blank" rel="noopener">0 A.D.</a> © Wildfire Games, licencia <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (adaptado: texturas y colores modificados). Efectos de sonido también de Little Robot Sound Factory (CC BY 3.0), Leohpaz (CC BY 4.0), qubodup, Bart Kelsey y dklon (CC BY 3.0), y Kenney, rubberduck, artisticdude y otros autores de OpenGameArt (CC0); detalle en CREDITOS-SONIDO.md. Mascotas y monstruos nuevos: Ultimate Monsters y Ultimate Animated Animals de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y Skeletons de <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a> (CC0); hada de <a href="https://github.com/Hankx-Studio/wish-weaver" target="_blank" rel="noopener">Wish Weaver</a> © 2026 Chengyang Tu y Hongyang Xu, licencia MIT (simplificada).</div>
 </div></div>
 <div id="fade"></div>
 
@@ -4931,7 +4931,23 @@ const BSND={aguara:{aggro:['aguara_bark','aguara_bark2'],atk:['aguara_growl','ag
  alma:{aggro:['ghost_wail','ghost_wail2'],atk:['ghost_attack'],hurt:['ghost_wail2'],die:['ghost_die'],idle:['ghost_wail','ghost_wail2'],v:.9,armor:true},
  kurupi:{aggro:['kurupi_roar'],atk:['kurupi_grunt','kurupi_roar'],hurt:['kurupi_grunt'],die:['kurupi_roar'],idle:['kurupi_grunt'],v:1.3,armor:true,dieRate:.75},
  pombero:{aggro:['pombero_whistle'],atk:['pombero_grunt'],hurt:['pombero_grunt'],die:['pombero_grunt'],idle:['pombero_whistle'],v:1,dieRate:.7},
- aoao:{aggro:['aoao_roar'],atk:['aoao_attack','aoao_roar'],hurt:['aoao_attack'],die:['aoao_roar'],idle:['aoao_roar'],v:1.35,dieRate:.7}};
+ aoao:{aggro:['aoao_roar'],atk:['aoao_attack','aoao_roar'],hurt:['aoao_attack'],die:['aoao_roar'],idle:['aoao_roar'],v:1.35,dieRate:.7},
+ /* voces de los seres que antes eran mudos */
+ jasyjatere:{aggro:['jasy_whistle'],atk:['jasy_whistle','magic_call'],hurt:['jasy_hurt'],die:['jasy_hurt'],idle:['jasy_whistle'],rate:1.1,v:.9,dieRate:.8},
+ kaajary:{aggro:['magic_call'],atk:['earth_atk'],hurt:['hurt_f1','hurt_f2'],die:['die_f'],idle:['magic_call'],v:.9},
+ mboijagua:{aggro:['fire_roar','snake_hiss'],atk:['mu_explode','snake_strike'],hurt:['snake_hiss'],die:['monai_roar'],idle:['fire_roar'],v:1.15,dieRate:.75},
+ ypo:{aggro:['ghost_moan2'],atk:['water_atk'],hurt:['ghost_wail2'],die:['ghost_die'],idle:['ghost_moan2'],rate:1.15,v:.9},
+ yaguaru:{aggro:['jaguar_growl'],atk:['jaguar_roar','water_atk'],hurt:['jaguar_growl'],die:['bdie2'],idle:['jaguar_growl'],rate:.85,v:1.15},
+ pora:{aggro:['ghost_wail','breath_scared'],atk:['ghost_attack'],hurt:['ghost_wail2'],die:['ghost_die'],idle:['ghost_moan4'],v:.95,armor:false},
+ tejuguasu:{aggro:['teju_roar'],atk:['teju_roar','teju_hiss'],hurt:['teju_hiss'],die:['teju_roar'],idle:['teju_hiss'],rate:.8,v:1.35,dieRate:.7},
+ kuarahyjara:{aggro:['mu_rage'],atk:['mu_explode','fire_roar'],hurt:['giant1'],die:['monster_c'],idle:['fire_roar'],v:1.15},
+ soldado:{aggro:['ghost_moan4','zombie_moan'],atk:['metal1','metal2'],hurt:['zombie_moan'],die:['ghost_die'],idle:['ghost_moan4'],v:1,armor:true},
+ malavision:{aggro:['breath_scared','laugh_evil2'],atk:['ghost_attack'],hurt:['ghost_wail2'],die:['ghost_die'],idle:['breath_scared'],v:.95},
+ anaboss:{aggro:['laugh_evil'],atk:['monster_b','mu_explode'],hurt:['monster_a'],die:['monster_c'],idle:['laugh_evil'],v:1.3,armor:true},
+ siervo:{aggro:['shade2'],atk:['shade0','mu_evil'],hurt:['shade1'],die:['shade2'],idle:['shade1'],v:1},
+ guardian:{aggro:['giant2'],atk:['giant0','metal0'],hurt:['giant1'],die:['giant2'],idle:['giant0'],v:1.15,armor:true,dieRate:.85},
+ tau:{aggro:['laugh_evil2','monster_a'],atk:['monster_b','mu_evil'],hurt:['monster_a'],die:['monster_c'],idle:['laugh_evil2'],v:1.4,dieRate:.8},
+ anaretan:{aggro:['monster_c','giant2'],atk:['monster_b','thunder'],hurt:['giant1'],die:['monster_c'],idle:['monster_a'],v:1.45,rate:.9,armor:true,dieRate:.75}};
 function beastSnd(e,ev,v){const B=BSND[e.type];if(!B||!B[ev])return;const r=(B.rate||1)*(e.golden?.9:1)*(ev==='die'&&B.dieRate?B.dieRate:1)/Math.pow(e.def.scale||1,.25);
   snd(B[ev],{x:e.p.x,z:e.p.z,vol:(v==null?1:v)*(B.v||1)*(e.def.boss?1.4:1),rate:r,maxD:e.def.boss?60:ev==='idle'?26:38,key:e.type+ev,min:{hurt:.35,idle:2.5,aggro:1.1,atk:.45,die:.1}[ev]||.2});}
 function beastFiles(types){const s=new Set();types.forEach(t=>{const B=BSND[t];if(B)['aggro','atk','hurt','die','idle'].forEach(k=>(B[k]||[]).forEach(n=>s.add(n)));});return [...s];}
@@ -4945,10 +4961,11 @@ function hitSnd(e,kind,strong){const B=BSND[e.type]||{},x=e.p.x,z=e.p.z;const bi
   if(HITSRC==='melee'||HITSRC==='arrow')snd(['flesh0','flesh1','flesh2','flesh3','flesh4','flesh5'],{x,z,vol:big?1:.8,rate:big?.85:1,key:'flesh'});
   if(B.armor||big&&HITSRC==='melee')snd(['metal0','metal1','metal2','metal3'],{x,z,vol:B.armor?.75:.5,rate:big?.9:1.05,key:'metal'});
   if(Math.random()<.4||big)beastSnd(e,'hurt',.75);}
-function stepSurface(){if(!Z)return 'grass';if(Z.id==='chaco')return 'sand';if(Z.id==='asuncion')return Math.hypot(P.x,P.z-8)<21||Math.abs(P.x)<2.6&&P.z>8?'gravel':'grass';if(Z.id==='ruinas')return Math.random()<.4?'rock':'grass';return 'grass';}
+function stepSurface(){if(!Z)return 'grass';if(Z.id==='chaco')return 'sand';if(Z.id==='esteros')return Math.random()<.45?'water':'grass';if(Z.id==='cerrocora'||Z.id==='bahianegra')return 'dirt';if(Z.id==='asuncion')return Math.hypot(P.x,P.z-8)<21||Math.abs(P.x)<2.6&&P.z>8?'gravel':'grass';if(Z.id==='ruinas')return Math.random()<.4?'rock':'grass';return 'grass';}
 function stepTick(dt){if(!AU.ctx||mode!=='game'||P.dead)return;const mv=P.mv||0;if(mv<.08){SND.stepT=0;return;}SND.stepT-=dt*(mv>.55?1.55:1.05);if(SND.stepT>0)return;SND.stepT=.5;const s=stepSurface();snd(['fs_'+s+'1','fs_'+s+'2','fs_'+s+'3','fs_'+s+'4'],{vol:.32*(mv>.55?1.15:.85),key:'step',min:.15,jit:.08});}
 /* música: dos bandejas con fundido */
-const MUSZ={ev_ana:'boss',ev_tuguy:'boss',asuncion:'asuncion',campos:'campos',esteros:'esteros',ruinas:'ruinas',chaco:'chaco',ybytyruzu:'campos2',monday:'esteros',mbaracayu:'esteros',cerrocora:'ruinas',bahianegra:'chaco'};
+/* cada tierra con su tema (música de 0 A.D., CC BY-SA 3.0) */
+const MUSZ={ev_ana:'boss',ev_tuguy:'boss',ev_raid:'raid',ev_duel:'duelo',asuncion:'asuncion',campos:'campos',esteros:'esteros',ruinas:'ruinas',chaco:'chaco',ybytyruzu:'campos2',monday:'monday',mbaracayu:'mbaracayu',cerrocora:'cerrocora',bahianegra:'bahianegra'};
 function musDeck(i){if(SND.deck[i])return SND.deck[i];const el=new Audio();el.crossOrigin='anonymous';el.preload='auto';el.loop=true;const g=AU.ctx.createGain();g.gain.value=0;
   try{const src=AU.ctx.createMediaElementSource(el);src.connect(g);g.connect(AU.track||AU.mus);}catch(e){}el.addEventListener('error',()=>{if(SND.deck[i]&&SND.deck[i].el===el)SND.musFail=true;});SND.deck[i]={el,g};return SND.deck[i];}
 function musUnlock(){if(SND.unlocked||!AU.ctx)return;SND.unlocked=true;for(let i=0;i<2;i++){const d=musDeck(i);d.el.muted=true;const p=d.el.play();if(p&&p.catch)p.catch(()=>{});d.el.pause();d.el.muted=false;}}
@@ -4958,7 +4975,7 @@ function musPlay(name){if(!AU.ctx||SND.musFail||name===SND.track)return;SND.trac
 function musWant(){if(mode==='select')return 'title';if(!Z)return '';const boss=enemies.some(e=>e.def.boss&&!e.dead&&(e.aggro>0||Math.hypot(e.p.x-P.x,e.p.z-P.z)<16)&&Math.hypot(e.p.x-P.x,e.p.z-P.z)<40);if(boss)return 'boss';
   if(Z.id==='campos')return (SND.camposAlt?'campos2':'campos');return MUSZ[Z.id]||'campos';}
 /* ambientes en bucle */
-const BEDZ={ybytyruzu:{amb_temperate:.45,amb_wind:.3},monday:{amb_river:.7,amb_tropical:.3},mbaracayu:{amb_tropical:.7},cerrocora:{amb_wind:.55},bahianegra:{amb_tropical:.45,amb_wind:.25},asuncion:{amb_trade:.42,amb_temperate:.26},campos:{amb_temperate:.55,amb_wind:.08},esteros:{amb_tropical:.62},ruinas:{amb_wind:.42,amb_temperate:.14},chaco:{amb_wind:.5}};
+const BEDZ={ev_ana:{amb_hell:.42},ev_raid:{amb_cave:.55},ev_tuguy:{amb_wind:.35,amb_hell:.18},ybytyruzu:{amb_temperate:.45,amb_wind:.3},monday:{amb_waterfall:.5,amb_river:.35,amb_tropical:.3},mbaracayu:{amb_tropical:.7},cerrocora:{amb_wind:.55},bahianegra:{amb_tropical:.45,amb_wind:.25},asuncion:{amb_trade:.42,amb_temperate:.26},campos:{amb_temperate:.55,amb_wind:.08},esteros:{amb_tropical:.62},ruinas:{amb_wind:.42,amb_temperate:.14},chaco:{amb_wind:.5}};
 function bedSet(id){if(!AU.ctx)return;const W=BEDZ[id]||{},t=AU.ctx.currentTime;for(const n in SND.bed){if(!(n in W)){const b=SND.bed[n];b.pending=false;if(b.g){b.g.gain.setTargetAtTime(0,t,.8);setTimeout(()=>{try{b.s.stop();}catch(e){}},3500);}delete SND.bed[n];}}
   for(const n in W){if(SND.bed[n]){if(SND.bed[n].g)SND.bed[n].g.gain.setTargetAtTime(W[n],t,.8);continue;}SND.bed[n]={pending:true,g:null,s:null};sndLoad(n).then(b=>{const B=SND.bed[n];if(!b||!B||!B.pending||!AU.ctx)return;const c=AU.ctx,s=c.createBufferSource();s.buffer=b;s.loop=true;const g=c.createGain();g.gain.value=0;s.connect(g);g.connect(AU.amb||AU.sfx);s.start();g.gain.setTargetAtTime((BEDZ[Z&&Z.id]||{})[n]||0,c.currentTime,1);B.pending=false;B.g=g;B.s=s;});}
   for(const k in SND.buf)if(/^amb_/.test(k)&&!(k in W)){delete SND.buf[k];delete SND.load[k];}}
@@ -4989,7 +5006,7 @@ function sndZone(id){riverStop();if(!AU.ctx)return;bedSet(id);const types=[...ne
   sndPre(['crackle','fs_grass1','fs_grass2','fs_grass3','fs_grass4'].concat(id==='chaco'?['fs_sand1','fs_sand2','fs_sand3','fs_sand4']:id==='asuncion'?['fs_gravel1','fs_gravel2','fs_gravel3','fs_gravel4','chicken0','chicken1','moo0','pig_amb','neigh','horse_snort','dog_bark']:id==='ruinas'?['fs_rock1','fs_rock2','fs_rock3','fs_rock4']:[]));
   if(id==='campos'||id==='esteros')sndPre(['moo0','moo1','moo2','neigh','horse_snort']);if(id==='ruinas'||id==='chaco')sndPre(['bleat']);}
 function sndCore(){sndPre(['swing0','swing1','swing2','swing3','metal0','metal1','metal2','metal3','flesh0','flesh1','flesh2','flesh3','flesh4','flesh5','bow0','bow1','bow2','afly0','afly1','ahit0','ahit1','ahit2',
-  'mu_levelup','mu_gem','mu_rare','mu_drop','mu_coins','mu_potion','mu_twist','mu_stab','mu_swell','mu_rage','mu_energy','mu_fireball','mu_explode','mu_teleport','mu_evil','mu_lightning','mu_triple','mu_heal','mu_shield','mu_rain','bolt_hit','blink','block0','block1','block2','hurt_m0','hurt_m1','hurt_m2','hurt_m3','hurt_m4','hurt_f0','hurt_f1','hurt_f2','die_m','die_f','bdie0','bdie1','bdie2']);}
+  'mu_levelup','mu_gem','mu_rare','mu_drop','mu_coins','mu_potion','mu_twist','mu_stab','mu_swell','mu_rage','mu_energy','mu_fireball','mu_explode','mu_teleport','mu_evil','mu_lightning','mu_triple','mu_heal','mu_shield','mu_rain','bolt_hit','ui_click','equip','equip_light','block0','block1','block2','hurt_m0','hurt_m1','hurt_m2','hurt_m3','hurt_m4','hurt_f0','hurt_f1','hurt_f2','die_m','die_f','bdie0','bdie1','bdie2']);}
 function sndSetVol(){if(!AU.ctx)return;const t=AU.ctx.currentTime;AU.mus.gain.setTargetAtTime(.32*SND.vol.mus,t,.1);if(AU.track)AU.track.gain.setTargetAtTime(.55*SND.vol.mus,t,.1);AU.sfx.gain.setTargetAtTime(.75*SND.vol.sfx,t,.1);if(AU.amb)AU.amb.gain.setTargetAtTime(SND.vol.sfx,t,.1);try{localStorage.setItem('tsm-vol',JSON.stringify(SND.vol));}catch(e){}}
 
 /* ================= interfaz ================= */
@@ -5026,7 +5043,7 @@ function evHud(title,line){let el=$('#evHud');if(!el){el=document.createElement(
 function evSpawn(type,x,z,over){const e=makeEnemy(type,x,z,false,null,Object.assign({aggro:45},over||{}));e.summon=true;e.aggro=999;e.born=T;EV.list.push(e);return e;}
 const mmss=t=>{t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0');};
 function evAlive(){return EV.list.filter(e=>!e.dead&&enemies.includes(e));}
-function evFinish(win,msg){if(win&&C){const a=achData();a.ev[EV.kind]=(a.ev[EV.kind]||0)+1;dayProg('event',1);achCheck();}EV.phase='end';EV.endT=EV.t;evHud(win?'¡Victoria!':'Fin del evento',msg);toast(`<em style="color:${win?'var(--good)':'var(--bad)'}">${msg}</em>`);if(win){if(!snd('mu_levelup',{vol:.95,jit:0}))sfx('level');beamFx(P.x,P.z,0xffd76a,1.6);ringFx(P.x,P.z,0xffe39a,6,.9);}}
+function evFinish(win,msg){if(win&&C){const a=achData();a.ev[EV.kind]=(a.ev[EV.kind]||0)+1;dayProg('event',1);achCheck();}EV.phase='end';EV.endT=EV.t;evHud(win?'¡Victoria!':'Fin del evento',msg);if(!win)try{snd('jingle_lose',{vol:.6,jit:0,min:1});}catch(_){}toast(`<em style="color:${win?'var(--good)':'var(--bad)'}">${msg}</em>`);if(win){if(!snd('mu_levelup',{vol:.95,jit:0}))sfx('level');beamFx(P.x,P.z,0xffd76a,1.6);ringFx(P.x,P.z,0xffe39a,6,.9);}}
 function evGive(it){if(!addItem(it)){const d=dropAt(P.x+R(-1,1),P.z+R(-1,1),{item:it});if(d)d.pdrop=true;}}
 function evTick(dt){const E=EV;if(!E||!Z.event||P.dead)return;E.t+=dt;
   if(E.phase==='end'){if(E.t-E.endT>7){EV=null;evHud(null);travel('asuncion');}return;}
@@ -5122,7 +5139,7 @@ function itemCard(it,ctx){ICTX=ctx;const L=[];const iu=iconURL(it);if(iu)L.push(
     B.push(`<button class="btn ghost" data-act="drop">${ctx.confirm?'Sí, tirarlo':'Tirar'}</button>`);}
   B.push(`<button class="btn ghost" data-act="closeItem">Cerrar</button>`);
   $('#itemCard').innerHTML=L.join('')+`<div class="it-btns">${B.join('')}</div>`;$('#pItem').hidden=false;refreshPause();}
-function equipFromInv(i){const it=C.inv[i];if(!it||canEquip(it))return;const k=it.k;const prev=C.eq[k];C.eq[k]=it;C.inv[i]=prev||null;afterGear();toast(`Equipaste <em style="color:${itemColor(it)}">${esc(itemName(it))}</em>`);}
+function equipFromInv(i){const it=C.inv[i];if(!it||canEquip(it))return;const k=it.k;try{snd(['armor','pants','helm','boots','gloves','shield'].includes(k)&&it.t>=2?'equip':'equip_light',{vol:.7,min:.1});}catch(_){}const prev=C.eq[k];C.eq[k]=it;C.inv[i]=prev||null;afterGear();toast(`Equipaste <em style="color:${itemColor(it)}">${esc(itemName(it))}</em>`);}
 function unequip(k){const it=C.eq[k];if(!it)return;const i=C.inv.indexOf(null);if(i<0){toast('No hay lugar en el inventario');return;}C.inv[i]=it;C.eq[k]=null;afterGear();}
 function afterGear(){recalc();rebuildHero(C.cls,C.eq);persist();}
 function applyGem(target){const sub=GEM.sub;if(!takeItem('gem',sub,1)){GEM=null;return;}let ok=true,msg;
@@ -5343,7 +5360,7 @@ const ACT={
 };
 document.addEventListener('input',e=>{if(e.target.id==='volMus'){SND.vol.mus=+e.target.value;sndSetVol();}else if(e.target.id==='volSfx'){SND.vol.sfx=+e.target.value;sndSetVol();snd(['swing0','metal1'],{vol:.6,min:.2});}});
 ACT.faceStep=d=>{const n=HEADS[SELV.cls==='arquera'?'f':'m'].length;const ni=$('#nameIn');if(ni)SELV.name=ni.value;SELV.face=(((SELV.face||0)+(+d.d))%n+n)%n;renderSelect();previewHero();};
-document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b.dataset,b);}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;try{snd('ui_click',{vol:.32,min:.03,jit:.04});}catch(_){}const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b.dataset,b);}});
 /* ================= baúl de la cuenta (como el baúl clásico: compartido por todos tus personajes) ================= */
 const VAULT_N=120,VAULT_MAXG=2000000000;
 const VST={unlocked:false,feePaid:false,pin:null,buf:'',pin1:'',amt:null};
@@ -5651,7 +5668,7 @@ function mobTele(m){const e=mobByN(m.n);if(!e||e.dead&&m.ab!=='doom')return;cons
 /* desafío de grupo: la Guarida de Añaretã */
 function raidGo(m){LIVE.raidKey=m.key;LIVE.raidT=T;toast(`<em style="color:#ff7a4a">¡Desafío aceptado!</em> Entrando a la Guarida de Añaretã (nivel ${m.lvl}, ${m.n} jugadores)`);closeAll();travel('ev_raid',[R(-3,3),22]);
   setTimeout(()=>chatAdd({ch:'s',m:'Añaretã tiene ataques marcados en el piso: salí de las zonas rojas. A los 6 minutos de empezar la pelea consume la sala.'}),2500);}
-function raidWin(){toast('<em style="color:var(--gold)">¡Derrotaron a Añaretã!</em> Las recompensas cayeron a tus pies. Volvés a Asunción en 30 segundos');if(!snd('mu_rare',{vol:1,jit:0,min:.3}))sfx('rare');
+function raidWin(){toast('<em style="color:var(--gold)">¡Derrotaron a Añaretã!</em> Las recompensas cayeron a tus pies. Volvés a Asunción en 30 segundos');if(!snd('jingle_win',{vol:.85,jit:0,min:1}))sfx('rare');
   const L=C.L;for(let i=0;i<2;i++){const a=Math.random()*TAU;dropAt(P.x+Math.sin(a)*1.6,P.z+Math.cos(a)*1.6,{item:rollEquip(Math.max(L,40),1,.35,.3)});}
   [['kerana',3],['jasy',2],['yvy',1]].forEach(([g,n])=>{const a=Math.random()*TAU;dropAt(P.x+Math.sin(a)*1.2,P.z+Math.cos(a)*1.2,{item:stackItem('gem',g,n)});});
   dropAt(P.x+.8,P.z-.8,{gold:Math.round(L*L*120)});C.raids=(C.raids||0)+1;persist();
@@ -5867,7 +5884,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
