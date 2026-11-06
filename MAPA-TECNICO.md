@@ -113,6 +113,8 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
   - El bloque de color `.ola` está desactivado.
   - Las fotos van **sin** `filter: drop-shadow`, porque Safari dibuja un rectángulo. En su lugar hay una sombra de piso con `.fig::after`.
 - Portada en celular (≤860px): las tarjetas de mitología y descargas forman juntas una sola pantalla (50svh cada una, con aire para el encabezado y la barra de abajo). Los puntos de snap en celular son `.pan.main` y `.pan.myth` (no `#ch-inicio`). Clave: `#ch-inicio` usa `overflow:clip`, porque con `overflow:hidden` el capítulo pasa a ser contenedor de scroll y Safari ignora los snaps de adentro (saltaba directo a Mitología). Probar siempre con WebKit: `tools/wk.js` y `wk3.js` (Playwright webkit, iPhone 15).
+- Cada capítulo debe entrar entero en la pantalla (si es más alto, el snap deja paradas a medias): reglas por alto de pantalla al final de `shell_head.html` (laptops bajas, celulares ≤760 y ≤620 de alto, pantallas 2K/4K). Solo Descargas puede ser más alto (lista larga, es el último).
+- Revisión en dispositivos: `tools/devs.js URL` (iPhone SE/15/15 Pro Max, iPad Mini vertical y horizontal, iPad Pro, Pixel 7, Galaxy S9+, Galaxy Tab, laptops 1366 y 1568, PC 1920 y 2560, Firefox, Safari Mac; `ONLY="iPhone SE,PC 2560"` para filtrar) y `tools/chh.js URL` (qué capítulos son más altos que la pantalla).
 - `_headers`: `/img/*` se guarda 1 día en caché, por eso existe la huella en la dirección.
 
 ## Herramientas de prueba (`/home/claude/tools`)
