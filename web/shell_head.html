@@ -346,4 +346,9 @@ html{transition:background .35s ease}
 .ch.home .pfig img{transition:opacity .5s .05s ease,transform .25s ease}
 /* la figura del panel de mitología no choca con el botón de la esquina ni con el borde de arriba */
 .pan.myth .pfig img{height:70%;top:57%}
+/* sin drop-shadow en las fotos: Safari (iPhone) dibuja la sombra recortada al recuadro de la imagen y aparece un rectángulo oscuro; en su lugar, una sombra suave en el piso */
+.ch .fig img,.pan.main .pfig img,.pan.myth .pfig img,.pan.dl .pfig img{filter:none!important}
+.ch .fig::after{content:"";position:absolute;left:24%;right:24%;bottom:5%;height:9%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.3),transparent);z-index:-1;pointer-events:none}
+#ch-alas .fig::after,#ch-items .fig::after,#ch-mapas .fig::after{display:none}
+.ch .fig{isolation:isolate}
 </style>
