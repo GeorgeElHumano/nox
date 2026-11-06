@@ -633,7 +633,8 @@
     "boots": "Botas"
    },
    "wn": "Alas de Guyra Pytã",
-   "wn2": "Alas de Tau Pytã"
+   "wn2": "Alas de Tau Pytã",
+   "wn3": "Alas de Kuarahy"
   },
   "hechicero": {
    "name": "Hechicero",
@@ -728,7 +729,8 @@
     "boots": "Sandalias"
    },
    "wn": "Alas de Jasy",
-   "wn2": "Alas de Ñamandu"
+   "wn2": "Alas de Ñamandu",
+   "wn3": "Alas de Jasy Ñamandu"
   },
   "gladiador": {
    "name": "Gladiador",
@@ -823,7 +825,8 @@
     "boots": "Grebas"
    },
    "wn": "Alas de Tupã",
-   "wn2": "Alas de la Tormenta"
+   "wn2": "Alas de la Tormenta",
+   "wn3": "Alas de Ára Pytã"
   },
   "mburuvicha": {
    "name": "Mburuvicha",
@@ -918,7 +921,8 @@
     "boots": "Botas"
    },
    "wn": "Capa de Guyra Hũ",
-   "wn2": "Alas de Guyra Hũ Guasu"
+   "wn2": "Alas de Guyra Hũ Guasu",
+   "wn3": "Alas de Ñanderuvusu"
   },
   "arquera": {
    "name": "Arquera",
@@ -1013,7 +1017,8 @@
     "boots": "Botas"
    },
    "wn": "Alas de Mainumby",
-   "wn2": "Alas de Arasy"
+   "wn2": "Alas de Arasy",
+   "wn3": "Alas de Mainumby"
   }
  },
  "lv": [
@@ -1159,6 +1164,11 @@
    "name": "Gema de Yvy",
    "col": "#33f07e",
    "desc": "Agrega +4 de opción adicional, hasta +16. 50% de éxito. Si falla, se pierde la opción."
+  },
+  "mainumby": {
+   "name": "Pluma de Mainumby",
+   "col": "#39f0c8",
+   "desc": "Pluma del mainumby, el colibrí mensajero de Ñamandu. Se usa en el Caldero de Kerana para crear las alas de tercera generación. La sueltan los jefes y los élites de nivel 50 o más."
   },
   "kerana": {
    "name": "Gema de Kerana",

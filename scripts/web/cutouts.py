@@ -104,10 +104,11 @@ def lineup(order,H,scales,lift,name,gap=-.05,w=1600):
         b=bs[i];m=int(bw[i]*.12);box=(max(0,b[0]-m),0,min(ims[i].width,b[1]+m),ims[i].height)
         c.alpha_composite(ims[i].crop(box),(pos[i][0]+box[0],pos[i][1]))
     savew(trim(c,.02),name,w)
-V5=([.62,.8,1,.8,.62],[230,110,0,110,230])
+V5=([.8,.9,1,.9,.8],[120,55,0,55,120])
+# separación positiva: cada portador queda entero y a la vista; solo las puntas de las alas se cruzan por detrás
 if len(R)==5:
-    lineup(['hechicero','arquera','caballero','gladiador','mburuvicha'],1100,*V5,'hero_portadores')
-    lineup(['mburuvicha','gladiador','caballero','arquera','hechicero'],1100,*V5,'cut_razas')
+    lineup(['hechicero','arquera','caballero','gladiador','mburuvicha'],1100,*V5,'hero_portadores',gap=.22)
+    lineup(['mburuvicha','gladiador','caballero','arquera','hechicero'],1100,*V5,'cut_razas',gap=.22)
 # ---- sets: retratos de ficha y recorte del capítulo
 S={}
 for f in glob.glob(AS+'/*_[0-6].png'):
@@ -117,18 +118,21 @@ for f in glob.glob(AS+'/*_[0-6].png'):
     c=canvas(max(im.width,int(im.height*3/4)),max(im.height,int(im.width*4/3)));c.paste(im,((c.width-im.width)//2,c.height-im.height));savew(c,f'set_{cls}_{t}',720)
 if all((k,6) in S for k in CLS):
     R0=R;R={k:S[(k,6)] for k in CLS}
-    lineup(['hechicero','caballero','gladiador','mburuvicha','arquera'],1100,*V5,'cut_sets')
+    lineup(['hechicero','caballero','gladiador','mburuvicha','arquera'],1100,*V5,'cut_sets',gap=.12)
     R=R0
 # ---- ítems: armas en abanico, el escudo atrás
 names=['caballero_weapon','hechicero_weapon','arquera_weapon','gladiador_weapon','mburuvicha_weapon']
 if all(ok(f'{BIG}/{n}.png') for n in names+['shield']):
     c=canvas(1400,1050)
-    sh=trim(Image.open(f'{BIG}/shield.png'),.02);sh=fit(sh,520,760);c.alpha_composite(sh,(700-sh.width//2,1050-sh.height-40))
+    sh=trim(Image.open(f'{BIG}/shield.png'),.02);sh=fit(sh,430,620);c.alpha_composite(sh,(700-sh.width//2,1050-sh.height-60))
     for i,n in enumerate(names):
         im=trim(Image.open(f'{BIG}/{n}.png'),.02)
         # cada arma apunta hacia arriba y se abre en abanico
+        # los íconos vienen en diagonal (empuñadura abajo a la izquierda): se enderezan antes de armar el abanico
+        a=np.asarray(im.getchannel('A'))>40;h0,w0=a.shape;bl=a[h0//2:,:w0//2].sum();br=a[h0//2:,w0//2:].sum()
+        im=trim(im.rotate(45 if bl>=br else -45,expand=True,resample=Image.BICUBIC),.02)
         if im.width>im.height:im=im.rotate(90,expand=True)
-        im=fit(im,260,820);ang=-34+i*17;im=im.rotate(-ang,expand=True,resample=Image.BICUBIC)
+        im=fit(im,230,860);ang=-34+i*17;im=im.rotate(-ang,expand=True,resample=Image.BICUBIC)
         import math;x=int(700+math.sin(math.radians(ang))*330-im.width//2);y=int(1050-im.height-20-abs(ang)*1.2)
         c.alpha_composite(im,(max(0,x),max(0,y)))
     savew(c,'cut_items',1400)

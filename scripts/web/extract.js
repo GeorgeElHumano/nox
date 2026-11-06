@@ -15,7 +15,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
     const mobs={};for(const [k,m] of Object.entries(G.MOBS)){const zs=ZK.filter(z=>(G.ZONES[z].spots||[]).some(s=>s.m===k)||(G.ZONES[z].boss&&G.ZONES[z].boss[0]===k)||m.zone===z);mobs[k]={name:m.name,lvl:m.lvl,boss:!!m.boss,ficha:(G.MYTH[k]&&G.MYTH[k].ficha)||m.ficha||'',zones:zs};}
     const cls={};for(const [k,c] of Object.entries(G.CLASSES)){cls[k]={name:c.name,evo:c.evo,base:c.base,desc:c.desc,hint:c.hint,unlock:c.unlock||null,
       skills:(G.CSK[k]||[]).map(id=>{const s=G.SKILLS[id];return {cls:k,name:s.name,lvl:s.lvl,evo:!!s.evo,mp:s.mp,desc:s.desc};}),
-      sets:G.SETN[k].map((n,i)=>({n,col:hex(G.TIERGLOW[k][i])})),w:G.WNAME[k],slots:G.SLOTN[k],wn:G.WINGN[k],wn2:G.WINGN2[k]};}
+      sets:G.SETN[k].map((n,i)=>({n,col:hex(G.TIERGLOW[k][i])})),w:G.WNAME[k],slots:G.SLOTN[k],wn:G.WINGN[k],wn2:G.WINGN2[k],wn3:G.WINGN3?G.WINGN3[k]:null};}
     const loot={};for(const [k,L] of Object.entries(G.LOOTDEF)){if(!L||L.length<3)continue;loot[k]={t1:L[0][1],t2:L[1][1],slot:L[2][1],uniq:L[2][2],flavor:L[2][3]};}
     const gems={};for(const [k,g] of Object.entries(G.GEMS))gems[k]={name:g.name,col:g.col,desc:g.desc};
     const pots={};for(const [k,x] of Object.entries(G.POTS))pots[k]={name:x.name,kind:x.kind,pct:x.pct,add:x.add,price:x.price};
