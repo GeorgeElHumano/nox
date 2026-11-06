@@ -11,6 +11,7 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 - **Bart Kelsey** — CC BY 3.0 — Level Up! (OpenGameArt).
 - **dklon** — CC BY 3.0 — Whistles (OpenGameArt).
 - **CC0 (dominio público)**: Kenney (50 RPG Sound Effects, Interface Sounds), rubberduck (80 CC0 RPG SFX, 80 CC0 Creature SFX 1 y 2), artisticdude (RPG Sound Pack), jaggedstone (Magic Spell SFX), trazzz123 (Deep Monster Roar), caveboytup (Wolf Monster), fvcalderan (Insect Sounds), y los paquetes "Bear growls", "Monster snarls" y "Steam release sounds" de OpenGameArt.
+- **Sonidos propios de NOX (CC0)**: la gema y el aviso de ítem raro están hechos por síntesis, sin muestras de terceros.
 
 ## Efectos (assets/s)
 
@@ -138,14 +139,14 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 | mu_evil.mp3 | leo_heal/21_Debuff_01.wav | Leohpaz | CC BY 4.0 |
 | mu_explode.mp3 | leo_magic/04_Fire_explosion_04_medium.wav | Leohpaz | CC BY 4.0 |
 | mu_fireball.mp3 | rd80/spell_fire_02.ogg | rubberduck (OpenGameArt) | CC0 |
-| mu_gem.mp3 | lrsf_coins/Wav/Gems_Few/Gems_Few_01.wav | Little Robot Sound Factory | CC BY 3.0 |
+| mu_gem.mp3 | síntesis propia (cristal) | NOX | CC0 |
 | mu_heal.mp3 | leo_heal/02_Heal_02.wav | Leohpaz | CC BY 4.0 |
 | mu_levelup.mp3 | levelup/Level Up!/orchestra.wav | Bart Kelsey (OpenGameArt) | CC BY 3.0 |
 | mu_lightning.mp3 | leo_magic/18_Thunder_02.wav | Leohpaz | CC BY 4.0 |
 | mu_potion.mp3 | artd/RPG Sound Pack/inventory/bubble2.wav | artisticdude (OpenGameArt) | CC0 |
 | mu_rage.mp3 | leo_magic/45_Charge_05.wav | Leohpaz | CC BY 4.0 |
 | mu_rain.mp3 | mezcla: bow_attack_01.ogg, arrowfly_01.ogg, arrowfly_02.ogg, arrowfly_01.ogg, arrowfly_02.ogg | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
-| mu_rare.mp3 | fsl/Fantasy Sound Library/Wav/Jingle_Achievement_00.wav | Little Robot Sound Factory | CC BY 3.0 |
+| mu_rare.mp3 | síntesis propia (aviso de dos notas) | NOX | CC0 |
 | mu_shield.mp3 | leo_heal/17_Def_buff_01.wav | Leohpaz | CC BY 4.0 |
 | mu_stab.mp3 | rd80/blade_02.ogg | rubberduck (OpenGameArt) | CC0 |
 | mu_swell.mp3 | leo_heal/16_Atk_buff_04.wav | Leohpaz | CC BY 4.0 |

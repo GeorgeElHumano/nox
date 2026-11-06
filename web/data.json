@@ -398,7 +398,7 @@
    "name": "Moñái",
    "lvl": 68,
    "boss": true,
-   "ficha": "Moñái, tercer hijo: serpiente enorme, color de tierra y pasto, con dos cuernos rectos y coloridos que usa como antenas para hipnotizar a las aves; señor de los campos abiertos, trepa a los árboles y roba en los pueblos. Lo venció el sacrificio de Porâsý.",
+   "ficha": "Moñái, tercer hijo: serpiente enorme del color de la tierra colorada, con cresta de fuego, colmillos que gotean veneno y dos cuernos largos que usa como antenas para hipnotizar a las aves; señor de los campos abiertos, trepa a los árboles y roba en los pueblos. Lo venció el sacrificio de Porâsý.",
    "zones": [
     "esteros"
    ]
@@ -550,7 +550,7 @@
     "ene": 10
    },
    "desc": "Espada y escudo. Mucha vida y gran daño cuerpo a cuerpo.",
-   "hint": "Fuerza sube el daño. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida (3 por punto). Energía sube el maná.",
+   "hint": "Fuerza sube el daño de la espada. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida (3 por punto). Energía sube el maná y el daño de sus técnicas.",
    "unlock": null,
    "skills": [
     {
@@ -646,7 +646,7 @@
     "ene": 30
    },
    "desc": "Fuego y espíritus del monte. Daño mágico a distancia.",
-   "hint": "Energía sube el daño mágico y el maná. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida. Fuerza casi no le sirve.",
+   "hint": "Energía sube el daño mágico y el maná. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida. Fuerza le da un poco de defensa.",
    "unlock": null,
    "skills": [
     {
@@ -832,13 +832,13 @@
    "name": "Mburuvicha",
    "evo": "Mburuvicha Guasu",
    "base": {
-    "fue": 26,
+    "fue": 18,
     "agi": 20,
-    "vit": 20,
-    "ene": 25
+    "vit": 22,
+    "ene": 31
    },
-   "desc": "Señor de guerra guaraní. Cetro, capa y el cuervo Guyra Hũ, que caza por él.",
-   "hint": "Fuerza sube el daño del cetro. Energía hace más fuerte al cuervo Guyra Hũ. Gana 7 puntos por nivel. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida.",
+   "desc": "Señor de guerra guaraní. Cetro, capa y el cuervo Guyra Hũ, que caza por él. Pelea con la energía de los antiguos.",
+   "hint": "Energía es su poder: sube el daño del cetro, la fuerza del cuervo Guyra Hũ y el maná. Gana 7 puntos por nivel. Fuerza suma un poco de daño. Agilidad sube la defensa y la velocidad. Vitalidad sube la vida.",
    "unlock": 50,
    "skills": [
     {

@@ -29,7 +29,12 @@ let shot=null;
       await p.evaluate(k=>window.__NOX.STUDIO.mob(k),k);
       // esperar modelos externos (hasta 12 s) y que se re-arme
       for(let i=0;i<44;i++){await wait(500);const st=await p.evaluate(()=>{const e=window.__NOX.enemies[0];return e?{kind:e.kind,oad:!!(e.oad||e.mixer)}:null});if(st&&['glb','snake','scorp','lizard'].includes(st.kind)||i>40)break;}
-      await wait(800);await p.evaluate(()=>{const e=window.__NOX.enemies[0];if(e){const S=window.__NOX.STUDIO;S.frame(e.hgt,e.rad,.55,['snake','lizard','scorp'].includes(e.kind)||e.B&&e.B.len>3?.55:.28);const d=S.cam.clone().sub(S.look).multiplyScalar(+(window.__ZOOM||.8));S.cam.copy(S.look).add(d);}});await wait(400);
+      await wait(800);await p.evaluate(()=>{const X=window.__NOX,e=X.enemies[0];if(X.HERO)X.HERO.g.visible=false;if(e){const S=X.STUDIO;
+        /* encuadre por la caja real del modelo, en tres cuartos: se ve el cuerpo entero (cuernos, cola, cuello) y no solo la cara */
+        e.g.updateMatrixWorld(true);const bb=new THREE.Box3();e.g.traverse(o=>{if(o.isMesh&&o.visible&&o.geometry){o.geometry.computeBoundingBox();const b2=o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);bb.union(b2);}});
+        const c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());const low=['snake','lizard','scorp'].includes(e.kind)||e.B&&e.B.len>3;
+        const rear=e.rear||e.m&&e.m.rear;const a=rear?1.45:1.25,pt=rear?.12:low?.42:.22,D=(Math.max(sz.y,Math.hypot(sz.x,sz.z)*.8)*1.25+1.0)*(+(window.__ZOOM||.8))*1.12;
+        S.look.copy(c);S.cam.set(c.x+Math.sin(a)*Math.cos(pt)*D,c.y+Math.sin(pt)*D,c.z+Math.cos(a)*Math.cos(pt)*D);window.__GB=[c.toArray(),sz.toArray()];}});await wait(1500);console.log('caja',k,JSON.stringify(await p.evaluate(()=>window.__GB)));
       await shot(`${OUT}/${k}.png`);console.log('foto',k);}}
   if(MODE==='sets'){const LV=+(process.argv[5]||0);const classes=ONLY.length?ONLY:['caballero','hechicero','arquera','gladiador','mburuvicha'];
     await p.evaluate(()=>{window.__NOX.STUDIO.hero();});
