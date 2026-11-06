@@ -52,8 +52,18 @@ def guard(path,im):
         except Exception:STATS['cambiadas']+=1
     else:STATS['nuevas']+=1
     return True
+def soft(im,F=.07):
+    """Bordes suaves: el resplandor que llega al borde de la foto se apaga de a poco (sin recuadro) y se borra la neblina casi invisible."""
+    im=im.convert('RGBA');a=np.asarray(im.getchannel('A')).astype(np.float32);h,w=a.shape
+    f=max(4,int(min(w,h)*F));y=np.minimum(np.arange(h),np.arange(h)[::-1])[:,None];x=np.minimum(np.arange(w),np.arange(w)[::-1])[None,:]
+    t=np.clip(np.minimum(y,x)/f,0,1);fade=t*t*(3-2*t)
+    k=np.clip((a-40)/160,0,1)   # lo sólido (cuerpo) no se toca; lo translúcido (brillo, humo) se apaga hacia el borde
+    a2=a*(k+(1-k)*fade)
+    a2=np.where(a2<8,0,np.where(a2<24,(a2-8)*1.5,a2))
+    im.putalpha(Image.fromarray(np.clip(a2,0,255).astype(np.uint8)));return im
 def savew(im,name,w,q=86):
     if im.width>w:im=im.resize((w,round(im.height*w/im.width)),Image.LANCZOS)
+    im=soft(im)
     path=f'{O}/{name}.webp'
     if not guard(path,im):return
     im.save(path,'WEBP',quality=q,method=6)
