@@ -119,6 +119,9 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Portada: el héroe va a `SELY=.09` (el empedrado está a .03); `updLife` esconde a los vecinos entre la cámara y el héroe en el menú. Prueba: `tools/selhero.js`.
 - Arena: al perder, `duelend` deja al jugador muerto (animación de muerte) hasta volver a Asunción a los 9 s. Prueba: `tools/dueltest.js` con `__NOX.duelTest`.
 
+- Arena (tablero): `duelTick` arma el tablero una vez por duelo (`hud._key`) y después solo cambia anchos y números, para que la barra clara de daño (`i.tr`, con retraso) se anime; `low` titila bajo 25 % y `hit` sacude al recibir. `body.induel` oculta la misión y el reloj. En celular acostado va a 126 px del borde y mide 50vw.
+- Grupo: `#liveInv`/`#duelInv` van al centro (24vh), grandes y con brillo; la invitación a grupo suena. `bigNote(html,bad)` muestra avisos grandes arriba al centro (entra al grupo, se une, sale, se disuelve) comparando la lista de miembros en el mensaje `party`. Prueba: `tools/duelhud.js` (usa `__NOX.duelSet` y `__NOX.liveTest`).
+
 ## Assets del juego
 
 - `assets/*.json`: modelos.
