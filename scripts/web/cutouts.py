@@ -136,19 +136,25 @@ if all((k,6) in S for k in CLS):
 # ---- ítems: armas en abanico, el escudo atrás
 names=['caballero_weapon','hechicero_weapon','arquera_weapon','gladiador_weapon','mburuvicha_weapon']
 if all(ok(f'{BIG}/{n}.png') for n in names+['shield']):
-    c=canvas(1400,1050)
-    sh=trim(Image.open(f'{BIG}/shield.png'),.02);sh=fit(sh,430,620);c.alpha_composite(sh,(700-sh.width//2,1050-sh.height-60))
-    for i,n in enumerate(names):
+    # vitrina: cada arma parada en su columna, separadas, y el escudo al centro; nada se encima
+    ims=[]
+    for n in names:
         im=trim(Image.open(f'{BIG}/{n}.png'),.02)
-        # cada arma apunta hacia arriba y se abre en abanico
-        # los íconos vienen en diagonal (empuñadura abajo a la izquierda): se enderezan antes de armar el abanico
         a=np.asarray(im.getchannel('A'))>40;h0,w0=a.shape;bl=a[h0//2:,:w0//2].sum();br=a[h0//2:,w0//2:].sum()
         im=trim(im.rotate(45 if bl>=br else -45,expand=True,resample=Image.BICUBIC),.02)
         if im.width>im.height:im=im.rotate(90,expand=True)
-        im=fit(im,230,860);ang=-34+i*17;im=im.rotate(-ang,expand=True,resample=Image.BICUBIC)
-        import math;x=int(700+math.sin(math.radians(ang))*330-im.width//2);y=int(1050-im.height-20-abs(ang)*1.2)
-        c.alpha_composite(im,(max(0,x),max(0,y)))
+        ims.append(fit(im,200,820))
+    sh=fit(trim(Image.open(f'{BIG}/shield.png'),.02),300,420)
+    row=ims[:2]+[sh]+ims[2:];W=1600;c=canvas(W,1000);col=W/len(row)
+    for i,im in enumerate(row):
+        x=int(col*i+col/2-im.width/2);y=int(960-im.height) if im is not sh else int(960-im.height-120)
+        c.alpha_composite(im,(x,y))
     savew(c,'cut_items',1400)
+# ---- mascotas
+PE=WORK+'/pets'
+if os.path.isdir(PE):
+    for f in glob.glob(PE+'/pet_*.png'):
+        im=trim(Image.open(f),.06);sz=max(im.width,im.height);c=canvas(sz,sz);c.paste(im,((sz-im.width)//2,(sz-im.height)//2));savew(c,os.path.basename(f)[:-4],360)
 # ---- íconos de inventario a 128 px (ic/)
 IC=WORK+'/icons'
 if os.path.isdir(IC):

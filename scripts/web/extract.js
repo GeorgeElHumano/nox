@@ -19,7 +19,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
     const loot={};for(const [k,L] of Object.entries(G.LOOTDEF)){if(!L||L.length<3)continue;loot[k]={t1:L[0][1],t2:L[1][1],slot:L[2][1],uniq:L[2][2],flavor:L[2][3]};}
     const gems={};for(const [k,g] of Object.entries(G.GEMS))gems[k]={name:g.name,col:g.col,desc:g.desc};
     const pots={};for(const [k,x] of Object.entries(G.POTS))pots[k]={name:x.name,kind:x.kind,pct:x.pct,add:x.add,price:x.price};
-    const pets={};for(const [k,x] of Object.entries(G.PETS))pets[k]={name:x.n,col:x.col,desc:x.desc};
+    const pets={};for(const [k,x] of Object.entries(G.PETS))pets[k]={name:x.n,col:x.col,desc:x.desc,price:x.price};
     const rar={};for(const [k,x] of Object.entries(G.RAR))rar[k]={n:x.n,c:x.c};
     const ancs={};for(const [k,x] of Object.entries(G.ANCS))ancs[k]={n:x.n,b:x.b.map(([n,t])=>`${n}${n===2?' piezas':''}: ${t}`)};
     const npcs={};for(const [k,n] of Object.entries(G.NPCS)){const g=G.NPC_GEAR[k]||{};npcs[k]={name:n.name,role:n.role,greet:n.greet,cls:g.cls,t:g.t,wg:g.wg,lv:g.lv};}
