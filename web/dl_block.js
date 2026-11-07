@@ -1,7 +1,7 @@
 /* ===== Enlaces de descarga ===== */
 const VERSION='1.0.6';
 const REL='https://github.com/GeorgeElHumano/nox/releases/latest/download/';
-const LINKS={android:REL+'NOX.apk',windows:REL+'NOX-Windows.zip',mac:REL+'NOX-Mac-AppleSilicon.zip',macIntel:REL+'NOX-Mac-Intel.zip',web:'jugar/'};
+const LINKS={android:REL+'NOX.apk',windows:REL+'NOX-Instalador.exe',mac:REL+'NOX-Mac-AppleSilicon.zip',macIntel:REL+'NOX-Mac-Intel.zip',web:'jugar/'};
 const PREVIEW=/claude/.test(location.hostname);
 const GAME_PREVIEW='https://claude.ai/artifact/DFUdRNZw2EpYzqMqfuYVtU';
 const webURL=()=>PREVIEW?GAME_PREVIEW:new URL(LINKS.web,location.href).href;
@@ -22,13 +22,13 @@ const PLAT=[
  {id:'android',name:'Android',req:'Android 7 o superior',sub:'APK, fuera de Play Store',btn:'Descargar NOX.apk',
   steps:['Descargá <b>NOX.apk</b> desde el celular.','Abrí el archivo desde la notificación de descarga o desde la carpeta <b>Descargas</b>.','Si Android lo pide, tocá <b>Configuración</b> y activá <b>Permitir de esta fuente</b> para tu navegador. Después volvé atrás.','Tocá <b>Instalar</b>. Si Play Protect muestra un aviso, tocá <b>Más detalles</b> y luego <b>Instalar de todas formas</b>.','Abrí NOX desde su ícono. El juego se actualiza solo cuando tenés internet.'],
   note:'El aviso aparece porque NOX se instala por fuera de Play Store. Descargá la APK solo desde esta página.'},
- {id:'windows',name:'Windows',req:'Windows 10 y 11 · 64 bits',sub:'Comprimido, unos 140 MB',btn:'Descargar NOX-Windows.zip',
-  steps:['Descargá <b>NOX-Windows.zip</b>.','Hacé clic derecho en el archivo, elegí <b>Extraer todo</b> y guardalo donde quieras, por ejemplo en Documentos.','Abrí la carpeta <b>NOX</b> y hacé doble clic en <b>NOX.exe</b>.','Si aparece <b>Windows protegió tu PC</b>, tocá <b>Más información</b> y después <b>Ejecutar de todas formas</b>.','Para tenerlo a mano, hacé clic derecho en NOX.exe y elegí <b>Anclar a Inicio</b>. <b>F11</b> alterna pantalla completa.'],
-  note:'El aviso de Windows aparece porque el juego todavía no tiene firma digital. Con internet, NOX.exe abre siempre la última versión.'},
+ {id:'windows',name:'Windows',req:'Windows 10 y 11 · 64 bits',sub:'Instalador, unos 140 MB',btn:'Descargar el instalador',
+  steps:['Descargá <b>NOX-Instalador.exe</b> y abrilo.','Si aparece <b>Windows protegió tu PC</b>, tocá <b>Más información</b> y después <b>Ejecutar de todas formas</b>.','Se instala solo, sin pedir permisos de administrador, y deja el acceso directo <b>NOX</b> en el escritorio y en el menú Inicio.','Abrí NOX desde ese acceso directo. <b>F11</b> alterna pantalla completa.'],
+  note:'El aviso de Windows aparece porque el juego todavía no tiene firma digital. Con internet, NOX abre siempre la última versión. Para quitarlo: Configuración → Aplicaciones → NOX → Desinstalar.'},
  {id:'mac',name:'Mac',req:'macOS 11 o superior',sub:'Apple Silicon e Intel',btn:'Mac con Apple Silicon (M1, M2, M3, M4)',btn2:'Mac con Intel',
   steps:['Elegí tu tipo de Mac: abrí el <b>menú Apple → Acerca de esta Mac</b>. Si dice <b>Chip Apple M</b>, bajá la de Apple Silicon. Si dice <b>Intel</b>, la de Intel.','Hacé doble clic en el .zip descargado para descomprimirlo. Aparece <b>NOX.app</b>.','Arrastrá <b>NOX.app</b> a la carpeta <b>Aplicaciones</b>.','Abrí NOX. La primera vez macOS avisa que no puede verificar al desarrollador: tocá <b>Listo</b>.','Andá a <b>Ajustes del Sistema</b>, entrá en <b>Privacidad y seguridad</b>, bajá hasta el mensaje de NOX y tocá <b>Abrir igualmente</b>.','Confirmá con tu contraseña. Desde ahí NOX abre normal, como cualquier app.'],
   note:'El aviso aparece porque NOX todavía no está firmado por Apple. Solo hay que aprobarlo una vez.'},
  {id:'ios',name:'iPhone y iPad',req:'Safari · sin App Store',sub:'Se instala desde el navegador',btn:'Abrir el juego',
-  steps:['Abrí la dirección del juego en <b>Safari</b>.','Tocá el botón <b>Compartir</b>, el cuadrado con una flecha hacia arriba.','Bajá en el menú y tocá <b>Agregar a inicio</b>.','Tocá <b>Agregar</b>. El ícono de NOX queda en tu pantalla de inicio.','Abrí NOX desde ese ícono: se ve a pantalla completa y se actualiza solo.'],
+  steps:['Abrí la dirección del juego en <b>Safari</b>.','Tocá <b>Compartir</b>: el botón de abajo, o el cuadrado con una flecha hacia arriba de Safari (en iOS 26 está dentro del menú <b>···</b>).','Bajá en el menú y tocá <b>Agregar a inicio</b>.','Tocá <b>Agregar</b>. El ícono de NOX queda en tu pantalla de inicio.','Abrí NOX desde ese ícono: se ve a pantalla completa y se actualiza solo.'],
   note:'Por ahora NOX no está en la App Store, así que en iPhone y iPad se instala de esta forma. Tiene que ser desde Safari: Chrome en iPhone no muestra la opción.',copy:true}
 ];
