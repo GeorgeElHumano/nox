@@ -610,6 +610,20 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
 #sel .acct{background:rgba(12,13,36,.72);border:0;box-shadow:inset 0 0 0 1px var(--wline);border-radius:999px}
 #sel .facepick b{color:var(--wgold-hi)}
 #sel .credits a{color:var(--wgold-hi)}
+/* celular vertical, lista de personajes: como antes, el personaje arriba a la vista y todo lo demás abajo y compacto */
+@media (orientation:portrait){
+ #sel:not(.creating) .web-eb{display:none}
+ #sel:not(.creating) .logo{width:min(290px,74vw);margin:-4px 0 -8px -8px}
+ #sel:not(.creating) .slogan{font-size:clamp(15px,4.3vw,18px);line-height:1.2;max-width:none;margin:2px 0 0}
+ #sel:not(.creating) .sel-head p{font-size:13.5px;line-height:1.4;margin:4px 0 0}
+ #sel:not(.creating) .sel-in{gap:8px}
+ #sel:not(.creating) #acctBar{gap:6px}
+ #sel:not(.creating) .acct{font-size:12px;padding:5px 11px}
+ #sel:not(.creating) #acctBar .btn{padding:5px 13px;font-size:12px}
+ #sel .credits{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;font-size:11px;line-height:1.4}
+ #sel .credits.open{display:block}
+}
+@media (orientation:portrait) and (max-height:780px){#sel:not(.creating) .sel-head p{display:none}}
 /* pantalla de carga */
 #boot{background:radial-gradient(1px 1px at 12% 22%,#fff9 50%,transparent),radial-gradient(1px 1px at 78% 16%,#fffa 50%,transparent),radial-gradient(1.5px 1.5px at 64% 70%,#f6d892cc 50%,transparent),radial-gradient(1px 1px at 30% 80%,#fff8 50%,transparent),radial-gradient(1px 1px at 88% 58%,#fff9 50%,transparent),radial-gradient(1.5px 1.5px at 20% 52%,#f6d892aa 50%,transparent),radial-gradient(1px 1px at 46% 12%,#fff7 50%,transparent),radial-gradient(ellipse at 50% 40%,#2c3172 0%,var(--night) 42%,var(--night3) 100%);color:var(--paper);font-family:var(--body)}
 #boot .b-eb{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:15px;letter-spacing:.06em;color:var(--wgold-hi);margin-top:-6px}
@@ -767,7 +781,7 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
 </g></svg><div class="eyebrow web-eb">Un MMORPG hecho en Paraguay</div><div class="slogan">La Noche Larga cayó sobre el Paraguay. <em>Vos sos quien la enfrenta.</em></div><p>Un MMORPG de aventuras en el Paraguay medieval. Elegí tu clase, repartí tus puntos, mejorá tu equipo con gemas y enfrentá a los siete hijos de Tau y Kerana.</p></div>
   <div id="acctBar"></div>
   <div id="selBody"></div>
-  <div class="credits">Personajes, ropa, pelo, animaciones y armas de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a>; suelos de <a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a>: CC0 (dominio público). Caras, armaduras, jeguaka, yvyra'i y bastones hechos para NOX. Bestias, criaturas míticas, árboles, sonidos y música: arte de <a href="https://play0ad.com" target="_blank" rel="noopener">0 A.D.</a> © Wildfire Games, licencia <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (adaptado: texturas y colores modificados). Efectos de sonido también de Little Robot Sound Factory (CC BY 3.0), Leohpaz (CC BY 4.0), qubodup, Bart Kelsey y dklon (CC BY 3.0), y Kenney, rubberduck, artisticdude y otros autores de OpenGameArt (CC0); detalle en CREDITOS-SONIDO.md. Mascotas y monstruos nuevos: Ultimate Monsters y Ultimate Animated Animals de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y Skeletons de <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a> (CC0); hada de <a href="https://github.com/Hankx-Studio/wish-weaver" target="_blank" rel="noopener">Wish Weaver</a> © 2026 Chengyang Tu y Hongyang Xu, licencia MIT (simplificada).</div>
+  <div class="credits" title="Tocá para ver todos los créditos" onclick="if(event.target.tagName!=='A')this.classList.toggle('open')">Personajes, ropa, pelo, animaciones y armas de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a>; suelos de <a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a>: CC0 (dominio público). Caras, armaduras, jeguaka, yvyra'i y bastones hechos para NOX. Bestias, criaturas míticas, árboles, sonidos y música: arte de <a href="https://play0ad.com" target="_blank" rel="noopener">0 A.D.</a> © Wildfire Games, licencia <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (adaptado: texturas y colores modificados). Efectos de sonido también de Little Robot Sound Factory (CC BY 3.0), Leohpaz (CC BY 4.0), qubodup, Bart Kelsey y dklon (CC BY 3.0), y Kenney, rubberduck, artisticdude y otros autores de OpenGameArt (CC0); detalle en CREDITOS-SONIDO.md. Mascotas y monstruos nuevos: Ultimate Monsters y Ultimate Animated Animals de <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> y Skeletons de <a href="https://kaylousberg.com" target="_blank" rel="noopener">KayKit</a> (CC0); hada de <a href="https://github.com/Hankx-Studio/wish-weaver" target="_blank" rel="noopener">Wish Weaver</a> © 2026 Chengyang Tu y Hongyang Xu, licencia MIT (simplificada).</div>
 </div></div>
 <div id="fade"></div>
 
@@ -6322,7 +6336,7 @@ function setZoom(z){CAMZ=Math.min(1.4,Math.max(.55,z));clearTimeout(setZoom.t);s
 function updCamera(dt){
   if(mode==='select'){const port=innerHeight>innerWidth,a=Math.sin(T*.15)*.3+(port?0:.18),rr=port?8:5,cy=port?2.2:1.6;camT.set(Math.sin(a)*rr,cy,6.2+Math.cos(a)*rr);camera.position.copy(camT);
     const sh=!port&&innerWidth>=640?1.45:0;look.set(-Math.cos(a)*sh,.95,6.2+Math.sin(a)*sh);camera.lookAt(look);
-    const oy=port?Math.round(innerHeight*(window.__CREATING&&!$('#sel').hidden?.12:.31)):0;if(oy!==camOY){camOY=oy;if(oy)camera.setViewOffset(innerWidth,innerHeight,0,oy,innerWidth,innerHeight);else camera.clearViewOffset();}}
+    const oy=port?Math.round(innerHeight*(window.__CREATING&&!$('#sel').hidden?.12:.33)):0;if(oy!==camOY){camOY=oy;if(oy)camera.setViewOffset(innerWidth,innerHeight,0,oy,innerWidth,innerHeight);else camera.clearViewOffset();}}
   else if(STUDIO.on){if(camOY){camOY=0;camera.clearViewOffset();}camera.position.copy(STUDIO.cam);camera.lookAt(STUDIO.look);}
   else{if(camOY){camOY=0;camera.clearViewOffset();}const port=innerHeight>innerWidth,k=(port?1.4:1)*CAMZ,hd=6.6*k,vh=10.2*k,py=H(P.x,P.z);camT.set(P.x+Math.sin(CAM_YAW)*hd,py+vh,P.z+Math.cos(CAM_YAW)*hd);
     if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));look.set(P.x,py+1,P.z);HOLE.uHole.value=1;if(shake>0){camera.position.x+=R(-1,1)*shake*.35;camera.position.y+=R(-1,1)*shake*.35;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
