@@ -34,6 +34,8 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
   - El cuervo del Mburuvicha está en `ravenTick`: daño `.55*(1+ene/260)`.
   - En el Caballero, la energía sube las técnicas: `useSkill` multiplica `mult` por `1+ene/500`.
 - Mascotas: `PETS` (precio, sonido), `PETK`, `C.pets={imp,hada,rudolf}` (las tres a la vez, una casilla cada una en `#eqGrid`, `.pslot`). `petTick`/`petMove` dibujan una figura por mascota en `PETPOS`. Se venden en la tienda de Ña Eusebia (`shopStock('boticaria')`). Sonidos `pet_imp`, `pet_hada`, `pet_rudolf` (síntesis propia). Íconos en `assets/ui/pet_*.webp`. Partidas viejas: `C.pet` pasa a `C.pets` en `fixChar`.
+- Muertes de criaturas en código: `deadScorp` (panza arriba), `deadLizard` (sobre la panza), serpientes con `e.deadK` dentro de `updSnake`; poses guardadas en `e.dk0` y repuestas en `respawnEnemy`. Luisón usa el ataque del aguará (`ATK_FROM`). Teju Guasu salta el inicio de su muerte (`deathFrom`). Fantasmas: altura máxima .18.
+- Mascotas: Imp = `pet_bat` rojo con cuernos (`horns`), Rudolf = `c_a_stag` con pelaje (`fur`, UV de caja). Precios: Rudolf 800.000, Imp y Hada 1.500.000.
 - `fixChar()`: migraciones de las partidas guardadas. Si `c.mbE` no existe, al Mburuvicha se le devuelven los puntos una sola vez y se avisa con un toast en `enterGame`.
 - Mobs y mapas:
   - `MOBS`: definición de cada mob (`model:'quad'|'lizard'|'scorp'|'snake'|'biped'`).
