@@ -1079,8 +1079,8 @@ const trampleTex=canvasTex(256,(x,s)=>{const n=noiseArr(s,6,4),img=x.createImage
 const petalTex=canvasTex(32,(x,s)=>{x.fillStyle='#fff';x.beginPath();x.ellipse(s/2,s/2,s*.42,s*.22,.6,0,TAU);x.fill();});
 
 /* calidad gráfica y posprocesado */
-const Q={level:'medio'};try{const q=localStorage.getItem('tsm-calidad');const mob=matchMedia('(pointer:coarse)').matches,mem=navigator.deviceMemory||4,cpu=navigator.hardwareConcurrency||4;Q.auto=!q;Q.level=q||(mob?(mem<=3||cpu<=4?'bajo':'medio'):(mem<=4||cpu<=2?'medio':'alto'));}catch(e){Q.level='medio';}
-let composer=null,bloom=null,FINAL=null,windT=0,shake=0;
+const IS_MOB=matchMedia('(pointer:coarse)').matches;const Q={level:'medio'};try{const q=localStorage.getItem('tsm-calidad');const mob=matchMedia('(pointer:coarse)').matches,mem=navigator.deviceMemory||4,cpu=navigator.hardwareConcurrency||4;Q.auto=!q;Q.level=q||localStorage.getItem('tsm-calidad-auto')||(mob?(mem<=3||cpu<=4?'bajo':'medio'):(mem<=4||cpu<=2?'medio':'alto'));}catch(e){Q.level='medio';}
+let SHMOD=1;let composer=null,bloom=null,FINAL=null,windT=0,shake=0;
 const HAS_PP=!!(THREE.EffectComposer&&THREE.RenderPass&&THREE.UnrealBloomPass&&THREE.ShaderPass);
 const FinalShader={uniforms:{tDiffuse:{value:null},uVig:{value:1.15},uTime:{value:0},uRes:{value:new THREE.Vector2(1,1)},uSplit:{value:.3},uCurve:{value:.1},uSat:{value:.93}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
   fragmentShader:['uniform sampler2D tDiffuse;uniform float uVig;uniform float uTime;uniform vec2 uRes;uniform float uSplit;uniform float uCurve;uniform float uSat;varying vec2 vUv;',
@@ -1123,12 +1123,12 @@ async function benchRun(){if(BENCH.on)return;BENCH.on=true;const z0=Z.id,p0=[P.x
   document.getElementById('benchCopy').onclick=async()=>{try{if(navigator.share)await navigator.share({text:txt});else{await navigator.clipboard.writeText(txt);toast('Copiado: pegalo en WhatsApp');}}catch(e){try{await navigator.clipboard.writeText(txt);toast('Copiado');}catch(e2){}}};
   document.getElementById('benchClose').onclick=()=>{const m=document.getElementById('benchBox');if(m)m.remove();};window.__BENCH=res;}
 function setPR(pr){DYN.cur=pr;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);if(composer){composer.setPixelRatio(pr);composer.setSize(innerWidth,innerHeight);}}
-function dynRes(dt){if(mode!=='game'||paused)return;DYN.t+=dt;DYN.acc+=dt;DYN.n++;if(DYN.t<1.5)return;const a=DYN.acc/DYN.n;DYN.t=DYN.acc=DYN.n=0;const mn=innerWidth*innerHeight>1.2e6?.5:.75;const c30=FCAP.fps<=30,tLo=c30?1/26:1/33,tQ=c30?1/21:1/26,tHi=c30?1/29:1/54;/* si va muy lento baja de a 0,25 para recuperarse rápido */if(a>tLo&&DYN.cur>mn)setPR(Math.max(mn,+(DYN.cur-(a>1/18?.25:.15)).toFixed(2)));else if(a>tQ&&DYN.cur<=mn&&Q.auto&&Q.level!=='bajo'){DYN.slow=(DYN.slow||0)+1;if(DYN.slow>=2){DYN.slow=0;Q.level=Q.level==='alto'?'medio':'bajo';try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();toast('Ajustamos los gráficos a <em>'+Q.level+'</em> para que el juego corra más fluido');}}else if(a<tHi&&DYN.cur<DYN.base)setPR(Math.min(DYN.base,+(DYN.cur+.1).toFixed(2)));}
+function dynRes(dt){if(mode!=='game'||paused)return;DYN.t+=dt;DYN.acc+=dt;DYN.n++;if(DYN.t<1.5)return;const a=DYN.acc/DYN.n;DYN.t=DYN.acc=DYN.n=0;const mn=innerWidth*innerHeight>1.2e6?.5:.75;const c30=FCAP.fps<=30,tLo=c30?1/26:1/33,tQ=c30?1/21:1/26,tHi=c30?1/29:1/54;/* si va muy lento baja de a 0,25 para recuperarse rápido */if(a>tLo&&DYN.cur>mn)setPR(Math.max(mn,+(DYN.cur-(a>1/18?.25:.15)).toFixed(2)));else if(a>tQ&&DYN.cur<=mn&&Q.auto&&Q.level!=='bajo'){DYN.slow=(DYN.slow||0)+1;if(DYN.slow>=2){DYN.slow=0;Q.level=Q.level==='alto'?'medio':'bajo';/* se recuerda aparte, para que siga en automático */try{localStorage.setItem('tsm-calidad-auto',Q.level);}catch(e){}applyQuality();toast('Ajustamos los gráficos a <em>'+Q.level+'</em> para que el juego corra más fluido');}}else if(a<tHi&&DYN.cur<DYN.base)setPR(Math.min(DYN.base,+(DYN.cur+.1).toFixed(2)));}
 function applyQuality(){
   /* presupuesto de píxeles: en monitores grandes (PC) la resolución interna se limita para mantener los FPS */
   const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS */let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,mob?1.3:1.5):Math.min(dpr,mob?1.5:2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
   renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);DYN.base=pr;DYN.cur=pr;
-  sun.castShadow=Q.level!=='bajo';const ms=Q.level==='alto'&&!big&&!mob?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
+  sun.castShadow=Q.level!=='bajo';/* celular: la sombra cubre 40x40 m alrededor del jugador (en vez de 60x60): menos objetos en la pasada de sombra y sombras más nítidas */{const e=mob?20:30;if(sc.right!==e){sc.left=sc.bottom=-e;sc.right=sc.top=e;sc.updateProjectionMatrix();}}SHMOD=mob&&Q.level!=='alto'?2:1;const ms=Q.level==='alto'&&!big&&!mob?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
   if(composer){try{composer.renderTarget1.dispose();composer.renderTarget2.dispose();}catch(e){}composer=null;bloom=null;}
   if(HAS_PP&&Q.level!=='bajo'){try{const w=innerWidth,h=innerHeight;let rt=null;
       if(renderer.capabilities&&renderer.capabilities.isWebGL2&&THREE.WebGLMultisampleRenderTarget){rt=new THREE.WebGLMultisampleRenderTarget(Math.round(w*pr),Math.round(h*pr),{format:THREE.RGBAFormat,stencilBuffer:true});rt.samples=big?(Q.level==='alto'?2:0):(Q.level==='alto'?(mob?2:4):(mob?0:2));}
@@ -1136,7 +1136,7 @@ function applyQuality(){
       if(!rt)rt=new THREE.WebGLRenderTarget(Math.round(w*pr),Math.round(h*pr),{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:true});
       composer=new THREE.EffectComposer(renderer,rt);composer.setPixelRatio(pr);composer.setSize(w,h);
       composer.addPass(new THREE.RenderPass(scene,camera));
-      bloom=new THREE.UnrealBloomPass(new THREE.Vector2(big?w*.5:w,big?h*.5:h),.26,.55,.93);composer.addPass(bloom);
+      /* el brillo (bloom) son muchas pasadas de pantalla completa: en el celular solo en alto y a media resolución */if(!(mob&&Q.level!=='alto')){bloom=new THREE.UnrealBloomPass(new THREE.Vector2(big||mob?w*.5:w,big||mob?h*.5:h),.26,.55,.93);composer.addPass(bloom);}
       FINAL=new THREE.ShaderPass(FinalShader);FINAL.uniforms.uRes.value.set(w,h);composer.addPass(FINAL);}
     catch(e){console.error(e);composer=null;bloom=null;}}
 }
@@ -1693,14 +1693,14 @@ function bakeLocal(g){const by=new Map();for(const c of g.children){if(!c.isMesh
 /* las piezas chicas de un personaje (gemas, hebillas, remaches, plumas sueltas) no proyectan sombra:
    en el mapa de sombras miden menos de un texel y solo cuestan llamadas de dibujo */
 function shadowTrim(root,lim){lim=lim||.3;root.updateMatrixWorld(true);const bx=new THREE.Box3(),sz=new THREE.Vector3();let n=0;
-  root.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||!o.castShadow||!o.geometry)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bx.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);bx.getSize(sz);if(sz.length()<lim){o.castShadow=false;n++;}});return n;}
+  root.traverse(o=>{if(o.isMesh&&o.castShadow&&/^(Eyes|Eyebrows|Eyelashes)$/.test(o.name)){o.castShadow=false;n++;return;}/* ojos y cejas no se ven en la sombra */if(!o.isMesh||o.isSkinnedMesh||!o.castShadow||!o.geometry)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bx.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);bx.getSize(sz);if(sz.length()<lim){o.castShadow=false;n++;}});return n;}
 
 /* une el decorado quieto de la zona (casas, muros, puestos, faroles...) por material y por cuadrante de 24 m:
    se dibuja igual pero con muchas menos llamadas, en la vista y en la sombra */
 /* materiales cuyo sombreado mueve vértices según su posición local (viento, alas, boca, pelaje): no se pueden unir */
 function bakeVS(m){if(!m)return true;if(m.userData&&m.userData.vsLocal)return true;const f=m.onBeforeCompile;if(!f||f===THREE.Material.prototype.onBeforeCompile)return false;return /uWind|SWAY|uWP|uMouth|uTS=|instanceMatrix\[3\]/.test(String(f));}
 function mergeStatic(G,dyn,moved){if(!G||(Z&&Z.event)||window.__NOBAKE)return 0;G.updateMatrixWorld(true);const cells=new Map();const CS=24;const bx=new THREE.Box3(),c=new THREE.Vector3();
-  G.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||o.isInstancedMesh||o===G||o.children.length||dyn.has(o)||(moved&&moved.has(o))||o.userData.mergedW||o.userData.nobake||!o.geometry||!o.material||Array.isArray(o.material))return;
+  G.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||o.isInstancedMesh||o===G||o.children.length||dyn.has(o)||(moved&&moved.has(o))||o.userData.mergedW||o.userData.nobake||o.userData.shProxy||!o.geometry||!o.material||Array.isArray(o.material))return;
     if(o.onBeforeRender!==THREE.Object3D.prototype.onBeforeRender)return;
     for(let q=o.parent;q&&q!==G;q=q.parent){if(!q.visible||q.isBone||q.isSkinnedMesh||q.userData.nobake)return;}if(!o.visible)return;
     const g=o.geometry;if(!g.attributes.position||(g.morphAttributes&&Object.keys(g.morphAttributes).length)||g.drawRange.count!==Infinity&&g.drawRange.count<(g.index?g.index.count:g.attributes.position.count))return;
@@ -1717,7 +1717,10 @@ function mergeStatic(G,dyn,moved){if(!G||(Z&&Z.event)||window.__NOBAKE)return 0;
   return n;}
 /* personaje terminado (héroe, PNJ, otro jugador): se une lo rígido y las piezas chicas dejan de proyectar sombra */
 /* sombra por distancia: los mobs a más de 24 m no la proyectan (en gráficos alto, todos) */
-function mobShadow(e,d){const on=d<(Q.level==='alto'?36:24)||e.def.boss;if(e.shOn===on)return;if(!e.shL){e.shL=[];e.g.traverse(o=>{if(o.isMesh&&o.castShadow)e.shL.push(o);});}e.shOn=on;for(const o of e.shL)o.castShadow=on;}
+/* personajes del pueblo (PNJ, vecinos): proyectan sombra solo cerca del jugador (en el celular, 16 m) */
+function charShadow(o,g,d){if(!g)return;const on=d<(IS_MOB?16:Q.level==='alto'?36:24),eye=d<(IS_MOB?12:18);if(o.shOn===on&&o.eyOn===eye&&o.shG===g)return;if(o.shG!==g){o.shG=g;o.shL=[];o.eyL=[];g.traverse(x=>{if(x.isMesh&&x.castShadow)o.shL.push(x);if(x.isMesh&&/^(Eyes|Eyebrows|Eyelashes)$/.test(x.name))o.eyL.push(x);});o.shOn=o.eyOn=null;}
+  if(o.shOn!==on){o.shOn=on;for(const x of o.shL)x.castShadow=on;}/* de lejos los ojos y las cejas no se distinguen: se ocultan (2 llamadas menos por persona) */if(o.eyOn!==eye){o.eyOn=eye;for(const x of o.eyL)x.visible=eye;}}
+function mobShadow(e,d){const on=d<(IS_MOB?20:Q.level==='alto'?36:24)||e.def.boss;if(e.shOn===on)return;if(!e.shL){e.shL=[];e.g.traverse(o=>{if(o.isMesh&&o.castShadow)e.shL.push(o);});}e.shOn=on;for(const o of e.shL)o.castShadow=on;}
 /* mobs hechos con piezas (serpientes, bichos de 4 patas, alacranes): une las piezas quietas de cada grupo animado
    (cabeza, mandíbula, pata, pájaros) que comparten material, en el espacio del grupo. Lo que el código mueve por su cuenta
    (referenciado directo, alas, llamas, ojos) queda aparte. Los mobs con animación de modelo (mixer) no se tocan. */
@@ -2275,7 +2278,7 @@ function snakeModel(m,gold){
   return{g,rig,head,jaw,tube,geo,N,SEG,LEN,ridge,ridgeI,orbit:head.userData.birds||null,mats:[skin,belly],rad:1,hgt:m.rear?2.1:1.2,kind:'snake',rear:m.rear||0,thick:m.thick||1,venom:head.userData.venom||null,dragon:m.head==='dragon'};
 }
 const _sM=new THREE.Matrix4(),_sQ=new THREE.Quaternion(),_sTilt=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-.55),_sV=new THREE.Vector3(),_sX=new THREE.Vector3(),_sY=new THREE.Vector3(),_sZ=new THREE.Vector3();
-function updSnake(e,t,sp,lk){const {geo,N,SEG,LEN}=e,a=geo.attributes.position.array,ph=e.phase,pts=[],R=e.rear||0,TH=e.thick||1,DK=e.deadK||0;
+function updSnake(e,t,sp,lk){const {geo,N,SEG,LEN}=e,a=geo.attributes.position.array;if(!geo.attributes.normal)geo.setAttribute('normal',new THREE.BufferAttribute(new Float32Array(a.length),3));const nr=geo.attributes.normal.array,ph=e.phase,pts=[],R=e.rear||0,TH=e.thick||1,DK=e.deadK||0;
   for(let i=0;i<N;i++){const u=i/(N-1),z=.45-u*LEN,x=Math.sin(ph*.8-u*7)*.45*Math.min(1,u*3)*(1-DK*.35),rr0=(.33*Math.pow(1-u,.75)+.03)*TH,y=(.34*TH*(1-u*.65)+(!R&&i<5?(lk*.6+.15)*(1-i/5):0))*(1-DK)+rr0*.8*DK;pts.push([x,y,z]);}
   if(R){/* cuello erguido en S, como cobra: sube casi vertical y la cabeza mira hacia adelante y abajo; al atacar se lanza */
     const b=pts[R],H=(1.6-lk*.6)*(1-DK),D=1.05+lk*1.0+DK*1.4,sw=Math.sin(t*1.05+ph*.15)*.2*(1-DK);
@@ -2287,12 +2290,13 @@ function updSnake(e,t,sp,lk){const {geo,N,SEG,LEN}=e,a=geo.attributes.position.a
     let nx,nz;if(R&&i<=R){nx=sx0;nz=sz0;}else{const l=Math.hypot(tx,tz)||1;nx=tz/l;nz=-tx/l;}
     let ux=ty*nz,uy=tz*nx-tx*nz,uz=-ty*nx;const ul=Math.hypot(ux,uy,uz)||1;ux/=ul;uy/=ul;uz/=ul;if(i===0){T0x=tx;T0y=ty;T0z=tz;U0x=ux;U0y=uy;U0z=uz;}
     const u=i/(N-1),rr=(.33*Math.pow(1-u,.75)+.03)*(i<2?.85:1)*TH*(R&&i<R?.7+.3*Math.min(1,i/(R*.6)):1);
-    for(let j=0;j<SEG;j++){const an=j/SEG*TAU,cx=Math.cos(an),cy=Math.sin(an),k=(i*SEG+j)*3,ky=cy*rr*(cy<0?.8:.95);a[k]=p[0]+nx*cx*rr+ux*ky;a[k+1]=p[1]+uy*ky;a[k+2]=p[2]+nz*cx*rr+uz*ky;}
+    for(let j=0;j<SEG;j++){const an=j/SEG*TAU,cx=Math.cos(an),cy=Math.sin(an),k=(i*SEG+j)*3,f=cy<0?.8:.95,ky=cy*rr*f;a[k]=p[0]+nx*cx*rr+ux*ky;a[k+1]=p[1]+uy*ky;a[k+2]=p[2]+nz*cx*rr+uz*ky;
+      /* normal exacta de la elipse (antes computeVertexNormals: más de la mitad del tiempo de las serpientes) */const cyf=cy/f;let mx=nx*cx+ux*cyf,my=uy*cyf,mz=nz*cx+uz*cyf;const ml=Math.hypot(mx,my,mz)||1;nr[k]=mx/ml;nr[k+1]=my/ml;nr[k+2]=mz/ml;}
     if(e.ridge){const r=e.ridge[i-2];if(r&&i>=2){r.position.set(p[0]+ux*rr*.95,p[1]+uy*rr*.95,p[2]+uz*rr*.95);
       _sX.set(nx,0,nz);_sY.set(ux,uy,uz);_sZ.crossVectors(_sX,_sY);_sM.makeBasis(_sX,_sY,_sZ);r.quaternion.setFromRotationMatrix(_sM);if(e.dragon)r.quaternion.multiply(_sTilt);
       const k2=e.dragon?Math.max(.35,1-i/(e.ridge.length+4)):1;r.scale.set(.35*rr/.3,rr/.3*k2,rr/.3*k2);}}}
   if(e.ridgeI){const I=e.ridgeI;for(let k=0;k<e.ridge.length;k++){const r=e.ridge[k];r.updateMatrix();I.setMatrixAt(k,r.matrix);}I.instanceMatrix.needsUpdate=true;}
-  geo.attributes.position.needsUpdate=true;geo.computeVertexNormals();
+  geo.attributes.position.needsUpdate=true;geo.attributes.normal.needsUpdate=true;
   if(R){e.head.position.set(pts[0][0]+T0x*.12+U0x*.04,pts[0][1]+T0y*.12+U0y*.04,pts[0][2]+T0z*.12+U0z*.04);e.head.rotation.y=Math.atan2(T0x,T0z);e.head.rotation.x=(Math.min(.38,Math.max(-.2,-Math.asin(Math.max(-1,Math.min(1,T0y)))))+.08+lk*.3)*(1-DK)+DK*.12;e.jaw.rotation.x=.38+lk*.5+Math.sin(t*1.7)*.05*(1-DK)+DK*.25;
     if(e.venom&&e.g.visible&&!e.dead&&Math.random()<.18){const v=e.venom[Math.random()<.5?0:1];v.getWorldPosition(_sV);parts(_sV.x,_sV.y,_sV.z,{n:1,col:0x8aff4a,spd:.04,up:-.3,grav:1.4,life:.9,size:.22,op:.85});}}
   else{e.head.position.set(pts[0][0],pts[0][1]+.05-DK*.12,pts[0][2]+.15);e.head.rotation.y=Math.atan2(pts[0][0]-pts[2][0],pts[0][2]-pts[2][2]);e.head.rotation.x=-lk*.35+DK*.15;e.jaw.rotation.x=lk*.6+DK*.4;}}
@@ -3763,7 +3767,7 @@ function lifeZone(id){lifeClear();if(!OAD.on||OAD.failed||!LIFE_POP[id])return;c
   (P0.fly||[]).forEach(([kind,n,cx,cz,rad,h])=>{for(let i=0;i<Math.round(n*low);i++){const c=lifeCritter(kind);if(!c)continue;lifePut(c,cx,cz,{fly:true,cx:cx+R(-3,3),cz:cz+R(-3,3),rad:rad*R(.85,1.15),h:h+R(-2,3),ang:R(0,TAU)+i*.25,w:(kind==='hawk'?.18:.32)*(Math.random()<.5?1:-1),ph:R(0,6)});}});}
 /* portada: el empedrado de la plaza está 3 cm sobre el suelo y los pies de la pose quieta bajan unos 6 cm: se sube al personaje para que no se hunda */
 const SELY=.09;
-function updLife(dt){if(!LIFE.length)return;for(const c of LIFE){const d=Math.hypot(P.x-c.x,P.z-c.z);c.g.visible=d<(c.fly?110:66)&&!(mode==='select'&&!c.fly&&Math.abs(c.x)<8&&c.z>1.5&&c.z<19);/* en la portada nadie cruza entre la cámara y el personaje */if(!c.g.visible)continue;
+function updLife(dt){if(!LIFE.length)return;for(const c of LIFE){const d=Math.hypot(P.x-c.x,P.z-c.z);c.g.visible=d<(c.fly?110:66)&&!(mode==='select'&&!c.fly&&Math.abs(c.x)<8&&c.z>1.5&&c.z<19);if(!c.fly)charShadow(c,c.g,d);/* en la portada nadie cruza entre la cámara y el personaje */if(!c.g.visible)continue;
   if(c.fly){c.ang+=dt*c.w;const x=c.cx+Math.cos(c.ang)*c.rad,z=c.cz+Math.sin(c.ang)*c.rad;c.x=x;c.z=z;c.g.position.set(x,c.h+Math.sin(T*.6+c.ph)*1.4,z);
     c.g.rotation.set(0,Math.atan2(-Math.sin(c.ang)*c.w,Math.cos(c.ang)*c.w),-Math.sign(c.w)*.35);c.mixer.update(dt);continue;}
   if(c.flee&&d<c.flee&&!P.dead&&mode==='game'){const ax=c.x-P.x,az=c.z-P.z,ad=Math.hypot(ax,az)||1;c.st='run';c.t=1.4;c.tx=c.x+ax/ad*7;c.tz=c.z+az/ad*7;}
@@ -4136,6 +4140,45 @@ function dustTick(dt,mv){if(!mv||(HERO&&HERO.flyK>.3)||Q.level==='bajo'||!Z||mod
     addFx(sp,.7+Math.random()*.35,(o,kk)=>{o.scale.setScalar(s0*(1+kk*2.6));o.position.y+=.003;o.material.opacity=op*(1-kk)*Math.min(1,kk*7);});}}
 /* rendimiento: congela las matrices de todo lo que no se mueve en la zona */
 function flatNoShadow(){if(!zoneG)return;const bx=new THREE.Box3(),sz=new THREE.Vector3();zoneG.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh||!o.castShadow)return;const m=o.material;if(m&&(m.transparent||(Array.isArray(m)&&m.some(x=>x.transparent)))){o.castShadow=false;return;}if(!o.geometry)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();o.updateWorldMatrix(true,false);bx.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);bx.getSize(sz);if(sz.y<.3&&Math.max(sz.x,sz.z)>1.2)o.castShadow=false;});}
+/* sombra del decorado quieto: todo lo que proyecta sombra y no se mueve se junta en una malla "fantasma" por celda de 32 m
+   (solo posiciones), visible solo durante la pasada de sombra (shadowProxyHook). Las piezas originales dejan
+   de proyectar sombra. Así la pasada de sombra hace un puñado de llamadas en vez de cientos. Hojas con recorte (alphaTest),
+   transparentes o con viento siguen como antes. */
+/* vegetación y decorado instanciado: three.js dibuja una InstancedMesh entera aunque la mayoría quede detrás de la cámara.
+   Se parte en celdas de 40 m, cada una con su esfera real: lo que no está en la vista (o en la sombra) no se dibuja. */
+function chunkInstances(G){if(!G||window.__NOBAKE)return 0;const CS=40,list=[];G.traverse(o=>{if(o.isInstancedMesh&&!o.userData.chunk&&!o.userData.nobake&&o.visible&&o.count>=16&&o.parent)list.push(o);});
+  const m=new THREE.Matrix4(),v=new THREE.Vector3(),sv=new THREE.Vector3(),q=new THREE.Quaternion();let n=0;
+  for(const im of list){const g=im.geometry;if(!g.boundingSphere)g.computeBoundingSphere();const gs=g.boundingSphere,cells=new Map();
+    for(let i=0;i<im.count;i++){im.getMatrixAt(i,m);v.setFromMatrixPosition(m);const k=Math.floor(v.x/CS)+','+Math.floor(v.z/CS);if(!cells.has(k))cells.set(k,[]);cells.get(k).push(i);}
+    const mk=idx=>{const ng=new THREE.BufferGeometry();for(const a in g.attributes)ng.setAttribute(a,g.attributes[a]);if(g.index)ng.setIndex(g.index);for(const gr of g.groups)ng.addGroup(gr.start,gr.count,gr.materialIndex);ng.userData.keep=g.userData.keep;
+      const c=new THREE.Vector3(),ps=[];for(const i of idx){im.getMatrixAt(i,m);m.decompose(v,q,sv);const p=gs.center.clone().applyMatrix4(m);ps.push([p,gs.radius*Math.max(sv.x,sv.y,sv.z)]);c.add(p);}c.divideScalar(idx.length);let r=0;for(const [p,rr] of ps)r=Math.max(r,p.distanceTo(c)+rr);ng.boundingSphere=new THREE.Sphere(c,r);
+      const ni=new THREE.InstancedMesh(ng,im.material,idx.length);idx.forEach((i,j)=>{im.getMatrixAt(i,m);ni.setMatrixAt(j,m);if(im.instanceColor){im.getColorAt(i,_chC);ni.setColorAt(j,_chC);}});if(ni.instanceColor)ni.instanceColor.needsUpdate=true;
+      ni.castShadow=im.castShadow;ni.receiveShadow=im.receiveShadow;ni.renderOrder=im.renderOrder;ni.layers.mask=im.layers.mask;ni.name=im.name;ni.userData=Object.assign({},im.userData,{chunk:1});ni.frustumCulled=true;
+      ni.position.copy(im.position);ni.quaternion.copy(im.quaternion);ni.scale.copy(im.scale);ni.matrixAutoUpdate=im.matrixAutoUpdate;ni.updateMatrix();ni.onBeforeRender=im.onBeforeRender;return ni;};
+    const par=im.parent;for(const idx of cells.values())par.add(mk(idx));par.remove(im);try{im.dispose&&im.dispose();}catch(e){}n++;}
+  return n;}
+const _chC=new THREE.Color();
+const SHPROXY_M={},SHPROXY=[];let SHPROXY_ON=true;
+/* las mallas de sombra están ocultas para la cámara del juego y se muestran solo mientras se dibuja la sombra
+   (three.js arma la lista de la escena antes de la pasada de sombra) */
+function shadowProxyHook(){const sm=renderer.shadowMap;if(sm.__px)return;sm.__px=1;const base=sm.render.bind(sm);sm.render=function(a,b,c){let k=0;for(let i=0;i<SHPROXY.length;i++){const m=SHPROXY[i];if(!m.parent)continue;SHPROXY[k++]=m;m.visible=SHPROXY_ON;}SHPROXY.length=k;try{base(a,b,c);}finally{for(const m of SHPROXY)m.visible=false;}};}function shadowProxy(G,dyn,moved){if(!G||(Z&&Z.event)||window.__NOBAKE||window.__NOSHP)return 0;G.updateMatrixWorld(true);const cells=new Map(),CS=32,bx=new THREE.Box3(),c=new THREE.Vector3(),v=new THREE.Vector3();
+  G.traverse(o=>{if(!o.isMesh||!o.castShadow||o.isSkinnedMesh||o.isInstancedMesh||o.children.length||dyn.has(o)||(moved&&moved.has(o))||o.userData.nobake||o.userData.shProxy||!o.geometry||!o.material||Array.isArray(o.material))return;
+    if(o.onBeforeRender!==THREE.Object3D.prototype.onBeforeRender||o.matrixAutoUpdate)return;
+    for(let q=o.parent;q&&q!==G;q=q.parent){if(!q.visible||q.isBone||q.isSkinnedMesh||q.userData.nobake||dyn.has(q))return;}if(!o.visible)return;
+    const m=o.material,g=o.geometry;if(m.transparent||m.alphaTest>0||m.alphaMap||bakeVS(m)||m.displacementMap||!g.attributes.position||g.attributes.position.isInterleavedBufferAttribute||(g.morphAttributes&&Object.keys(g.morphAttributes).length))return;
+    if(g.drawRange.count!==Infinity&&g.drawRange.count<(g.index?g.index.count:g.attributes.position.count))return;
+    if(!g.boundingBox)g.computeBoundingBox();bx.copy(g.boundingBox).applyMatrix4(o.matrixWorld);bx.getCenter(c);
+    const side=m.shadowSide!=null?m.shadowSide:m.side;const k=side+'#'+Math.floor(c.x/CS)+','+Math.floor(c.z/CS);if(!cells.has(k))cells.set(k,{side,list:[]});cells.get(k).list.push(o);});
+  let n=0;
+  for(const {side,list} of cells.values()){if(list.length<2)continue;let nv=0,ni=0;for(const o of list){const g=o.geometry;nv+=g.attributes.position.count;ni+=g.index?g.index.count:g.attributes.position.count;}
+    const pos=new Float32Array(nv*3),idx=nv>65535?new Uint32Array(ni):new Uint16Array(ni);let pv=0,pi=0;
+    for(const o of list){const g=o.geometry,pa=g.attributes.position,base=pv;for(let i=0;i<pa.count;i++){v.fromBufferAttribute(pa,i).applyMatrix4(o.matrixWorld);pos[pv*3]=v.x;pos[pv*3+1]=v.y;pos[pv*3+2]=v.z;pv++;}
+      if(g.index){const ia=g.index.array;for(let i=0;i<ia.length;i++)idx[pi++]=ia[i]+base;}else for(let i=0;i<pa.count;i++)idx[pi++]=base+i;
+      o.castShadow=false;n++;}
+    const mg=new THREE.BufferGeometry();mg.setAttribute('position',new THREE.BufferAttribute(pos,3));mg.setIndex(new THREE.BufferAttribute(idx,1));mg.computeBoundingSphere();
+    const mat=SHPROXY_M[side]||(SHPROXY_M[side]=keep(new THREE.MeshBasicMaterial({side,colorWrite:false,depthWrite:false})));
+    const mm=new THREE.Mesh(mg,mat);mm.castShadow=true;mm.receiveShadow=false;mm.visible=false;SHPROXY.push(mm);mm.userData.shProxy=list.length;mm.userData.src=list;mm.name='sombraDecorado';mm.matrixAutoUpdate=false;G.add(mm);}
+  return n;}
 function freezeStatic(){if(!zoneG)return 0;try{flatNoShadow();}catch(e){}const dyn=new Set();const mark=o=>{while(o&&o!==zoneG){dyn.add(o);o=o.parent;}};
   zoneG.traverse(o=>{if(o.isSkinnedMesh||o.isBone||o.isPoints||o.isSprite||o.isLight)mark(o);});
   const sub=g=>{if(g)g.traverse(x=>dyn.add(x));};npcs.forEach(n=>sub(n.m&&n.m.g));enemies.forEach(e=>{sub(e.g);sub(e.bar);});try{LIFE.forEach(c=>sub(c.g||c.m&&c.m.g));}catch(e){}drops.forEach(d=>sub(d.g));
@@ -4144,7 +4187,7 @@ function freezeStatic(){if(!zoneG)return 0;try{flatNoShadow();}catch(e){}const d
   /* lo que se mueve con las animaciones del ambiente (banderas, faroles, molinos) no se une */zoneG.updateMatrixWorld(true);const wsnap=new Map();zoneG.traverse(o=>{if(o.isMesh&&!dyn.has(o))wsnap.set(o,o.matrixWorld.clone());});
   const T0=T;T+=.37;try{for(const f of AMB)f(.1);}catch(e){}zoneG.updateMatrixWorld(true);const moved=new Set();wsnap.forEach((m,o)=>{if(!m.equals(o.matrixWorld))moved.add(o);});T=T0;try{for(const f of AMB)f(0);}catch(e){}
   let n=0;cand.forEach((o,i)=>{const q=snap[i];if(!o.position.equals(q[0])||!o.quaternion.equals(q[1])||!o.scale.equals(q[2]))return;o.updateMatrix();o.matrixAutoUpdate=false;n++;});
-  zoneG.updateMatrixWorld(true);try{window.__MRG=(window.__MRG||0)+mergeStatic(zoneG,dyn,moved);}catch(e){console.error(e);}return n;}
+  try{window.__CHK=chunkInstances(zoneG);}catch(e){console.error(e);}zoneG.updateMatrixWorld(true);try{window.__MRG=(window.__MRG||0)+mergeStatic(zoneG,dyn,moved);}catch(e){console.error(e);}try{shadowProxyHook();window.__SHP=shadowProxy(zoneG,dyn,moved);}catch(e){console.error(e);}return n;}
 let FRZT=null;function freezeSoon(){clearTimeout(FRZT);FRZT=setTimeout(()=>{try{window.__FRZ=freezeStatic();}catch(e){}},1800);}
 function flushV(V,G){for(const k in V){const L=V[k];if(!L.length)continue;const d=VDEF[k](),im=new THREE.InstancedMesh(d[0],d[1],L.length);im.userData.vkey=k;const hasCol=true;dummy.rotation.order=d[3]||'XYZ';
   L.forEach((a,i)=>{dummy.position.set(a[0],a[1],a[2]);dummy.rotation.set(a[3],a[4],a[5]);dummy.scale.set(a[6],a[7],a[8]);dummy.updateMatrix();im.setMatrixAt(i,dummy.matrix);if(hasCol){tmpC.setHex(a[9]!=null?a[9]:0xffffff);im.setColorAt(i,tmpC);}});
@@ -4660,7 +4703,7 @@ function deadLizard(e,k){/* el lagarto se desploma sobre la panza: patas abierta
   e.legs.forEach(L=>{L.hip.rotation.y=0;L.hip.rotation.z=(1.2+k*.4)*L.sx;L.kn.rotation.z=(-1.25+k*.9)*L.sx;});
   e.tail.forEach((t,i)=>{t.rotation.z=k*(.12+i*.04);t.rotation.x=(i===0?PI/2-.1:0)+(i===0?k*.08:0);});
   e.heads.forEach(h=>{h.h.rotation.x=k*.35;h.jaw.rotation.x=k*.45;h.nk.rotation.x=k*.2;});e.rig.position.z=0;}
-function animEnemy(e,dt,sp){const w=Math.min(1,sp/2.5);e.phase+=dt*(2+sp*2.2);const lk=e.lunge>0?Math.sin((1-e.lunge/.35)*PI):0;
+function animEnemy(e,dt,sp){const w=Math.min(1,sp/2.5);e.phase+=dt*(2+sp*2.2);/* lejos o fuera de la vista: no se anima (nadie lo ve) */if(!e.g.visible&&!STUDIO.on){e.animSkip=(e.animSkip||0)+dt;return;}if(e.kind==="glb"&&e.animSkip){dt+=Math.min(1,e.animSkip);}e.animSkip=0;const lk=e.lunge>0?Math.sin((1-e.lunge/.35)*PI):0;
   if(e.kind==='glb')oadMobAnim(e,dt,sp);else if(e.kind==='quad')poseQuad(e,w,lk);
   else if(e.kind==='biped'){poseHuman(e,{t:T,mv:w,walk:e.phase,act:e.lunge>0?(e.weaponAnim||'slash'):null,actT:e.lunge>0?1-e.lunge/.35:-1,lean:e.hunch||0,stance:e.aggro>0?1:0,seed:e.hx});if(e.cape)animCape(e.cape,T,w);if(e.float)e.hips.position.y+=.18+Math.sin(T*2+e.hx)*.07;}
   else if(e.kind==='lizard')poseLizard(e,w,lk);else if(e.kind==='scorp')poseScorp(e,w,lk);else if(e.kind==='snake')updSnake(e,T,w,lk);
@@ -5138,7 +5181,7 @@ function animHero(dt){if(!HERO)return;const r=HERO,cls=r.cls;const y=H(P.x,P.z);
   if(r.glowCol&&(r.glowLv||0)>=11&&mode==='game'&&r.g.parent===scene){r.spk=(r.spk||0)-dt;if(r.spk<=0){r.spk=.12;parts(r.g.position.x+(Math.random()-.5)*.8,r.g.position.y+.4+Math.random()*1.4,r.g.position.z+(Math.random()-.5)*.8,{n:2,col:r.glowCol,spd:.4,up:.8,grav:-.6,life:.8,size:.22});}}
   if(r.aura){r.aura.material.opacity=mode==='game'&&DS&&DS.set&&DS.setLv>=7?.55+Math.sin(T*3)*.15:0;r.aura.rotation.z+=.0035;}}
 
-function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);const want=d<7?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
+function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);charShadow(n,n.m&&n.m.g,d);const want=d<7?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
 
 /* ================= entrada ================= */
 const joyEl=$('#joy'),knob=$('#knob'),joy={id:null,ox:0,oy:0,x:0,y:0};
@@ -6228,7 +6271,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={duelSet:o=>{Object.assign(DUEL,o);LIVE.me=LIVE.me||'me';},duelTest:m=>{DUEL.key=m.key;DUEL.side='a';DUEL.room={a:'me',b:'x',start:0};LIVE.me='me';duelMsg(m);},bakeNow:()=>{delete window.__NOBAKE;npcs.forEach(n=>charBake(n.m));if(HERO)charBake(HERO);try{LIVE.others.forEach(o=>o.m&&charBake(o.m));}catch(e){}return freezeStatic();},get MRG(){return window.__MRG||0},get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={get SCN(){return scene},shpSet:on=>{SHPROXY_ON=on;zoneG.traverse(o=>{if(o.userData.src)o.userData.src.forEach(x=>x.castShadow=!on);});},get CAM(){return camera},duelSet:o=>{Object.assign(DUEL,o);LIVE.me=LIVE.me||'me';},duelTest:m=>{DUEL.key=m.key;DUEL.side='a';DUEL.room={a:'me',b:'x',start:0};LIVE.me='me';duelMsg(m);},bakeNow:()=>{delete window.__NOBAKE;npcs.forEach(n=>charBake(n.m));if(HERO)charBake(HERO);try{LIVE.others.forEach(o=>o.m&&charBake(o.m));}catch(e){}return freezeStatic();},get MRG(){return window.__MRG||0},get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
@@ -6394,7 +6437,7 @@ function tickOnce(dt,rdt,draw){
   }catch(err){console.error(err);}
   if(FINAL)FINAL.uniforms.uTime.value=windT;
   /* rendimiento: el mapa de sombras se rehace un cuadro sí y otro no (la pasada más cara después de la escena) */
-  SHF=(SHF+1)%(FCAP.fps<=30?1:2);/* a 30 cuadros la sombra se actualiza en cada cuadro (si no, quedaría a 15 por segundo) */renderer.shadowMap.needsUpdate=SHF===0||snapCam||mode!=='game';
+  SHF=(SHF+1)%(FCAP.fps<=30?SHMOD:2);/* celular en medio: la sombra cada 2 cuadros también a 30 *//* a 30 cuadros la sombra se actualiza en cada cuadro (si no, quedaría a 15 por segundo) */renderer.shadowMap.needsUpdate=SHF===0||snapCam||mode!=='game';
   if(!draw)return;
   if(window.__CAMF)window.__CAMF(camera);
   if(composer&&!STUDIO.alphaOn)composer.render();else renderer.render(scene,camera);

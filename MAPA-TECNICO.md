@@ -93,6 +93,14 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Mobs lejanos: `e.g.visible=!!(dl<D||boss)` con D = 62 (alto), 54 (medio), 40 (bajo). Antes daba `undefined` para los que no son jefes y three.js los dibujaba igual (solo oculta con `false`): ojo con cualquier `visible=` que no sea booleano. `mobShadow`: en medio y bajo solo hacen sombra los mobs a menos de 24 m.
 - Mobs hechos con piezas (serpientes, cuadrúpedos, alacranes): `mobBake(m)` en `makeEnemy`, después de `charBake`. Une las piezas quietas de cada grupo (cabeza, mandíbula, patas, pájaros) por material en el espacio del grupo; deja aparte lo referenciado directo por `m`, `userData.solo/wing/flame/gem/piece/nobake`, sprites y mobs con `mixer` (GLB). La cresta de las serpientes es un `InstancedMesh` (`ridgeI`; `ridge` quedan como Object3D sin escena que el animador mueve y se copian a la instancia). Mboitui 42→18 mallas, Moñái 92→33; Esteros con 10 mobs encima: 413/1221 → 252/472 llamadas (`tools/swarm.js`).
 - Celular (`pointer:coarse`) en alto: resolución máx. 1,5 (medio 1,3), MSAA 2 (medio 0) y mapa de sombras 1024. `dynRes` revisa cada 1,5 s y baja 0,25 si va por debajo de 18 FPS. En alto los mobs hacen sombra hasta 36 m.
+- Optimización para celulares (7/11, tarde). Medido con `MOB=1 Q=medio W=926 H=428 node perf2.js` (Chromium con `isMobile`, `pointer:coarse`); llamadas promedio por cuadro: Asunción 672→~300, Esteros 239→132, Cerro Corá 153→102; triángulos de Chaco 487k→283k. Lógica de Esteros con 10 mobs: 6,5→2,4 ms (`tools/prof.js zona 0 N`, perfil de CPU por función).
+  - `updSnake`: normales exactas de la elipse (antes `computeVertexNormals` por serpiente y cuadro).
+  - `animEnemy`: no anima mobs ocultos (`e.g.visible` false); los GLB recuperan el tiempo perdido al volver (máx. 1 s).
+  - `shadowProxy` (en `freezeStatic`): todo el decorado quieto que proyecta sombra se junta en una malla de solo posiciones por celda de 32 m y lado; las piezas originales dejan de proyectar. Las mallas fantasma están ocultas y `shadowProxyHook` las muestra solo durante la pasada de sombra (envuelve `renderer.shadowMap.render`; three.js arma la lista de la escena antes). No sirve ponerlas en otra capa: la sombra de r128 prueba la capa contra la cámara del juego. Se excluye lo transparente, con `alphaTest`, con viento (`bakeVS`) o que se mueve. Comparar: `__NOX.shpSet(false/true)`; apagar con `window.__NOSHP=1`.
+  - `chunkInstances` (en `freezeStatic`): parte cada InstancedMesh de 16+ instancias en celdas de 40 m con su esfera real (geometría nueva que comparte los atributos), para que la cámara y la sombra descarten lo que no ven.
+  - `charShadow(o,g,d)`: PNJ y vecinos proyectan sombra solo a menos de 16 m en el celular (24/36 en PC) y esconden ojos y cejas a más de 12 m. Ojos y cejas nunca proyectan sombra (`shadowTrim`).
+  - `IS_MOB`: en el celular la sombra cubre 40x40 m (no 60x60), en medio se actualiza cada 2 cuadros (`SHMOD`), el brillo (bloom) solo va en alto y a media resolución, y los mobs proyectan sombra hasta 20 m.
+  - Calidad automática: si `dynRes` baja la calidad la guarda en `tsm-calidad-auto` y sigue en automático (antes quedaba fija para siempre).
 - En producción Cloudflare sirve los `.json` con brotli: entrar a Asunción baja ~6 MB.
 - `__NOX.bakeNow()` une todo a mano (con `__NOBAKE` puesto al cargar) y `tools/vis.js` saca fotos antes/después del mismo instante.
 
@@ -165,6 +173,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `gdrive.py`: lista y baja carpetas de Google Drive (packs de Quaternius).
 - `oga.sh`: busca en OpenGameArt.
 - `livegame.js` (juego publicado en 5 dispositivos), `presan.js` (revisión previa a publicar).
+- `prof.js` (perfil de CPU por función), `tris.js` (triángulos, llamadas y quién proyecta sombra), `shshot2.js` (sombra con y sin `shadowProxy` en el mismo cuadro), `run.sh` (levanta el servidor local y corre). `boot.js` acepta `mobile:true` o `MOB=1`; `perf2.js` acepta `Q=medio`.
 - `swarm.js` (Esteros en alto con 10 mobs encima: llamadas, mallas y lógica), `mobprobe.js` (mallas por tipo de mob), `snakeshot.js` (foto de serpientes), `helmprobe.js` (alturas de ojos y casco).
 - `perf2.js` (rendimiento por zona), `who.js`/`casters.js`/`cast2.js` (qué dibuja y qué hace sombra), `texleak.js`, `vis.js`, `benchtest.js`.
 
