@@ -1231,13 +1231,13 @@
    "name": "Hada del Monte",
    "col": "#bff0ff",
    "desc": "Te acompaña y aumenta tu defensa un 12%.",
-   "price": 2000000
+   "price": 1500000
   },
   "rudolf": {
    "name": "Rudolf",
    "col": "#e2b27a",
    "desc": "Te acompaña y aumenta el oro de las bestias un 50%.",
-   "price": 1200000
+   "price": 800000
   }
  },
  "loot": {
