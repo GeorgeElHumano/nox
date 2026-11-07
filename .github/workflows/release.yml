@@ -27,8 +27,19 @@ jobs:
           cp desktop/LEEME-windows.txt NOX/LEEME.txt
           ./rcedit.exe NOX/NOX.exe --set-icon desktop/icon.ico --set-version-string ProductName NOX --set-version-string FileDescription "NOX - Crónicas del Paraguay" --set-version-string CompanyName "The BnKr Media" --set-file-version "$V" --set-product-version "$V"
           7z a -tzip -mx=9 NOX-Windows.zip NOX > /dev/null
+      - name: Armar el instalador (deja el acceso directo en el escritorio)
+        run: |
+          V=$(cat VERSION)
+          ISCC="/c/Program Files (x86)/Inno Setup 6/ISCC.exe"
+          [ -f "$ISCC" ] || { choco install innosetup -y --no-progress > /dev/null; }
+          "$ISCC" //Q "//DAppVer=$V" desktop/nox.iss
+          ls -la NOX-Instalador.exe
       - uses: actions/upload-artifact@v4
-        with: { name: windows, path: NOX-Windows.zip }
+        with:
+          name: windows
+          path: |
+            NOX-Windows.zip
+            NOX-Instalador.exe
   mac:
     # Se arma en Linux (los equipos Mac de GitHub no estaban disponibles) y se firma "ad hoc" con rcodesign.
     runs-on: ubuntu-latest
