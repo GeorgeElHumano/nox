@@ -80,6 +80,15 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `camera.far` = fin de la niebla de la zona + 6 m, y el cielo se achica para quedar adentro: con 3ra/1ra persona se ve hasta el horizonte y así no se dibuja lo que ya está tapado por la niebla. Aun así esas cámaras dibujan el doble que la clásica (Campos, celular: ~178 → ~355 llamadas).
 - El área de la sombra la fija `updCamera` cada cuadro (40/30 m, ×0,65 en el celular).
 
+- 1ra persona tipo CS: el cuerpo mira siempre hacia la cámara (`fpFace`; al moverse `P.ry=CAM_YAW+PI`, se puede caminar de costado y para atrás). Con objetivo, la vista gira hacia él. La cámara va en el hueso de la cabeza (`HERO.headB`, altura suavizada en `FPY`). Mira `#xhair` (roja con objetivo) y el ataque sin objetivo elige el enemigo más cerca del centro (`crossTarget`, 24° y 22 m).
+
+### Mapa, carga y voz (7/11)
+
+- Minimapa: otros jugadores en lila (`#b98cff`, los del grupo `#ecd6ff`). Tocar el minimapa abre `#bigMap` (`openBigMap`/`drawBigMap`, norte arriba, nombres de portales, PNJ y jugadores, se redibuja cada 150 ms; Esc o tocar afuera cierra).
+- Pantalla de carga entre mapas: `travel` llama a `zloadShow(id)` (foto `assets/ui/zona_<id>.webp` de 1280x720, nombre, subtítulo y barra que sigue a `OAD.pend`) y la saca cuando no queda nada por bajar (mín. 1,2 s, máx. 12 s). Fotos con `tools/zoneshots.js` (`ZS=`).
+- Chat de voz: `VOXA`. El micrófono pasa por un `GainNode` (`micV`, 0–5) a un `MediaStreamDestination` que es lo que se envía (`VOX.send`); las voces que llegan van por `createMediaStreamSource` → `inG` (`inV`, 0–5) → altavoz, con el `<audio>` en silencio. Sliders en el panel de grupo (`#voxMic`, `#voxIn`, `localStorage noxVoxMic/noxVoxIn`). `voxDuckTick` baja `AU.master` a 85 % en el chat de voz y a 55 % mientras alguien habla.
+- Portada: el héroe nunca muestra el modelo viejo; queda oculto con `#heroLoad` ("Cargando tu personaje…") y reintenta la descarga cada 8 s (`rebuildHero` limpia `OAD.failed` en el menú).
+
 ### Ganchos de prueba
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
@@ -119,7 +128,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Portada: el héroe va a `SELY=.09` (el empedrado está a .03); `updLife` esconde a los vecinos entre la cámara y el héroe en el menú. Prueba: `tools/selhero.js`.
 - Arena: al perder, `duelend` deja al jugador muerto (animación de muerte) hasta volver a Asunción a los 9 s. Prueba: `tools/dueltest.js` con `__NOX.duelTest`.
 
-- Arena (tablero): `duelTick` arma el tablero una vez por duelo (`hud._key`) y después solo cambia anchos y números, para que la barra clara de daño (`i.tr`, con retraso) se anime; `low` titila bajo 25 % y `hit` sacude al recibir. `body.induel` oculta la misión y el reloj. En celular acostado va a 126 px del borde y mide 50vw.
+- Arena (tablero): `duelTick` arma el tablero una vez por duelo (`hud._key`) y después solo cambia anchos y números, para que la barra clara de daño (`i.tr`, con retraso) se anime; `low` titila bajo 25 % y `hit` sacude al recibir. `body.induel` oculta la misión y el reloj. Compacto, arriba al centro entre la placa del jugador y el minimapa (celular acostado: `calc(100vw - 590px)`, entre 300 y 370 px).
 - Grupo: `#liveInv`/`#duelInv` van al centro (24vh), grandes y con brillo; la invitación a grupo suena. `bigNote(html,bad)` muestra avisos grandes arriba al centro (entra al grupo, se une, sale, se disuelve) comparando la lista de miembros en el mensaje `party`. Prueba: `tools/duelhud.js` (usa `__NOX.duelSet` y `__NOX.liveTest`).
 
 ## Assets del juego
