@@ -1,13 +1,10 @@
 {
- "build": "202611071956",
- "min": "202611071956",
- "title": "Parche del 7 de noviembre",
+ "build": "202611072039",
+ "min": "202611072039",
+ "title": "Parche del 7 de noviembre (noche)",
  "notes": [
-  "Pantalla de carga con la foto del destino",
-  "Tres cámaras: clásica, 3ra y 1ra persona",
-  "Mapa completo al tocar el minimapa",
-  "Afuera de las murallas de Asunción ya se puede pelear",
-  "Chat de voz con volumen de 0 a 500 %",
-  "El juego avisa cuando sale un parche nuevo"
+  "1ra persona sin mira, más gran angular y con tus brazos a la vista al moverte",
+  "El modo automático sigue usando técnicas con el inventario u otro menú abierto",
+  "El servidor en vivo también pide la última versión"
  ]
 }

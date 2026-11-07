@@ -20,7 +20,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
 - **Parches (desde el 7/11):** antes de publicar el juego correr `scripts/patch.sh "Título" "novedad 1" "novedad 2"…`. Pone la versión (AAAAMMDDHHMM, hora de Paraguay) en `NOX_BUILD` dentro de `public/jugar/index.html` y escribe `public/jugar/build.json` (`build`, `min`, `title`, `notes`). Por defecto `min = build`: el parche es obligatorio para jugar en línea (`OPCIONAL=1` deja el mínimo anterior y el aviso se puede cerrar).
   - El juego revisa `build.json` al abrir, cada 3 minutos y al volver a la pestaña (`updCheck`), y muestra `#patchBox` con las notas; "Actualizar ahora" guarda y recarga con `?v=build`. Obligatorio: corta el modo en vivo (`window.__UPDREQ`) y no se puede cerrar.
   - La API (`minBuild` en `functions/api/[[path]].js`) lee `build.json` con `env.ASSETS` y responde 426 en las rutas `game/*` (menos `game/count`) si el juego no manda `x-nox-build` o es más viejo. Las versiones de antes no mandan ese dato, así que también tienen que actualizar.
-  - El servidor en vivo (`live/`, otro Worker) todavía no pide versión: se despliega aparte con `wrangler deploy` y acá no hay credenciales de Cloudflare. Mientras tanto lo frena el juego (no conecta si hay parche obligatorio) y la API (no deja guardar).
+  - El servidor en vivo (`live/`, Worker `nox-live`) se despliega solo con cada push a `main` (Workers Builds de Cloudflare, se ve en las versiones del Worker). Pide versión: el juego manda `&b=NOX_BUILD` y si es menor que `min` de `build.json` (`minBuild`, caché de 60 s) cierra con 4426; el juego entonces corta el modo en vivo y llama a `updCheck`.
   - `build.json` va sin caché (`_headers`).
 - `functions/api/[[path]].js`: la API del servidor (cuentas, pedidos), con base D1 `nox-db`.
 - `gamedata.json`: exportación de datos del juego que usa `gencatalog.py` para `lib/catalog.js` (tienda). No valida stats.
@@ -85,7 +85,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `camera.far` = fin de la niebla de la zona + 6 m, y el cielo se achica para quedar adentro: con 3ra/1ra persona se ve hasta el horizonte y así no se dibuja lo que ya está tapado por la niebla. Aun así esas cámaras dibujan el doble que la clásica (Campos, celular: ~178 → ~355 llamadas).
 - El área de la sombra la fija `updCamera` cada cuadro (40/30 m, ×0,65 en el celular).
 
-- 1ra persona tipo CS: el cuerpo mira siempre hacia la cámara (`fpFace`; al moverse `P.ry=CAM_YAW+PI`, se puede caminar de costado y para atrás). Con objetivo, la vista gira hacia él. La cámara va en el hueso de la cabeza (`HERO.headB`, altura suavizada en `FPY`). Mira `#xhair` (roja con objetivo) y el ataque sin objetivo elige el enemigo más cerca del centro (`crossTarget`, 24° y 22 m).
+- 1ra persona (7/11, noche): sin mira; FOV gran angular (vertical que da ~120° horizontales, entre 62 y 80; `near` .06). El héroe se ve: `fpArms` achica el hueso `head` a .001 (cabeza, casco y pelo desaparecen) y suma un giro en el mundo a `upperarm`/`lowerarm` (`boneRotW`) para llevar los brazos al frente con vaivén al caminar; al atacar baja a 30 % y manda la animación. Cámara en el hueso de la cabeza, más adelante y arriba al correr. El cuerpo mira hacia la cámara (`fpFace`) y el ataque sin objetivo elige el enemigo más cerca del centro (`crossTarget`). Fotos: `tools/fpshot.js`.
 
 ### Mapa, carga y voz (7/11)
 
@@ -99,6 +99,8 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Ficha y ajustes separados: `renderChar` (personaje) y `renderCfg` (`#pCfg`: cuenta, gráficos, cámara, FPS, sonido), botón de engranaje `#mbCfg` (`openCfg`). El botón rápido de cámara `#mbCam` va a la izquierda del minimapa con la etiqueta `#camQ` (CLÁS/3RA/1RA).
 - Inventario: `irPreview` usa `cc0Hero` (el mismo cuerpo del juego); si no bajó todavía espera con `cc0Want`. El de 0 A.D. solo si el CC0 está apagado.
 - Asunción: `townR:38`. En `loadZone` la copia `Z` recibe un getter `safe` que es verdadero solo dentro de las murallas (radio 36), así que afuera hay combate, música de campo, mobs activos y AUTO. Spots en las afueras (aguara y taitetu, `ZONES.asuncion.spots`), más animales, cuervos, halcones y 2 guardias patrullando la puerta (`LIFE_POP.asuncion`). Aviso al cruzar la muralla (`P.inTown`). Ojo: `Object.assign` copia getters como valores; por eso el getter se define sobre `Z`.
+
+- AUTO con menús abiertos: sigue peleando y `useSkill` deja usar técnicas aunque haya panel abierto (`paused`) si el AUTO está prendido.
 
 ### Ganchos de prueba
 

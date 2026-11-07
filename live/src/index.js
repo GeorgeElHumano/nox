@@ -11,12 +11,26 @@ async function sha256(s) { return hex(new Uint8Array(await crypto.subtle.digest(
 const clip = (s, n) => String(s == null ? '' : s).slice(0, n);
 const PARTY_MAX = 5;
 
+let MIN = { v: '', t: 0 };
+async function minBuild() {
+  if (Date.now() - MIN.t < 60000) return MIN.v;
+  try { const r = await fetch('https://noxparaguay.com/jugar/build.json', { cf: { cacheTtl: 30 } }); if (r.ok) { const j = await r.json(); MIN = { v: String(j.min || ''), t: Date.now() }; } } catch {}
+  MIN.t = Date.now(); return MIN.v;
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/live/ping') return new Response('ok');
     if (url.pathname !== '/live/ws') return new Response('No encontrado', { status: 404 });
     if (req.headers.get('Upgrade') !== 'websocket') return new Response('Se espera WebSocket', { status: 426 });
+    // versión mínima: la de /jugar/build.json (la escribe scripts/patch.sh); un juego viejo recibe el código 4426 y muestra el aviso de actualización
+    const min = await minBuild();
+    if (min && !((url.searchParams.get('b') || '') >= min)) {
+      const pair = new WebSocketPair(); const [client, server] = Object.values(pair);
+      server.accept(); server.close(4426, 'Hay una actualización de NOX');
+      return new Response(null, { status: 101, webSocket: client });
+    }
     const tok = url.searchParams.get('t') || '';
     if (!/^[0-9a-f]{64}$/.test(tok)) return new Response('Sin sesión', { status: 401 });
     const row = await env.DB.prepare('SELECT u.id,u.name,u.role,s.exp FROM sessions s JOIN users u ON u.id=s.uid WHERE s.th=?').bind(await sha256(tok)).first();
