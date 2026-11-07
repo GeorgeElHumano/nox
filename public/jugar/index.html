@@ -616,6 +616,10 @@ body.induel #track,body.induel #evClock{display:none}
 .droom{display:flex;align-items:center;gap:8px;justify-content:space-between}.droom span{font-size:12.5px;color:#e6d6b8}.droom small{display:block;color:#bfae8e;font-size:11px}
 #liveInv{bottom:auto;top:calc(var(--st) + 60px);left:50%;transform:translateX(-50%);width:min(320px,calc(100vw - 20px));text-align:center;align-items:center}
 @media (orientation:landscape) and (max-height:560px){#chatLog{bottom:calc(var(--sb) + 130px);width:min(320px,38vw)}.lpanel{bottom:calc(var(--sb) + 8px);max-height:calc(100vh - 70px)}#chatList{min-height:80px}}
+#patchBox{position:fixed;inset:0;z-index:210;display:grid;place-items:center;background:rgba(6,5,14,.78);padding:16px;backdrop-filter:blur(2px)}
+#patchBox .pt-in{width:min(440px,100%);max-height:calc(100vh - 32px);overflow:auto;display:flex;flex-direction:column;gap:10px;padding:20px;border-radius:14px;background:linear-gradient(#22264f,#12142e);box-shadow:0 0 0 1px #0c0e28,0 0 0 2px #e2a83f,0 0 40px rgba(226,168,63,.35),0 20px 50px rgba(0,0,0,.7);text-align:center;animation:invIn2 .4s cubic-bezier(.2,1.5,.4,1)}
+#patchBox small{font-family:var(--display);letter-spacing:.24em;text-transform:uppercase;color:#e2a83f;font-size:11.5px}#patchBox b{font-family:var(--display);color:#fff1d2;font-size:21px;letter-spacing:.03em}
+#patchBox ul{margin:0;padding:0 0 0 18px;text-align:left;color:#e8e2f4;font-size:14px;line-height:1.5}#patchBox p{margin:0;color:#cfc6e6;font-size:13px}#patchBox .pb{justify-content:center;gap:8px}
 #updBox{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(8,5,3,.8);padding:16px}
 #updBox .upd-in{width:min(420px,100%);display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:6px;background:linear-gradient(#2a1c10,#120b06);box-shadow:0 0 0 1px #0c0603,0 0 0 2px #c9a050,0 20px 50px rgba(0,0,0,.7);text-align:center}
 #updBox b{font-family:var(--display);color:#f3d38a;letter-spacing:.04em}#updBox p{margin:0;color:#e6d6b8;font-size:14px;line-height:1.45}#updBox small{color:#bfae8e;font-size:12px}#updBox .pb{justify-content:center}#updBox a.btn{text-decoration:none;color:#fff;display:inline-flex;align-items:center}
@@ -5979,8 +5983,8 @@ function starterEq(cls){const eq={};EQK.forEach(k=>eq[k]=null);eq.weapon=newEqui
 const SRV={on:null,tokKey:'nox-token',pollT:0,admLast:0,adm:null};
 const srvTok=()=>{try{return localStorage.getItem(SRV.tokKey)||'';}catch(e){return '';}};
 const srvSetTok=t=>{try{if(t)localStorage.setItem(SRV.tokKey,t);else localStorage.removeItem(SRV.tokKey);}catch(e){}};
-async function srvApi(m,path,b){const r=await fetch('/api/'+path,{method:m,headers:{'content-type':'application/json',...(srvTok()?{authorization:'Bearer '+srvTok()}:{})},body:b!==undefined?JSON.stringify(b):undefined});
-  let j={};try{j=await r.json();}catch(e){}if(!r.ok){const e=new Error(j.error||('Error '+r.status));e.status=r.status;e.code=r.status===401?'revoked':'http';throw e;}return j;}
+async function srvApi(m,path,b){const r=await fetch('/api/'+path,{method:m,headers:{'content-type':'application/json','x-nox-build':NOX_BUILD,...(srvTok()?{authorization:'Bearer '+srvTok()}:{})},body:b!==undefined?JSON.stringify(b):undefined});
+  let j={};try{j=await r.json();}catch(e){}if(r.status===426&&j&&j.update)updShow({build:j.min,min:j.min},true);if(!r.ok){const e=new Error(j.error||('Error '+r.status));e.status=r.status;e.code=r.status===401?'revoked':'http';throw e;}return j;}
 async function srvProbe(){if(window.claude&&typeof window.claude.use==='function')return false;if(!/^https?:$/.test(location.protocol))return false;if(/(^|\.)noxparaguay\.(com|pages\.dev)$/.test(location.hostname))return true;
   try{const c=new AbortController();const t=setTimeout(()=>c.abort(),15000);const r=await fetch('/api/ping',{signal:c.signal});clearTimeout(t);if(!r.ok)return false;const j=await r.json();return !!(j&&j.ok);}catch(e){return false;}}
 function noxDB(){const snap=(id,data)=>({id,exists:data!=null,data:()=>data});const qs=d=>({empty:!d.length,docs:d.map(x=>snap(x.id,x.data))});
@@ -6045,7 +6049,7 @@ function liveEq(){const o={};if(!C)return o;for(const k of EQK){const it=C.eq[k]
 function liveS(){return{n:C.name,c:C.cls,L:C.L,evo:!!C.evo,eq:liveEq(),pet:petsOn()[0]||null,pets:petsOn(),face:C.face!=null?C.face:hashName(C.name)};}
 function livePos(){return{x:+P.x.toFixed(2),z:+P.z.toFixed(2),ry:+P.ry.toFixed(2),mv:+(P.mv||0).toFixed(2),ac:LIVE.ac,d:P.dead?1:0};}
 function liveSend(o){const w=LIVE.ws;if(w&&w.readyState===1){try{w.send(typeof o==='string'?o:JSON.stringify(o));}catch(e){}}}
-function liveConnect(){if(LIVE.ws||!SRV.on||NET.mode!=='online'||!srvTok())return;let ws;try{ws=new WebSocket(liveURL());}catch(e){return;}
+function liveConnect(){if(LIVE.ws||window.__UPDREQ||!SRV.on||NET.mode!=='online'||!srvTok())return;let ws;try{ws=new WebSocket(liveURL());}catch(e){return;}
   LIVE.ws=ws;ws.onopen=()=>{LIVE.on=true;LIVE.retry=1;LIVE.zone=null;liveHello();liveUI();};
   ws.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(x){return;}try{liveMsg(m);}catch(x){console.error(x);}};
   ws.onclose=e=>{const was=LIVE.on;LIVE.ws=null;LIVE.on=false;liveClear();mobNetReset();voiceStop(true);LIVE.party=null;liveUI();
@@ -6372,6 +6376,18 @@ function liveHUD(){if($('#mbChat'))return;const menu=document.querySelector('#hu
   });}
 /* aviso de actualización de la app de Android */
 function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=String(b||'0').split('.').map(n=>parseInt(n)||0);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)<(y[i]||0)?-1:1;}return 0;}
+/* ===== parches: aviso de actualización en todos los dispositivos =====
+   Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
+   y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
+const NOX_BUILD='202611071956';const UPD={shown:'',req:false};
+async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
+function updShow(j,req){if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
+  if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
+  let d=document.getElementById('patchBox');if(d)d.remove();d=document.createElement('div');d.id='patchBox';
+  const notes=(j.notes||[]).slice(0,8).map(n=>'<li>'+String(n).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])+'</li>').join('');
+  d.innerHTML=`<div class="pt-in"><small>${req?'Actualización obligatoria':'Nueva actualización'}</small><b>${j.title?String(j.title).replace(/[<>&]/g,''):'Hay un parche nuevo de NOX'}</b>${notes?'<ul>'+notes+'</ul>':''}<p>${req?'Para seguir jugando en línea necesitás la última versión. Tu progreso guardado no se pierde.':'Actualizá cuando quieras: tu progreso guardado no se pierde.'}</p><div class="pb"><button class="btn" id="ptGo">Actualizar ahora</button>${req?'':'<button class="btn ghost" id="ptLater">Más tarde</button>'}</div></div>`;
+  document.body.appendChild(d);d.querySelector('#ptGo').onclick=()=>{try{if(typeof persist==='function'&&C)persist();}catch(e){}setTimeout(()=>{const u=new URL(location.href);u.searchParams.set('v',j.build);location.replace(u.href);},350);};const l=d.querySelector('#ptLater');if(l)l.onclick=()=>d.remove();}
+setTimeout(updCheck,4000);setInterval(updCheck,180000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck();});
 async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/([0-9.]+)/);if(!m)return;let mine=m[1];try{if(window.NOXApp&&NOXApp.version)mine=NOXApp.version();}catch(e){}
   let v;try{v=await (await fetch('../version.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!v||!v.version||!v.apk||verCmp(mine,v.version)>=0)return;
   try{if(localStorage.getItem('nox-upd-skip')===v.version&&Date.now()-(+localStorage.getItem('nox-upd-t')||0)<6*3600e3)return;}catch(e){}

@@ -3,3 +3,6 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /img/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/jugar/build.json
+  Cache-Control: no-store

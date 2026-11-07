@@ -1,0 +1,13 @@
+{
+ "build": "202611071956",
+ "min": "202611071956",
+ "title": "Parche del 7 de noviembre",
+ "notes": [
+  "Pantalla de carga con la foto del destino",
+  "Tres cámaras: clásica, 3ra y 1ra persona",
+  "Mapa completo al tocar el minimapa",
+  "Afuera de las murallas de Asunción ya se puede pelear",
+  "Chat de voz con volumen de 0 a 500 %",
+  "El juego avisa cuando sale un parche nuevo"
+ ]
+}

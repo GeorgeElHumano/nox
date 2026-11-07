@@ -388,6 +388,15 @@ route('POST', 'admin/give', async ({ db, req }) => {
   return json({ ok: true, delivered: n, code: c });
 }, { admin: true });
 
+/* parche mínimo para jugar en línea: lo dice public/jugar/build.json ("min"). El juego manda su versión en x-nox-build;
+   si es más vieja (o no la manda, como las versiones de antes), las rutas del juego responden 426 y el juego pide actualizar. */
+let BUILD_CACHE = { t: 0, min: '' };
+async function minBuild(env, url) {
+  if (Date.now() - BUILD_CACHE.t < 60000) return BUILD_CACHE.min;
+  try { const r = await env.ASSETS.fetch(new URL('/jugar/build.json', url)); const j = await r.json(); BUILD_CACHE = { t: Date.now(), min: String(j.min || '') }; }
+  catch { BUILD_CACHE = { t: Date.now(), min: '' }; }
+  return BUILD_CACHE.min;
+}
 export async function onRequest(ctx) {
   const { request: req, env, params } = ctx;
   const db = env.DB;
@@ -395,6 +404,10 @@ export async function onRequest(ctx) {
   await init(db);
   const url = new URL(req.url);
   const path = (Array.isArray(params.path) ? params.path.join('/') : String(params.path || '')).replace(/\/+$/, '');
+  if (path.startsWith('game/') && path !== 'game/count') {
+    const min = await minBuild(env, url), b = req.headers.get('x-nox-build') || '';
+    if (min && b < min) return json({ error: 'Hay una actualización de NOX. Actualizá el juego para seguir jugando en línea.', update: true, min }, 426);
+  }
   for (const r of routes) {
     if (r.m !== req.method) continue;
     const m = path.match(r.re); if (!m) continue;
