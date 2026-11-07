@@ -89,6 +89,12 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Chat de voz: `VOXA`. El micrófono pasa por un `GainNode` (`micV`, 0–5) a un `MediaStreamDestination` que es lo que se envía (`VOX.send`); las voces que llegan van por `createMediaStreamSource` → `inG` (`inV`, 0–5) → altavoz, con el `<audio>` en silencio. Sliders en el panel de grupo (`#voxMic`, `#voxIn`, `localStorage noxVoxMic/noxVoxIn`). `voxDuckTick` baja `AU.master` a 85 % en el chat de voz y a 55 % mientras alguien habla.
 - Portada: el héroe nunca muestra el modelo viejo; queda oculto con `#heroLoad` ("Cargando tu personaje…") y reintenta la descarga cada 8 s (`rebuildHero` limpia `OAD.failed` en el menú).
 
+### Ajustes, inventario y Asunción (7/11, noche)
+
+- Ficha y ajustes separados: `renderChar` (personaje) y `renderCfg` (`#pCfg`: cuenta, gráficos, cámara, FPS, sonido), botón de engranaje `#mbCfg` (`openCfg`). El botón rápido de cámara `#mbCam` va a la izquierda del minimapa con la etiqueta `#camQ` (CLÁS/3RA/1RA).
+- Inventario: `irPreview` usa `cc0Hero` (el mismo cuerpo del juego); si no bajó todavía espera con `cc0Want`. El de 0 A.D. solo si el CC0 está apagado.
+- Asunción: `townR:38`. En `loadZone` la copia `Z` recibe un getter `safe` que es verdadero solo dentro de las murallas (radio 36), así que afuera hay combate, música de campo, mobs activos y AUTO. Spots en las afueras (aguara y taitetu, `ZONES.asuncion.spots`), más animales, cuervos, halcones y 2 guardias patrullando la puerta (`LIFE_POP.asuncion`). Aviso al cruzar la muralla (`P.inTown`). Ojo: `Object.assign` copia getters como valores; por eso el getter se define sobre `Z`.
+
 ### Ganchos de prueba
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
