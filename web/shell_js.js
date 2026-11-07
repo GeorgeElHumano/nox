@@ -1,4 +1,4 @@
-const ready=p=>p.id==='ios'||p.id==='web'?true:!!LINKS[p.id];
+const ready=p=>p.id==='ios'||p.id==='web'||p.id==='android'?true:!!LINKS[p.id];
 const iconHTML=p=>'<img src="img/icon-256.png" alt="" width="72" height="72">'+ICONS[p.id];
 const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
 /* ===== dispositivo de quien entra: el botón principal descarga directo lo que le sirve ===== */
@@ -6,17 +6,17 @@ const DEV=(()=>{const u=navigator.userAgent||'',tp=navigator.maxTouchPoints||0;
   if(/Android/i.test(u))return 'android';if(/iPhone|iPod/.test(u))return 'ios';if(/iPad/.test(u)||(/Macintosh/.test(u)&&tp>0))return 'ipad';
   if(/Windows/.test(u))return 'windows';if(/Macintosh|Mac OS X/.test(u))return 'mac';return null;})();
 const DEVP=DEV==='ipad'?'ios':DEV;
-const DEVLBL={android:'Descargar para Android',windows:'Descargar para Windows',mac:'Descargar para Mac',ios:'Instalar en iPhone',ipad:'Instalar en iPad'};
+const DEVLBL={android:'Instalar en Android',windows:'Descargar para Windows',mac:'Descargar para Mac',ios:'Instalar en iPhone',ipad:'Instalar en iPad'};
 if(DEVP){const i=PLAT.findIndex(p=>p.id===DEVP);if(i>0)PLAT.unshift(PLAT.splice(i,1)[0]);}
 const platHTML=PLAT.map((p,i)=>`<button class="plat${p.id===DEVP?' mine':''}" type="button" data-p="${p.id}" style="--i:${i}" aria-haspopup="dialog">${p.id===DEVP?'<span class="mine-tag">Tu dispositivo</span>':''}<div class="plat-icon">${iconHTML(p)}</div><div><div class="pn">${p.name}</div><div class="pr">${p.req}<br>${p.sub}${['android','windows','mac'].includes(p.id)?'<br>Versión '+VERSION:''}</div></div><div class="go"><span>Cómo instalarlo</span><span class="state ${ready(p)?'ok':''}">${ready(p)?'Disponible':'Pronto'}</span></div></button>`).join('');
 $('#platforms').innerHTML=platHTML;$('#platforms2').innerHTML=platHTML;
 const M=$('#modal'),DL=$('#dlModal');let lastFocus=null;
 function lock(on){document.documentElement.classList.toggle('locked',on);}
 function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=document.activeElement;DL.hidden=true;
-  $('#mIcon').innerHTML=iconHTML(p);$('#mReq').textContent=p.req+(['android','windows','mac'].includes(p.id)?' · versión '+VERSION:'');$('#mTitle').textContent='NOX para '+p.name;
+  $('#mIcon').innerHTML=iconHTML(p);$('#mReq').textContent=p.req+(['windows','mac'].includes(p.id)?' · versión '+VERSION:'');$('#mTitle').textContent='NOX para '+p.name;
   $('#mSteps').innerHTML=p.steps.map(s=>'<li><span>'+s+'</span></li>').join('');
-  let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button>'+(p.id==='ios'?'<button type="button" id="mShare">Agregar a inicio</button>':'')+'</div>';extra+='<p class="note">'+p.note+'</p>';$('#mExtra').innerHTML=extra;
-  const href=p.id==='ios'||p.id==='web'?webURL():LINKS[p.id];
+  let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button>'+(p.id==='ios'?'<button type="button" id="mShare">Agregar a inicio</button>':'')+'</div>';extra+='<p class="note">'+p.note+'</p>';if(p.beta&&LINKS.android)extra+='<p class="beta">¿Preferís un archivo para instalar? <a href="'+LINKS.android+'" data-track="android" rel="noopener">Beta para Android (APK)</a></p>';$('#mExtra').innerHTML=extra;
+  const href=p.id==='ios'||p.id==='web'?webURL():p.id==='android'?webURL()+'?inicio=1':LINKS[p.id];
   $('#mActions').innerHTML=href?'<a class="btn btn-gold" href="'+href+'" data-track="'+p.id+'" target="_blank" rel="noopener">'+p.btn+'</a>'+(p.btn2?'<a class="btn btn-line" href="'+LINKS.macIntel+'" data-track="macIntel" target="_blank" rel="noopener">'+p.btn2+'</a>':''):'<span class="btn btn-gold" aria-disabled="true">'+p.btn+' · disponible pronto</span><a class="btn btn-line" href="'+webURL()+'" data-track="web" target="_blank" rel="noopener">Mientras tanto, jugar en el navegador</a>';
   $('#mActions').insertAdjacentHTML('beforeend','<button type="button" class="btn btn-line" data-dlall>Otros dispositivos</button>');
   M.hidden=false;lock(true);$('#mClose').focus();
@@ -26,7 +26,7 @@ function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=doc
 function closeAll(){M.hidden=true;DL.hidden=true;$('#fmodal').hidden=true;$('#viewer').hidden=true;lock(false);if(lastFocus&&lastFocus.focus)lastFocus.focus();}
 function openDl(){lastFocus=document.activeElement;M.hidden=true;DL.hidden=false;lock(true);$('#dlClose').focus();}
 /* botón principal: en Android y Windows arranca la descarga y muestra cómo instalar; en iPhone, iPad y Mac muestra los pasos; si no se reconoce, la lista completa */
-function smartDl(){if(!DEVP)return openDl();if((DEVP==='android'||DEVP==='windows')&&LINKS[DEVP]&&!PREVIEW){/* la descarga va por un marco oculto: la página no se mueve aunque la red falle */const f=document.createElement('iframe');f.hidden=true;f.src=LINKS[DEVP];document.body.appendChild(f);setTimeout(()=>f.remove(),60000);track(DEVP);openPlat(DEVP);$('#mExtra').insertAdjacentHTML('afterbegin','<p class="note"><b>La descarga ya empezó.</b> Si no arrancó, tocá el botón de abajo.</p>');return;}openPlat(DEVP);}
+function smartDl(){if(!DEVP)return openDl();if(DEVP==='windows'&&LINKS[DEVP]&&!PREVIEW){/* la descarga va por un marco oculto: la página no se mueve aunque la red falle */const f=document.createElement('iframe');f.hidden=true;f.src=LINKS[DEVP];document.body.appendChild(f);setTimeout(()=>f.remove(),60000);track(DEVP);openPlat(DEVP);$('#mExtra').insertAdjacentHTML('afterbegin','<p class="note"><b>La descarga ya empezó.</b> Si no arrancó, tocá el botón de abajo.</p>');return;}openPlat(DEVP);}
 if(DEV)$$('[data-dl]').forEach(b=>{if(/gratis/i.test(b.textContent)||b.closest('.dock')||b.closest('.dlch'))b.textContent=DEVLBL[DEV];});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){openPlat(b.dataset.p);return;}if(e.target.closest('[data-dlall]')){openDl();return;}if(e.target.closest('[data-dl]')){smartDl();return;}
   const o=e.target.closest('[data-open]');if(o){openDeep(o.dataset.open);return;}

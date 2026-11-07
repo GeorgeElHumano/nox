@@ -662,6 +662,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .steps li::before{content:counter(st);width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--ink-3);border:1px solid var(--gold);color:var(--gold-hi);font-family:var(--display);font-weight:700}
 .steps li span{padding-top:5px}.steps b{color:var(--gold-hi)}
 .note{font-size:var(--s-1);color:var(--muted);background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.beta{font-size:.8rem;color:var(--muted);opacity:.75;margin:8px 2px 0}.beta a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .copy{display:flex;gap:8px;align-items:center;background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 14px}
 .copy input{all:unset;flex:1;min-width:0;font-size:.95rem;color:var(--paper);overflow:hidden;text-overflow:ellipsis}
 .copy button{all:unset;cursor:pointer;padding:8px 14px;border-radius:9px;background:var(--ink-3);border:1px solid var(--line);font-weight:700;font-size:.9rem;color:var(--gold-hi)}
@@ -1049,9 +1050,9 @@ const PLAT=[
  {id:'web',name:'Navegador',req:'Chrome, Edge, Safari o Firefox',sub:'Sin instalar nada',btn:'Jugar ahora',
   steps:['Tocá <b>Jugar ahora</b>. El juego se abre en una pestaña nueva.','Entrá con tu cuenta o tocá <b>Crear cuenta</b>. Es la misma cuenta de la tienda.','Elegí tu raza, tu rostro y el nombre de tu personaje.','En PC, <b>F11</b> pone el navegador en pantalla completa. En el celular se ve mejor acostado.'],
   note:'Funciona en PC, Mac, celulares y tablets. La primera vez tarda un poco más porque descarga los modelos del juego.'},
- {id:'android',name:'Android',req:'Android 7 o superior',sub:'APK, fuera de Play Store',btn:'Descargar NOX.apk',
-  steps:['Descargá <b>NOX.apk</b> desde el celular.','Abrí el archivo desde la notificación de descarga o desde la carpeta <b>Descargas</b>.','Si Android lo pide, tocá <b>Configuración</b> y activá <b>Permitir de esta fuente</b> para tu navegador. Después volvé atrás.','Tocá <b>Instalar</b>. Si Play Protect muestra un aviso, tocá <b>Más detalles</b> y luego <b>Instalar de todas formas</b>.','Abrí NOX desde su ícono. El juego se actualiza solo cuando tenés internet.'],
-  note:'El aviso aparece porque NOX se instala por fuera de Play Store. Descargá la APK solo desde esta página.'},
+ {id:'android',name:'Android',req:'Chrome en Android',sub:'Se instala desde Chrome',btn:'Abrir el juego',
+  steps:['Tocá <b>Abrir el juego</b> desde el celular, en <b>Chrome</b>. Se abre con una guía.','Tocá <b>Instalar NOX</b>. Si no aparece, abrí el menú <b>⋮</b> de Chrome y tocá <b>Agregar a la pantalla principal</b> y después <b>Instalar</b>.','Abrí NOX desde su ícono: se ve a pantalla completa y se actualiza solo.'],
+  note:'Así siempre tenés la última versión, sin descargar archivos.',beta:true},
  {id:'windows',name:'Windows',req:'Windows 10 y 11 · 64 bits',sub:'Instalador, unos 140 MB',btn:'Descargar el instalador',
   steps:['Descargá <b>NOX-Instalador.exe</b> y abrilo.','Si aparece <b>Windows protegió tu PC</b>, tocá <b>Más información</b> y después <b>Ejecutar de todas formas</b>.','Se instala solo, sin pedir permisos de administrador, y deja el acceso directo <b>NOX</b> en el escritorio y en el menú Inicio.','Abrí NOX desde ese acceso directo. <b>F11</b> alterna pantalla completa.'],
   note:'El aviso de Windows aparece porque el juego todavía no tiene firma digital. Con internet, NOX abre siempre la última versión. Para quitarlo: Configuración → Aplicaciones → NOX → Desinstalar.'},
@@ -1063,7 +1064,7 @@ const PLAT=[
   note:'Por ahora NOX no está en la App Store, así que en iPhone y iPad se instala de esta forma. Tiene que ser desde Safari: Chrome en iPhone no muestra la opción.',copy:true}
 ];
 
-const ready=p=>p.id==='ios'||p.id==='web'?true:!!LINKS[p.id];
+const ready=p=>p.id==='ios'||p.id==='web'||p.id==='android'?true:!!LINKS[p.id];
 const iconHTML=p=>'<img src="img/icon-256.png" alt="" width="72" height="72">'+ICONS[p.id];
 const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
 /* ===== dispositivo de quien entra: el botón principal descarga directo lo que le sirve ===== */
@@ -1071,17 +1072,17 @@ const DEV=(()=>{const u=navigator.userAgent||'',tp=navigator.maxTouchPoints||0;
   if(/Android/i.test(u))return 'android';if(/iPhone|iPod/.test(u))return 'ios';if(/iPad/.test(u)||(/Macintosh/.test(u)&&tp>0))return 'ipad';
   if(/Windows/.test(u))return 'windows';if(/Macintosh|Mac OS X/.test(u))return 'mac';return null;})();
 const DEVP=DEV==='ipad'?'ios':DEV;
-const DEVLBL={android:'Descargar para Android',windows:'Descargar para Windows',mac:'Descargar para Mac',ios:'Instalar en iPhone',ipad:'Instalar en iPad'};
+const DEVLBL={android:'Instalar en Android',windows:'Descargar para Windows',mac:'Descargar para Mac',ios:'Instalar en iPhone',ipad:'Instalar en iPad'};
 if(DEVP){const i=PLAT.findIndex(p=>p.id===DEVP);if(i>0)PLAT.unshift(PLAT.splice(i,1)[0]);}
 const platHTML=PLAT.map((p,i)=>`<button class="plat${p.id===DEVP?' mine':''}" type="button" data-p="${p.id}" style="--i:${i}" aria-haspopup="dialog">${p.id===DEVP?'<span class="mine-tag">Tu dispositivo</span>':''}<div class="plat-icon">${iconHTML(p)}</div><div><div class="pn">${p.name}</div><div class="pr">${p.req}<br>${p.sub}${['android','windows','mac'].includes(p.id)?'<br>Versión '+VERSION:''}</div></div><div class="go"><span>Cómo instalarlo</span><span class="state ${ready(p)?'ok':''}">${ready(p)?'Disponible':'Pronto'}</span></div></button>`).join('');
 $('#platforms').innerHTML=platHTML;$('#platforms2').innerHTML=platHTML;
 const M=$('#modal'),DL=$('#dlModal');let lastFocus=null;
 function lock(on){document.documentElement.classList.toggle('locked',on);}
 function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=document.activeElement;DL.hidden=true;
-  $('#mIcon').innerHTML=iconHTML(p);$('#mReq').textContent=p.req+(['android','windows','mac'].includes(p.id)?' · versión '+VERSION:'');$('#mTitle').textContent='NOX para '+p.name;
+  $('#mIcon').innerHTML=iconHTML(p);$('#mReq').textContent=p.req+(['windows','mac'].includes(p.id)?' · versión '+VERSION:'');$('#mTitle').textContent='NOX para '+p.name;
   $('#mSteps').innerHTML=p.steps.map(s=>'<li><span>'+s+'</span></li>').join('');
-  let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button>'+(p.id==='ios'?'<button type="button" id="mShare">Agregar a inicio</button>':'')+'</div>';extra+='<p class="note">'+p.note+'</p>';$('#mExtra').innerHTML=extra;
-  const href=p.id==='ios'||p.id==='web'?webURL():LINKS[p.id];
+  let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button>'+(p.id==='ios'?'<button type="button" id="mShare">Agregar a inicio</button>':'')+'</div>';extra+='<p class="note">'+p.note+'</p>';if(p.beta&&LINKS.android)extra+='<p class="beta">¿Preferís un archivo para instalar? <a href="'+LINKS.android+'" data-track="android" rel="noopener">Beta para Android (APK)</a></p>';$('#mExtra').innerHTML=extra;
+  const href=p.id==='ios'||p.id==='web'?webURL():p.id==='android'?webURL()+'?inicio=1':LINKS[p.id];
   $('#mActions').innerHTML=href?'<a class="btn btn-gold" href="'+href+'" data-track="'+p.id+'" target="_blank" rel="noopener">'+p.btn+'</a>'+(p.btn2?'<a class="btn btn-line" href="'+LINKS.macIntel+'" data-track="macIntel" target="_blank" rel="noopener">'+p.btn2+'</a>':''):'<span class="btn btn-gold" aria-disabled="true">'+p.btn+' · disponible pronto</span><a class="btn btn-line" href="'+webURL()+'" data-track="web" target="_blank" rel="noopener">Mientras tanto, jugar en el navegador</a>';
   $('#mActions').insertAdjacentHTML('beforeend','<button type="button" class="btn btn-line" data-dlall>Otros dispositivos</button>');
   M.hidden=false;lock(true);$('#mClose').focus();
@@ -1091,7 +1092,7 @@ function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=doc
 function closeAll(){M.hidden=true;DL.hidden=true;$('#fmodal').hidden=true;$('#viewer').hidden=true;lock(false);if(lastFocus&&lastFocus.focus)lastFocus.focus();}
 function openDl(){lastFocus=document.activeElement;M.hidden=true;DL.hidden=false;lock(true);$('#dlClose').focus();}
 /* botón principal: en Android y Windows arranca la descarga y muestra cómo instalar; en iPhone, iPad y Mac muestra los pasos; si no se reconoce, la lista completa */
-function smartDl(){if(!DEVP)return openDl();if((DEVP==='android'||DEVP==='windows')&&LINKS[DEVP]&&!PREVIEW){/* la descarga va por un marco oculto: la página no se mueve aunque la red falle */const f=document.createElement('iframe');f.hidden=true;f.src=LINKS[DEVP];document.body.appendChild(f);setTimeout(()=>f.remove(),60000);track(DEVP);openPlat(DEVP);$('#mExtra').insertAdjacentHTML('afterbegin','<p class="note"><b>La descarga ya empezó.</b> Si no arrancó, tocá el botón de abajo.</p>');return;}openPlat(DEVP);}
+function smartDl(){if(!DEVP)return openDl();if(DEVP==='windows'&&LINKS[DEVP]&&!PREVIEW){/* la descarga va por un marco oculto: la página no se mueve aunque la red falle */const f=document.createElement('iframe');f.hidden=true;f.src=LINKS[DEVP];document.body.appendChild(f);setTimeout(()=>f.remove(),60000);track(DEVP);openPlat(DEVP);$('#mExtra').insertAdjacentHTML('afterbegin','<p class="note"><b>La descarga ya empezó.</b> Si no arrancó, tocá el botón de abajo.</p>');return;}openPlat(DEVP);}
 if(DEV)$$('[data-dl]').forEach(b=>{if(/gratis/i.test(b.textContent)||b.closest('.dock')||b.closest('.dlch'))b.textContent=DEVLBL[DEV];});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){openPlat(b.dataset.p);return;}if(e.target.closest('[data-dlall]')){openDl();return;}if(e.target.closest('[data-dl]')){smartDl();return;}
   const o=e.target.closest('[data-open]');if(o){openDeep(o.dataset.open);return;}

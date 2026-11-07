@@ -254,6 +254,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .steps li::before{content:counter(st);width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--ink-3);border:1px solid var(--gold);color:var(--gold-hi);font-family:var(--display);font-weight:700}
 .steps li span{padding-top:5px}.steps b{color:var(--gold-hi)}
 .note{font-size:var(--s-1);color:var(--muted);background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.beta{font-size:.8rem;color:var(--muted);opacity:.75;margin:8px 2px 0}.beta a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .copy{display:flex;gap:8px;align-items:center;background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 14px}
 .copy input{all:unset;flex:1;min-width:0;font-size:.95rem;color:var(--paper);overflow:hidden;text-overflow:ellipsis}
 .copy button{all:unset;cursor:pointer;padding:8px 14px;border-radius:9px;background:var(--ink-3);border:1px solid var(--line);font-weight:700;font-size:.9rem;color:var(--gold-hi)}
