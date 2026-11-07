@@ -74,6 +74,23 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
 
+## Rendimiento (optimización del 7/11)
+
+- Dónde se va el tiempo: casi todo son **llamadas de dibujo**, sobre todo en la pasada de sombra (se actualiza cada 2 cuadros a 60 y cada cuadro con tope 30). Medir con `tools/perf2.js` (vista + sombra por zona, espera a que termine de cargar).
+- `charBake(r)`: se llama al terminar cada personaje (héroe en `rebuildHero`, otros jugadores en `liveModel`, PNJ al final de `npcLit`, mobs en `makeEnemy` y `oadUpgradeMobs`).
+  - `bakeRig`: une las mallas rígidas colgadas del mismo hueso con material equivalente (`bakeSig`) y las mallas con piel que comparten esqueleto, postura de enlace y material.
+  - No toca lo que el objeto `r` referencia (`bakeKeep`: alas, capa, armas en la mano, efectos de set...). Un hueso referenciado sí deja unir lo que cuelga de él. `forge`, `glowMats`, `eq`, `spec` se ignoran (solo se usan al armar).
+  - Nunca une una malla que tenga hijos ni materiales que mueven vértices en espacio local (`bakeVS`: viento, alas, boca, pelaje; o `userData.vsLocal`).
+  - Alas: `bakeLocal` une el armazón (huesos, nudos, anillos) en el espacio del ala. Efecto visible: las articulaciones ahora siguen la ola del ala en vez de quedar sueltas.
+  - `shadowTrim`: las piezas de menos de 30 cm no proyectan sombra.
+- `mergeStatic(zoneG,dyn,moved)`: dentro de `freezeStatic`, une el decorado quieto por material y por cuadrante de 24 m. `moved` sale de simular `AMB` y comparar matrices; no corre en zonas de evento. Se apaga con `window.__NOBAKE=1` (para comparar).
+- `disposeTree` ahora suelta las texturas de los materiales que suelta (las `keep()` quedan) y la textura de huesos de cada esqueleto. Antes cada viaje sumaba ~100 texturas en la placa (prueba: `tools/texleak.js`).
+- Cuadros por segundo: `FCAP.fps` (30 en celular, 60 en PC; `localStorage tsm-fps`). `dynRes` usa umbrales según el tope. Ajustes → "Cuadros por segundo" y "Ver FPS" (`FPSM`, también con `?fps=1`).
+- Prueba en teléfonos reales: `jugar/?prueba=1` muestra "Medir rendimiento"; recorre Asunción, Campos, Chaco, Esteros y Cerro Corá (8 s cada una), da FPS, bajones y dibujos, y se copia o comparte el resultado. `BENCH.on` hace al jugador invulnerable mientras mide.
+- Descargas: los modelos se bajan por zona a pedido (`oadNeed`). `oadFetch` reintenta 2 veces antes de dar un modelo por perdido (antes un corte de señal dejaba todo en modelos simples). La gente y animales del ambiente se piden después de lo principal (`oadLater`). Animaciones aligeradas sin cambios (`gt/resample.mjs`, tolerancia 1e-5).
+- En producción Cloudflare sirve los `.json` con brotli: entrar a Asunción baja ~6 MB.
+- `__NOX.bakeNow()` une todo a mano (con `__NOBAKE` puesto al cargar) y `tools/vis.js` saca fotos antes/después del mismo instante.
+
 ## Assets del juego
 
 - `assets/*.json`: modelos.
@@ -134,6 +151,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `live.js` y `live2.js`: revisan noxparaguay.com en vivo.
 - `gdrive.py`: lista y baja carpetas de Google Drive (packs de Quaternius).
 - `oga.sh`: busca en OpenGameArt.
+- `perf2.js` (rendimiento por zona), `who.js`/`casters.js`/`cast2.js` (qué dibuja y qué hace sombra), `texleak.js`, `vis.js`, `benchtest.js`.
 
 ## Pendientes conocidos
 
