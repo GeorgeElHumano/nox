@@ -72,6 +72,14 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Portada en celular vertical (lista de personajes): la cámara corre la imagen hacia arriba (`setViewOffset`, 30 % de la altura en `updCamera`) para que el personaje se vea arriba; abajo van logo de 290 px, frase de 15-18 px, cuenta y tarjetas. Sin la línea "Un MMORPG hecho en Paraguay", la descripción se oculta en pantallas de menos de 780 px y los créditos quedan en una línea que se abre al tocar. Medir con `tools/selmeasure.js` (WebKit, `ADMIN=1` simula los botones de administrador).
 - Las dos usan el tema de la web: noche `#1a1d47`, oro `#e2a83f`/`#f6d892`, fuentes Cinzel, Cormorant Garamond y Alegreya Sans. El bloque CSS está antes del script de boot.
 
+### Cámaras (7/11)
+
+- `CAMM`: `'iso'` (la clásica, `CAM_YAW=PI/4` fijo), `'tercera'` (detrás del hombro derecho a `3.6*CAMZ`, FOV 62) y `'primera'` (ojos a 1,62 m, FOV 72, el héroe se oculta). Se guarda en `localStorage noxCam`. `setCam(m)`, botón `#mbCam` (`camCycle`), tecla **B** y sección Cámara en la ficha del personaje (`camSet`).
+- `CAM_YAW` ahora es variable: el joystick y el minimapa ya la usaban, así que el movimiento queda relativo a la cámara. `CAM_PITCH` se limita en `camTurn`.
+- Arrastrar en la pantalla (o con el botón izquierdo del mouse) gira la cámara (`CDRAG`, ojo: `DRAG` y `LOOK` ya existen para el inventario y la luz); un toque corto sigue llamando a `tapAt` al soltar.
+- `camera.far` = fin de la niebla de la zona + 6 m, y el cielo se achica para quedar adentro: con 3ra/1ra persona se ve hasta el horizonte y así no se dibuja lo que ya está tapado por la niebla. Aun así esas cámaras dibujan el doble que la clásica (Campos, celular: ~178 → ~355 llamadas).
+- El área de la sombra la fija `updCamera` cada cuadro (40/30 m, ×0,65 en el celular).
+
 ### Ganchos de prueba
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
@@ -99,7 +107,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
   - `shadowProxy` (en `freezeStatic`): todo el decorado quieto que proyecta sombra se junta en una malla de solo posiciones por celda de 32 m y lado; las piezas originales dejan de proyectar. Las mallas fantasma están ocultas y `shadowProxyHook` las muestra solo durante la pasada de sombra (envuelve `renderer.shadowMap.render`; three.js arma la lista de la escena antes). No sirve ponerlas en otra capa: la sombra de r128 prueba la capa contra la cámara del juego. Se excluye lo transparente, con `alphaTest`, con viento (`bakeVS`) o que se mueve. Comparar: `__NOX.shpSet(false/true)`; apagar con `window.__NOSHP=1`.
   - `chunkInstances` (en `freezeStatic`): parte cada InstancedMesh de 16+ instancias en celdas de 40 m con su esfera real (geometría nueva que comparte los atributos), para que la cámara y la sombra descarten lo que no ven.
   - `charShadow(o,g,d)`: PNJ y vecinos proyectan sombra solo a menos de 16 m en el celular (24/36 en PC) y esconden ojos y cejas a más de 12 m. Ojos y cejas nunca proyectan sombra (`shadowTrim`).
-  - `IS_MOB`: en el celular la sombra cubre 40x40 m (no 60x60), en medio se actualiza cada 2 cuadros (`SHMOD`), el brillo (bloom) solo va en alto y a media resolución, y los mobs proyectan sombra hasta 20 m.
+  - `IS_MOB`: en el celular la sombra cubre un 65 % del área (en `updCamera`), en medio se actualiza cada 2 cuadros (`SHMOD`), el brillo (bloom) solo va en alto y a media resolución, y los mobs proyectan sombra hasta 20 m.
   - Calidad automática: si `dynRes` baja la calidad la guarda en `tsm-calidad-auto` y sigue en automático (antes quedaba fija para siempre).
 - En producción Cloudflare sirve los `.json` con brotli: entrar a Asunción baja ~6 MB.
 - `__NOX.bakeNow()` une todo a mano (con `__NOBAKE` puesto al cargar) y `tools/vis.js` saca fotos antes/después del mismo instante.

@@ -682,6 +682,7 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
         <button class="mb" data-act="openTravel" aria-label="Viajar" id="mbTravel"></button>
         <button class="mb" data-act="openQuests" aria-label="Misiones" id="mbQuest"></button>
         <button class="mb" data-act="toggleSound" aria-label="Sonido" id="mbSound"></button>
+        <button class="mb" data-act="camCycle" aria-label="Cambiar cámara" id="mbCam"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
         <button class="mb auto" data-act="toggleAuto" id="autoBtn">AUTO</button>
       </div>
     </div>
@@ -1128,7 +1129,7 @@ function applyQuality(){
   /* presupuesto de píxeles: en monitores grandes (PC) la resolución interna se limita para mantener los FPS */
   const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS */let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,mob?1.3:1.5):Math.min(dpr,mob?1.5:2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
   renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);DYN.base=pr;DYN.cur=pr;
-  sun.castShadow=Q.level!=='bajo';/* celular: la sombra cubre 40x40 m alrededor del jugador (en vez de 60x60): menos objetos en la pasada de sombra y sombras más nítidas */{const e=mob?20:30;if(sc.right!==e){sc.left=sc.bottom=-e;sc.right=sc.top=e;sc.updateProjectionMatrix();}}SHMOD=mob&&Q.level!=='alto'?2:1;const ms=Q.level==='alto'&&!big&&!mob?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
+  sun.castShadow=Q.level!=='bajo';SHMOD=mob&&Q.level!=='alto'?2:1;const ms=Q.level==='alto'&&!big&&!mob?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
   if(composer){try{composer.renderTarget1.dispose();composer.renderTarget2.dispose();}catch(e){}composer=null;bloom=null;}
   if(HAS_PP&&Q.level!=='bajo'){try{const w=innerWidth,h=innerHeight;let rt=null;
       if(renderer.capabilities&&renderer.capabilities.isWebGL2&&THREE.WebGLMultisampleRenderTarget){rt=new THREE.WebGLMultisampleRenderTarget(Math.round(w*pr),Math.round(h*pr),{format:THREE.RGBAFormat,stencilBuffer:true});rt.samples=big?(Q.level==='alto'?2:0):(Q.level==='alto'?(mob?2:4):(mob?0:2));}
@@ -2018,7 +2019,7 @@ let HEROWAIT=0;
 function rebuildHero(cls,eq){/* mientras baja el cuerpo nuevo (CC0) no se muestra el modelo viejo de piezas: el héroe queda oculto hasta 12 s y después, si no llegó, se muestra el de respaldo */let wait=false;if(CC0.on)wait=!cc0Want(cls,eq,()=>{if(HERO&&!HERO.cc0&&C.cls===cls){rebuildHero(C.cls,C.eq);if(mode==='select'){HERO.g.position.set(0,SELY,6.2);HERO.g.rotation.set(0,0,0);}}})&&!OAD.failed;else oadWantHero(cls,eq);
   const old=HERO;const r=buildHero(cls,eq);
   if(old){r.g.position.copy(old.g.position);r.g.rotation.copy(old.g.rotation);['flyK','flyPh','flyHz','beat','bank','lastRy','standK'].forEach(k=>{if(old[k]!=null)r[k]=old[k];});scene.remove(old.g);disposeTree(old.g);}
-  HERO=r;charBake(r);addBlob(r.g,1.3);scene.add(r.g);clearTimeout(HEROWAIT);if(wait&&!r.cc0){r.g.visible=false;HEROWAIT=setTimeout(()=>{if(HERO===r)r.g.visible=true;},12000);}
+  HERO=r;charBake(r);addBlob(r.g,1.3);scene.add(r.g);clearTimeout(HEROWAIT);if(wait&&!r.cc0){r.hideWait=true;r.g.visible=false;HEROWAIT=setTimeout(()=>{r.hideWait=false;},12000);}
   /* anillo del set completo: banda de luz suave con borde fino y marcas, no un disco plano */const a=new THREE.Mesh(new THREE.PlaneGeometry(2.3,2.3),new THREE.MeshBasicMaterial({map:auraRingTex(),color:0xffc35a,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));a.rotation.x=-PI/2;a.position.y=.06;r.g.add(a);HERO.aura=a;{const its=ARMK.map(k=>eq&&eq[k]).filter(Boolean);if(its.length&&its.every(it=>it.t===its[0].t))a.material.color.setHex(tierGlow(cls,its[0].t));}
 }
 /* ---------- animación humana por poses ---------- */
@@ -5074,7 +5075,11 @@ function usePot(kind){if(P.dead||mode!=='game')return;if(P.potCD>0)return;
   takeItem('pot',sub,1);const amt=Math.round(max*POTS[sub].pct+POTS[sub].add);if(kind==='hp'){P.hp=Math.min(max,P.hp+amt);popNum('+'+amt,P.x,H(P.x,P.z)+2.4,P.z,'heal');}else P.mp=Math.min(max,P.mp+amt);P.potCD=.5;if(!snd('mu_potion',{vol:.7}))sfx('potion');}
 
 /* ================= jugador ================= */
-const CAM_YAW=PI/4;
+/* cámaras: 'iso' (la de siempre, de arriba en diagonal), 'tercera' (detrás del hombro, se gira arrastrando) y 'primera' (desde los ojos) */
+const CAMS=['iso','tercera','primera'],CAMN={iso:'Clásica',tercera:'3ra persona',primera:'1ra persona'};let CAMM='iso';try{const c=localStorage.getItem('noxCam');if(CAMS.includes(c))CAMM=c;}catch(e){}
+let CAM_YAW=PI/4,CAM_PITCH=.32;const CDRAG={id:null,x:0,y:0,sx:0,sy:0,moved:false};
+function setCam(m){CAMM=m;try{localStorage.setItem('noxCam',m);}catch(e){}if(m==='iso')CAM_YAW=PI/4;else{CAM_YAW=P.ry+PI;CAM_PITCH=m==='primera'?0:.32;}snapCam=true;const b=document.getElementById('mbCam');if(b)b.title='Cámara: '+CAMN[m];toast('Cámara: <em>'+CAMN[m]+'</em>'+(m!=='iso'?' · arrastrá la pantalla para girar':''));}
+function camTurn(dx,dy){if(CAMM==='iso')return;CAM_YAW-=dx*.0065;CAM_PITCH=Math.max(CAMM==='primera'?-1.1:-.35,Math.min(CAMM==='primera'?1.1:1.05,CAM_PITCH+dy*.0045));}
 const AUTO={on:false,ax:0,az:0};
 let atkHeld=false,invT=0;
 const keys={};
@@ -5201,11 +5206,14 @@ function tapAt(cx,cy,noGround){
 host.addEventListener('pointerdown',e=>{
   if(mode!=='game'||paused||P.dead)return;
   if(e.pointerType!=='mouse'&&e.clientX<innerWidth*.45&&e.clientY>innerHeight*.35&&joy.id===null){joy.id=e.pointerId;joy.ox=e.clientX;joy.oy=e.clientY;joy.x=joy.y=0;joyEl.style.left=e.clientX+'px';joyEl.style.top=e.clientY+'px';joyEl.style.bottom='auto';joyEl.style.margin='-58px 0 0 -58px';joyEl.classList.add('on');try{host.setPointerCapture(e.pointerId);}catch(err){}return;}
-  if(e.pointerType==='mouse'){if(e.button===2){RMB.on=true;RMB.t=performance.now();tapAt(e.clientX,e.clientY);}else if(e.button===0)tapAt(e.clientX,e.clientY,true);return;}
-  /* pellizco con dos dedos = zoom */if(e.pointerId!==joy.id){PINCH.pts.set(e.pointerId,[e.clientX,e.clientY]);if(PINCH.pts.size>=2){const a=[...PINCH.pts.values()];PINCH.d0=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1;PINCH.z0=CAMZ;P.moveTo=null;return;}}
+  if(e.pointerType==='mouse'){if(e.button===2){RMB.on=true;RMB.t=performance.now();tapAt(e.clientX,e.clientY);}else if(e.button===0){if(CAMM!=='iso'){CDRAG.id=e.pointerId;CDRAG.x=CDRAG.sx=e.clientX;CDRAG.y=CDRAG.sy=e.clientY;CDRAG.moved=false;CDRAG.mouse=true;}else tapAt(e.clientX,e.clientY,true);}return;}
+  /* pellizco con dos dedos = zoom */if(e.pointerId!==joy.id){PINCH.pts.set(e.pointerId,[e.clientX,e.clientY]);if(PINCH.pts.size>=2){CDRAG.id=null;const a=[...PINCH.pts.values()];PINCH.d0=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1;PINCH.z0=CAMZ;P.moveTo=null;return;}}
+  /* con cámara libre, arrastrar gira la cámara; un toque corto sigue eligiendo objetivo o lugar */if(CAMM!=='iso'){CDRAG.id=e.pointerId;CDRAG.x=CDRAG.sx=e.clientX;CDRAG.y=CDRAG.sy=e.clientY;CDRAG.moved=false;CDRAG.mouse=false;return;}
   tapAt(e.clientX,e.clientY);
 });
 const PINCH={pts:new Map(),d0:1,z0:1};
+addEventListener('pointermove',e=>{if(e.pointerId!==CDRAG.id)return;if(!CDRAG.moved&&Math.hypot(e.clientX-CDRAG.sx,e.clientY-CDRAG.sy)>9)CDRAG.moved=true;if(CDRAG.moved)camTurn(e.clientX-CDRAG.x,e.clientY-CDRAG.y);CDRAG.x=e.clientX;CDRAG.y=e.clientY;});
+const endDrag=e=>{if(e.pointerId!==CDRAG.id)return;const tap=!CDRAG.moved&&e.type==='pointerup';CDRAG.id=null;if(tap&&mode==='game'&&!paused&&!P.dead)tapAt(e.clientX,e.clientY,CDRAG.mouse);};addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
 addEventListener('pointermove',e=>{if(!PINCH.pts.has(e.pointerId))return;PINCH.pts.set(e.pointerId,[e.clientX,e.clientY]);if(PINCH.pts.size>=2){const a=[...PINCH.pts.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1;setZoom(PINCH.z0*PINCH.d0/d);}});
 const endPinch=e=>{PINCH.pts.delete(e.pointerId);};addEventListener('pointerup',endPinch);addEventListener('pointercancel',endPinch);
 host.addEventListener('wheel',e=>{if(mode!=='game')return;e.preventDefault();setZoom(CAMZ*(1+Math.sign(e.deltaY)*.08));},{passive:false});
@@ -5223,7 +5231,7 @@ addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;co
   if(k==='escape'){closeAll();return;}
   if(mode!=='game')return;
   if(paused){if(k==='i'||k==='v'||k==='c'||k==='m')closeAll();return;}
-  keys[k]=true;
+  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%3]);return;}
   if(k===' '||k==='j'){e.preventDefault();if(!atkHeld){atkHeld=true;attackPress();}}
   const SKK={q:0,w:1,e:2,r:3};if(k in SKK)useSkill(SKK[k]);if(k==='1')usePot('hp');if(k==='2')usePot('mp');if(k==='a'&&!atkHeld){atkHeld=true;attackPress();setTimeout(()=>{if(!keys[' '])atkHeld=false;},150);}
   if(k==='i'||k==='v')ACT.openInv();if(k==='c')ACT.openChar();if(k==='m')ACT.openTravel();if(k==='h')ACT.toggleAuto();if(k==='l')ACT.openQuests();
@@ -5619,6 +5627,7 @@ function renderChar(){const cl=CLASSES[C.cls];
   <p class="hint">${cl.hint} Con el set de armadura completo (5 piezas del mismo tipo) ganás +10% de defensa, y +5% más si todas son +10.</p>
   <div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p><button class="btn full ghost" data-act="toMenu">Cambiar de personaje</button></div>
   <div class="sect"><h3>Gráficos</h3><div class="tabs">${['bajo','medio','alto'].map(l=>`<button data-act="quality" data-q="${l}" class="${Q.level===l?'on':''}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div><p class="hint" style="margin:0">Alto: más nitidez, sombras finas y brillos. Bajo: sin brillos ni sombras, para celulares más simples.</p></div>
+  <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra y 1ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
   <div class="sect"><h3>Cuadros por segundo</h3><div class="tabs">${[30,60].map(f=>`<button data-act="fpsCap" data-f="${f}" class="${FCAP.fps===f?'on':''}">${f}</button>`).join('')}<button data-act="fpsShow" class="${FPSM.on?'on':''}">Ver FPS</button></div><p class="hint" style="margin:0">30 gasta menos batería y calienta menos el celular. 60 se ve más suave si tu equipo lo aguanta.</p></div>
   <div class="sect"><h3>Sonido</h3><label class="vol"><span>Música</span><input type="range" id="volMus" min="0" max="1" step="0.05" value="${SND.vol.mus}"></label><label class="vol"><span>Efectos y ambiente</span><input type="range" id="volSfx" min="0" max="1" step="0.05" value="${SND.vol.sfx}"></label></div>`;}
 
@@ -5651,7 +5660,7 @@ function achCheck(){if(!C)return;const a=achData();
     toast(`<em style="color:var(--gold)">Logro: ${esc(L.d)}</em><br>Título nuevo: <b>${esc(t)}</b> · +₲ ${fmt(L.g)}`);if(!snd('mu_levelup',{vol:.8,jit:0}))sfx('level');if(!C.title)C.title=L.id;persist();}}
 let HLBL=null;
 function heroLabelTick(){if(!C||mode!=='game'){if(HLBL)HLBL.el.hidden=true;return;}
-  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+2.25+y,P.z];},()=>mode==='game'&&!P.dead);}
+  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+2.25+y,P.z];},()=>mode==='game'&&!P.dead&&CAMM==='iso');}
   const L=C.title&&LOGROS.find(x=>x.id===C.title),cl=CLASSES[C.cls],h=`${LIVE.myBub?`<span class="bub">${esc(LIVE.myBub)}</span>`:''}${L?`<small class="tt">${esc(logroT(L,C.cls))}</small>`:''}<i>★</i> ${esc(C.name)}<small>Vos · Nv ${C.L} · ${cl?(C.evo?cl.evo:cl.name):''}</small>`;if(LIVE.myBubT&&T>LIVE.myBubT){LIVE.myBub=null;LIVE.myBubT=0;}if(HLBL.html!==h){HLBL.html=h;HLBL.el.innerHTML=h;}}
 /* misiones diarias: tres por día, cambian a medianoche */
 const DAYT={kill:{d:n=>`Derrotá ${n} bestias`,n:L=>40+Math.min(60,L)},elite:{d:()=>'Derrotá 1 bestia élite',n:()=>1,hard:1},gem:{d:n=>`Usá ${n} gemas en tu equipo`,n:()=>2},event:{d:()=>'Ganá un evento (Añá o Tuguy)',n:()=>1,hard:1},gold:{d:n=>`Derrotá ${n} bestias doradas`,n:()=>2,hard:1},night:{d:n=>`Derrotá ${n} bestias de noche`,n:()=>30}};
@@ -5717,7 +5726,7 @@ const ACT={
     else travel(d.z,pos);},
   fpsCap(d){FCAP.fps=+d.f===30?30:60;try{localStorage.setItem('tsm-fps',FCAP.fps);}catch(e){}DYN.t=DYN.acc=DYN.n=0;toast('Cuadros por segundo: '+FCAP.fps);renderChar();},
   fpsShow(){FPSM.on=!FPSM.on;fpsBox();try{localStorage.setItem('tsm-fpsv',FPSM.on?'1':'0');}catch(e){}renderChar();},
-  quality(d){Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
+  camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%3]);},camSet(d){setCam(d.c);renderChar();},quality(d){Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
   cauldSel(d){CALD.sel=+d.i;CALD.res=null;renderCaldero();},
   cauldGo(d){cauldGo(d.r);},
   selPlay(d){enterGame(+d.i);},
@@ -6271,7 +6280,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={get SCN(){return scene},shpSet:on=>{SHPROXY_ON=on;zoneG.traverse(o=>{if(o.userData.src)o.userData.src.forEach(x=>x.castShadow=!on);});},get CAM(){return camera},duelSet:o=>{Object.assign(DUEL,o);LIVE.me=LIVE.me||'me';},duelTest:m=>{DUEL.key=m.key;DUEL.side='a';DUEL.room={a:'me',b:'x',start:0};LIVE.me='me';duelMsg(m);},bakeNow:()=>{delete window.__NOBAKE;npcs.forEach(n=>charBake(n.m));if(HERO)charBake(HERO);try{LIVE.others.forEach(o=>o.m&&charBake(o.m));}catch(e){}return freezeStatic();},get MRG(){return window.__MRG||0},get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={get SCN(){return scene},camSet:m=>setCam(m),camTurn:(x,y)=>camTurn(x,y),shpSet:on=>{SHPROXY_ON=on;zoneG.traverse(o=>{if(o.userData.src)o.userData.src.forEach(x=>x.castShadow=!on);});},get CAM(){return camera},duelSet:o=>{Object.assign(DUEL,o);LIVE.me=LIVE.me||'me';},duelTest:m=>{DUEL.key=m.key;DUEL.side='a';DUEL.room={a:'me',b:'x',start:0};LIVE.me='me';duelMsg(m);},bakeNow:()=>{delete window.__NOBAKE;npcs.forEach(n=>charBake(n.m));if(HERO)charBake(HERO);try{LIVE.others.forEach(o=>o.m&&charBake(o.m));}catch(e){}return freezeStatic();},get MRG(){return window.__MRG||0},get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
@@ -6412,11 +6421,20 @@ function updCamera(dt){
     const sh=!port&&innerWidth>=640?1.45:0;look.set(-Math.cos(a)*sh,.95,6.2+Math.sin(a)*sh);camera.lookAt(look);
     const oy=port?Math.round(innerHeight*(window.__CREATING&&!$('#sel').hidden?.12:.30)):0;if(oy!==camOY){camOY=oy;if(oy)camera.setViewOffset(innerWidth,innerHeight,0,oy,innerWidth,innerHeight);else camera.clearViewOffset();}}
   else if(STUDIO.on){if(camOY){camOY=0;camera.clearViewOffset();}camera.position.copy(STUDIO.cam);camera.lookAt(STUDIO.look);}
+  else if(CAMM!=='iso'&&mode==='game'){if(camOY){camOY=0;camera.clearViewOffset();}const py=H(P.x,P.z)+(HERO&&HERO.flyK?HERO.flyK*1.2:0),sy=Math.sin(CAM_YAW),cy=Math.cos(CAM_YAW),cp=Math.cos(CAM_PITCH),sp=Math.sin(CAM_PITCH);
+    if(CAMM==='primera'){/* desde los ojos: la cámara mira hacia donde apunta el giro */camera.position.set(P.x-sy*.12,py+1.62,P.z-cy*.12);look.set(camera.position.x-sy*cp*10,camera.position.y-sp*10,camera.position.z-cy*cp*10);snapCam=false;}
+    else{/* tercera persona: detrás y apenas a la derecha del hombro, como en Fortnite */const d=3.6*CAMZ,rx=cy*.55,rz=-sy*.55;look.set(P.x+rx,py+1.55,P.z+rz);camT.set(look.x+sy*cp*d,look.y+sp*d,look.z+cy*cp*d);
+      const gy=H(camT.x,camT.z)+.35;if(camT.y<gy)camT.y=gy;/* no se mete bajo el terreno */
+      if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.00001,dt));}
+    HOLE.uHole.value=0;if(shake>0){camera.position.x+=R(-1,1)*shake*.2;camera.position.y+=R(-1,1)*shake*.2;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
   else{if(camOY){camOY=0;camera.clearViewOffset();}const port=innerHeight>innerWidth,k=(port?1.4:1)*CAMZ,hd=6.6*k,vh=10.2*k,py=H(P.x,P.z);camT.set(P.x+Math.sin(CAM_YAW)*hd,py+vh,P.z+Math.cos(CAM_YAW)*hd);
     if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));look.set(P.x,py+1,P.z);HOLE.uHole.value=1;if(shake>0){camera.position.x+=R(-1,1)*shake*.35;camera.position.y+=R(-1,1)*shake*.35;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
   camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();HOLE.uPV.value.set(P.x,H(P.x,P.z)+1.1,P.z).applyMatrix4(camera.matrixWorldInverse);if(mode!=='game')HOLE.uHole.value=0;
   sky.position.copy(camera.position);const cx=mode==='game'?P.x:0,cz=mode==='game'?P.z:6;sun.position.set(cx+sunDir.x*90,sunDir.y*90,cz+sunDir.z*90);sun.target.position.set(cx,0,cz);
-  const s=innerHeight>innerWidth?40:30;if(sc.right!==s){sc.left=-s;sc.right=s;sc.top=s;sc.bottom=-s;sc.updateProjectionMatrix();}
+  if(HERO)HERO.g.visible=!HERO.hideWait&&!(CAMM==='primera'&&mode==='game');
+  {const fv=mode==='game'&&CAMM!=='iso'?(CAMM==='primera'?72:62):45;if(camera.fov!==fv){camera.fov=fv;camera.updateProjectionMatrix();}}
+  /* lo que está más allá de la niebla total no se ve: la cámara corta ahí (con la cámara de 3ra y 1ra persona se ve hasta el horizonte) y el cielo se achica para quedar adentro */{const ff=scene.fog&&scene.fog.far<590?Math.round(scene.fog.far+6):600;if(camera.far!==ff){camera.far=ff;camera.updateProjectionMatrix();sky.scale.setScalar(Math.min(1,ff*.9/450));}}
+  /* área de la sombra alrededor del jugador: en el celular más chica (menos objetos en la pasada de sombra) */const s=(innerHeight>innerWidth?40:30)*(IS_MOB?.65:1);if(sc.right!==s){sc.left=-s;sc.right=s;sc.top=s;sc.bottom=-s;sc.updateProjectionMatrix();}
 }
 let last=performance.now(),HITSTOP=0;
 /* las pruebas automáticas pueden detener el reloj (__HOLD) y avanzar cuadro a cuadro con __NOX.step(dt), con o sin dibujar */
