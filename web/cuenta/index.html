@@ -450,5 +450,14 @@ let pollT=0;function startAdminPoll(){clearInterval(pollT);if(S.me&&S.me.user.ro
 
 (async()=>{await loadMe();renderWho();startAdminPoll();route();})();
 </script>
+<script>/* ojito para ver la contraseña: se agrega solo a cada campo de contraseña */
+(function(){const P='<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',S=a=>'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P+(a?'':'<path d="M3 3l18 18"/>')+'</svg>';
+function wrap(i){if(i.dataset.eye)return;i.dataset.eye='1';const cs=getComputedStyle(i),w=document.createElement('span');w.className='pwbox';w.style.cssText='position:relative;min-width:0;display:'+(cs.display==='block'?'block':'inline-flex')+';flex:'+cs.flex;i.parentNode.insertBefore(w,i);w.appendChild(i);i.style.width='100%';i.style.flex='1 1 auto';i.style.paddingRight='44px';i.style.boxSizing='border-box';
+  const b=document.createElement('button');b.type='button';b.className='pweye';b.setAttribute('aria-label','Mostrar contraseña');b.innerHTML=S(true);b.style.cssText='position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;opacity:.7;cursor:pointer;box-shadow:none';
+  b.onmousedown=e=>e.preventDefault();b.onclick=()=>{const show=i.type==='password';i.type=show?'text':'password';b.innerHTML=S(!show);b.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');b.style.opacity=show?'1':'.7';};w.appendChild(b);}
+function scan(r){(r||document).querySelectorAll('input[type=password]:not([data-eye])').forEach(wrap);}
+window.pwEyeScan=scan;const go=()=>{scan();const root=document.getElementById('sel')||document.body;new MutationObserver(()=>scan(root)).observe(root,{childList:true,subtree:true});};
+document.readyState==='loading'?document.addEventListener('DOMContentLoaded',go):go();})();
+</script>
 </body>
 </html>

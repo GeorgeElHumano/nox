@@ -36,13 +36,13 @@ if want og razas; then
 import os
 from PIL import Image
 import numpy as np
-new=Image.open('/tmp/nox-og.jpg');dst='web/img/w/og.jpg'
+new=Image.open('/tmp/nox-og.jpg');dst='web/img/w/og-invita.jpg'
 def same(a,b,tol=9.0,frac=.04):
     if a.size!=b.size:return False
     x=np.asarray(a.convert('RGB')).astype(np.int16);y=np.asarray(b.convert('RGB')).astype(np.int16);d=np.abs(x-y).max(2)
     return d.mean()<tol and (d>40).mean()<frac
-if os.environ.get('FORCE')=='1' or not os.path.exists(dst) or not same(Image.open(dst),new):new.save(dst,'JPEG',quality=88);print('og.jpg actualizada')
-else:print('og.jpg sin cambios')
+if os.environ.get('FORCE')=='1' or not os.path.exists(dst) or not same(Image.open(dst),new):new.save(dst,'JPEG',quality=88);print('og-invita.jpg actualizada')
+else:print('og-invita.jpg sin cambios')
 PY
 fi
 bash scripts/web/build.sh
