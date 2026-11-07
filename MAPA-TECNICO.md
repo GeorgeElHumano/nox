@@ -13,9 +13,9 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 6/11/2026:
-  - La web nueva está publicada.
-  - El juego de `arte-cc0` (Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul) **todavía no** está publicado.
+- Estado al 7/11/2026: **juego y web publicados** (main = `arte-cc0`, commit cd26eb0). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas y la optimización.
+  - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
+  - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
 - `functions/api/[[path]].js`: la API del servidor (cuentas, pedidos), con base D1 `nox-db`.
 - `gamedata.json`: exportación de datos del juego que usa `gencatalog.py` para `lib/catalog.js` (tienda). No valida stats.
 
@@ -152,12 +152,11 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `live.js` y `live2.js`: revisan noxparaguay.com en vivo.
 - `gdrive.py`: lista y baja carpetas de Google Drive (packs de Quaternius).
 - `oga.sh`: busca en OpenGameArt.
+- `livegame.js` (juego publicado en 5 dispositivos), `presan.js` (revisión previa a publicar).
 - `perf2.js` (rendimiento por zona), `who.js`/`casters.js`/`cast2.js` (qué dibuja y qué hace sombra), `texleak.js`, `vis.js`, `benchtest.js`.
 
 ## Pendientes conocidos
 
-- Cuando se publique el juego con las 3 mascotas: en `web/views.js` (pestaña Mascotas) volver a poner el texto "Podés llevar las tres a la vez… Ña Eusebia las vende" y activar los precios (`W.petsShop`). Hoy la web publicada no lo dice porque el juego publicado todavía lleva una sola.
-
-- Publicar el juego de `arte-cc0` cuando el dueño lo apruebe.
+- Confirmar requisitos mínimos con los resultados de `?prueba=1` en teléfonos reales del dueño.
 - Ítem "Coraza del Rey de las Serpientes": el texto dice "piel dorada" y el Moñái ahora es rojo. Falta que el dueño decida el texto nuevo.
 - Nada de esto existe para el escorpión ni el Moñái en modelos 3D descargables gratis (poly.pizza da 403 desde el servidor). Por eso son procedurales.
