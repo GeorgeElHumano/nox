@@ -33,6 +33,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `recalc()` (cerca de la línea 1450): fórmulas de vida, maná, daño y defensa por clase.
   - El cuervo del Mburuvicha está en `ravenTick`: daño `.55*(1+ene/260)`.
   - En el Caballero, la energía sube las técnicas: `useSkill` multiplica `mult` por `1+ene/500`.
+- Mascotas: `PETS` (precio, sonido), `PETK`, `C.pets={imp,hada,rudolf}` (las tres a la vez, una casilla cada una en `#eqGrid`, `.pslot`). `petTick`/`petMove` dibujan una figura por mascota en `PETPOS`. Se venden en la tienda de Ña Eusebia (`shopStock('boticaria')`). Sonidos `pet_imp`, `pet_hada`, `pet_rudolf` (síntesis propia). Íconos en `assets/ui/pet_*.webp`. Partidas viejas: `C.pet` pasa a `C.pets` en `fixChar`.
 - `fixChar()`: migraciones de las partidas guardadas. Si `c.mbE` no existe, al Mburuvicha se le devuelven los puntos una sola vez y se avisa con un toast en `enterGame`.
 - Mobs y mapas:
   - `MOBS`: definición de cada mob (`model:'quad'|'lizard'|'scorp'|'snake'|'biped'`).
@@ -83,6 +84,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
   - Se arman con `/home/claude/sndaudit/build.py`.
   - Todas las fuentes son gratuitas y con licencia. El volumen va parejo por categoría (`CAT`).
   - Los créditos están en `CREDITOS-SONIDO.md`.
+  - Escudos: `CC0_SH` (un modelo por set) + `CC0_SHT` (tinte desde Tau) para que no se repitan.
   - `mu_gem` y `mu_rare` son síntesis propia: `sndaudit/synth.py`.
   - Ojo: si a `build.py` se le pasan argumentos, pisa `build.json`. Correrlo siempre sin argumentos.
 - `assets/m/*.mp3`: música de 0 A.D. (CC BY-SA 3.0) normalizada a −18 LUFS, a 112k.
@@ -132,6 +134,8 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `oga.sh`: busca en OpenGameArt.
 
 ## Pendientes conocidos
+
+- Cuando se publique el juego con las 3 mascotas: en `web/views.js` (pestaña Mascotas) volver a poner el texto "Podés llevar las tres a la vez… Ña Eusebia las vende" y activar los precios (`W.petsShop`). Hoy la web publicada no lo dice porque el juego publicado todavía lleva una sola.
 
 - Publicar el juego de `arte-cc0` cuando el dueño lo apruebe.
 - Ítem "Coraza del Rey de las Serpientes": el texto dice "piel dorada" y el Moñái ahora es rojo. Falta que el dueño decida el texto nuevo.

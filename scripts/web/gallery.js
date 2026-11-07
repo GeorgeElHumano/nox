@@ -68,6 +68,10 @@ let shot=null;
       await p.evaluate(()=>{const X=window.__NOX,H=X.HERO,Wg=H.wings.g;(H.g.parent||H.g).traverse(o=>{if(!(o.isMesh||o.isSkinnedMesh||o.isPoints||o.isSprite||o.isLine))return;let q=o,inW=false;while(q){if(q===Wg){inW=true;break;}q=q.parent;}if(!inW)o.visible=false;});
         H.g.updateMatrixWorld(true);const bb=new THREE.Box3();Wg.traverse(o=>{if(o.isMesh&&o.visible&&!o.isSprite)bb.expandByObject(o);});const c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());const S=X.STUDIO;const R=Math.max(sz.x,sz.y*1.3)+.2;S.look.copy(c);S.cam.set(c.x+Math.sin(Math.PI+.25)*R*1.65,c.y+R*.95,c.z+Math.cos(Math.PI+.25)*R*1.65);});
       await wait(400);await shot(`${OUT}/${cls}_g${g}_${lv}.png`);console.log('ala sola',cls,g,lv);}}
+  if(MODE==='pets'){await p.evaluate(()=>{const X=window.__NOX;if(X.HERO)X.HERO.g.visible=false;X.STUDIO.clear&&X.STUDIO.clear();});
+    for(const k of ['imp','hada','rudolf']){const bb=await p.evaluate(k=>window.__NOX.petShow(k),k);await wait(1200);
+      await p.evaluate(bb=>{const S=window.__NOX.STUDIO;const c=[(bb[0][0]+bb[1][0])/2,(bb[0][1]+bb[1][1])/2,(bb[0][2]+bb[1][2])/2];const sz=Math.max(bb[1][0]-bb[0][0],bb[1][1]-bb[0][1],bb[1][2]-bb[0][2]);S.look.set(c[0],c[1],c[2]);S.cam.set(c[0]+sz*1.1,c[1]+sz*.45,c[2]+sz*1.7);},bb);await wait(500);
+      await shot(`${OUT}/pet_${k}.png`);console.log('foto mascota',k);}}
   if(MODE==='icons'){/* íconos de inventario: equipo por raza y set, escudos, gemas, pociones y alas (fondo transparente siempre) */
     const shot=async(name,it)=>{let d=null;for(let i=0;i<40;i++){d=await p.evaluate(it=>{const X=window.__NOX;try{return X.irIcon(it);}catch(e){return 'ERR '+e.message;}},it);if(d&&d!=='WAIT'&&!String(d).startsWith('ERR'))break;await wait(400);}
       if(d&&d!=='WAIT'&&!String(d).startsWith('ERR'))fs.writeFileSync(`${OUT}/${name}.png`,Buffer.from(d.split(',')[1],'base64'));else console.log('sin icono',name,String(d).slice(0,80));};

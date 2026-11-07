@@ -11,7 +11,7 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 - **Bart Kelsey** — CC BY 3.0 — Level Up! (OpenGameArt).
 - **dklon** — CC BY 3.0 — Whistles (OpenGameArt).
 - **CC0 (dominio público)**: Kenney (50 RPG Sound Effects, Interface Sounds), rubberduck (80 CC0 RPG SFX, 80 CC0 Creature SFX 1 y 2), artisticdude (RPG Sound Pack), jaggedstone (Magic Spell SFX), trazzz123 (Deep Monster Roar), caveboytup (Wolf Monster), fvcalderan (Insect Sounds), y los paquetes "Bear growls", "Monster snarls" y "Steam release sounds" de OpenGameArt.
-- **Sonidos propios de NOX (CC0)**: la gema y el aviso de ítem raro están hechos por síntesis, sin muestras de terceros.
+- **Sonidos propios de NOX (CC0)**: la gema, el aviso de ítem raro y las voces de las mascotas están hechos por síntesis, sin muestras de terceros.
 
 ## Efectos (assets/s)
 
@@ -147,6 +147,9 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 | mu_rage.mp3 | leo_magic/45_Charge_05.wav | Leohpaz | CC BY 4.0 |
 | mu_rain.mp3 | mezcla: bow_attack_01.ogg, arrowfly_01.ogg, arrowfly_02.ogg, arrowfly_01.ogg, arrowfly_02.ogg | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
 | mu_rare.mp3 | síntesis propia (aviso de dos notas) | NOX | CC0 |
+| pet_imp.mp3 | síntesis propia (chillido de murciélago) | NOX | CC0 |
+| pet_hada.mp3 | síntesis propia (campanitas) | NOX | CC0 |
+| pet_rudolf.mp3 | síntesis propia (resoplido y cascabeles) | NOX | CC0 |
 | mu_shield.mp3 | leo_heal/17_Def_buff_01.wav | Leohpaz | CC BY 4.0 |
 | mu_stab.mp3 | rd80/blade_02.ogg | rubberduck (OpenGameArt) | CC0 |
 | mu_swell.mp3 | leo_heal/16_Atk_buff_04.wav | Leohpaz | CC BY 4.0 |

@@ -173,6 +173,7 @@ input{user-select:text;-webkit-user-select:text}
 /* inventario */
 .inv-wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:center}
 .eqgrid{display:grid;grid-template-columns:repeat(3,58px);grid-auto-rows:58px;gap:6px;flex:none}
+.pslot{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 40%,transparent)}.pslot .pimg.off{opacity:.22;filter:grayscale(1)}.pslot .pimg{width:80%;height:80%}.pet-r{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(167,129,72,.15)}
 .inv-side{flex:1 1 280px;min-width:0}
 .invgrid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px}
 .cell,.slot{position:relative;aspect-ratio:1;max-width:100%;border-radius:6px;background:var(--cell);border:1px solid rgba(94,69,41,.8);display:grid;place-items:center;padding:0}
@@ -865,11 +866,11 @@ function petBuild(sub){const g=new THREE.Group();
   g.traverse(o=>{if(o.isMesh)o.castShadow=false;});return g;}
 /* mascotas con modelo propio (CC0 / MIT): Imp = murciélago (Quaternius), Hada = hada alada, Rudolf = ciervo (Quaternius) con nariz roja.
    Se cargan aparte del set de 0 A.D. para que un fallo no apague los demás modelos. Tamaño chico: acompañan, no tapan. */
-const PETMODEL={imp:{f:'pet_bat',sz:.38,fly:1.2,anim:'Idle',ts:1.25,glow:0xff4a2a,gs:.7},hada:{f:'pet_fairy',sz:.32,fly:1.25,anim:'Flap',ts:1,glow:0xcff6ff,gs:.55},rudolf:{f:'pet_stag',sz:.5,fly:0,anim:'Idle',walk:'Walk',run:'Gallop',glow:0xff2a2a,nose:1}};
+const PETMODEL={imp:{f:'pet_bat',sz:.62,fly:1.2,anim:'Idle',ts:1.25,glow:0xff4a2a,gs:.6,tint:[0xd2442a,.45],em:[0x5a1000,.35]},hada:{f:'pet_fairy',sz:.46,fly:1.25,anim:'Flap',ts:1,glow:0xcff6ff,gs:.55},rudolf:{f:'pet_stag',sz:.78,fly:0,anim:'Idle',walk:'Walk',run:'Gallop',glow:0xff2a2a,nose:1}};
 const PETOK={},PETG={};
 function petGLB(n){if(!PETG[n]){PETG[n]=fetch(OAD.base+n+'.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json();}).then(j=>new Promise((res,rej)=>{const s=atob(j.glb),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);new THREE.GLTFLoader().parse(u.buffer,'',g=>{PETOK[n]=g;res(g);},rej);}));PETG[n].catch(()=>{});}return PETG[n];}
 function petModel(sub,g){const M=PETMODEL[sub],g0=M&&PETOK[M.f];if(!g0)return false;
-  const m=THREE.SkeletonUtils.clone(g0.scene);m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(o.material){o.material=o.material.clone();if(o.material.metalness!=null)o.material.metalness=Math.min(o.material.metalness,.2);}}});
+  const m=THREE.SkeletonUtils.clone(g0.scene);m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(o.material){o.material=o.material.clone();if(o.material.metalness!=null)o.material.metalness=Math.min(o.material.metalness,.2);if(M.tint)o.material.color.lerp(new THREE.Color(M.tint[0]),M.tint[1]);if(M.em&&o.material.emissive){o.material.emissive.setHex(M.em[0]);o.material.emissiveIntensity=M.em[1];}}}});
   const bb=new THREE.Box3().setFromObject(m),sz=bb.getSize(new THREE.Vector3()),k=M.sz/Math.max(sz.x,sz.y,sz.z,1e-3);m.scale.multiplyScalar(k);m.updateMatrixWorld(true);
   const b2=new THREE.Box3().setFromObject(m);m.position.y-=b2.min.y;m.position.x-=(b2.min.x+b2.max.x)/2;m.position.z-=(b2.min.z+b2.max.z)/2;g.add(m);g.updateMatrixWorld(true);
   const mx=new THREE.AnimationMixer(m),acts={};(g0.animations||[]).forEach(c=>{acts[c.name]=mx.clipAction(c);});
@@ -879,29 +880,36 @@ function petModel(sub,g){const M=PETMODEL[sub],g0=M&&PETOK[M.f];if(!g0)return fa
   if(M.nose){/* nariz roja de Rudolf: en la punta del hocico, pegada al hueso de la cabeza para que siga la animación */
     const b3=new THREE.Box3().setFromObject(m);let head=null;m.traverse(o=>{if(!head&&o.isBone&&/head/i.test(o.name)&&!/end|nub|top/i.test(o.name))head=o;});
     const hp=new THREE.Vector3();if(head)head.getWorldPosition(hp);else hp.set(0,b3.max.y*.8,b3.max.z);
-    const nose=new THREE.Group();nose.add(new THREE.Mesh(new THREE.SphereGeometry(M.sz*.045,10,8),new THREE.MeshBasicMaterial({color:0xff2a1a})));const ng=glowSprite(0xff2a1a,M.sz*.32,.85);nose.add(ng);U.flick=ng;
+    const nose=new THREE.Group();nose.add(new THREE.Mesh(new THREE.SphereGeometry(M.sz*.045,10,8),new THREE.MeshBasicMaterial({color:0xff2a1a})));const ng=glowSprite(0xff2a1a,M.sz*.2,.8);nose.add(ng);U.flick=ng;
     let tip=null;m.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes.position){const pa=o.geometry.attributes.position,v=new THREE.Vector3();o.updateMatrixWorld(true);
       for(let i=0;i<pa.count;i+=3){v.fromBufferAttribute(pa,i);if(o.isSkinnedMesh&&o.boneTransform)o.boneTransform(i,v);v.applyMatrix4(o.matrixWorld);if(Math.abs(v.y-hp.y)<M.sz*.25&&(!tip||v.z>tip.z))tip=v.clone();}}});
     nose.position.copy(tip||hp);g.add(nose);if(head)head.attach(nose);}
   return true;}
-const PET={g:null,sub:null,x:0,z:0,ok:false,req:{}};
+const PETREQ={},PETO={};/* una figura por mascota llevada; cada una camina o vuela en su lugar alrededor del jugador */
+const PETPOS={imp:[-.95,-1.05],hada:[.95,-1.05],rudolf:[0,-1.9]};
 function petTick(dt){
-  const want=C&&C.pet&&mode==='game'&&P&&!P.dead?C.pet.sub:null;
-  if(want&&PETMODEL[want]&&!PET.req[want]){PET.req[want]=1;petGLB(PETMODEL[want].f).then(()=>{PET.sub=null;}).catch(()=>{});}
-  if(want!==PET.sub){if(PET.g){scene.remove(PET.g);}PET.g=null;PET.sub=want;if(want){PET.g=petBuild(want);scene.add(PET.g);PET.ok=false;}}
-  if(!PET.g)return;
-  const fx=Math.sin(P.ry),fz=Math.cos(P.ry),tx=P.x-fx*1.25+fz*.85,tz=P.z-fz*1.25-fx*.85;
-  const ox=PET.x,oz=PET.z;
-  if(!PET.ok||Math.hypot(tx-PET.x,tz-PET.z)>12){PET.x=tx;PET.z=tz;PET.ok=true;}
-  else{const k=Math.min(1,dt*5);PET.x+=(tx-PET.x)*k;PET.z+=(tz-PET.z)*k;}
-  const u=PET.g.userData,PMo=PETMODEL[PET.sub],mdl=!!u.model,fly=mdl?PMo.fly:.95,sp=dt>0?Math.hypot(PET.x-ox,PET.z-oz)/dt:0;PET.sp=(PET.sp||0)+(sp-(PET.sp||0))*Math.min(1,dt*6);
-  const y=H(PET.x,PET.z)+fly+(fly?Math.sin(T*3.2)*.08:0);PET.g.position.set(PET.x,y,PET.z);
-  {const want=PET.sp>.5?Math.atan2(PET.x-ox,PET.z-oz):P.ry;let d=want-PET.g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));PET.g.rotation.y+=d*Math.min(1,dt*8);}
-  if(u.mixer){if(PMo.walk){const nx=PET.sp>4.2&&u.acts[PMo.run]?u.acts[PMo.run]:PET.sp>.6&&u.acts[PMo.walk]?u.acts[PMo.walk]:u.acts[PMo.anim];if(nx&&nx!==u.cur){nx.reset().play();if(u.cur)u.cur.crossFadeTo(nx,.25,false);u.cur=nx;}if(u.cur===u.acts[PMo.walk])u.cur.timeScale=clamp(PET.sp/1.6,.6,2);}u.mixer.update(dt);}
+  const on=mode==='game'&&P&&!P.dead?petsOn():[];
+  for(const k of on)if(PETMODEL[k]&&!PETREQ[k]){PETREQ[k]=1;petGLB(PETMODEL[k].f).then(()=>{if(PETO[k])PETO[k].rebuild=1;}).catch(()=>{});}
+  for(const k of PETK){const want=on.includes(k);let Q=PETO[k];
+    if((!want||Q&&Q.rebuild)&&Q){scene.remove(Q.g);disposeTree&&disposeTree(Q.g);if(!want){delete PETO[k];continue;}Q=null;}
+    if(!want)continue;
+    if(!Q){Q=PETO[k]={g:petBuild(k),x:0,z:0,ok:false,sp:0,sndT:6+Math.random()*10};scene.add(Q.g);}
+    petMove(Q,k,dt);}}
+function petMove(Q,k,dt){
+  const o=PETPOS[k],fx=Math.sin(P.ry),fz=Math.cos(P.ry),tx=P.x+fx*o[1]+fz*o[0],tz=P.z+fz*o[1]-fx*o[0];
+  const ox=Q.x,oz=Q.z;
+  if(!Q.ok||Math.hypot(tx-Q.x,tz-Q.z)>12){Q.x=tx;Q.z=tz;Q.ok=true;}
+  else{const kk=Math.min(1,dt*5);Q.x+=(tx-Q.x)*kk;Q.z+=(tz-Q.z)*kk;}
+  const u=Q.g.userData,PMo=PETMODEL[k],mdl=!!u.model,fly=mdl?PMo.fly:.95,sp=dt>0?Math.hypot(Q.x-ox,Q.z-oz)/dt:0;Q.sp+=(sp-Q.sp)*Math.min(1,dt*6);
+  const y=H(Q.x,Q.z)+fly+(fly?Math.sin(T*3.2+o[0]*2)*.08:0);Q.g.position.set(Q.x,y,Q.z);
+  {const want=Q.sp>.5?Math.atan2(Q.x-ox,Q.z-oz):P.ry;let d=want-Q.g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));Q.g.rotation.y+=d*Math.min(1,dt*8);}
+  if(u.mixer){if(PMo.walk){const nx=Q.sp>4.2&&u.acts[PMo.run]?u.acts[PMo.run]:Q.sp>.6&&u.acts[PMo.walk]?u.acts[PMo.walk]:u.acts[PMo.anim];if(nx&&nx!==u.cur){nx.reset().play();if(u.cur)u.cur.crossFadeTo(nx,.25,false);u.cur=nx;}if(u.cur===u.acts[PMo.walk])u.cur.timeScale=clamp(Q.sp/1.6,.6,2);}u.mixer.update(dt);}
   if(u.wings){const f=Math.sin(T*16)*.7;u.wings[0].rotation.y=f;u.wings[1].rotation.y=-f;}
   if(u.tail)u.tail.rotation.z=Math.sin(T*6)*.5;
   if(u.flick)u.flick.material.opacity=.35+.2*Math.sin(T*11);
-  if(PET.sub==='hada'&&!u.model&&PET.g.children[0]&&PET.g.children[0].material){PET.g.children[0].material.opacity=.5+.15*Math.sin(T*4);}
+  if(k==='hada'&&!u.model&&Q.g.children[0]&&Q.g.children[0].material){Q.g.children[0].material.opacity=.5+.15*Math.sin(T*4);}
+  /* de vez en cuando hace su sonido, bajito y desde donde está */
+  Q.sndT-=dt;if(Q.sndT<=0){Q.sndT=14+Math.random()*16;if(AU.ctx&&AU.on&&Q.sp<3)snd(PETS[k].snd,{x:Q.x,z:Q.z,vol:.35,jit:.08});}
 }
 
 /* ================= Guyra Hũ: el cuervo del Mburuvicha ================= */
@@ -1433,7 +1441,9 @@ const isEq=it=>!!it&&EQK.includes(it.k);
 const stackable=it=>['gem','pot','scroll','quest','mat'].includes(it.k);
 function newEquip(cls,k,t,o){o=o||{};const it={u:++UID,k,c:cls,t,lv:o.lv||0,op:o.op||0,luck:!!o.luck,ex:o.ex||[]};if(o.epic)it.epic=true;if(o.anc)it.anc=o.anc;return it;}
 function stackItem(k,sub,n){return{u:++UID,k,sub,n:n||1};}
-const PETS={imp:{n:'Imp',col:'#ff6a4a',desc:'Te acompaña y aumenta tu daño un 8%.'},hada:{n:'Hada del Monte',col:'#bff0ff',desc:'Te acompaña y aumenta tu defensa un 12%.'},rudolf:{n:'Rudolf',col:'#e2b27a',desc:'Te acompaña y aumenta el oro de las bestias un 50%.'}};
+const PETS={imp:{n:'Imp',col:'#ff6a4a',desc:'Te acompaña y aumenta tu daño un 8%.',price:1500000,snd:'pet_imp',side:-1},hada:{n:'Hada del Monte',col:'#bff0ff',desc:'Te acompaña y aumenta tu defensa un 12%.',price:2000000,snd:'pet_hada',side:1},rudolf:{n:'Rudolf',col:'#e2b27a',desc:'Te acompaña y aumenta el oro de las bestias un 50%.',price:1200000,snd:'pet_rudolf',side:0}};
+const PETK=['imp','hada','rudolf'];/* se pueden llevar las tres a la vez: una casilla por mascota */
+const petsOn=()=>C&&C.pets?PETK.filter(k=>C.pets[k]):[];
 const newPet=()=>({u:++UID,k:'pet',sub:pick(['imp','hada','rudolf']),n:1});
 function itemName(it){
   if(it.k==='pet')return PETS[it.sub].n;  if(it.k==='gem')return GEMS[it.sub].name;if(it.k==='pot')return POTS[it.sub].name;if(it.k==='scroll')return SCROLLS[it.sub].name;if(it.k==='quest')return QITEMS[it.sub].name;if(it.k==='mat')return MATS[it.sub]?MATS[it.sub].name:'Trofeo';
@@ -1461,7 +1471,7 @@ function canEquip(it){
   const r=reqOf(it);if(C.L<r.lvl)return 'Necesitás nivel '+r.lvl;if(C.st[r.main]<r.stat)return 'Necesitás '+r.stat+' de '+STATN[r.main];return null;
 }
 function itemPrice(it){
-  if(it.k==='pet')return 400000;
+  if(it.k==='pet')return PETS[it.sub].price;
   if(it.k==='gem')return GEMS[it.sub].sell*3;if(it.k==='pot')return POTS[it.sub].price;if(it.k==='scroll')return SCROLLS[it.sub].price;if(it.k==='quest')return 0;if(it.k==='mat')return(MATS[it.sub]?MATS[it.sub].sell:50)*3;
   if(it.k==='wings')return 3000000*(1+it.lv*.5)*((it.g||1)>=3?14:(it.g||1)>=2?4:1);
   return Math.round(TPRICE[it.t]*PRICEF[it.k]*(1+it.lv*it.lv*.18)*(it.ex&&it.ex.length?3:1)*(it.luck?1.3:1)*(1+it.op*.3)/10)*10;
@@ -1498,7 +1508,7 @@ function recalc(){
   const set=setOK&&setT>=0;if(set){def*=1.1;if(setLv>=10)def*=1.05;}
   if(ex.hp)maxHP*=1+.04*ex.hp;if(ex.mp)maxMP*=1+.04*ex.mp;
   if(P.buffs.vida>0)maxHP*=1.25;if(P.buffs.def>0)def+=10+s.ene/6;
-  const pt=C.pet?C.pet.sub:null;if(pt==='hada')def*=1.12;const pDmg=pt==='imp'?1.08:1,pGold=pt==='rudolf'?1.5:1;
+  const pts=C.pets||{};if(pts.hada)def*=1.12;const pDmg=pts.imp?1.08:1,pGold=pts.rudolf?1.5:1;
   min=Math.max(1,Math.round(min));max=Math.max(min+1,Math.round(max));
   DS={petGold:pGold,anc,maxHP:Math.round(maxHP),maxMP:Math.round(maxMP),min,max,def:Math.round(def),dmgMul:(1+wingDmg)*(1+.02*(ex.dmg||0))*ancDmg*pDmg,
     atkTime:Math.max(.2,CLASSES[cls].atk/((1+s.agi/220)*(1+.07*(ex.spd||0))*ancSpd)),crit:.03+(luckW?.05:0)+ancCrit+(P.buffs.crit>0?.15:0),exr:.1*(ex.exr||0),absorb,dr:.04*(ex.dr||0)+ancDr,refl:.05*(ex.refl||0),
@@ -3124,8 +3134,11 @@ const CC0_W={caballero:['c_k_sword_1handed','c_k_sword_2handed','c_w_dagger_2','
  gladiador:['c_k_sword_2handed','c_w_dagger_2','c_w_claymore','c_w_claymore','c_w_claymore','c_w_claymore','c_w_claymore'],
  arquera:['c_w_bow_wooden','c_w_bow_wooden','c_w_bow_wooden2','c_w_bow_wooden2','c_w_bow_golden','c_w_bow_golden','c_w_bow_evil'],
  hechicero:[],mburuvicha:[]};
-const CC0_SH=['c_k_shield_round','c_w_shield_round','c_w_shield_heater','c_w_shield_heater_2','c_w_shield_heater_2','c_w_shield_celtic_golden','c_w_shield_celtic_golden'];
-const CC0_WS={c_w_axe_small:.29,c_w_hammer_small:.23,c_w_axe:.23,c_w_hammer_double:.23,c_k_sword_1handed:.62,c_k_sword_2handed:.46,c_w_dagger_2:.26,c_w_claymore:.2,c_w_axe_double:.17,c_w_bow_wooden:.25,c_w_bow_wooden2:.25,c_w_bow_golden:.25,c_w_bow_evil:.25,c_k_shield_round:.75,c_w_shield_round:.28,c_w_shield_heater:.28,c_w_shield_heater_2:.28,c_w_shield_celtic_golden:.26};
+const CC0_SH=['c_k_shield_round','c_w_shield_round','c_w_shield_round_2','c_w_shield_heater','c_w_shield_heater_2','c_w_shield_celtic_golden','c_w_shield_celtic_golden'];
+/* cada escudo con su propia forma o color: desde el Guardián se tiñe con el metal y el brillo de su set (Tau rojo oscuro, Yvága violeta, Yvy Marane'ỹ oro blanco) */
+const CC0_SHT=[null,null,null,null,[0x5a1a14,.65],[0xb89aff,.6],[0xfff2c0,.55]];
+function cc0ShieldTint(o,t){const c=CC0_SHT[t];if(!c||!o)return o;o.traverse(x=>{if(x.isMesh){x.material.color.lerp(new THREE.Color(c[0]),c[1]);x.material.metalness=Math.max(x.material.metalness||0,.55);x.material.roughness=Math.min(x.material.roughness==null?1:x.material.roughness,.38);if(t>=5&&x.material.emissive){x.material.emissive.setHex(c[0]);x.material.emissiveIntensity=t===6?.18:.12;}}});return o;}
+const CC0_WS={c_w_axe_small:.29,c_w_hammer_small:.23,c_w_axe:.23,c_w_hammer_double:.23,c_k_sword_1handed:.62,c_k_sword_2handed:.46,c_w_dagger_2:.26,c_w_claymore:.2,c_w_axe_double:.17,c_w_bow_wooden:.25,c_w_bow_wooden2:.25,c_w_bow_golden:.25,c_w_bow_evil:.25,c_k_shield_round:.75,c_w_shield_round:.28,c_w_shield_round_2:.28,c_w_shield_heater:.28,c_w_shield_heater_2:.28,c_w_shield_celtic_golden:.26};
 function cc0Files(cls,eq){const S=CC0_CLS[cls],F=cc0Face(cls),f=['c_anim1','c_anim2','c_body_'+S.base,'c_o_'+S.outfit];if(S.legs)f.push('c_o_'+S.legs);F.hair.forEach(h=>f.push('c_h_'+h[0]));
   const w=eq&&eq.weapon,sh=eq&&eq.shield;if(w&&CC0_W[cls]&&CC0_W[cls].length)f.push(CC0_W[cls][Math.min(6,w.t|0)]);if(sh)f.push(CC0_SH[Math.min(6,sh.t|0)]);if(cls==='arquera')f.push('c_k_quiver');return [...new Set(f)];}
 function cc0Want(cls,eq,cb){if(!CC0.on||OAD.failed)return false;const f=cc0Files(cls,eq);if(oadHave(f))return true;oadNeed(f,cb);return false;}
@@ -3257,7 +3270,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
       else if(cls==='mburuvicha'){obj=cc0Cetro(S,1.5,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.15];clip=clipsA.Idle_Loop;}
       else{const n=CC0_W[cls][wt];obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[-1,0,0];clip=clipsA.Pistol_Aim_Neutral;}}
       if(obj){const calm=cls==='hechicero'||cls==='mburuvicha'?null:cls==='arquera'?{clip:clipsA.Idle_Loop,t:.5,dir:[0,1,0],side:[-1,0,0]}:{clip:clipsA.Idle_Loop,t:.5,dir:[0,-.82,.57],side:[1,0,0]};const h=cc0Grip2(body,clip,tt,bone,obj,dir,side,s,0,calm);if(h&&calm){if(cls==='arquera')h.userData.kOnly='atk1';(r.grips=r.grips||[]).push(h);}if(h){forgeGlow(h,cls,w);h.userData.piece='weapon';r.forge=r.forge||[];r.forge.push(h);}cc0Grip(body,sd,1);}}
-    if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0Model(n,null,false);if(o2){const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
+    if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0ShieldTint(cc0Model(n,null,false),Math.min(6,eq.shield.t|0));if(o2){const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
     if(cls==='arquera'){const q=cc0Model('c_k_quiver');if(q)cc0Hold(body,'spine_03',q,[.06,.02,-.17],[0,0,-.45],.55);}
     if(cls==='mburuvicha'&&!(eq&&eq.helm)){const h=cc0Hold(body,'Head',cc0Jeguaka(.124),[0,.175,-.01],[0,0,0],1);}}catch(e){console.error(e);}
   const ANI={k:{idle:'Sword_Idle',calm:'Idle_Loop',walk:'Walk_Loop',cwalk:'Walk_Formal_Loop',run:'Jog_Fwd_Loop',death:'Death01',atk1:'Sword_Regular_A',atk2:'Sword_Regular_B',spin:'Sword_Heavy_Combo'},
@@ -3746,7 +3759,7 @@ function irInit(){if(IR.r||!OAD.on||OAD.failed)return IR.r;try{const r=new THREE
   IR.scene=S;IR.iscene=IS;IR.cam=new THREE.PerspectiveCamera(26,1,.01,100);IR.r.domElement.className='inv3d';}catch(e){IR.r=null;OAD.on=OAD.on;}return IR.r;}
 function irClean(o){o.traverse(x=>{if(x.material){const ms=Array.isArray(x.material)?x.material:[x.material];ms.forEach(m=>{if(METALS.has(m)){METALS.delete(m);m.envMap=null;m.needsUpdate=true;}});}});return o;}
 function iconKey(it){if(isEq(it))return it.k+'|'+it.c+'|'+(it.k==='wings'?Math.min(3,Math.floor((it.lv||0)/4))+'g'+(it.g||1):it.t);return it.k+'|'+it.sub;}
-function iconURL(it){if(!it||it.k==='pet')return null;const k=iconKey(it);if(IR.cache[k])return IR.cache[k];if(!IR.queue.some(q=>q.k===k)&&IR.cache[k]!==false)IR.queue.push({k,it});irPump();return null;}
+function iconURL(it){if(!it)return null;if(it.k==='pet')return 'assets/ui/pet_'+it.sub+'.webp';const k=iconKey(it);if(IR.cache[k])return IR.cache[k];if(!IR.queue.some(q=>q.k===k)&&IR.cache[k]!==false)IR.queue.push({k,it});irPump();return null;}
 function iconFiles(it){const c=it.c,t=it.t;if(it.k==='weapon')return [c==='mburuvicha'?'p_hammer':c==='caballero'||c==='gladiador'?'p_ks'+Math.min(4,t):c==='hechicero'?'p_ws'+Math.min(2,t):'p_ab'+Math.min(3,t)];if(it.k==='shield')return ['p_kd'+Math.min(4,t)];
   if(it.k==='helm')return [c==='caballero'||c==='mburuvicha'||c==='gladiador'?'p_kh'+Math.min(4,t):c==='hechicero'?(t<=1?'p_head_hood':'p_head_tiara'):'p_crown_f'];if(['armor','pants','gloves','boots'].includes(it.k))return ['body_'+(c==='hechicero'?'m_robe':c==='arquera'?'f_tunic':'m_tunic')];return [];}
 function irPump(){if(IR.busy||!IR.queue.length)return;if(!irInit()){IR.queue.length=0;return;}IR.busy=true;const q=IR.queue[0];const files=iconFiles(q.it);
@@ -3788,7 +3801,7 @@ function irFrame(root,mode,region,cam,aspect){root.updateMatrixWorld(true);
   const dir=region?new THREE.Vector3(.35,.12,1).normalize():new THREE.Vector3(.15,.25,1).normalize();cam.position.copy(c).addScaledVector(dir,d*1.05);cam.lookAt(c);}
 /* ícono del arma o escudo CC0: la misma pieza que lleva el personaje */
 function cc0ItemObj(it){const c=it.c,t=Math.min(6,it.t|0),S=forjaOf(c,t);let n=null;if(it.k==='shield')n=CC0_SH[t];else if(c!=='hechicero'&&c!=='mburuvicha')n=CC0_W[c][t];
-  if(n){if(!oadHave([n])){oadNeed([n],()=>{});return 'WAIT';}return cc0Model(n,c==='arquera'||it.k==='shield'?null:S.m,c!=='arquera'&&it.k!=='shield');}
+  if(n){if(!oadHave([n])){oadNeed([n],()=>{});return 'WAIT';}const o=cc0Model(n,c==='arquera'||it.k==='shield'?null:S.m,c!=='arquera'&&it.k!=='shield');return it.k==='shield'&&o?cc0ShieldTint(o,t):o;}
   const g=new THREE.Group(),o=c==='hechicero'?cc0Staff(S,1.55,t):cc0Cetro(S,1.5,t);g.add(o);return g;}
 function irRenderIcon(it){const R0=irObject(it);if(R0==='WAIT')return 'WAIT';if(!R0)return null;let wait=false;R0.o.traverse(x=>{const m=x.material;if(m&&m.map&&!(m.map.image&&(m.map.image.complete===undefined||m.map.image.complete)&&(m.map.image.naturalWidth||m.map.image.width)))wait=true;});if(wait&&(IR.tries=(IR.tries||0)+1)<12){irDispose(R0.o);return 'WAIT';}IR.tries=0;
   const root=new THREE.Group();root.add(R0.o);irClean(root);if(R0.mode!=='obj')root.traverse(x=>{if(x.material&&x.material.userData&&x.material.userData.kind){x.material.emissive.setHex(0x2a2620);}});IR.iscene.add(root);try{return irShot(root,R0);}finally{IR.iscene.remove(root);irDispose(root);}}
@@ -5217,8 +5230,9 @@ function cellHTML(it){if(!it)return '';const u=iconURL(it),rr=itemR(it);return `
 function gemOk(it,sub){if(!isEq(it))return false;if(sub==='tupa')return it.lv<6;if(sub==='jasy')return it.lv>=6&&it.lv<9;if(sub==='yvy')return it.op<4;return false;}
 function renderInv(){
   const lay=[null,'helm','wings','weapon','armor','shield','gloves','pants','boots'];
+  const pg=PETK.map(k=>{const it=C.pets&&C.pets[k];return `<button class="slot pslot ${it?'':'empty'}" data-act="petslot" data-p="${k}" aria-label="Mascota: ${PETS[k].n}" style="--pc:${PETS[k].col}"><img class="ico pimg ${it?'':'off'}" src="assets/ui/pet_${k}.webp" alt="" draggable="false"><span class="sl">${PETS[k].n.split(' ')[0]}</span></button>`;}).join('');
   $('#eqGrid').innerHTML=lay.map(k=>{if(!k)return '<span></span>';const it=C.eq[k],na=k==='shield'&&C.cls!=='caballero'||k==='helm'&&C.cls==='gladiador';const ok=GEM&&it&&gemOk(it,GEM.sub);
-    return `<button class="slot ${it?'':'empty'} ${na?'na':''} ${ok?'ok':''}" data-act="eqslot" data-k="${k}" ${na?'disabled':''} aria-label="${SLOTLABEL[k]}">${it?cellHTML(it):`<span style="color:var(--dim)">${ICON_SVG(k==='weapon'?'weapon_'+C.cls:k)}</span>`}<span class="sl">${SLOTLABEL[k]}</span></button>`;}).join('');
+    return `<button class="slot ${it?'':'empty'} ${na?'na':''} ${ok?'ok':''}" data-act="eqslot" data-k="${k}" ${na?'disabled':''} aria-label="${SLOTLABEL[k]}">${it?cellHTML(it):`<span style="color:var(--dim)">${ICON_SVG(k==='weapon'?'weapon_'+C.cls:k)}</span>`}<span class="sl">${SLOTLABEL[k]}</span></button>`;}).join('')+pg;
   $('#invGrid').innerHTML=C.inv.map((it,i)=>{const ok=GEM&&it&&gemOk(it,GEM.sub);const dim=GEM&&!ok;return `<button class="cell ${it?'has q'+itemQ(it):''} ${ok?'ok':''} ${dim?'dim':''}" data-act="cell" data-i="${i}" aria-label="${it?esc(itemName(it)):'Vacío'}">${cellHTML(it)}</button>`;}).join('');
   $('#invGold').textContent=fmt(C.gold);$('#invFree').textContent=freeSlots()+' lugares libres';
   const gb=$('#gemBar');if(GEM){gb.hidden=false;gb.innerHTML=`<span>Elegí el ítem para la <b style="color:${GEMS[GEM.sub].col}">${GEMS[GEM.sub].name}</b></span><button class="btn sm ghost" data-act="gemCancel">Cancelar</button>`;}else gb.hidden=true;
@@ -5244,10 +5258,11 @@ function itemCard(it,ctx){ICTX=ctx;const L=[];const iu=iconURL(it);if(iu)L.push(
   else if(ctx.src==='vinv'){B.push(`<button class="btn" data-act="vPut" ${it.k==='quest'?'disabled':''}>Guardar en el baúl</button>`);}
   else if(ctx.src==='shopsell'){B.push(`<button class="btn" data-act="sell" ${sp?'':'disabled'}>Vender por ₲ ${fmt(sp)}</button>`);}
   else if(ctx.src==='eq'){B.push(`<button class="btn" data-act="unequip">Quitar</button>`);}
+  else if(ctx.src==='pet'){B.push(`<button class="btn" data-act="petOff" data-p="${ctx.sub}">Dejar en el inventario</button>`);}
   else{if(isEq(it)){const why=canEquip(it);B.push(`<button class="btn" data-act="equip" ${why?'disabled':''}>Equipar</button>`);if(why)L.push(`<div class="it-l req bad">${why}</div>`);}
     if(it.k==='quest'&&EVQ[it.sub])B.push(`<button class="btn" data-act="use">Entrar al evento</button>`);if(it.k==='pot'||it.k==='scroll')B.push(`<button class="btn" data-act="use">Usar</button>`);
     if(it.k==='gem'&&it.sub!=='kerana'&&it.sub!=='mainumby')B.push(`<button class="btn" data-act="gem">Usar en un ítem</button>`);
-    if(it.k==='pet')B.push(`<button class="btn" data-act="petOn">${C.pet?'Cambiar por este':'Llevar'}</button>`);
+    if(it.k==='pet')B.push(`<button class="btn" data-act="petOn">${C.pets&&C.pets[it.sub]?'Cambiar por esta':'Llevar'}</button>`);
     B.push(`<button class="btn ghost" data-act="drop">${ctx.confirm?'Sí, tirarlo':'Tirar'}</button>`);}
   B.push(`<button class="btn ghost" data-act="closeItem">Cerrar</button>`);
   $('#itemCard').innerHTML=L.join('')+`<div class="it-btns">${B.join('')}</div>`;$('#pItem').hidden=false;refreshPause();}
@@ -5267,14 +5282,14 @@ function applyGem(target){const sub=GEM.sub;if(!takeItem('gem',sub,1)){GEM=null;
 
 /* tiendas */
 let SHOP=null;
-function shopStock(id){if(id==='boticaria')return['hp1','hp2','hp3','mp1','mp2','mp3'].map(s=>stackItem('pot',s,1)).concat([stackItem('scroll','regreso',1)]);
+function shopStock(id){if(id==='boticaria')return['hp1','hp2','hp3','mp1','mp2','mp3'].map(s=>stackItem('pot',s,1)).concat([stackItem('scroll','regreso',1)]).concat(PETK.map(k=>({u:0,k:'pet',sub:k,n:1})));
   const cls=C.cls,ks=['weapon'].concat(cls==='caballero'?['shield']:[]).concat(ARMK.filter(k=>!(cls==='gladiador'&&k==='helm'))),out=[];const maxT=C.L>=25?2:1;for(let t=0;t<=maxT;t++)ks.forEach(k=>out.push(newEquip(cls,k,t)));return out;}
 function openShop(n){SHOP={id:n.id,tab:'buy',stock:shopStock(n.id)};$('#shopTitle').textContent=n.def.name;$('#shopRole').textContent=n.def.role;$('#shopGreet').textContent=n.def.greet;renderShop();showPanel('pShop');}
 function renderShop(){$('#tabBuy').classList.toggle('on',SHOP.tab==='buy');$('#tabSell').classList.toggle('on',SHOP.tab==='sell');
   if(SHOP.tab==='buy'){$('#shopBody').innerHTML='<div class="list">'+SHOP.stock.map((it,i)=>{const pr=itemPrice(it),why=isEq(it)?canEquip(it):null;let sub='';
-      if(it.k==='weapon'){const d=itemDmg(it);sub=`Daño ${d[0]}–${d[1]}`;}else if(isEq(it))sub=`Defensa ${itemDef(it)}`;else if(it.k==='pot')sub=`Recupera ${Math.round(POTS[it.sub].pct*100)}% + ${POTS[it.sub].add}`;else sub=SCROLLS[it.sub].desc;
+      if(it.k==='weapon'){const d=itemDmg(it);sub=`Daño ${d[0]}–${d[1]}`;}else if(isEq(it))sub=`Defensa ${itemDef(it)}`;else if(it.k==='pot')sub=`Recupera ${Math.round(POTS[it.sub].pct*100)}% + ${POTS[it.sub].add}`;else if(it.k==='pet')sub=PETS[it.sub].desc+(C.pets&&C.pets[it.sub]?' · ya la llevás':'');else sub=SCROLLS[it.sub].desc;
       if(isEq(it)){const r=reqOf(it);sub+=` · Nivel ${r.lvl} · ${STATN[r.main]} ${r.stat}`;}
-      return `<div class="row"><span class="ico" style="color:${itemColor(it)}">${ICON_SVG(iconOf(it))}</span><div><div class="nm">${esc(itemName(it))}</div><div class="sub ${why?'bad':''}">${sub}</div></div><div style="text-align:right"><div class="pr">₲ ${fmt(pr)}</div><button class="btn sm" data-act="buy" data-i="${i}" ${C.gold<pr?'disabled':''}>Comprar</button>${stackable(it)?`<button class="btn sm ghost" data-act="buy" data-i="${i}" data-n="10" ${C.gold<pr*10?'disabled':''}>×10</button>`:''}</div></div>`;}).join('')+'</div>';}
+      return `<div class="row"><span class="ico" style="color:${itemColor(it)}">${it.k==='pet'?`<img src="${iconURL(it)}" alt="" style="width:100%;height:100%;object-fit:contain">`:ICON_SVG(iconOf(it))}</span><div><div class="nm">${esc(itemName(it))}</div><div class="sub ${why?'bad':''}">${sub}</div></div><div style="text-align:right"><div class="pr">₲ ${fmt(pr)}</div><button class="btn sm" data-act="buy" data-i="${i}" ${C.gold<pr?'disabled':''}>Comprar</button>${stackable(it)?`<button class="btn sm ghost" data-act="buy" data-i="${i}" data-n="10" ${C.gold<pr*10?'disabled':''}>×10</button>`:''}</div></div>`;}).join('')+'</div>';}
   else $('#shopBody').innerHTML=`<p class="hint" style="margin:0 0 8px">Tocá un objeto para venderlo.</p><div class="invgrid">${C.inv.map((it,i)=>`<button class="cell" data-act="sellcell" data-i="${i}">${cellHTML(it)}</button>`).join('')}</div>`;
   $('#shopGold').textContent=fmt(C.gold);$('#shopFree').textContent=freeSlots()+' lugares libres';}
 
@@ -5398,14 +5413,15 @@ function dayProg(k,n){if(!C)return;const D=dailies();for(const q of D.list)if(q.
 function dayReward(q){const hard=DAYT[q.k].hard;return{gold:Math.round(C.L*(hard?3000:1800)/100)*100+5000,gem:hard&&C.L>=15?'jasy':'tupa'};}
 function dailyHTML(){const D=dailies();return `<div class="sect"><h3>Misiones diarias</h3><p class="hint" style="margin:0 0 6px">Se renuevan cada día a medianoche.</p>${D.list.map((q,i)=>{const r=dayReward(q),done=q.n>=q.goal;
   return `<div class="recipe day"><h4>${esc(DAYT[q.k].d(q.goal))}</h4><div class="prog"><i style="width:${q.n/q.goal*100}%"></i></div><div class="it-l req">${q.n} / ${q.goal} · Recompensa: ₲ ${fmt(r.gold)} + ${esc(GEMS[r.gem].name)}</div>${q.cl?'<div class="it-l" style="color:var(--good)">Reclamada</div>':done?`<button class="btn sm" data-act="dailyClaim" data-i="${i}">Reclamar</button>`:''}</div>`;}).join('')}</div>`;}
-function petHTML(){const p=C.pet;return `<div class="sect"><h3>Mascota</h3>${p?`<div class="it-l" style="color:${PETS[p.sub].col}"><b>${esc(PETS[p.sub].n)}</b></div><p class="it-d">${PETS[p.sub].desc}</p><button class="btn sm ghost" data-act="petOff">Dejarla en el inventario</button>`:'<p class="it-d">No llevás ninguna mascota. Imp, Hada y Rudolf caen de las bestias élite y de los jefes.</p>'}</div>`;}
+function petHTML(){const on=petsOn();return `<div class="sect"><h3>Mascotas <small style="color:var(--dim);font-weight:500">${on.length} de 3</small></h3>${on.length?on.map(k=>`<div class="pet-r"><div><div class="it-l" style="color:${PETS[k].col}"><b>${esc(PETS[k].n)}</b></div><p class="it-d" style="margin:2px 0 0">${PETS[k].desc}</p></div><button class="btn sm ghost" data-act="petOff" data-p="${k}">Dejar</button></div>`).join(''):''}<p class="it-d">${on.length<3?'Podés llevar las tres a la vez: Imp, Hada del Monte y Rudolf. Caen de las bestias élite y de los jefes, y Ña Eusebia las vende en Asunción.':'Llevás las tres mascotas.'}</p></div>`;}
 function titlesHTML(){const a=achData();return `<div class="sect"><h3>Títulos y logros</h3><p class="hint" style="margin:0 0 6px">Tu título se ve sobre tu nombre. Tocá uno ganado para usarlo.</p><div class="titles">${LOGROS.map(L=>{const got=C.titles.includes(L.id),on=C.title===L.id;
   return `<button class="ttl ${got?'got':''} ${on?'on':''}" ${got?`data-act="setTitle" data-t="${L.id}"`:'disabled'}><b>${esc(logroT(L,C.cls))}</b><small>${esc(L.d)}</small></button>`;}).join('')}</div></div>`;}
 
 /* acciones */
 const ACT={
-  petOn(){const it=C.inv[ICTX.i];if(!it||it.k!=='pet')return;const prev=C.pet;C.pet=it;C.inv[ICTX.i]=prev||null;$('#pItem').hidden=true;toast(`<em>${esc(PETS[it.sub].n)}</em> te acompaña ahora`);recalc();persist();renderInv();refreshPause();},
-  petOff(){if(!C.pet)return;if(!addItem(C.pet)){toast('Tu inventario está lleno');return;}toast(`Dejaste a ${esc(PETS[C.pet.sub].n)} en el inventario`);C.pet=null;recalc();persist();renderChar();},
+  petOn(){const it=C.inv[ICTX.i];if(!it||it.k!=='pet')return;C.pets=C.pets||{};const prev=C.pets[it.sub];C.pets[it.sub]=it;C.inv[ICTX.i]=prev||null;$('#pItem').hidden=true;toast(`<em>${esc(PETS[it.sub].n)}</em> te acompaña ahora`);snd(PETS[it.sub].snd,{vol:.8,jit:0});recalc();persist();renderInv();refreshPause();},
+  petOff(d){const k=(d&&d.p)||(ICTX&&ICTX.sub)||petsOn()[0];const it=C.pets&&C.pets[k];if(!it)return;if(!addItem(it)){toast('Tu inventario está lleno');return;}toast(`Dejaste a ${esc(PETS[k].n)} en el inventario`);C.pets[k]=null;$('#pItem').hidden=true;recalc();persist();if(!$('#pInv').hidden)renderInv();renderChar();refreshPause();},
+  petslot(d){const it=C.pets&&C.pets[d.p];if(!it)return;itemCard(it,{src:'pet',sub:d.p});},
   dailyClaim(d){const q=dailies().list[+d.i];if(!q||q.cl||q.n<q.goal)return;const r=dayReward(q);if(!addItem(stackItem('gem',r.gem,1))){toast('Tu inventario está lleno');return;}C.gold+=r.gold;q.cl=true;toast(`<em style="color:var(--good)">Recompensa: ₲ ${fmt(r.gold)} + ${esc(GEMS[r.gem].name)}</em>`);if(!snd('mu_gem',{vol:.8,jit:0}))sfx('rare');persist();renderNpc();},
   setTitle(d){C.title=C.title===d.t?null:d.t;persist();renderChar();},
   craftInv(d){const R0=INVR[d.r];if(!R0||matN(false)<R0.c||matN(true)<R0.r||C.gold<R0.g)return;if(!addItem(stackItem('quest',R0.sub,1))){toast('Tu inventario está lleno');return;}takeMats(false,R0.c);takeMats(true,R0.r);C.gold-=R0.g;toast(`<em style="color:var(--good)">El caldero tejió ${R0.n}</em>`);snd('mu_gem',{vol:.8,jit:0});persist();renderCaldero();},
@@ -5433,7 +5449,7 @@ const ACT={
   gemCancel(){GEM=null;renderInv();},
   drop(){if(!ICTX.confirm){ICTX.confirm=true;itemCard(C.inv[ICTX.i],ICTX);return;}C.inv[ICTX.i]=null;$('#pItem').hidden=true;renderInv();refreshPause();persist();},
   shopTab(d){SHOP.tab=d.t;renderShop();},
-  buy(d){const it=SHOP.stock[+d.i],n=+(d.n||1),pr=itemPrice(it)*n;if(C.gold<pr)return;if(stackable(it)){const x=stackItem(it.k,it.sub,n);if(!addItem(x)){toast('No hay lugar en el inventario');return;}}else{const x=newEquip(it.c,it.k,it.t);if(!addItem(x)){toast('No hay lugar en el inventario');return;}}
+  buy(d){const it=SHOP.stock[+d.i],n=+(d.n||1),pr=itemPrice(it)*n;if(C.gold<pr)return;if(it.k==='pet'){const x={u:++UID,k:'pet',sub:it.sub,n:1};if(!addItem(x)){toast('No hay lugar en el inventario');return;}snd(PETS[it.sub].snd,{vol:.8,jit:0});}else if(stackable(it)){const x=stackItem(it.k,it.sub,n);if(!addItem(x)){toast('No hay lugar en el inventario');return;}}else{const x=newEquip(it.c,it.k,it.t);if(!addItem(x)){toast('No hay lugar en el inventario');return;}}
     C.gold-=pr;toast(`Compraste ${n>1?n+'× ':''}<em>${esc(itemName(it))}</em>`);renderShop();persist();},
   sellcell(d){const it=C.inv[+d.i];if(!it)return;itemCard(it,{src:'shopsell',i:+d.i});},
   sell(){const it=C.inv[ICTX.i];if(!it)return;const p=sellPrice(it);C.gold+=p;C.inv[ICTX.i]=null;$('#pItem').hidden=true;toast(`Vendiste <em>${esc(itemName(it))}</em> por <em class="g">₲ ${fmt(p)}</em>`);renderShop();refreshPause();persist();},
@@ -5610,6 +5626,7 @@ function fixChar(c){if(!c.inv||c.inv.length!==40){const a=new Array(40).fill(nul
   c.eq=c.eq||{};EQK.forEach(k=>{if(c.eq[k]===undefined)c.eq[k]=null;});c.q=c.q||{i:0,n:0,on:false};c.skills=c.skills||[CSK[c.cls][0]];c.st=c.st||Object.assign({},CLASSES[c.cls].base);
   ['L','xp','pts','gold','resets','kills'].forEach(k=>{if(typeof c[k]!=='number')c[k]=k==='L'?1:0;});
   /* el Mburuvicha pasó a pelear con Energía: se devuelven todos los puntos repartidos una sola vez para que el jugador los reparta de nuevo */
+  c.pets=c.pets||{};if(c.pet){if(!c.pets[c.pet.sub])c.pets[c.pet.sub]=c.pet;else{const i=c.inv.indexOf(null);if(i>=0)c.inv[i]=c.pet;}delete c.pet;}
   if(c.cls==='mburuvicha'&&!c.mbE){const b=CLASSES.mburuvicha.base,sum=o=>o.fue+o.agi+o.vit+o.ene;c.pts+=Math.max(0,sum(c.st)-sum(b));c.st=Object.assign({},b);c.mbE=1;c._mbMsg=1;}
   return c;}
 function newChar(name,cls){const inv=new Array(40).fill(null);inv[0]=stackItem('pot','hp1',10);inv[1]=stackItem('pot','mp1',5);inv[2]=stackItem('scroll','regreso',1);
@@ -5674,7 +5691,7 @@ const VOX={on:false,stream:null,peers:new Map(),muted:false};
 const LIVE_HZ=10,LIVE_MAX=24,CHN={g:'General',m:'Mapa',p:'Grupo',s:'Aviso'};
 function liveURL(){return(location.protocol==='https:'?'wss://':'ws://')+location.host+'/live/ws?t='+encodeURIComponent(srvTok());}
 function liveEq(){const o={};if(!C)return o;for(const k of EQK){const it=C.eq[k];if(it)o[k]={k:it.k,c:it.c,t:it.t|0,lv:it.lv|0,g:it.g|0};}return o;}
-function liveS(){return{n:C.name,c:C.cls,L:C.L,evo:!!C.evo,eq:liveEq(),pet:C.pet?C.pet.sub:null,face:C.face!=null?C.face:hashName(C.name)};}
+function liveS(){return{n:C.name,c:C.cls,L:C.L,evo:!!C.evo,eq:liveEq(),pet:petsOn()[0]||null,pets:petsOn(),face:C.face!=null?C.face:hashName(C.name)};}
 function livePos(){return{x:+P.x.toFixed(2),z:+P.z.toFixed(2),ry:+P.ry.toFixed(2),mv:+(P.mv||0).toFixed(2),ac:LIVE.ac,d:P.dead?1:0};}
 function liveSend(o){const w=LIVE.ws;if(w&&w.readyState===1){try{w.send(typeof o==='string'?o:JSON.stringify(o));}catch(e){}}}
 function liveConnect(){if(LIVE.ws||!SRV.on||NET.mode!=='online'||!srvTok())return;let ws;try{ws=new WebSocket(liveURL());}catch(e){return;}
@@ -5999,7 +6016,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
@@ -6147,9 +6164,11 @@ function updCamera(dt){
   const s=innerHeight>innerWidth?40:30;if(sc.right!==s){sc.left=-s;sc.right=s;sc.top=s;sc.bottom=-s;sc.updateProjectionMatrix();}
 }
 let last=performance.now(),HITSTOP=0;
+/* las pruebas automáticas pueden detener el reloj (__HOLD) y avanzar cuadro a cuadro con __NOX.step(dt), con o sin dibujar */
 function frame(now){
   requestAnimationFrame(frame);
-  const rdt=(now-last)/1000;const dt=Math.min(.05,rdt);last=now;if(rdt<1)dynRes(rdt);
+  const rdt0=(now-last)/1000;last=now;if(window.__HOLD)return;if(rdt0<1)dynRes(rdt0);tickOnce(Math.min(.05,rdt0),rdt0,!window.__NORENDER);}
+function tickOnce(dt,rdt,draw){
   if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
   try{
     if(mode==='game'&&C){updatePlayer(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}(MOBNET.role==='guest'?updateEnemiesGuest:updateEnemies)(gdt);mobNetTick(dt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}
@@ -6161,6 +6180,8 @@ function frame(now){
   if(FINAL)FINAL.uniforms.uTime.value=windT;
   /* rendimiento: el mapa de sombras se rehace un cuadro sí y otro no (la pasada más cara después de la escena) */
   SHF=(SHF+1)%2;renderer.shadowMap.needsUpdate=SHF===0||snapCam||mode!=='game';
+  if(!draw)return;
+  if(window.__CAMF)window.__CAMF(camera);
   if(composer&&!STUDIO.alphaOn)composer.render();else renderer.render(scene,camera);
 }
 

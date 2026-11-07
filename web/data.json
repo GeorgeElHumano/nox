@@ -1224,17 +1224,20 @@
   "imp": {
    "name": "Imp",
    "col": "#ff6a4a",
-   "desc": "Te acompaña y aumenta tu daño un 8%."
+   "desc": "Te acompaña y aumenta tu daño un 8%.",
+   "price": 1500000
   },
   "hada": {
    "name": "Hada del Monte",
    "col": "#bff0ff",
-   "desc": "Te acompaña y aumenta tu defensa un 12%."
+   "desc": "Te acompaña y aumenta tu defensa un 12%.",
+   "price": 2000000
   },
   "rudolf": {
    "name": "Rudolf",
    "col": "#e2b27a",
-   "desc": "Te acompaña y aumenta el oro de las bestias un 50%."
+   "desc": "Te acompaña y aumenta el oro de las bestias un 50%.",
+   "price": 1200000
   }
  },
  "loot": {
