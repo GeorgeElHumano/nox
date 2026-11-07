@@ -15,13 +15,13 @@ function lock(on){document.documentElement.classList.toggle('locked',on);}
 function openPlat(id){const p=PLAT.find(x=>x.id===id);if(!p)return;lastFocus=document.activeElement;DL.hidden=true;
   $('#mIcon').innerHTML=iconHTML(p);$('#mReq').textContent=p.req+(['android','windows','mac'].includes(p.id)?' · versión '+VERSION:'');$('#mTitle').textContent='NOX para '+p.name;
   $('#mSteps').innerHTML=p.steps.map(s=>'<li><span>'+s+'</span></li>').join('');
-  let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button><button type="button" id="mShare" hidden>Compartir</button></div>';extra+='<p class="note">'+p.note+'</p>';$('#mExtra').innerHTML=extra;
+  let extra='';if(p.copy)extra+='<div class="copy"><input id="mUrl" readonly value="'+webURL()+'" aria-label="Dirección del juego"><button type="button" id="mCopy">Copiar</button>'+(p.id==='ios'?'<button type="button" id="mShare">Agregar a inicio</button>':'')+'</div>';extra+='<p class="note">'+p.note+'</p>';$('#mExtra').innerHTML=extra;
   const href=p.id==='ios'||p.id==='web'?webURL():LINKS[p.id];
   $('#mActions').innerHTML=href?'<a class="btn btn-gold" href="'+href+'" data-track="'+p.id+'" target="_blank" rel="noopener">'+p.btn+'</a>'+(p.btn2?'<a class="btn btn-line" href="'+LINKS.macIntel+'" data-track="macIntel" target="_blank" rel="noopener">'+p.btn2+'</a>':''):'<span class="btn btn-gold" aria-disabled="true">'+p.btn+' · disponible pronto</span><a class="btn btn-line" href="'+webURL()+'" data-track="web" target="_blank" rel="noopener">Mientras tanto, jugar en el navegador</a>';
   $('#mActions').insertAdjacentHTML('beforeend','<button type="button" class="btn btn-line" data-dlall>Otros dispositivos</button>');
   M.hidden=false;lock(true);$('#mClose').focus();
   /* Compartir abre el menú del iPhone, donde está "Agregar a inicio" (solo si el navegador puede compartir) */
-  const sh=$('#mShare');if(sh&&navigator.share){sh.hidden=false;sh.onclick=()=>{navigator.share({title:'NOX · Crónicas del Paraguay',url:$('#mUrl').value}).catch(()=>{});};}
+  /* Agregar a inicio: abre el juego en esta misma pestaña con una guía que señala el botón Compartir de Safari (iOS no deja agregarlo solo) */const sh=$('#mShare');if(sh)sh.onclick=()=>{const u=new URL($('#mUrl').value);u.searchParams.set('inicio','1');location.href=u.href;};
   const c=$('#mCopy');if(c)c.onclick=()=>{const i=$('#mUrl');const done=()=>{c.textContent='Copiado';setTimeout(()=>c.textContent='Copiar',1600);};try{navigator.clipboard.writeText(i.value).then(done,()=>{i.select();done();});}catch(e){i.select();done();}};}
 function closeAll(){M.hidden=true;DL.hidden=true;$('#fmodal').hidden=true;$('#viewer').hidden=true;lock(false);if(lastFocus&&lastFocus.focus)lastFocus.focus();}
 function openDl(){lastFocus=document.activeElement;M.hidden=true;DL.hidden=false;lock(true);$('#dlClose').focus();}
