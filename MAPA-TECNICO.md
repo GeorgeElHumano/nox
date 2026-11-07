@@ -79,7 +79,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 ### Cámaras (7/11)
 
-- `CAMM`: `'iso'` (la clásica, `CAM_YAW=PI/4` fijo), `'tercera'` (detrás del hombro derecho a `3.6*CAMZ`, FOV 62) y `'primera'` (ojos a 1,62 m, FOV 72, el héroe se oculta). Se guarda en `localStorage noxCam`. `setCam(m)`, botón `#mbCam` (`camCycle`), tecla **B** y sección Cámara en la ficha del personaje (`camSet`).
+- `CAMM`: `'iso'` (la clásica, `CAM_YAW=PI/4` fijo), `'tercera'` (detrás del hombro derecho a `3.6*CAMZ`, FOV 62) y `'primera'` (desde los ojos, ver abajo). Se guarda en `localStorage noxCam`. `setCam(m)`, botón `#mbCam` (`camCycle`), tecla **B** y sección Cámara en la ficha del personaje (`camSet`).
 - `CAM_YAW` ahora es variable: el joystick y el minimapa ya la usaban, así que el movimiento queda relativo a la cámara. `CAM_PITCH` se limita en `camTurn`.
 - Arrastrar en la pantalla (o con el botón izquierdo del mouse) gira la cámara (`CDRAG`, ojo: `DRAG` y `LOOK` ya existen para el inventario y la luz); un toque corto sigue llamando a `tapAt` al soltar.
 - `camera.far` = fin de la niebla de la zona + 6 m, y el cielo se achica para quedar adentro: con 3ra/1ra persona se ve hasta el horizonte y así no se dibuja lo que ya está tapado por la niebla. Aun así esas cámaras dibujan el doble que la clásica (Campos, celular: ~178 → ~355 llamadas).
