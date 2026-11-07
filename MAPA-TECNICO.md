@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 6 de noviembre de 2026.
+Última actualización: 7 de noviembre de 2026.
 
 ## Repositorio y publicación
 
@@ -88,6 +88,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Cuadros por segundo: `FCAP.fps` (30 en celular, 60 en PC; `localStorage tsm-fps`). `dynRes` usa umbrales según el tope. Ajustes → "Cuadros por segundo" y "Ver FPS" (`FPSM`, también con `?fps=1`).
 - Prueba en teléfonos reales: `jugar/?prueba=1` muestra "Medir rendimiento"; recorre Asunción, Campos, Chaco, Esteros y Cerro Corá (8 s cada una), da FPS, bajones y dibujos, y se copia o comparte el resultado. `BENCH.on` hace al jugador invulnerable mientras mide.
 - Descargas: los modelos se bajan por zona a pedido (`oadNeed`). `oadFetch` reintenta 2 veces antes de dar un modelo por perdido (antes un corte de señal dejaba todo en modelos simples). La gente y animales del ambiente se piden después de lo principal (`oadLater`). Animaciones aligeradas sin cambios (`gt/resample.mjs`, tolerancia 1e-5).
+- Mobs lejanos: `e.g.visible=!!(dl<D||boss)` con D = 62 (alto), 54 (medio), 40 (bajo). Antes daba `undefined` para los que no son jefes y three.js los dibujaba igual (solo oculta con `false`): ojo con cualquier `visible=` que no sea booleano. `mobShadow`: en medio y bajo solo hacen sombra los mobs a menos de 24 m.
 - En producción Cloudflare sirve los `.json` con brotli: entrar a Asunción baja ~6 MB.
 - `__NOX.bakeNow()` une todo a mano (con `__NOBAKE` puesto al cargar) y `tools/vis.js` saca fotos antes/después del mismo instante.
 
