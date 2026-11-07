@@ -21,7 +21,7 @@ const PLAT=[
   note:'Funciona en PC, Mac, celulares y tablets. La primera vez tarda un poco más porque descarga los modelos del juego.'},
  {id:'android',name:'Android',req:'Chrome en Android',sub:'Se instala desde Chrome',btn:'Abrir el juego',
   steps:['Tocá <b>Abrir el juego</b> desde el celular, en <b>Chrome</b>. Se abre con una guía.','Tocá <b>Instalar NOX</b>. Si no aparece, abrí el menú <b>⋮</b> de Chrome y tocá <b>Agregar a la pantalla principal</b> y después <b>Instalar</b>.','Abrí NOX desde su ícono: se ve a pantalla completa y se actualiza solo.'],
-  note:'Así siempre tenés la última versión, sin descargar archivos.',beta:true},
+  note:'Así siempre tenés la última versión, sin descargar archivos.'},
  {id:'windows',name:'Windows',req:'Windows 10 y 11 · 64 bits',sub:'Instalador, unos 140 MB',btn:'Descargar el instalador',
   steps:['Descargá <b>NOX-Instalador.exe</b> y abrilo.','Si aparece <b>Windows protegió tu PC</b>, tocá <b>Más información</b> y después <b>Ejecutar de todas formas</b>.','Se instala solo, sin pedir permisos de administrador, y deja el acceso directo <b>NOX</b> en el escritorio y en el menú Inicio.','Abrí NOX desde ese acceso directo. <b>F11</b> alterna pantalla completa.'],
   note:'El aviso de Windows aparece porque el juego todavía no tiene firma digital. Con internet, NOX abre siempre la última versión. Para quitarlo: Configuración → Aplicaciones → NOX → Desinstalar.'},
