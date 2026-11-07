@@ -68,6 +68,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 - `#boot`: pantalla de carga. Un script inline mide los fetch de `assets/`.
 - `#sel`: portada y selección de personaje.
+- Portada en celular vertical (lista de personajes): la cámara corre la imagen hacia arriba (`setViewOffset`, 33 % de la altura en `updCamera`) para que el personaje se vea arriba; abajo van logo de 290 px, frase de 15-18 px, cuenta y tarjetas. Sin la línea "Un MMORPG hecho en Paraguay", la descripción se oculta en pantallas de menos de 780 px y los créditos quedan en una línea que se abre al tocar. Medir con `tools/selmeasure.js` (WebKit, `ADMIN=1` simula los botones de administrador).
 - Las dos usan el tema de la web: noche `#1a1d47`, oro `#e2a83f`/`#f6d892`, fuentes Cinzel, Cormorant Garamond y Alegreya Sans. El bloque CSS está antes del script de boot.
 
 ### Ganchos de prueba
