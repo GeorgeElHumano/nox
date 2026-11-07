@@ -13,7 +13,8 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 7/11/2026: **juego y web publicados** (main = `arte-cc0`, commit cd26eb0). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas y la optimización.
+- Estado al 7/11/2026: **juego y web publicados** (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
+- Apps (`.github/workflows/release.yml`): corre al cambiar `VERSION`, `desktop/**`, `android/**` o el workflow en `main`. Windows sale como `NOX-Windows.zip` y como `NOX-Instalador.exe` (Inno Setup 6, `desktop/nox.iss`: instala sin admin en `%LOCALAPPDATA%\Programs\NOX`, acceso directo en el escritorio y en Inicio, desinstalable desde Windows). El bot sube `public/version.json` a `main` al terminar: mergear `origin/main` antes del próximo push. La web apunta a `releases/latest/download/…`: no cambiar un enlace hasta que la versión ya tenga el archivo.
   - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
   - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
 - `functions/api/[[path]].js`: la API del servidor (cuentas, pedidos), con base D1 `nox-db`.
@@ -90,8 +91,17 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Prueba en teléfonos reales: `jugar/?prueba=1` muestra "Medir rendimiento"; recorre Asunción, Campos, Chaco, Esteros y Cerro Corá (8 s cada una), da FPS, bajones y dibujos, y se copia o comparte el resultado. `BENCH.on` hace al jugador invulnerable mientras mide.
 - Descargas: los modelos se bajan por zona a pedido (`oadNeed`). `oadFetch` reintenta 2 veces antes de dar un modelo por perdido (antes un corte de señal dejaba todo en modelos simples). La gente y animales del ambiente se piden después de lo principal (`oadLater`). Animaciones aligeradas sin cambios (`gt/resample.mjs`, tolerancia 1e-5).
 - Mobs lejanos: `e.g.visible=!!(dl<D||boss)` con D = 62 (alto), 54 (medio), 40 (bajo). Antes daba `undefined` para los que no son jefes y three.js los dibujaba igual (solo oculta con `false`): ojo con cualquier `visible=` que no sea booleano. `mobShadow`: en medio y bajo solo hacen sombra los mobs a menos de 24 m.
+- Mobs hechos con piezas (serpientes, cuadrúpedos, alacranes): `mobBake(m)` en `makeEnemy`, después de `charBake`. Une las piezas quietas de cada grupo (cabeza, mandíbula, patas, pájaros) por material en el espacio del grupo; deja aparte lo referenciado directo por `m`, `userData.solo/wing/flame/gem/piece/nobake`, sprites y mobs con `mixer` (GLB). La cresta de las serpientes es un `InstancedMesh` (`ridgeI`; `ridge` quedan como Object3D sin escena que el animador mueve y se copian a la instancia). Mboitui 42→18 mallas, Moñái 92→33; Esteros con 10 mobs encima: 413/1221 → 252/472 llamadas (`tools/swarm.js`).
+- Celular (`pointer:coarse`) en alto: resolución máx. 1,5 (medio 1,3), MSAA 2 (medio 0) y mapa de sombras 1024. `dynRes` revisa cada 1,5 s y baja 0,25 si va por debajo de 18 FPS. En alto los mobs hacen sombra hasta 36 m.
 - En producción Cloudflare sirve los `.json` con brotli: entrar a Asunción baja ~6 MB.
 - `__NOX.bakeNow()` une todo a mano (con `__NOBAKE` puesto al cargar) y `tools/vis.js` saca fotos antes/después del mismo instante.
+
+## Detalles de personajes (7/11)
+
+- Arquera: el arco va en `hand_l` con `dir=[0,1,.05]`, `side=[1,0,0]` (el lomo hacia el blanco). Prueba: `tools/bowshot.js`.
+- Cascos: `forgeApply` mide la línea de las cejas (mallas `Eyes`/`Eyebrows` del cuerpo CC0) y se la pasa a `forgeHelm(S,U,top,cls,brow)`. Los cascos cerrados (`cap/round/crest/full/horn/wing`) y la corona con gorro se ajustan de la coronilla a las cejas (domo cortado en el ecuador) y la cara queda a la vista. Prueba: `tools/helmshot.js` (`CLS=`, `OUT=`; todas las clases y sets 0-6, de frente y tres cuartos).
+- Portada: el héroe va a `SELY=.09` (el empedrado está a .03); `updLife` esconde a los vecinos entre la cámara y el héroe en el menú. Prueba: `tools/selhero.js`.
+- Arena: al perder, `duelend` deja al jugador muerto (animación de muerte) hasta volver a Asunción a los 9 s. Prueba: `tools/dueltest.js` con `__NOX.duelTest`.
 
 ## Assets del juego
 
@@ -155,6 +165,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `gdrive.py`: lista y baja carpetas de Google Drive (packs de Quaternius).
 - `oga.sh`: busca en OpenGameArt.
 - `livegame.js` (juego publicado en 5 dispositivos), `presan.js` (revisión previa a publicar).
+- `swarm.js` (Esteros en alto con 10 mobs encima: llamadas, mallas y lógica), `mobprobe.js` (mallas por tipo de mob), `snakeshot.js` (foto de serpientes), `helmprobe.js` (alturas de ojos y casco).
 - `perf2.js` (rendimiento por zona), `who.js`/`casters.js`/`cast2.js` (qué dibuja y qué hace sombra), `texleak.js`, `vis.js`, `benchtest.js`.
 
 ## Pendientes conocidos
