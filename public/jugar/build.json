@@ -1,10 +1,12 @@
 {
- "build": "202611081239",
- "min": "202611081239",
- "title": "Ranking de jugadores",
+ "build": "202611082009",
+ "min": "202611082009",
+ "title": "Gestos y botones nuevos",
  "notes": [
-  "Ranking con los personajes de más nivel, con luz verde si están jugando",
-  "Cantidad de jugadores en línea en la portada",
-  "Ranking en la rueda del sol y en la portada"
+  "Rueda de gestos: saludo, baile, risa, llanto, burla, celebración y descanso (botón bajo el mapa o tecla G)",
+  "Los demás jugadores ven tus gestos",
+  "Botones de Personaje y Bolsa al lado de la vida",
+  "El contador de FPS va chiquito al lado de la hora",
+  "En iPhone ya se puede deslizar la lista de destinos del mapa"
  ]
 }

@@ -18,6 +18,8 @@ async function minBuild() {
   MIN.t = Date.now(); return MIN.v;
 }
 
+const GESTOS = ['saludo', 'baile', 'risa', 'llanto', 'burla', 'celebracion', 'descanso'];
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
@@ -242,6 +244,7 @@ export class World {
 
     if (t === 'p') { // posición: x,z,ry,mv,ac (contador de ataques),d (muerto),f (vuela)
       a.p = { x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, mv: +m.mv || 0, ac: m.ac | 0, d: m.d ? 1 : 0 };
+      if (GESTOS.includes(m.g)) a.p.g = m.g; // gesto en curso (saludo, baile…), para que lo vean los demás
       this.save(ws, a);
       if (!a.zone) return;
       const out = JSON.stringify({ t: 'p', id: a.uid, ...a.p });
