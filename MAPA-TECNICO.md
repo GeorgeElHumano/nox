@@ -13,7 +13,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 8/11/2026: **juego y web publicados** (parche 202611081151: HUD v2, arreglos del 8/11, venta múltiple, capas y empuñaduras; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
+- Estado al 8/11/2026: **juego y web publicados** (parche 202611081239: HUD v2, arreglos del 8/11, venta múltiple, capas, empuñaduras y ranking; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
 - Apps (`.github/workflows/release.yml`): corre al cambiar `VERSION`, `desktop/**`, `android/**` o el workflow en `main`. Windows sale como `NOX-Windows.zip` y como `NOX-Instalador.exe` (Inno Setup 6, `desktop/nox.iss`: instala sin admin en `%LOCALAPPDATA%\Programs\NOX`, acceso directo en el escritorio y en Inicio, desinstalable desde Windows). El bot sube `public/version.json` a `main` al terminar: mergear `origin/main` antes del próximo push. La web apunta a `releases/latest/download/…`: no cambiar un enlace hasta que la versión ya tenga el archivo.
   - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
   - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
@@ -134,6 +134,12 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Peto: el caparazón del pecho incluye las clavículas (antes quedaba una franja sin cubrir entre peto y hombreras, se veía en el gladiador).
 - Empuñaduras: `cc0Grip(body,side,k)` guarda el cierre en `body.userData.curl` y `cc0Recurl` lo vuelve a aplicar después de cada `skeleton.pose()` (en `cc0GripQ`, `cc0APose` y `cc0MakeBow`); antes el escudo abría la mano de la espada. `cc0Grip2` pone el arma en el promedio de las falanges cerradas (centro del puño). Pruebas: `tools/gripshot.js` (mano de cerca) y `tools/armshot.js` (cuerpo entero, 4 poses, todas las clases y sets).
 - Recoger objetos: `tryPickup` revisa si hay lugar antes del sonido (antes sonaba en cada cuadro con la bolsa llena).
+
+### Ranking y jugadores en línea (8/11, tarde; publicado)
+
+- API `GET /api/game/ranking` (sin sesión, sin pedir versión): lee `players.chars` de todas las cuentas, ordena por `resets` y después `L`, devuelve los 50 primeros (`name, cls, L, resets, evo, staff`), en caché 60 s en el Worker de Pages (`RANK`). Se alimenta de `game/summary`, que el juego manda en cada guardado (`syncSummary`).
+- Servidor en vivo `GET /live/online` (Worker `nox-live`, objeto `World`): `{n, names}` con los personajes conectados que ya mandaron su estado (`a.s`), nombres en minúscula.
+- Juego: `RANK` (`list`, `on`, `n`), `onlineFetch`, `rankLoad`, `renderRank`; panel `#pRank` (en `anyPanel`, `closeAll`, `padRoot`), opción "Ranking" con ícono `crown` en `WHEEL`, `ACT.openRank`. En la portada `acctBar` agrega `.onl` ("N jugando ahora", luz verde) y el botón Ranking cuando hay servidor. Se refresca cada 30 s (portada y panel abierto). Prueba: `tools/rankt.js` (en el juego) y `tools/rankp.js` (portada), con `__NOX.rankTest(lista, nombres, n)`.
 
 ### Ganchos de prueba
 
