@@ -92,7 +92,6 @@ const LBLPOS={asuncion:[-.45,.05,'end'],campos:[.42,-.42,'start'],ruinas:[.42,.1
 const X=p=>(p[0]+63.2).toFixed(2),Y=p=>(-p[1]-18.9).toFixed(2);
 $('#svgwrap').innerHTML=`<svg viewBox="-.3 0 12.4 9.2" role="img" aria-label="Mapa del reino con las diez tierras"><defs><radialGradient id="gl"><stop offset="0" stop-color="#e2a83f" stop-opacity=".35"/><stop offset="1" stop-color="#e2a83f" stop-opacity="0"/></radialGradient></defs>
 <path class="land" d="M${PY.map(p=>X(p)+','+Y(p)).join('L')}Z"/><path class="river" d="M${RIO.map(p=>X(p)+','+Y(p)).join('L')}"/>
-<path class="route" d="M${ZK.map(k=>X(PINS[k])+','+Y(PINS[k])).join('L')}"/>
 ${ZK.map((k,i)=>`<g class="pin ${k==='asuncion'?'safe':''}" data-z="${k}" tabindex="0" role="button" aria-label="${esc(W.zones[k].name)}"><circle class="halo" cx="${X(PINS[k])}" cy="${Y(PINS[k])}" r=".55" fill="url(#gl)" stroke="none"/><circle cx="${X(PINS[k])}" cy="${Y(PINS[k])}" r=".32"/><text x="${X(PINS[k])}" y="${Y(PINS[k])}">${i===0?'A':i}</text><text class="lbl" style="text-anchor:${LBLPOS[k][2]}" x="${(+X(PINS[k])+LBLPOS[k][0]).toFixed(2)}" y="${(+Y(PINS[k])+LBLPOS[k][1]).toFixed(2)}">${esc(W.zones[k].name)}</text></g>`).join('')}</svg>`;
 let curZ='asuncion';
 const mobChip=k=>{const m=W.mobs[k];return `<button type="button" class="${m.boss?'boss':''}" data-go="bestiario/${k}"><img src="${IMG('mob_'+k)}" alt="" loading="lazy">${m.name}${m.boss?' · jefe':''}</button>`;};

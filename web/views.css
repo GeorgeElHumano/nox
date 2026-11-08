@@ -155,11 +155,11 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .mapa{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
 .svgwrap{background:radial-gradient(70% 60% at 50% 50%,#1d1510,var(--ink) 80%);border:1px solid var(--line);border-radius:20px;padding:10px;position:sticky;top:76px}
 .svgwrap svg{width:100%;height:auto;display:block}
-.land{fill:#1f1711;stroke:var(--gold-dim,#8a6526);stroke-width:.06;stroke-linejoin:round}
+.land{fill:#1f1711;stroke:rgba(255,255,255,.12);stroke-width:.04;stroke-linejoin:round}
 .river{fill:none;stroke:#3a5a7a;stroke-width:.07;stroke-linecap:round;opacity:.9}
-.route{fill:none;stroke:var(--gold);stroke-width:.05;stroke-dasharray:.18 .14;opacity:.75}
 .pin{cursor:pointer}
 .pin circle{fill:var(--ink);stroke:var(--gold);stroke-width:.07;transition:r .15s}
+.pin .halo,.pin.on .halo,.pin:hover .halo,.pin.safe.on .halo{stroke:none;fill:url(#gl);r:.55}
 .pin text{font-family:var(--display);font-size:.34px;fill:var(--gold-hi);text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:700}
 .pin .lbl{font-family:var(--body);font-size:.3px;fill:var(--paper);text-anchor:start;dominant-baseline:central;paint-order:stroke;stroke:#000;stroke-width:.1;font-weight:500}
 .pin:hover circle,.pin.on circle{fill:var(--gold);r:.42}
@@ -269,7 +269,6 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
 .pin .halo{animation:pulse 2.2s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
 @keyframes pulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.9;transform:scale(1.5)}}
-.route{stroke-dasharray:60;stroke-dashoffset:60;animation:draw 2.4s .3s ease forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
 .fimg img{animation:breathe 3s ease-in-out infinite}
 @keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}

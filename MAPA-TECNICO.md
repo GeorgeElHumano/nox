@@ -102,6 +102,19 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 - AUTO con menús abiertos: sigue peleando y `useSkill` deja usar técnicas aunque haya panel abierto (`paused`) si el AUTO está prendido.
 
+### HUD v2 (7/11, noche; en local, falta publicar)
+
+- Íconos de técnicas y ataques: `SKI` (paths de game-icons.net, CC BY 3.0: Lorc, Delapouite, Skoll) y `SKIC(id)` con degradé por elemento (`SKIG`, gradientes `skg_*` en un SVG oculto). Ataques `atk_<clase>`, pociones `pot_hp/pot_mp`. Créditos en `.credits`.
+- `hudV2Init`: tarjeta de vida `#lifeCard` (reemplaza orbes y placa, que quedan ocultos), sol `#sunBtn` con contador `#sunN` y aviso la primera vez (`noxSunTip`), `#mmFoot` bajo el minimapa con el botón de cámara y el oro, AUTO junto a Atacar. Los botones sueltos de `.menu` quedan ocultos (siguen existiendo).
+- Rueda del sol `#wheel` (`wheelToggle`, `WHEEL`): Personaje, Bolsa, Misiones, Grupo, Chat, Ajustes. Esc la abre si no hay nada abierto.
+- Menús a media pantalla: CSS sobre `.panel:not(.top)` (mitad derecha; en vertical, abajo desde 42 %), `#partyBox`/`#chatBox` igual, `pItem` en la otra mitad. Pestañas comunes `#pTabs` (`tabsFor`, `PTABS`, `tabCycle`). `closeAll` y `anyPanel` incluyen `pCfg`, `pMap`, grupo, chat y rueda.
+- Cámara con menú abierto: `hcTick`/`hcCamera` (`HC.on`, clase `body.half`): de frente al héroe, FOV 40, `setViewOffset` para centrarlo en la mitad libre (horizontal 25 %, vertical 22 %).
+- Mapa: tocar el minimapa (o M, o View en el mando) abre `#pMap` (`openMap`, `renderMap`, `MAPV`): mapa de la zona (`drawBigMap(cv,x,sz)`) con pestañas Viajar / Spots de caza (botones `travel`/`warp` de siempre) y "Mapa del reino" (Paraguay de la web sin líneas, `PYO/PYR/PYP/PYL`). El minimapa usa la foto desde arriba `assets/ui/top_<zona>.webp` (640 px, 260 m de lado, cámara ortogonal; se rehacen con `tools/topzones.js`) en un lienzo de 520 (`minimapPhoto`; `drawMinimap` dibuja `mmBg` a 260).
+- Mando táctil: aparece solo en el 36 % izquierdo y el 55 % de abajo.
+- PC/Mac en 3ra y 1ra persona (`WASD()`): WASD camina, clic captura el mouse (pointer lock) y mira, clic izquierdo ataca, clic derecho = técnica 1, Q/E/R = técnicas 2-4, 1/2 pociones, Espacio AUTO, Tab siguiente enemigo, F hablar, Alt suelta el cursor. En la clásica, como antes (Q W E R, Espacio ataca). Barra de técnicas abajo al centro en PC con la tecla en cada botón (`kbLabels`).
+- Mando (Gamepad API, `padTick`, `PAD`): stick izq camina (escribe en `joy`), stick der mira, RT ataca, X/Y/B/RB técnicas, LT fija y LB pasa de enemigo, cruceta ↑↓ pociones, ← voz, → AUTO, A habla/acepta, Menu rueda, View mapa, R3 cámara, L3 centra. En menús: stick/cruceta mueve el foco (`padMove`), A elige, B vuelve, LB/RB pestañas. `body.pad` esconde el joystick. Prueba: `tools/ctl.js` (mando simulado).
+- Pruebas: `tools/hud2.js` (`MOB=1`, `W/H`, `CAM`, `OUT`), `tools/inv2.js` (invitación).
+
 ### Ganchos de prueba
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
