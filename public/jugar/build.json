@@ -1,14 +1,15 @@
 {
- "build": "202611080140",
- "min": "202611080140",
- "title": "Parche del 8 de noviembre: HUD nuevo",
+ "build": "202611080452",
+ "min": "202611080452",
+ "title": "Arreglos de NOX",
  "notes": [
-  "Pantalla más limpia: tarjeta de vida, misión en una línea y el sol MENÚ con todos los menús en rueda",
-  "Menús a media pantalla y transparentes, con tu personaje siempre a la vista",
-  "El minimapa es una foto real de la zona: tocalo para ver el mapa, viajar y el mapa del reino",
-  "Íconos nuevos para cada técnica y ataque",
-  "PC y Mac: WASD y mouse en 3ra y 1ra persona",
-  "Soporte para mandos de Xbox, PlayStation y genéricos",
-  "El mando táctil aparece en una zona más chica"
+  "Lagos de Ypacaraí, Trinidad y el Monday con orilla natural",
+  "Spots de caza más espaciosos y mapa del reino con scroll",
+  "Primera persona sin brazos ni cuervo tapando la vista",
+  "Minimapa siempre en la esquina y hora del juego debajo",
+  "Asunción mejor iluminada de noche y más luz sobre tu personaje",
+  "Punto rojo cuando hay misiones diarias para reclamar",
+  "La X para cerrar queda fija al bajar en los menús",
+  "La pantalla no se apaga mientras jugás"
  ]
 }
