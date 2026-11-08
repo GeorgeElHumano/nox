@@ -13,7 +13,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 8/11/2026: **juego y web publicados** (parche 202611080452: HUD v2 y arreglos del 8/11; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
+- Estado al 8/11/2026: **juego y web publicados** (parche 202611081151: HUD v2, arreglos del 8/11, venta múltiple, capas y empuñaduras; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
 - Apps (`.github/workflows/release.yml`): corre al cambiar `VERSION`, `desktop/**`, `android/**` o el workflow en `main`. Windows sale como `NOX-Windows.zip` y como `NOX-Instalador.exe` (Inno Setup 6, `desktop/nox.iss`: instala sin admin en `%LOCALAPPDATA%\Programs\NOX`, acceso directo en el escritorio y en Inicio, desinstalable desde Windows). El bot sube `public/version.json` a `main` al terminar: mergear `origin/main` antes del próximo push. La web apunta a `releases/latest/download/…`: no cambiar un enlace hasta que la versión ya tenga el archivo.
   - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
   - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
@@ -125,7 +125,15 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Menús a media pantalla: la cabecera `.card-h` con la X es `position:sticky` (el padding de arriba de la tarjeta pasó a la cabecera).
 - Luz: `heroFill` (PointLight cálida, 7,5 m, sigue al héroe del lado de la cámara; .45 de día a 1,2 de noche) y `plazaL` (2 faroles en Asunción, 32 m, más fuertes de noche); la luz ambiente de Asunción sube hasta 45 % de noche (`hemiI` en `dnTick`). Las luces están siempre en escena con intensidad 0 cuando no se usan, para no recompilar shaders.
 - Pantalla siempre encendida: `AWAKE` (`awakeOn/awakeOff`): Wake Lock API mientras `mode==='game'`, se pide de nuevo al volver a la pestaña y con cada toque; respaldo para iOS < 16.4: video mudo en bucle `assets/ui/despierto.mp4` (3 s, 64 px). Solo debe existir **un** `const AWAKE` (en el merge del 8/11 entró otro de la rama `arte-mitologia` y se quitó).
-- Ganchos nuevos en `__NOX`: `H`, `LAKE_Y`, `enemies`, `AWAKE`.
+- Ganchos nuevos en `__NOX`: `H`, `LAKE_Y`, `enemies`, `AWAKE`, `openShop`, `newEquip`.
+
+### Tienda, capas y empuñaduras (8/11, mediodía; publicado)
+
+- Venta múltiple: en la pestaña Vender, `SHOP.sel` (Set de índices de `C.inv`) y `SHOP.cfm` (doble toque). Acciones `sellMode`, `sellPick` (`comun` = equipo normal sin +4, `todo`, `nada`), `sellCancel`, `sellMany`; avisa si hay objetos valiosos (`itemR!=='normal'` o `itemQ>=2`). Prueba: `tools/sellt.js`.
+- Capa: solo el Mburuvicha (en `cc0Hero`, en el héroe de 0 A.D. y en el modelo viejo). `capeFit(r)` mide en la pose de reposo lo que hay en la espalda y cuelga la capa detrás (`c.lowBack` abre la parte de abajo). El carcaj de la arquera se arma después de la capa y va por encima.
+- Peto: el caparazón del pecho incluye las clavículas (antes quedaba una franja sin cubrir entre peto y hombreras, se veía en el gladiador).
+- Empuñaduras: `cc0Grip(body,side,k)` guarda el cierre en `body.userData.curl` y `cc0Recurl` lo vuelve a aplicar después de cada `skeleton.pose()` (en `cc0GripQ`, `cc0APose` y `cc0MakeBow`); antes el escudo abría la mano de la espada. `cc0Grip2` pone el arma en el promedio de las falanges cerradas (centro del puño). Pruebas: `tools/gripshot.js` (mano de cerca) y `tools/armshot.js` (cuerpo entero, 4 poses, todas las clases y sets).
+- Recoger objetos: `tryPickup` revisa si hay lugar antes del sonido (antes sonaba en cada cuadro con la bolsa llena).
 
 ### Ganchos de prueba
 
