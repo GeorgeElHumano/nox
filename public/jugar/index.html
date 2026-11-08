@@ -2211,7 +2211,7 @@ function buildHero(cls,eq){const cc=cc0Hero(cls,eq);if(cc)return cc;const oo=CC0
     else if(cls==='hechicero'){const s=staffMesh(w.t,w.lv,gc);s.position.set(0,0,.02);r.handR.add(s);r.staff=s;}
     else{const b=bowMesh(w.t,w.lv,gc);b.position.set(0,0,.02);r.handL.add(b);r.bow=b;}}
   if(eq.shield&&cls==='caballero'){const sh=shieldMesh(eq.shield.t);r.handL.add(sh);r.shield=sh;}
-  if(tt('armor')>=1||cls==='hechicero'&&tt('armor')>=2){r.cape=makeCape(cls==='caballero'?0x8e1a20:[0,0,0x1a2a5a,0x3a4a7a,0xb8902a][tt('armor')]||0x2a1a3a);r.torso.add(r.cape.mesh);}
+  if(cls==='mburuvicha'&&tt('armor')>=0){r.cape=makeCape(cls==='caballero'?0x8e1a20:[0,0,0x1a2a5a,0x3a4a7a,0xb8902a][tt('armor')]||0x2a1a3a);r.torso.add(r.cape.mesh);}
   if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.torso.add(W.g);r.wings=W;}
   r.cls=cls;bakeGroups(r.g);return r;}
 /* capa: tela con pliegues, angosta en los hombros, envuelve la espalda; textura con sombras de pliegue y ribete del color del set */
@@ -2696,7 +2696,7 @@ function oadHero(cls,eq){if(!OAD.on||OAD.failed)return null;const s=oadHeroSpec(
   const pre=VIS(cls)==='caballero'?'k':cls==='hechicero'?'w':'a';const fem=cls==='arquera';const map={idle:pre+'_idle',walk:pre+'_walk',run:pre+'_run',death:'death_a',calm:fem?'n_idle_f':'n_idle_m',cwalk:fem?'n_walk_f':'n_walk_m'};
   if(pre==='k'){map.atk1='k_atk1';map.atk2='k_atk2';map.spin='k_spin';}else if(pre==='w'){map.atk1='w_cast';map.heal='w_heal';}else map.atk1='a_shoot';
   oadActs(r,r.body,map);/* arranca directo en la pose tranquila (sin pasar por la guardia de combate) */oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
-  const at=s.at;/* capa del color de su set (oscurecida), así cada set se reconoce también por la silueta */if(cls==='caballero'&&at>=1||cls==='hechicero'&&at>=2||cls==='arquera'&&at>=3||cls==='gladiador'&&at>=2||cls==='mburuvicha'){const cc=new THREE.Color(tierGlow(cls,at)).multiplyScalar(at>=3?.95:.85);r.cape=makeCape(cc.getHex(),forjaOf(cls,at).t);r.anchor.add(r.cape.mesh);}
+  const at=s.at;/* capa del color de su set (oscurecida), así cada set se reconoce también por la silueta */if(cls==='mburuvicha'){const cc=new THREE.Color(tierGlow(cls,at)).multiplyScalar(at>=3?.95:.85);r.cape=makeCape(cc.getHex(),forjaOf(cls,at).t);r.anchor.add(r.cape.mesh);}
   if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
   if(r.chest){r.body.updateMatrixWorld(true);wingSocket(r);}/* alas y capa ancladas al pecho desde la pose base: siempre en la espalda */
   {const its=ARMK.map(k=>eq[k]).filter(Boolean);
@@ -3650,17 +3650,22 @@ function cc0Hold(body,bone,obj,p,rot,s){body.updateMatrixWorld(true);const b=bod
 /* agarre: se calcula con la pose de referencia del clip (p. ej. la guardia con espada) para que el arma quede como se espera
    dir = hacia dónde apunta el arma en esa pose (ejes del personaje), side = hacia dónde mira su cara ancha */
 function cc0GripQ(body,clip,t,bone,dir,side){const sk=[];body.traverse(o=>{if(o.isSkinnedMesh)sk.push(o);});const b=body.getObjectByName(bone);const rq=new THREE.Quaternion();body.updateMatrixWorld(true);body.getWorldQuaternion(rq);const qR=new THREE.Quaternion();b.getWorldQuaternion(qR);
-  let qP=qR.clone();if(clip){const mx=new THREE.AnimationMixer(body);const a=mx.clipAction(clip);a.play();mx.setTime(t*clip.duration);body.updateMatrixWorld(true);b.getWorldQuaternion(qP);a.stop();mx.uncacheRoot(body);const seen=new Set();sk.forEach(m=>{if(!seen.has(m.skeleton)){seen.add(m.skeleton);m.skeleton.pose();}});body.updateMatrixWorld(true);}
+  let qP=qR.clone();if(clip){const mx=new THREE.AnimationMixer(body);const a=mx.clipAction(clip);a.play();mx.setTime(t*clip.duration);body.updateMatrixWorld(true);b.getWorldQuaternion(qP);a.stop();mx.uncacheRoot(body);const seen=new Set();sk.forEach(m=>{if(!seen.has(m.skeleton)){seen.add(m.skeleton);m.skeleton.pose();}});cc0Recurl(body);body.updateMatrixWorld(true);}
   const Y=new THREE.Vector3(...dir).normalize().applyQuaternion(rq),Zs=new THREE.Vector3(...side).applyQuaternion(rq);const X=new THREE.Vector3().crossVectors(Y,Zs).normalize();const Z=new THREE.Vector3().crossVectors(X,Y).normalize();
   const qW=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X,Y,Z));const qRest=qR.clone().multiply(qP.clone().invert()).multiply(qW);return qR.clone().invert().multiply(qRest);}
 /* el arma cambia de agarre según la animación: en guardia apunta arriba y adelante; en reposo o caminando, la punta va hacia abajo */
 function cc0Grip2(body,clip,t,bone,obj,dir,side,s,along,calm){const b=body.getObjectByName(bone);if(!b)return null;const qK=cc0GripQ(body,clip,t,bone,dir,side);
   body.updateMatrixWorld(true);const pw=new THREE.Vector3().setFromMatrixPosition(b.matrixWorld);const m1=body.getObjectByName(bone==='hand_l'?'middle_01_l':'middle_01_r');
-  if(m1&&/hand/.test(bone)){pw.lerp(new THREE.Vector3().setFromMatrixPosition(m1.matrixWorld),.55);}else if(along){const c=b.children.find(x=>x.isBone);if(c)pw.lerp(new THREE.Vector3().setFromMatrixPosition(c.matrixWorld),along);}
+  if(m1&&/hand/.test(bone)){const sd=bone==='hand_l'?'l':'r',fs=[];for(const f of ['index','middle','ring','pinky'])for(const i of [1,2,3]){const fb=body.getObjectByName(`${f}_0${i}_${sd}`);if(fb)fs.push(new THREE.Vector3().setFromMatrixPosition(fb.matrixWorld));}
+    /* centro del puño: promedio de las falanges ya cerradas (el arma pasa por adentro de los dedos, no al costado de la palma) */
+    if(fs.length>=8){const c=new THREE.Vector3();fs.forEach(v=>c.add(v));c.multiplyScalar(1/fs.length);pw.copy(c);}else pw.lerp(new THREE.Vector3().setFromMatrixPosition(m1.matrixWorld),.55);}else if(along){const c=b.children.find(x=>x.isBone);if(c)pw.lerp(new THREE.Vector3().setFromMatrixPosition(c.matrixWorld),along);}
   const h=new THREE.Group();h.position.copy(b.worldToLocal(pw.clone()));h.quaternion.copy(qK);const bs=new THREE.Vector3().setFromMatrixScale(b.matrixWorld).x||1;h.scale.setScalar(s/bs);h.add(obj);b.add(h);
   if(calm){h.userData.qK=qK;h.userData.qC=cc0GripQ(body,calm.clip,calm.t||.5,bone,calm.dir,calm.side||side);}return h;}
 /* dedos cerrados alrededor del arma (las animaciones no traen los dedos) */
-function cc0Grip(body,side,k){for(const f of ['index','middle','ring','pinky'])for(const i of [1,2,3]){const b=body.getObjectByName(`${f}_0${i}_${side}`);if(b)b.rotation.z+=(side==='r'?-1:1)*k*(i===1?.9:1.2);}
+/* cada mano recuerda cuánto se cerró, para volver a cerrarla después de que skeleton.pose() devuelva los huesos a la postura de enlace */
+function cc0Grip(body,side,k){const u=body.userData.curl=body.userData.curl||{};u[side]=(u[side]||0)+k;cc0Curl1(body,side,k);}
+function cc0Recurl(body){const u=body.userData.curl;if(!u)return;for(const sd in u)cc0Curl1(body,sd,u[sd]);}
+function cc0Curl1(body,side,k){for(const f of ['index','middle','ring','pinky'])for(const i of [1,2,3]){const b=body.getObjectByName(`${f}_0${i}_${side}`);if(b)b.rotation.z+=(side==='r'?-1:1)*k*(i===1?.9:1.2);}
   for(const i of [1,2]){const b=body.getObjectByName(`thumb_0${i}_${side}`);if(b)b.rotation.z+=(side==='r'?-1:1)*k*.4;}}
 function cc0Model(n,col,metal){const g=OAD.ok[n];if(!g)return null;const o=g.scene.clone(true);o.traverse(x=>{if(!x.isMesh)return;x.castShadow=true;x.material=x.material.clone();if(col!=null){x.material.color.lerp(new THREE.Color(col),.55);}if(metal){x.material.metalness=Math.max(x.material.metalness||0,.6);x.material.roughness=Math.min(x.material.roughness==null?1:x.material.roughness,.4);regMetal(x.material);}});return o;}
 function cc0Human(cls,eq,o){o=o||{};const S=CC0_CLS[cls],F=o.face||cc0Face(cls),tt=k=>eq&&eq[k]?eq[k].t|0:-1;
@@ -3696,7 +3701,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
       if(cls==='hechicero'){obj=cc0Staff(S,1.55,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.08];clip=clipsA.Spell_Simple_Idle_Loop;}
       else if(cls==='mburuvicha'){obj=cc0Cetro(S,1.5,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.15];clip=clipsA.Idle_Loop;}
       else{const n=CC0_W[cls][wt];obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
-      if(obj){const calm=cls==='hechicero'||cls==='mburuvicha'?null:cls==='arquera'?{clip:clipsA.Idle_Loop,t:.5,dir:[0,1,0],side:[1,0,0]}:{clip:clipsA.Idle_Loop,t:.5,dir:[0,-.82,.57],side:[1,0,0]};const h=cc0Grip2(body,clip,tt,bone,obj,dir,side,s,0,calm);if(h&&calm){if(cls==='arquera')h.userData.kOnly='atk1';(r.grips=r.grips||[]).push(h);}if(h){forgeGlow(h,cls,w);h.userData.piece='weapon';r.forge=r.forge||[];r.forge.push(h);}cc0Grip(body,sd,1);}}
+      if(obj){cc0Grip(body,sd,1);body.updateMatrixWorld(true);const calm=cls==='hechicero'||cls==='mburuvicha'?null:cls==='arquera'?{clip:clipsA.Idle_Loop,t:.5,dir:[0,1,0],side:[1,0,0]}:{clip:clipsA.Idle_Loop,t:.5,dir:[0,-.82,.57],side:[1,0,0]};const h=cc0Grip2(body,clip,tt,bone,obj,dir,side,s,0,calm);if(h&&calm){if(cls==='arquera')h.userData.kOnly='atk1';(r.grips=r.grips||[]).push(h);}if(h){forgeGlow(h,cls,w);h.userData.piece='weapon';r.forge=r.forge||[];r.forge.push(h);}}}
     if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0ShieldTint(cc0Model(n,null,false),Math.min(6,eq.shield.t|0));if(o2){const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
     if(cls==='mburuvicha'&&!(eq&&eq.helm)){const h=cc0Hold(body,'Head',cc0Jeguaka(.124),[0,.175,-.01],[0,0,0],1);}}catch(e){console.error(e);}
   const ANI={k:{idle:'Sword_Idle',calm:'Idle_Loop',walk:'Walk_Loop',cwalk:'Walk_Formal_Loop',run:'Jog_Fwd_Loop',death:'Death01',atk1:'Sword_Regular_A',atk2:'Sword_Regular_B',spin:'Sword_Heavy_Combo'},
@@ -3705,7 +3710,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   const pre=VIS(cls)==='caballero'?'k':cls==='hechicero'?'w':'a';const clips={};['c_anim1','c_anim2'].forEach(f=>(OAD.ok[f].animations||[]).forEach(c=>clips[c.name]=c));
   const map={};for(const k in ANI[pre])if(clips[ANI[pre][k]])map[k]=clips[ANI[pre][k]];if(cls==='arquera'){if(CC0.bow===undefined){try{CC0.bow=cc0MakeBow(r.body,clips);}catch(e){console.error(e);CC0.bow=null;}}if(CC0.bow)map.atk1=CC0.bow;}
   oadActs(r,body,map);oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
-  const at=r.spec.at;if(cls==='caballero'&&at>=1||cls==='hechicero'&&at>=2||cls==='arquera'&&at>=3||cls==='gladiador'&&at>=2||cls==='mburuvicha'){const cc=new THREE.Color(tierGlow(cls,at)).multiplyScalar(at>=3?.95:.85);r.cape=makeCape(cc.getHex(),forjaOf(cls,at).t);r.anchor.add(r.cape.mesh);try{capeFit(r);}catch(e){console.error(e);}}
+  const at=r.spec.at;if(cls==='mburuvicha'){const cc=new THREE.Color(tierGlow(cls,at)).multiplyScalar(at>=3?.95:.85);r.cape=makeCape(cc.getHex(),forjaOf(cls,at).t);r.anchor.add(r.cape.mesh);try{capeFit(r);}catch(e){console.error(e);}}
   /* el carcaj va por encima de la capa (si la hay), nunca atravesándola */
   if(cls==='arquera')try{const q=cc0Model('c_k_quiver');if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
   if(eq&&eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
@@ -3716,7 +3721,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   cc0Glow(r);return r;}
 const CC0_FIT={chest:[0,-.08,.05],hip:[0,0,.035]};
 /* la forja se diseñó sobre la pose en A de 0 A.D.: se baja el brazo un momento para colgar las piezas y después vuelve a la pose en T */
-function cc0APose(body,on){const sk=[];body.traverse(o=>{if(o.isSkinnedMesh)sk.push(o);});if(!on){const seen=new Set();sk.forEach(m=>{if(!seen.has(m.skeleton)){seen.add(m.skeleton);m.skeleton.pose();}});body.updateMatrixWorld(true);return;}
+function cc0APose(body,on){const sk=[];body.traverse(o=>{if(o.isSkinnedMesh)sk.push(o);});if(!on){const seen=new Set();sk.forEach(m=>{if(!seen.has(m.skeleton)){seen.add(m.skeleton);m.skeleton.pose();}});cc0Recurl(body);body.updateMatrixWorld(true);return;}
   body.updateMatrixWorld(true);const rq=new THREE.Quaternion();body.getWorldQuaternion(rq);
   for(const [n,a] of [['upperarm_l',-1.22],['upperarm_r',1.22]]){const b=body.getObjectByName(n);if(!b)continue;const ax=new THREE.Vector3(0,0,1).applyQuaternion(rq);const wq=new THREE.Quaternion();b.getWorldQuaternion(wq);
     const nq=new THREE.Quaternion().setFromAxisAngle(ax,a).multiply(wq);const pq=new THREE.Quaternion();b.parent.getWorldQuaternion(pq);b.quaternion.copy(pq.invert().multiply(nq));}
@@ -3942,7 +3947,7 @@ function cc0MakeBow(body,clips){const aim=clips.Pistol_Aim_Neutral;if(!aim)retur
   const pose=(handT,elbowT)=>{ua.quaternion.copy(q0.ua);la.quaternion.copy(q0.la);ha.quaternion.copy(q0.ha);body.updateMatrixWorld(true);aimBone(ua,la,elbowT);aimBone(la,ha,handT);return [ua.quaternion.clone(),la.quaternion.clone()];};
   const sh=W(ua),head=W(hd);const chin=head.clone().add(R([-.05,-.07,.1])),elb=sh.clone().add(R([-.12,.04,-.3]));const far=head.clone().add(R([-.16,-.03,-.06])),elb2=sh.clone().add(R([-.2,.05,-.34]));
   const drawn=pose(chin,elb),rel=pose(far,elb2);const rest=[q0.ua,q0.la];
-  a.stop();mx.uncacheRoot(body);const seen=new Set();sk.forEach(m=>{if(!seen.has(m.skeleton)){seen.add(m.skeleton);m.skeleton.pose();}});body.updateMatrixWorld(true);
+  a.stop();mx.uncacheRoot(body);const seen=new Set();sk.forEach(m=>{if(!seen.has(m.skeleton)){seen.add(m.skeleton);m.skeleton.pose();}});cc0Recurl(body);body.updateMatrixWorld(true);
   const T=[0,.42,.62,.68,1],tr=aim.tracks.filter(t=>!/^(upperarm_r|lowerarm_r)\./.test(t.name)).map(t=>t.clone());
   const qt=(name,arr)=>new THREE.QuaternionKeyframeTrack(name+'.quaternion',T,arr.flatMap(q=>q.toArray()));
   tr.push(qt('upperarm_r',[rest[0],drawn[0],drawn[0],rel[0],rest[0]]),qt('lowerarm_r',[rest[1],drawn[1],drawn[1],rel[1],rest[1]]));
@@ -5111,6 +5116,7 @@ function tryPickup(d){
     if(d.own&&d.own!==LIVE.me&&!(d.opid&&LIVE.party&&LIVE.party.pid===d.opid)&&srvNow()-(d.sts||0)<20000){if(T-(d.warnT||-9)>5){d.warnT=T;toast(`Es de <b>${esc(d.ownN||'otro jugador')}</b> por unos segundos`);}return false;}
     if(d.obj.item){const it=d.obj.item,st=stackable(it)&&C.inv.some(x=>x&&x.k===it.k&&x.sub===it.sub&&(x.n||1)<99);if(!st&&!C.inv.includes(null)){if(T-lastFull>2.5){toast('Tu inventario está lleno');lastFull=T;}return false;}}
     d.req=T;liveSend({t:'dp',id:d.sid});return false;}
+  if(d.obj.gold==null&&d.obj.item){const it=d.obj.item,st=stackable(it)&&C.inv.some(x=>x&&x.k===it.k&&x.sub===it.sub&&(x.n||1)<99);if(!st&&!C.inv.includes(null)){if(T-lastFull>2.5){toast('Tu inventario está lleno');lastFull=T;}return false;}}
   if(!snd(d.obj.gold!=null?'mu_coins':'mu_drop',{vol:d.obj.gold!=null?.7:.6,rate:d.obj.gold!=null?1:1.15}))sfx(d.obj.gold!=null?'gold':'item');if(d.obj.gold!=null){C.gold+=d.obj.gold;toast(`<em class="g">+₲ ${fmt(d.obj.gold)}</em>`);}
   else{if(!addItem(d.obj.item)){if(T-lastFull>2.5){toast('Tu inventario está lleno');lastFull=T;}return false;}toast(`Obtuviste <em style="color:${itemColor(d.obj.item)}">${esc(itemName(d.obj.item))}</em>`);}
   removeDrop(d);return true;
