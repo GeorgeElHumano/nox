@@ -13,7 +13,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 8/11/2026: **juego y web publicados** (parche 202611081239: HUD v2, arreglos del 8/11, venta múltiple, capas, empuñaduras y ranking; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
+- Estado al 8/11/2026: **juego y web publicados** (parche 202611082009: HUD v2, arreglos del 8/11, venta múltiple, capas, empuñaduras, ranking y gestos; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
 - Apps (`.github/workflows/release.yml`): corre al cambiar `VERSION`, `desktop/**`, `android/**` o el workflow en `main`. Windows sale como `NOX-Windows.zip` y como `NOX-Instalador.exe` (Inno Setup 6, `desktop/nox.iss`: instala sin admin en `%LOCALAPPDATA%\Programs\NOX`, acceso directo en el escritorio y en Inicio, desinstalable desde Windows). El bot sube `public/version.json` a `main` al terminar: mergear `origin/main` antes del próximo push. La web apunta a `releases/latest/download/…`: no cambiar un enlace hasta que la versión ya tenga el archivo.
   - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
   - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
@@ -140,6 +140,18 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - API `GET /api/game/ranking` (sin sesión, sin pedir versión): lee `players.chars` de todas las cuentas, ordena por `resets` y después `L`, devuelve los 50 primeros (`name, cls, L, resets, evo, staff`), en caché 60 s en el Worker de Pages (`RANK`). Se alimenta de `game/summary`, que el juego manda en cada guardado (`syncSummary`).
 - Servidor en vivo `GET /live/online` (Worker `nox-live`, objeto `World`): `{n, names}` con los personajes conectados que ya mandaron su estado (`a.s`), nombres en minúscula.
 - Juego: `RANK` (`list`, `on`, `n`), `onlineFetch`, `rankLoad`, `renderRank`; panel `#pRank` (en `anyPanel`, `closeAll`, `padRoot`), opción "Ranking" con ícono `crown` en `WHEEL`, `ACT.openRank`. En la portada `acctBar` agrega `.onl` ("N jugando ahora", luz verde) y el botón Ranking cuando hay servidor. Se refresca cada 30 s (portada y panel abierto). Prueba: `tools/rankt.js` (en el juego) y `tools/rankp.js` (portada), con `__NOX.rankTest(lista, nombres, n)`.
+
+### Gestos, botones junto a la vida y FPS (8/11, noche; publicado)
+
+- Rueda de gestos: `GESTW` (7: saludo, baile, risa, llanto, burla, celebracion, descanso), `ACT.gestWheel` (botón `#mbGest` en `#mmFoot`, tecla G). `wheelToggle(force,list)` sirve para la rueda del sol y la de gestos (`WCUR`).
+- `P.gest={k,t,up,pend,done}`: `gestStart`/`gestEnd`. Moverse, atacar o una técnica lo cortan; en descanso primero se levanta (`up`, guarda la orden en `pend` y la devuelve al terminar). Solo con el cuerpo CC0 (`r.cc0`).
+- Animación: en `oadHeroAnim` la rama `gestAnim` pone la animación base (`GDEF[k].base`: `Idle_Loop`/`Yes` de c_anim1/2 en `r.gclips`, `Dance_Loop`/`LayToIdle` de `assets/c_gest.json`, cargado al primer uso con `gestLoad`; armado con `tools/clipjson.js` desde Quaternius UAL1/UAL2, CC0). Después de `mixer.update` corre `gestPose`: poses propias (saludo, risa, llanto, burla) con `gAim` (apunta un hueso a su hijo en una dirección del mundo) y `gRot`, en el marco del personaje (x izquierda, y arriba, z adelante). Ojo: el hueso de la cabeza se llama `Head`.
+- Mientras dura se esconden los hijos no-hueso de los huesos (armas, escudo, carcaj) en `r.gHid`; `gestOff` los devuelve. Globito `.gbub` con el ícono sobre la cabeza, textos `.gfl` que suben, lágrimas y papelitos con `parts`.
+- En línea: `livePos` manda `g` y el Worker la deja pasar solo si está en `GESTOS`; los demás la reciben en `o.P.gest` y la animan con el mismo código.
+- `#lcRow` = `#lifeCard` + `#lcSide` (Personaje y Bolsa, con punto rojo si hay puntos libres). En vertical de hasta 440 px la tarjeta mide 38vw (border-box), el nivel se muestra sin la clase y el sol baja a 54 px, para no encimarse (medido con `tools/hudq.js` en iPhone SE, 15 y Pro Max).
+- FPS: `fpsMeter` escribe `#mmFps` ("60 FPS") dentro de `#mmClock`; el recuadro con datos técnicos (`#fpsBox`) queda solo para `?prueba=1` y la medición.
+- Mapa en vertical: `.mp-b` desliza entero (mapa arriba y la lista completa abajo); antes `.mp-r` crecía y se cortaba sin scroll en iPhone.
+- Pruebas: `tools/gtest.js` (rueda y los 7 gestos), `tools/gest4.js`/`onegif3.js` (GIF de muestra).
 
 ### Ganchos de prueba
 
