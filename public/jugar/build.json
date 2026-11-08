@@ -1,10 +1,14 @@
 {
- "build": "202611072039",
- "min": "202611072039",
- "title": "Parche del 7 de noviembre (noche)",
+ "build": "202611080140",
+ "min": "202611080140",
+ "title": "Parche del 8 de noviembre: HUD nuevo",
  "notes": [
-  "1ra persona sin mira, más gran angular y con tus brazos a la vista al moverte",
-  "El modo automático sigue usando técnicas con el inventario u otro menú abierto",
-  "El servidor en vivo también pide la última versión"
+  "Pantalla más limpia: tarjeta de vida, misión en una línea y el sol MENÚ con todos los menús en rueda",
+  "Menús a media pantalla y transparentes, con tu personaje siempre a la vista",
+  "El minimapa es una foto real de la zona: tocalo para ver el mapa, viajar y el mapa del reino",
+  "Íconos nuevos para cada técnica y ataque",
+  "PC y Mac: WASD y mouse en 3ra y 1ra persona",
+  "Soporte para mandos de Xbox, PlayStation y genéricos",
+  "El mando táctil aparece en una zona más chica"
  ]
 }
