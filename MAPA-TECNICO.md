@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 7 de noviembre de 2026.
+Última actualización: 8 de noviembre de 2026.
 
 ## Repositorio y publicación
 
@@ -13,7 +13,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 7/11/2026: **juego y web publicados** (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
+- Estado al 8/11/2026: **juego y web publicados** (parche 202611080452: HUD v2 y arreglos del 8/11; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
 - Apps (`.github/workflows/release.yml`): corre al cambiar `VERSION`, `desktop/**`, `android/**` o el workflow en `main`. Windows sale como `NOX-Windows.zip` y como `NOX-Instalador.exe` (Inno Setup 6, `desktop/nox.iss`: instala sin admin en `%LOCALAPPDATA%\Programs\NOX`, acceso directo en el escritorio y en Inicio, desinstalable desde Windows). El bot sube `public/version.json` a `main` al terminar: mergear `origin/main` antes del próximo push. La web apunta a `releases/latest/download/…`: no cambiar un enlace hasta que la versión ya tenga el archivo.
   - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
   - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
@@ -85,7 +85,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `camera.far` = fin de la niebla de la zona + 6 m, y el cielo se achica para quedar adentro: con 3ra/1ra persona se ve hasta el horizonte y así no se dibuja lo que ya está tapado por la niebla. Aun así esas cámaras dibujan el doble que la clásica (Campos, celular: ~178 → ~355 llamadas).
 - El área de la sombra la fija `updCamera` cada cuadro (40/30 m, ×0,65 en el celular).
 
-- 1ra persona (7/11, noche): sin mira; FOV gran angular (vertical que da ~120° horizontales, entre 62 y 80; `near` .06). El héroe se ve: `fpArms` achica el hueso `head` a .001 (cabeza, casco y pelo desaparecen) y suma un giro en el mundo a `upperarm`/`lowerarm` (`boneRotW`) para llevar los brazos al frente con vaivén al caminar; al atacar baja a 30 % y manda la animación. Cámara en el hueso de la cabeza, más adelante y arriba al correr. El cuerpo mira hacia la cámara (`fpFace`) y el ataque sin objetivo elige el enemigo más cerca del centro (`crossTarget`). Fotos: `tools/fpshot.js`.
+- 1ra persona (7/11, noche; corregida el 8/11): sin mira; FOV gran angular (vertical que da ~120° horizontales, entre 62 y 80; `near` .18). El héroe se ve: `fpArms` achica el hueso `head` a .001 (cabeza, casco y pelo desaparecen) y suma un giro en el mundo a `upperarm`/`lowerarm` (`boneRotW`) para llevar los brazos al frente con vaivén al caminar; desde el 8/11 los brazos quedan en su pose también al atacar (`ak` empuja solo el brazo derecho), porque antes cruzaban la lente. Cámara en la posición real del hueso de la cabeza (`FPH`, x/z suavizado y máx. .45 m; alto entre +1,35 y +1,95), .3 m adelante (.42 al correr). El cuervo del Mburuvicha sigue más atrás y al costado en 1ra persona y se oculta a menos de 2,2 m de la cámara (`ravenTick`). Prueba en combate: `tools/fpcombat.js` (Mburuvicha con set, mobs encima). El cuerpo mira hacia la cámara (`fpFace`) y el ataque sin objetivo elige el enemigo más cerca del centro (`crossTarget`). Fotos: `tools/fpshot.js`.
 
 ### Mapa, carga y voz (7/11)
 
@@ -102,7 +102,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 - AUTO con menús abiertos: sigue peleando y `useSkill` deja usar técnicas aunque haya panel abierto (`paused`) si el AUTO está prendido.
 
-### HUD v2 (7/11, noche; en local, falta publicar)
+### HUD v2 (7/11, noche; publicado el 8/11)
 
 - Íconos de técnicas y ataques: `SKI` (paths de game-icons.net, CC BY 3.0: Lorc, Delapouite, Skoll) y `SKIC(id)` con degradé por elemento (`SKIG`, gradientes `skg_*` en un SVG oculto). Ataques `atk_<clase>`, pociones `pot_hp/pot_mp`. Créditos en `.credits`.
 - `hudV2Init`: tarjeta de vida `#lifeCard` (reemplaza orbes y placa, que quedan ocultos), sol `#sunBtn` con contador `#sunN` y aviso la primera vez (`noxSunTip`), `#mmFoot` bajo el minimapa con el botón de cámara y el oro, AUTO junto a Atacar. Los botones sueltos de `.menu` quedan ocultos (siguen existiendo).
@@ -114,6 +114,18 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - PC/Mac en 3ra y 1ra persona (`WASD()`): WASD camina, clic captura el mouse (pointer lock) y mira, clic izquierdo ataca, clic derecho = técnica 1, Q/E/R = técnicas 2-4, 1/2 pociones, Espacio AUTO, Tab siguiente enemigo, F hablar, Alt suelta el cursor. En la clásica, como antes (Q W E R, Espacio ataca). Barra de técnicas abajo al centro en PC con la tecla en cada botón (`kbLabels`).
 - Mando (Gamepad API, `padTick`, `PAD`): stick izq camina (escribe en `joy`), stick der mira, RT ataca, X/Y/B/RB técnicas, LT fija y LB pasa de enemigo, cruceta ↑↓ pociones, ← voz, → AUTO, A habla/acepta, Menu rueda, View mapa, R3 cámara, L3 centra. En menús: stick/cruceta mueve el foco (`padMove`), A elige, B vuelve, LB/RB pestañas. `body.pad` esconde el joystick. Prueba: `tools/ctl.js` (mando simulado).
 - Pruebas: `tools/hud2.js` (`MOB=1`, `W/H`, `CAM`, `OUT`), `tools/inv2.js` (invitación).
+
+### Arreglos del 8/11 (publicados)
+
+- Lagos (`Z.lake`, Campos, Ruinas y Monday): `H()` arma una cuenca propia (fondo `LAKE_Y+.1-3.4`) y funde la orilla en 14 m con piso mínimo `LAKE_Y+.28`; antes el terreno cortaba el disco de agua. Fotos del minimapa rehechas (`tools/topzones.js`, `ZS=campos,ruinas,monday`). Prueba: `tools/lake.js` (altura del terreno menos `LAKE_Y` alrededor del lago).
+- Mapa (`#pMap`): filas de spots más grandes (`flex:none`, 48 px); el mapa del reino desliza (`.py` con `overflow:auto`, el SVG no se achica). Campos en `PYP` pasó a [-56.95,-25.42] para no tapar Asunción.
+- Celular vertical: se quitó `.mm-wrap{order:-1}`; el minimapa queda en la esquina derecha con el sol a su izquierda, igual que acostado.
+- Reloj del juego bajo el minimapa: `#mmClock` (☀/☾, `dnHour`), se actualiza en `hudV2Tick`.
+- Misiones diarias: `#dayDot` (oculto) cuenta las cumplidas sin reclamar; suma al contador del sol (`#sunN`), al punto de la rueda y a la pestaña Misiones (`.tdot` en `tabsFor`).
+- Menús a media pantalla: la cabecera `.card-h` con la X es `position:sticky` (el padding de arriba de la tarjeta pasó a la cabecera).
+- Luz: `heroFill` (PointLight cálida, 7,5 m, sigue al héroe del lado de la cámara; .45 de día a 1,2 de noche) y `plazaL` (2 faroles en Asunción, 32 m, más fuertes de noche); la luz ambiente de Asunción sube hasta 45 % de noche (`hemiI` en `dnTick`). Las luces están siempre en escena con intensidad 0 cuando no se usan, para no recompilar shaders.
+- Pantalla siempre encendida: `AWAKE` (`awakeOn/awakeOff`): Wake Lock API mientras `mode==='game'`, se pide de nuevo al volver a la pestaña y con cada toque; respaldo para iOS < 16.4: video mudo en bucle `assets/ui/despierto.mp4` (3 s, 64 px). Solo debe existir **un** `const AWAKE` (en el merge del 8/11 entró otro de la rama `arte-mitologia` y se quitó).
+- Ganchos nuevos en `__NOX`: `H`, `LAKE_Y`, `enemies`, `AWAKE`.
 
 ### Ganchos de prueba
 
@@ -202,6 +214,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Portada en celular (≤860px): las tarjetas de mitología y descargas forman juntas una sola pantalla (50svh cada una, con aire para el encabezado y la barra de abajo). Los puntos de snap en celular son `.pan.main` y `.pan.myth` (no `#ch-inicio`). Clave: `#ch-inicio` usa `overflow:clip`, porque con `overflow:hidden` el capítulo pasa a ser contenedor de scroll y Safari ignora los snaps de adentro (saltaba directo a Mitología). Probar siempre con WebKit: `tools/wk.js` y `wk3.js` (Playwright webkit, iPhone 15).
 - Cada capítulo debe entrar entero en la pantalla (si es más alto, el snap deja paradas a medias): reglas por alto de pantalla al final de `shell_head.html` (laptops bajas, celulares ≤760 y ≤620 de alto, pantallas 2K/4K). Solo Descargas puede ser más alto (lista larga, es el último).
 - Revisión en dispositivos: `tools/devs.js URL` (iPhone SE/15/15 Pro Max, iPad Mini vertical y horizontal, iPad Pro, Pixel 7, Galaxy S9+, Galaxy Tab, laptops 1366 y 1568, PC 1920 y 2560, Firefox, Safari Mac; `ONLY="iPhone SE,PC 2560"` para filtrar) y `tools/chh.js URL` (qué capítulos son más altos que la pantalla).
+- Capítulo **IX Capturas** (8/11; Descargas pasó a X): 17 capturas del juego real de la charla Trailer (sin videos), en `web/img/w/cap/<id>.webp` (1600 px) y `<id>_t.webp` (640 px). El capítulo muestra un mosaico de 3; la ficha `data-view="capturas"` tiene la grilla `#capgrid` y el visor `#caplb` (flechas, teclado, deslizar; se mueve a `body` al cargar porque `#deep` lo encerraba). Lista `CAPS` al final de `shell_js.js`. Prueba: `tools/webcap.js`.
 - Íconos (7/11, noche azul y sol dorado; fuente `/home/claude/opt/icon/icon.svg`, se renderiza con `tools/svgpng.js`): `img/nox-icon-192/256/512.png` (nombres nuevos para saltar la caché), `nox-icon-maskable-512.png` (sin esquinas, Android), `apple-touch-icon.png` (180, sin esquinas, también en la raíz), favicon SVG embebido en el juego, `jugar/manifest.webmanifest`, `android/.../mipmap-*/ic_launcher.png` y `desktop/icon.ico/png` (las apps hay que volver a armarlas con `scripts/app.sh`).
 - `_headers`: `/img/*` se guarda 1 día en caché, por eso existe la huella en la dirección.
 

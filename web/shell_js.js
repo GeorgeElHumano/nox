@@ -56,8 +56,8 @@ const BOSSZ={};Object.entries(W.mobs).forEach(([k,m])=>{if(m.boss&&m.zones)m.zon
   f.insertBefore(svg.firstChild,f.querySelector('.ola'));})();
 
 /* ===== el recorrido: capítulos a pantalla completa ===== */
-const CH=['inicio','mitologia','razas','sets','alas','items','mapas','bestiario','historia','descargar'];
-const CHN={inicio:'Portada',mitologia:'Mitología',razas:'Razas',sets:'Sets',alas:'Alas',items:'Ítems',mapas:'Mapas',bestiario:'Bestiario',historia:'Historia',descargar:'Descargar'};
+const CH=['inicio','mitologia','razas','sets','alas','items','mapas','bestiario','historia','capturas','descargar'];
+const CHN={inicio:'Portada',mitologia:'Mitología',razas:'Razas',sets:'Sets',alas:'Alas',items:'Ítems',mapas:'Mapas',bestiario:'Bestiario',historia:'Historia',capturas:'Capturas',descargar:'Descargar'};
 const ROM=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
 const stage=$('#stage'),deep=$('#deep');const VIEWS=$$('#deep [data-view]');let cur='inicio',deepView=null,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const chEl=k=>$('#ch-'+k);
@@ -87,7 +87,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'){if(!M.hidden||!DL.hidden||!$
   if(e.key==='Home'){e.preventDefault();go('inicio');}if(e.key==='End'){e.preventDefault();go('descargar');}});
 
 /* la ficha de cada capítulo */
-const DEF={mitologia:'leer',razas:()=>curR,sets:()=>curS+'/'+curT,alas:()=>curWc+'/'+curWi,items:()=>curI,mapas:()=>curZ,bestiario:'codice',historia:()=>curCh};
+const DEF={mitologia:'leer',razas:()=>curR,sets:()=>curS+'/'+curT,alas:()=>curWc+'/'+curWi,items:()=>curI,mapas:()=>curZ,bestiario:'codice',historia:()=>curCh,capturas:'todas'};
 function openDeep(k,arg,push=true){if(!VIEWS.some(s=>s.dataset.view===k))return;const a=arg||(typeof DEF[k]==='function'?DEF[k]():DEF[k]);
   VIEWS.forEach(s=>{s.hidden=s.dataset.view!==k;});deepView=k;$('#deepTitle').textContent=CHN[k];
   const i=CH.indexOf(k);$('#deepNext').innerHTML=(i<CH.length-1?`<button type="button" data-next="${CH[i+1]}">Siguiente: ${CHN[CH[i+1]]} →</button>`:'');
@@ -132,3 +132,13 @@ if(matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').match
   if(reduced){done();return;}
   if(seen){I.classList.add('out');Wv.classList.add('go','rev');setTimeout(()=>{I.hidden=true;go(start,false);},450);setTimeout(()=>{Wv.classList.remove('go','rev');I.remove();},1150);return;}
   setTimeout(()=>Wv.classList.add('go'),1900);setTimeout(()=>I.classList.add('out'),2300);setTimeout(()=>{I.hidden=true;go(start,false);},2650);setTimeout(()=>{Wv.classList.remove('go');I.remove();},3450);})();
+
+/* ===== capturas del juego: visor a pantalla completa con flechas, teclado y deslizar ===== */
+(()=>{const CAPS=[["01_asuncion_atardecer", "Asunción al atardecer"], ["02_caballero_alas", "Caballero con alas de Kuarahy"], ["03_gladiador", "Gladiador"], ["03_hechicero", "Hechicero"], ["03_arquera", "Arquera"], ["03_mburuvicha", "Mburuvicha y su cuervo"], ["04_campos_ypacarai", "Campos de Ypacaraí"], ["05_ruinas_trinidad", "Ruinas de Trinidad"], ["08_chaco_boreal", "Chaco Boreal"], ["15_giro_caballero", "Torbellino del Caballero"], ["12_alas_kuarahy", "Alas de Kuarahy"], ["13_noche_larga", "La Noche Larga"], ["09_tau", "Tau, padre de los siete"], ["10_teju_jagua", "Teju Jagua"], ["11_luison", "Luisón"], ["06_kurupi", "Kurupí"], ["14_pombero", "Pombero"]];const lb=document.getElementById('caplb'),g=document.getElementById('capgrid');if(!lb||!g)return;document.body.appendChild(lb);const im=lb.querySelector('img'),fc=lb.querySelector('figcaption');let ci=0,sx=null;
+ const show=i=>{ci=(i+CAPS.length)%CAPS.length;const [k,t]=CAPS[ci];im.src='img/w/cap/'+k+'.webp';im.alt=t;fc.textContent=t+' · '+(ci+1)+' de '+CAPS.length;};
+ const open=i=>{show(i);lb.hidden=false;lb.querySelector('.x').focus({preventScroll:true});},close=()=>{lb.hidden=true;const b=g.querySelector('[data-cap="'+ci+'"]');if(b)b.focus({preventScroll:true});};
+ g.addEventListener('click',e=>{const b=e.target.closest('[data-cap]');if(b)open(+b.dataset.cap);});
+ lb.addEventListener('click',e=>{const b=e.target.closest('[data-caplb]');if(b){e.stopPropagation();if(b.dataset.caplb==='x')close();else show(ci+ +b.dataset.caplb);}else if(e.target===lb)close();});
+ addEventListener('keydown',e=>{if(lb.hidden)return;if(e.key==='Escape'){e.stopPropagation();e.preventDefault();close();}else if(e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();show(ci+1);}else if(e.key==='ArrowLeft'){e.preventDefault();e.stopPropagation();show(ci-1);}},true);
+ lb.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});lb.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>45)show(ci+(dx<0?1:-1));},{passive:true});
+ const ob=new MutationObserver(()=>{if(!document.getElementById('deep').classList.contains('open'))lb.hidden=true;});ob.observe(document.getElementById('deep'),{attributes:true,attributeFilter:['class']});})();
