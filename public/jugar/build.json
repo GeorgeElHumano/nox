@@ -1,15 +1,12 @@
 {
- "build": "202611080452",
- "min": "202611080452",
- "title": "Arreglos de NOX",
+ "build": "202611081151",
+ "min": "202611081151",
+ "title": "Tienda, armaduras y empuñaduras",
  "notes": [
-  "Lagos de Ypacaraí, Trinidad y el Monday con orilla natural",
-  "Spots de caza más espaciosos y mapa del reino con scroll",
-  "Primera persona sin brazos ni cuervo tapando la vista",
-  "Minimapa siempre en la esquina y hora del juego debajo",
-  "Asunción mejor iluminada de noche y más luz sobre tu personaje",
-  "Punto rojo cuando hay misiones diarias para reclamar",
-  "La X para cerrar queda fija al bajar en los menús",
-  "La pantalla no se apaga mientras jugás"
+  "Vendé varios objetos a la vez en la tienda",
+  "Solo el Mburuvicha lleva capa",
+  "Las manos agarran bien el arma, el bastón y el arco",
+  "El peto del Gladiador ya no deja ver la piel en el pecho",
+  "Sin sonido repetido al pisar un objeto con el inventario lleno"
  ]
 }
