@@ -719,7 +719,9 @@ body.induel #track,body.induel #evClock{display:none}
 .panel:not(.top) #invPrev{display:none!important}
 .panel:not(.top) .inv-wrap{flex-direction:column;align-items:stretch;gap:8px}
 .panel:not(.top) .inv-left{justify-content:center}
-.panel:not(.top) .eqgrid{grid-template-columns:repeat(6,clamp(42px,6vw,58px))!important;grid-auto-rows:clamp(42px,6vw,58px)!important;gap:5px!important}
+.panel:not(.top) .eqgrid{grid-template-columns:repeat(3,52px)!important;grid-auto-rows:52px!important;gap:6px!important}
+@media (min-width:1100px){.panel:not(.top) .eqgrid{grid-template-columns:repeat(3,60px)!important;grid-auto-rows:60px!important}}
+body.half #track,body.half #evClock,body.half #buffs{display:none!important}body.half .lbl{display:none!important}
 body.half #hud .actions,body.half #joy,body.half #ctx,body.half #sunTip{display:none!important}
 .panel:not(.top) .inv-side{flex:none}
 /* mapa */
@@ -5724,7 +5726,7 @@ let GEM=null;
 function cellHTML(it){if(!it)return '';const u=iconURL(it),rr=itemR(it);return `${rr!=='normal'?`<span class="rg r-${rr}"></span>`:''}${u?`<img class="ico q${itemQ(it)} i-${rr}" src="${u}" alt="" draggable="false">`:`<span style="color:${itemColor(it)}">${ICON_SVG(iconOf(it))}</span>`}${isEq(it)&&it.lv?`<span class="lv">+${it.lv}</span>`:''}${it.n>1?`<span class="n">${it.n}</span>`:''}`;}
 function gemOk(it,sub){if(!isEq(it))return false;if(sub==='tupa')return it.lv<6;if(sub==='jasy')return it.lv>=6&&it.lv<9;if(sub==='yvy')return it.op<4;return false;}
 function renderInv(){
-  const lay=[null,'helm','wings','weapon','armor','shield','gloves','pants','boots'];
+  const lay=[null,'helm','wings','shield','armor','weapon','gloves','pants','boots'];
   const pg=PETK.map(k=>{const it=C.pets&&C.pets[k];return `<button class="slot pslot ${it?'':'empty'}" data-act="petslot" data-p="${k}" aria-label="Mascota: ${PETS[k].n}" style="--pc:${PETS[k].col}"><img class="ico pimg ${it?'':'off'}" src="assets/ui/pet_${k}.webp" alt="" draggable="false"><span class="sl">${PETS[k].n.split(' ')[0]}</span></button>`;}).join('');
   $('#eqGrid').innerHTML=lay.map(k=>{if(!k)return '<span></span>';const it=C.eq[k],na=k==='shield'&&C.cls!=='caballero'||k==='helm'&&C.cls==='gladiador';const ok=GEM&&it&&gemOk(it,GEM.sub);
     return `<button class="slot ${it?'':'empty'} ${na?'na':''} ${ok?'ok':''}" data-act="eqslot" data-k="${k}" ${na?'disabled':''} aria-label="${SLOTLABEL[k]}">${it?cellHTML(it):`<span style="color:var(--dim)">${ICON_SVG(k==='weapon'?'weapon_'+C.cls:k)}</span>`}<span class="sl">${SLOTLABEL[k]}</span></button>`;}).join('')+pg;
@@ -6788,10 +6790,10 @@ function tabCycle(d){const cur=PTABS.findIndex(p=>{const e=$('#'+p[2]);return e&
 const HC={on:false,snap:false};
 function hcTick(){const on=mode==='game'&&!!C&&!STUDIO.on&&(paused||['partyBox','chatBox'].some(id=>{const e=$('#'+id);return e&&!e.hidden;}));
   if(on!==HC.on){HC.on=on;document.body.classList.toggle('half',on);if(on){HC.snap=true;try{document.exitPointerLock&&document.exitPointerLock();}catch(e){}}else{snapCam=true;camOY=1;}}}
-function hcCamera(dt){const port=innerHeight>innerWidth,py=H(P.x,P.z),fx=Math.sin(P.ry),fz=Math.cos(P.ry),d=port?9:3.3;
+function hcCamera(dt){const port=innerHeight>innerWidth,py=H(P.x,P.z),fx=Math.sin(P.ry),fz=Math.cos(P.ry),d=port?9:IS_MOB?4.8:3.6;
   camT.set(P.x+fx*d+fz*.35,py+1.5,P.z+fz*d-fx*.35);const gy=H(camT.x,camT.z)+.4;if(camT.y<gy)camT.y=gy;look.set(P.x,py+1.02,P.z);
   if(HC.snap){camera.position.copy(camT);HC.snap=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));
-  const key=port?'hp':'hl';if(camOY!==key){camOY=key;if(port)camera.setViewOffset(innerWidth,innerHeight,0,Math.round(innerHeight*.22),innerWidth,innerHeight);else camera.setViewOffset(innerWidth,innerHeight,Math.round(innerWidth*.25),0,innerWidth,innerHeight);}
+  const key=port?'hp':'hl';if(camOY!==key){camOY=key;if(port)camera.setViewOffset(innerWidth,innerHeight,0,Math.round(innerHeight*.22),innerWidth,innerHeight);else camera.setViewOffset(innerWidth,innerHeight,Math.round(innerWidth*.25),-Math.round(innerHeight*(IS_MOB?.1:.04)),innerWidth,innerHeight);}
   HOLE.uHole.value=0;camera.lookAt(look);}
 addEventListener('resize',()=>{if(HC.on)camOY=1;});
 /* ================= mapa: zona + viajes a media pantalla, y el mapa del reino ================= */
