@@ -263,6 +263,19 @@ route('GET', 'game/taken', async ({ db, url, me }) => {
   return json({ uid: r ? r.uid : null });
 }, { auth: true });
 
+/* ranking: los personajes de más nivel de todas las cuentas (reinicios primero, después nivel); se arma desde el resumen que cada cuenta guarda */
+let RANK = { t: 0, data: null };
+route('GET', 'game/ranking', async ({ db }) => {
+  if (!RANK.data || now() - RANK.t > 60000) {
+    const rows = (await db.prepare("SELECT p.chars, u.role FROM players p JOIN users u ON u.id=p.uid WHERE p.chars IS NOT NULL AND p.chars<>'[]'").all()).results || [];
+    const all = [];
+    for (const r of rows) { let cs = []; try { cs = JSON.parse(r.chars || '[]'); } catch {} for (const c of cs) { if (!c || !c.name) continue; all.push({ name: String(c.name).slice(0, 24), cls: String(c.cls || '').slice(0, 12), L: +c.L || 1, resets: +c.resets || 0, evo: !!c.evo, staff: r.role === 'admin' }); } }
+    all.sort((a, b) => b.resets - a.resets || b.L - a.L || a.name.localeCompare(b.name));
+    RANK = { t: now(), data: all.slice(0, 50) };
+  }
+  return json({ list: RANK.data });
+});
+
 route('GET', 'game/count', async ({ db }) => {
   const r = await db.prepare('SELECT COUNT(*) n FROM users').first();
   return json({ n: r ? r.n : 0 });
@@ -404,7 +417,7 @@ export async function onRequest(ctx) {
   await init(db);
   const url = new URL(req.url);
   const path = (Array.isArray(params.path) ? params.path.join('/') : String(params.path || '')).replace(/\/+$/, '');
-  if (path.startsWith('game/') && path !== 'game/count') {
+  if (path.startsWith('game/') && path !== 'game/count' && path !== 'game/ranking') {
     const min = await minBuild(env, url), b = req.headers.get('x-nox-build') || '';
     if (min && b < min) return json({ error: 'Hay una actualización de NOX. Actualizá el juego para seguir jugando en línea.', update: true, min }, 426);
   }

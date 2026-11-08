@@ -22,6 +22,8 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/live/ping') return new Response('ok');
+    // quiénes están jugando ahora (para el ranking y la portada): solo nombres de personajes, sin datos de cuenta
+    if (url.pathname === '/live/online') return env.WORLD.get(env.WORLD.idFromName('reino')).fetch(new Request(req.url));
     if (url.pathname !== '/live/ws') return new Response('No encontrado', { status: 404 });
     if (req.headers.get('Upgrade') !== 'websocket') return new Response('Se espera WebSocket', { status: 426 });
     // versión mínima: la de /jugar/build.json (la escribe scripts/patch.sh); un juego viejo recibe el código 4426 y muestra el aviso de actualización
@@ -52,6 +54,11 @@ export class World {
   }
 
   async fetch(req) {
+    if (new URL(req.url).pathname === '/live/online') {
+      const pl = this.all().filter(x => x.a.s);
+      const names = [...new Set(pl.map(x => String(x.a.s.n || '').toLowerCase()).filter(Boolean))];
+      return new Response(JSON.stringify({ n: pl.length, names }), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
+    }
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     this.accept(server, req.headers.get('x-uid'), req.headers.get('x-acc'), req.headers.get('x-role'));
