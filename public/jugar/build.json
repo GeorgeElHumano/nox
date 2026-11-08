@@ -1,12 +1,10 @@
 {
- "build": "202611081151",
- "min": "202611081151",
- "title": "Tienda, armaduras y empuñaduras",
+ "build": "202611081239",
+ "min": "202611081239",
+ "title": "Ranking de jugadores",
  "notes": [
-  "Vendé varios objetos a la vez en la tienda",
-  "Solo el Mburuvicha lleva capa",
-  "Las manos agarran bien el arma, el bastón y el arco",
-  "El peto del Gladiador ya no deja ver la piel en el pecho",
-  "Sin sonido repetido al pisar un objeto con el inventario lleno"
+  "Ranking con los personajes de más nivel, con luz verde si están jugando",
+  "Cantidad de jugadores en línea en la portada",
+  "Ranking en la rueda del sol y en la portada"
  ]
 }
