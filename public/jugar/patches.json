@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611091853",
+  "title": "Mobs de 2 patas: mejor paso al correr",
+  "notes": [
+   "Los mobs de 2 patas patinan menos al correr: el paso se ajusta a la velocidad real del pie",
+   "Los magos y fantasmas (Ypo, Siervo, Y Jára, Jasy Jateré) usan un clip de correr con paso real"
+  ]
+ },
+ {
   "build": "202611091820",
   "title": "Baúl a pantalla completa",
   "notes": [

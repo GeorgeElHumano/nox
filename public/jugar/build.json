@@ -1,10 +1,9 @@
 {
- "build": "202611091820",
- "min": "202611091820",
- "title": "Baúl a pantalla completa",
+ "build": "202611091853",
+ "min": "202611091853",
+ "title": "Mobs de 2 patas: mejor paso al correr",
  "notes": [
-  "Baúl: ocupa toda la pantalla con casillas grandes y muestra los íconos reales de cada ítem",
-  "Los íconos reales también se cargan en el intercambio y en las tiendas de jugadores",
-  "Tocar la tarjeta de vida y maná abre la ficha del personaje"
+  "Los mobs de 2 patas patinan menos al correr: el paso se ajusta a la velocidad real del pie",
+  "Los magos y fantasmas (Ypo, Siervo, Y Jára, Jasy Jateré) usan un clip de correr con paso real"
  ]
 }
