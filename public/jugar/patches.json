@@ -1,5 +1,17 @@
 [
  {
+  "build": "202611082247",
+  "title": "Caldero, parches y arreglos",
+  "notes": [
+   "Nuevo botón «Historial de parches» en el inicio",
+   "La actualización obligatoria siempre muestra qué trae el parche",
+   "El Mbói Tata vuelve a mostrar su cabeza",
+   "El anillo del set completo se apoya sobre el terreno",
+   "Caldero de Jarýi Kuña más compacto: el ítem elegido aparece arriba",
+   "Mburuvicha: Capa de Guyra Hũ Guasu y Capa de Ñanderuvusu"
+  ]
+ },
+ {
   "build": "202611082124",
   "title": "Avisos y arreglos",
   "notes": [
