@@ -3116,7 +3116,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     const take=fly&&k<.95?1:0;r.flyHz=(r.flyHz||1.25)+((take?1.8:1.25)-(r.flyHz||1.25))*Math.min(1,dt*2);r.flyPh=(r.flyPh||0)+dt*TAU*r.flyHz;const ph=r.flyPh;
     const beat=Math.sin(ph+.45*Math.cos(ph));r.beat=beat;
     if(r.lastRy==null)r.lastRy=r.g.rotation.y;let dry=r.g.rotation.y-r.lastRy;dry=Math.atan2(Math.sin(dry),Math.cos(dry));r.lastRy=r.g.rotation.y;r.bank=(r.bank||0)+(clamp(-dry/Math.max(dt,.001)*.07,-.18,.18)-(r.bank||0))*Math.min(1,dt*2.5);
-    const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph-1.7)*.035+Math.sin(T*.8)*.035)*(r.npcP?.3:1);/* los PNJ apenas se despegan del piso */
+    const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph-1.7)*.035+Math.sin(T*.8)*.035)*(r.npcP?.3:.4);/* vuelo bajo: los personajes a 40 % de la altura original y los PNJ apenas se despegan del piso */
     r.model.rotation.set(-(P.hitK||0)*.12+pit,0,((r.bank||0)+Math.sin(T*.7)*.015)*ke);r.model.position.set(0,(r.footY||0)+lift+h0-h0*Math.cos(pit),-h0*Math.sin(pit));
     if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);(r.wings.sides||[]).forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
   if(!r.fb){r.fb={};r.fbq=[];['thigh_L','thigh_R','leg_L','leg_R','foot_L','foot_R','arm_L','arm_R','forearm_L','forearm_R','spine','chest','neck','head'].forEach(n=>{const o=r.body.getObjectByName(n);r.fb[n]=o;if(o)r.fbq.push([o,o.quaternion.clone(),n]);});}
@@ -7089,7 +7089,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611091336';const UPD={shown:'',req:false};
+const NOX_BUILD='202611091339';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}

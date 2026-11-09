@@ -292,7 +292,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 ## Parche de vuelo, misiones y vegetación (9/11, tarde)
 
-- Vuelo: en `oadHeroAnim`, `fly` = tiene `r.wings` (alas o capa del Mburuvicha) y `mode` es game o select, sin pelear, morir ni gesto; ya no depende de moverse ni de `Z.safe`. Los PNJ (`r.npcP`) y los otros jugadores usan la misma función; en los PNJ la altura (`lift`) va ×0,3.
+- Vuelo: en `oadHeroAnim`, `fly` = tiene `r.wings` (alas o capa del Mburuvicha) y `mode` es game o select, sin pelear, morir ni gesto; ya no depende de moverse ni de `Z.safe`. Los PNJ (`r.npcP`) y los otros jugadores usan la misma función; en los PNJ la altura (`lift`) va ×0,3 y en los personajes ×0,4 (60 % más bajo, parche 202611091339).
 - Mbói Tata: la cabeza usaba `mat()` (caché compartida) y cada serpiente le volvía a aplicar `crackGlow`; con varias, el sombreador duplicaba declaraciones y la cabeza no se dibujaba. Ahora `mat(...).clone()` y `crackGlow` se aplica una sola vez por material (`CG_ON`, WeakSet). Lo mismo para el arma de fuego de un mito (`tm2`). Prueba: `FOCUS=mboijagua node tools/zt.js SALIDA zona ybytyruzu`.
 - Misiones: `questWarp(q)` arma el botón de viaje (acción `warp`, spot del mob o `i=-1` para el jefe, mismo costo que el viaje a un spot) en el panel del Capitán y en `NPCV==='quests'` mientras la misión no está cumplida.
 - `tools/zt.js`: `HEROW=clase` (héroe nivel 200 con set 4 y alas), `QSHOT=1` (panel de Misiones), `FOCUS=mob`.
