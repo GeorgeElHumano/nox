@@ -1,8 +1,10 @@
 {
- "build": "202611091552",
- "min": "202611091552",
- "title": "Portada en celular",
+ "build": "202611091622",
+ "min": "202611091622",
+ "title": "Pose de vuelo nueva",
  "notes": [
-  "En el celular el personaje se ve entero en la portada: en vertical arriba del logo y en horizontal centrado en el espacio libre"
+  "El personaje vuela con el cuerpo apenas inclinado hacia adelante, los brazos junto al cuerpo (el del arma casi recto, el otro con el codo apenas flexionado) y las manos con un vaivén lento.",
+  "Una pierna va extendida y la otra apenas recogida, con las puntas de los pies hacia abajo.",
+  "El cuerpo flota: sube y baja unos 9 cm, el 5 % de su altura."
  ]
 }
