@@ -3054,7 +3054,7 @@ function makeAura(col){const g=new THREE.Group(),orbs=[];for(let i=0;i<9;i++){co
 function auraTick(r,dt){const A=r.epicAura;if(!A)return;const lift=r.model?r.model.position.y:0;A.position.y=lift;A.userData.orbs.forEach((q,i)=>{const a=T*q.sp+q.ph;q.o.position.set(Math.cos(a)*q.r,q.h+Math.sin(a*1.3+q.tilt*4)*.18+Math.sin(a)*q.tilt,Math.sin(a)*q.r);q.o.children[0].material.opacity=.45+.3*Math.sin(T*5+i);q.o.children[1].material.rotation=T*1.5+i;});
   if(mode==='game'&&r.g.parent===scene){r.auT=(r.auT||0)-dt;if(r.auT<=0){r.auT=.07;const q=A.userData.orbs[(Math.random()*A.userData.orbs.length)|0];_ov.copy(q.o.position);A.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:1,col:A.userData.col,spd:.15,up:.2,grav:-.1,life:.6,size:.13,op:.85});}}}
 const OAD_WIN={atk1:{k:[.12,.9],w:[.18,.55],a:[.12,.78]},atk2:{k:[.18,.88]},spin:{k:[0,1]},heal:{w:[.08,.6]}};
-let ARMZ=1;const WG=window.__WG={ry:.3,rz:-.12,rx:-.4,fy:.16,fx:-.2};const _aq1=new THREE.Quaternion(),_aq2=new THREE.Quaternion(),_aq3=new THREE.Quaternion(),_av1=new THREE.Vector3(),_av2=new THREE.Vector3(),_av3=new THREE.Vector3();const STANDP=window.__STANDP={arquera:[-.17,-.06,-.12],caballero:[-.06,-.06,-.12],hechicero:[-.17,-.09,-.13]};const _fq2=new THREE.Quaternion();const FT=window.__FT={pit:.06,lean:.08,B:{arm_L:[-.1,0,-.28],arm_R:[-.1,0,.28],forearm_L:[-.25,0,0],forearm_R:[-.25,0,0],thigh_L:[.05,0,0],thigh_R:[.28,0,0],leg_L:[-.08,0,0],leg_R:[-.5,0,0],foot_L:[.9,0,0],foot_R:[.8,0,0],spine:[-.04,0,0],neck:[-.15,0,0],head:[-.12,0,0]}};const _ov=new THREE.Vector3(),_fq=new THREE.Quaternion(),_fe=new THREE.Euler(),_cq=new THREE.Quaternion(),_gq=new THREE.Quaternion();
+let ARMZ=1;const WG=window.__WG={ry:.3,rz:-.12,rx:-.4,fy:.16,fx:-.2};const _aq1=new THREE.Quaternion(),_aq2=new THREE.Quaternion(),_aq3=new THREE.Quaternion(),_av1=new THREE.Vector3(),_av2=new THREE.Vector3(),_av3=new THREE.Vector3();const STANDP=window.__STANDP={arquera:[-.17,-.06,-.12],caballero:[-.06,-.06,-.12],hechicero:[-.17,-.09,-.13]};const _fq2=new THREE.Quaternion();const FT=window.__FT={pit:.16,lean:.04,elb:.38,hand:.07,B:{thigh_L:[.1,0,0],thigh_R:[-.3,0,0],leg_L:[0,0,0],leg_R:[.5,0,0],foot_L:[.45,0,0],foot_R:[.4,0,0],spine:[.05,0,0],neck:[-.08,0,0],head:[-.06,0,0]}};const _ov=new THREE.Vector3(),_fq=new THREE.Quaternion(),_fe=new THREE.Euler(),_cq=new THREE.Quaternion(),_gq=new THREE.Quaternion();
 /* las alas (y la capa) se cuelgan del hueso del pecho: siguen al torso sin cálculos por cuadro */
 /* pose de enlace del esqueleto antes de medir dónde van alas y capa: el cuerpo clonado puede venir con la pose que tenía el modelo
    (otra animación, a mitad de un viaje o de una muerte) y entonces las alas quedaban torcidas para siempre */
@@ -3119,18 +3119,26 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     const take=fly&&k<.95?1:0;r.flyHz=(r.flyHz||1.25)+((take?1.8:1.25)-(r.flyHz||1.25))*Math.min(1,dt*2);r.flyPh=(r.flyPh||0)+dt*TAU*r.flyHz;const ph=r.flyPh;
     const beat=Math.sin(ph+.45*Math.cos(ph));r.beat=beat;
     if(r.lastRy==null)r.lastRy=r.g.rotation.y;let dry=r.g.rotation.y-r.lastRy;dry=Math.atan2(Math.sin(dry),Math.cos(dry));r.lastRy=r.g.rotation.y;r.bank=(r.bank||0)+(clamp(-dry/Math.max(dt,.001)*.07,-.18,.18)-(r.bank||0))*Math.min(1,dt*2.5);
-    const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph-1.7)*.035+Math.sin(T*.8)*.035)*(r.npcP?.3:.4);/* vuelo bajo: los personajes a 40 % de la altura original y los PNJ apenas se despegan del piso */
+    const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph*.5-1.7)*.112)*(r.npcP?.3:.4);/* vuelo bajo: los personajes a 40 % de la altura original y los PNJ apenas se despegan del piso. Flota: sube y baja como mucho un 5 % de la altura (±4,5 cm), a la mitad del ritmo del aleteo */
     r.model.rotation.set(-(P.hitK||0)*.12+pit,0,((r.bank||0)+Math.sin(T*.7)*.015)*ke);r.model.position.set(0,(r.footY||0)+lift+h0-h0*Math.cos(pit),-h0*Math.sin(pit));
     if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);(r.wings.sides||[]).forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
   if(!r.fb){r.fb={};r.fbq=[];['thigh_L','thigh_R','leg_L','leg_R','foot_L','foot_R','arm_L','arm_R','forearm_L','forearm_R','spine','chest','neck','head'].forEach(n=>{const o=r.body.getObjectByName(n);r.fb[n]=o;if(o)r.fbq.push([o,o.quaternion.clone(),n]);});}
-  for(const [o,q] of r.fbq)o.quaternion.copy(q);/* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
+  if(!r.fl){/* huesos de la pose de vuelo: el esqueleto actual usa nombres tipo UE (thigh_l, calf_l, upperarm_l, lowerarm_l, spine_01…); antes sólo se buscaban los del Biped y la pose no se aplicaba a nadie */
+    r.fl=[];const AL={thigh_L:['thigh_L','thigh_l'],thigh_R:['thigh_R','thigh_r'],leg_L:['leg_L','calf_l'],leg_R:['leg_R','calf_r'],foot_L:['foot_L','foot_l'],foot_R:['foot_R','foot_r'],arm_L:['arm_L','upperarm_l'],arm_R:['arm_R','upperarm_r'],forearm_L:['forearm_L','lowerarm_l'],forearm_R:['forearm_R','lowerarm_r'],spine:['spine','spine_01'],chest:['chest','spine_03'],neck:['neck','neck_01'],head:['head','Head']};
+    const bindQ=o=>{let q=null;r.body.traverse(m=>{if(q||!m.isSkinnedMesh||!m.skeleton)return;const bs=m.skeleton.bones,bi=m.skeleton.boneInverses,i=bs.indexOf(o);if(i<0)return;const B=new THREE.Matrix4().copy(bi[i]).invert(),pi=bs.indexOf(o.parent),L=pi>=0?new THREE.Matrix4().copy(bi[pi]).multiply(B):B;q=new THREE.Quaternion();L.decompose(new THREE.Vector3(),q,new THREE.Vector3());});return q;};
+    for(const n in AL){let o=null;for(const a of AL[n]){o=r.body.getObjectByName(a);if(o)break;}if(o)r.fl.push([o,bindQ(o)||o.quaternion.clone(),n]);}}
+  for(const [o,q] of r.fbq)o.quaternion.copy(q);for(const [o,q] of r.fl)o.quaternion.copy(q);/* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
   r.mixer.update(STUDIO.frozen?0:dt);r.mixT=(r.mixT||0)+dt;if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
   if((r.flyK||0)>.01){const k=r.flyK,ke=k*k*(3-2*k);
     const sw=Math.sin(T*1.1)*.03,mvk=Math.min(1,(P.mv||0)*1.2);
     /* pose absoluta de levitación (como en MU): parte del reposo del esqueleto y le suma la pose; se mezcla con la animación según ke */
-    for(const [o,q] of r.fbq){const d=FT.B[o.name];if(!d)continue;const w=ke*(d[3]==null?1:d[3]);if(w<=0)continue;
-      let x=d[0],z=d[2]||0;if(o.name==='thigh_L')x+=sw;else if(o.name==='thigh_R')x-=sw;else if(o.name==='spine')x+=mvk*FT.lean;
-      _fq.setFromEuler(_fe.set(x,d[1]||0,z));_fq2.copy(q).multiply(_fq);o.quaternion.slerp(_fq2,w);}}
+    for(const [o,q,n] of r.fl){const d=FT.B[n];if(!d)continue;const w=ke*(d[3]==null?1:d[3]);if(w<=0)continue;
+      let x=d[0],z=d[2]||0;if(n==='thigh_L')x+=sw;else if(n==='thigh_R')x-=sw;else if(n==='spine')x+=mvk*FT.lean;
+      _fq.setFromEuler(_fe.set(x,d[1]||0,z));_fq2.copy(q).multiply(_fq);o.quaternion.slerp(_fq2,w);}
+    /* brazos: la animación ya los deja colgando junto al cuerpo (y el arma vertical), así que no se reemplazan: se les suma el codo apenas flexionado y el vaivén lento de las manos */
+    const hb=Math.sin(r.flyPh*.5+.6)*FT.hand;
+    const REL={arm_L:hb,arm_R:-hb*.5,forearm_L:FT.elb+hb*1.6,forearm_R:FT.elb*.3-hb*.4};
+    for(const [o,,n] of r.fl){const a=REL[n];if(a==null)continue;_fq.setFromEuler(_fe.set(a*ke,0,0));o.quaternion.multiply(_fq);}}
   {/* postura erguida en reposo y al caminar: columna derecha, pecho arriba, mirada al frente (no en ataques ni en vuelo) */
     const want=act||P.deadK>0?0:1;r.standK=(r.standK==null?1:r.standK)+(want-(r.standK==null?1:r.standK))*Math.min(1,dt*6);const w=r.standK*(1-Math.min(1,(r.flyK||0)*1.5));
     const still=!act&&!(P.deadK>0)&&(P.mv||0)<.05&&(r.flyK||0)<.05;r.stillK=(r.stillK||0)+((still?1:0)-(r.stillK||0))*Math.min(1,dt*4);
