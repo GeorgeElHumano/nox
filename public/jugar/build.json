@@ -1,9 +1,8 @@
 {
- "build": "202611091350",
- "min": "202611091350",
- "title": "Bolsa al día e ítems tirados",
+ "build": "202611091411",
+ "min": "202611091411",
+ "title": "Capa más suave",
  "notes": [
-  "La bolsa y el baúl abiertos se actualizan solos al recoger del piso o equipar arrastrando",
-  "Los ítems que tirás quedan 2 minutos en el piso: el primer minuto solo vos los podés levantar, después cualquiera"
+  "La capa del Mburuvicha ya no da un tirón al empezar a caminar o al detenerse"
  ]
 }
