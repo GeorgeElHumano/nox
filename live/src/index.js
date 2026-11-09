@@ -365,6 +365,13 @@ export class World {
       if (t === 'hi' && a.role === 'admin' && a.s && a.s.n) { this.admWel = this.admWel || new Map(); const last = this.admWel.get(a.uid) || 0; if (Date.now() - last > 600000) { this.admWel.set(a.uid, Date.now()); for (const x of this.all()) this.send(x.ws, { t: 'ann', k: 'adm', n: a.s.n }); } }
       return;
     }
+    if (t === 'sv') { // aviso global de un administrador ("/sv mensaje" en el chat): sale en grande en la pantalla de todos los conectados
+      if (a.role !== 'admin' || !a.s) { this.send(ws, { t: 'sys', m: 'Solo los administradores pueden enviar avisos globales.' }); return; }
+      const text = clip(m.m, 200).replace(/[\u0000-\u001f]/g, ' ').trim(); if (!text) return;
+      const now = Date.now(); if (now - (a.svT || 0) < 3000) return; a.svT = now; this.save(ws, a);
+      const s = JSON.stringify({ t: 'ann', k: 'sv', n: a.s.n, m: text, ts: now }); for (const x of this.all()) this.send(x.ws, s);
+      return;
+    }
     if (t === 'c') { // chat
       const text = clip(m.m, 200).replace(/[\u0000-\u001f]/g, ' ').trim(); if (!text || !a.s) return;
       const now = Date.now(); a.cq = (a.cq || []).filter(x => now - x < 10000); if (a.cq.length >= 6) { this.send(ws, { t: 'sys', m: 'Esperá un momento antes de escribir de nuevo.' }); return; }
