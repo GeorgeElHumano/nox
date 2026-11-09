@@ -1,8 +1,11 @@
 {
- "build": "202611091809",
- "min": "202611091809",
- "title": "Mobs de 2 patas: pasos acordes a su velocidad",
+ "build": "202611091743",
+ "min": "202611091743",
+ "title": "Intercambio, pilas y zoom",
  "notes": [
-  "Los mobs de 2 patas ya no patinan: el paso de caminar y correr se ajusta a lo que avanzan de verdad"
+  "Intercambio: si uno lo cierra, se cancela para los dos",
+  "Intercambio: avisos y errores arriba de la ventana; si falla, queda abierta mostrando el motivo",
+  "Separar pilas: en la bolsa, la venta y el baúl (botón Separar) y al ofrecer en un intercambio (elegís cuántos)",
+  "Celulares: sin zoom con doble toque ni pellizco"
  ]
 }
