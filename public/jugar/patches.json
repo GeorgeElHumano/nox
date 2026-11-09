@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611091820",
+  "title": "Baúl a pantalla completa",
+  "notes": [
+   "Baúl: ocupa toda la pantalla con casillas grandes y muestra los íconos reales de cada ítem",
+   "Los íconos reales también se cargan en el intercambio y en las tiendas de jugadores",
+   "Tocar la tarjeta de vida y maná abre la ficha del personaje"
+  ]
+ },
+ {
   "build": "202611091809",
   "title": "Mobs de 2 patas: pasos acordes a su velocidad",
   "notes": [
