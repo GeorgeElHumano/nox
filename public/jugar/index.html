@@ -5818,7 +5818,7 @@ function usePot(kind){if(P.dead||mode!=='game')return;if(P.potCD>0)return;
 
 /* ================= jugador ================= */
 /* cámaras: 'iso' (la de siempre, de arriba en diagonal), 'tercera' (detrás del hombro, se gira arrastrando) y 'primera' (desde los ojos) */
-const CAMS=['iso','tercera','primera'],CAMN={iso:'Clásica',tercera:'3ra persona',primera:'1ra persona'};let CAMM='iso';try{const c=localStorage.getItem('noxCam');if(CAMS.includes(c))CAMM=c;}catch(e){}
+const CAMS=['iso','tercera'],CAMN={iso:'Clásica',tercera:'3ra persona',primera:'1ra persona'};let CAMM='iso';try{const c=localStorage.getItem('noxCam');if(CAMS.includes(c))CAMM=c;}catch(e){}
 let CAM_YAW=PI/4,CAM_PITCH=.32,FPY=null,FPH=null;const _fpV=new THREE.Vector3();const CDRAG={id:null,x:0,y:0,sx:0,sy:0,moved:false};
 function setCam(m){CAMM=m;try{localStorage.setItem('noxCam',m);}catch(e){}if(m==='iso')CAM_YAW=PI/4;else{CAM_YAW=P.ry+PI;CAM_PITCH=m==='primera'?0:.32;}snapCam=true;const b=document.getElementById('mbCam');if(b)b.title='Cámara: '+CAMN[m];const q=document.getElementById('camQ');if(q)q.textContent=m==='iso'?'CLÁS':m==='tercera'?'3RA':'1RA';toast('Cámara: <em>'+CAMN[m]+'</em>'+(m!=='iso'?' · arrastrá la pantalla para girar':''));}
 function camTurn(dx,dy){if(CAMM==='iso')return;CAM_YAW-=dx*.0065;CAM_PITCH=Math.max(CAMM==='primera'?-1.1:-.35,Math.min(CAMM==='primera'?1.1:1.05,CAM_PITCH+dy*.0045));}
@@ -6001,7 +6001,7 @@ addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;co
   if(k==='escape'){const w=$('#wheel'),open=paused||(w&&!w.hidden)||['partyBox','chatBox'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});if(open||mode!=='game'){closeAll();closeBigMap();}else wheelToggle(true);return;}
   if(mode!=='game')return;
   if(paused){if(k==='i'||k==='v'||k==='c'||k==='m')closeAll();return;}
-  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%3]);return;}
+  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);return;}
   const wasd=WASD();if(wasd&&k===' '){e.preventDefault();if(!e.repeat)ACT.toggleAuto();}else if(k===' '||k==='j'){e.preventDefault();if(!atkHeld){atkHeld=true;attackPress();}}
   const SKK=wasd?{q:1,e:2,r:3}:{q:0,w:1,e:2,r:3};if(k in SKK)useSkill(SKK[k]);if(k==='1')usePot('hp');if(k==='2')usePot('mp');if(!wasd&&k==='a'&&!atkHeld){atkHeld=true;attackPress();setTimeout(()=>{if(!keys[' '])atkHeld=false;},150);}
   if(k==='i'||k==='v')ACT.openInv();if(k==='c')ACT.openChar();if(k==='m')ACT.openTravel();if(k==='h')ACT.toggleAuto();if(k==='l')ACT.openQuests();
@@ -6419,7 +6419,7 @@ function renderChar(){const cl=CLASSES[C.cls];
 /* ajustes (separados de la ficha del personaje) */
 function renderCfg(){$('#cfgBody').innerHTML=`<div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p><button class="btn full ghost" data-act="toMenu">Cambiar de personaje</button></div>
   <div class="sect"><h3>Gráficos</h3><div class="tabs">${['bajo','medio','alto'].map(l=>`<button data-act="quality" data-q="${l}" class="${Q.level===l?'on':''}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div><p class="hint" style="margin:0">Alto: más nitidez, sombras finas y brillos. Bajo: sin brillos ni sombras, para celulares más simples.</p></div>
-  <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra y 1ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
+  <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Acercá o alejá con dos dedos o la rueda del mouse. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
   <div class="sect"><h3>Cuadros por segundo</h3><div class="tabs">${[30,60].map(f=>`<button data-act="fpsCap" data-f="${f}" class="${FCAP.fps===f?'on':''}">${f}</button>`).join('')}<button data-act="fpsShow" class="${FPSM.on?'on':''}">Ver FPS</button></div><p class="hint" style="margin:0">30 gasta menos batería y calienta menos el celular. 60 se ve más suave si tu equipo lo aguanta.</p></div>
   <div class="sect"><h3>Sonido</h3><label class="vol"><span>Música</span><input type="range" id="volMus" min="0" max="1" step="0.05" value="${SND.vol.mus}"></label><label class="vol"><span>Efectos y ambiente</span><input type="range" id="volSfx" min="0" max="1" step="0.05" value="${SND.vol.sfx}"></label></div>`;}
 
@@ -6522,7 +6522,7 @@ const ACT={
     else travel(d.z,pos);},
   fpsCap(d){FCAP.fps=+d.f===30?30:60;try{localStorage.setItem('tsm-fps',FCAP.fps);}catch(e){}DYN.t=DYN.acc=DYN.n=0;toast('Cuadros por segundo: '+FCAP.fps);renderChar();},
   fpsShow(){FPSM.on=!FPSM.on;fpsBox();try{localStorage.setItem('tsm-fpsv',FPSM.on?'1':'0');}catch(e){}renderChar();},
-  camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%3]);},camSet(d){setCam(d.c);renderChar();renderCfg();},quality(d){Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
+  camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},quality(d){Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
   cauldSel(d){CALD.sel=+d.i;CALD.res=null;renderCaldero();const pb=$('#npcBody');const sc=pb&&(pb.closest('.card')||pb);try{sc.scrollTo({top:0,behavior:'smooth'});pb.scrollTo&&pb.scrollTo({top:0,behavior:'smooth'});}catch(e){}},
   cauldGo(d){cauldGo(d.r);},
   selPlay(d){enterGame(+d.i);},
@@ -7249,8 +7249,8 @@ function enterGame(i){CUR=i;C=fixChar(SAVE.chars[i]);SAVE.last=i;HERO_FACE=C.fac
 
 /* ================= cámara y bucle ================= */
 let snapCam=true,camOY=0;const camT=new THREE.Vector3(),look=new THREE.Vector3();
-let CAMZ=1;try{CAMZ=Math.min(1.4,Math.max(.55,+localStorage.getItem('noxZoom')||1));}catch(e){}
-function setZoom(z){CAMZ=Math.min(1.4,Math.max(.55,z));clearTimeout(setZoom.t);setZoom.t=setTimeout(()=>{try{localStorage.setItem('noxZoom',CAMZ.toFixed(2));}catch(e){}},400);}
+/* zoom: el doble de cerca y el doble de lejos que antes (.55–1.4) */const ZMIN=.275,ZMAX=2.8;let CAMZ=1;try{CAMZ=Math.min(ZMAX,Math.max(ZMIN,+localStorage.getItem('noxZoom')||1));}catch(e){}
+function setZoom(z){CAMZ=Math.min(ZMAX,Math.max(ZMIN,z));clearTimeout(setZoom.t);setZoom.t=setTimeout(()=>{try{localStorage.setItem('noxZoom',CAMZ.toFixed(2));}catch(e){}},400);}
 function updCamera(dt){
   if(mode==='select'){const port=innerHeight>innerWidth,a=Math.sin(T*.15)*.3+(port?0:.18),rr=port?8:5,cy=port?2.2:1.6;camT.set(Math.sin(a)*rr,cy,6.2+Math.cos(a)*rr);camera.position.copy(camT);
     const sh=!port&&innerWidth>=640?1.45:0;look.set(-Math.cos(a)*sh,.95,6.2+Math.sin(a)*sh);camera.lookAt(look);
@@ -7467,7 +7467,7 @@ function padTick(dt){if(!navigator.getGamepads)return;let gp=null;try{gp=[...nav
   if(dn(6)){const t=nearestEnemy(16);if(t)P.target=t;else toast('No hay enemigos cerca');}if(dn(4))nextTarget();
   if(dn(12))usePot('hp');if(dn(13))usePot('mp');if(dn(15))ACT.toggleAuto();
   if(dn(14)){try{if(VOX.on)ACT.vLeave();else ACT.vJoin();}catch(e){}}
-  if(dn(9))wheelToggle(true);if(dn(8))openMap('zone');if(dn(11))setCam(CAMS[(CAMS.indexOf(CAMM)+1)%3]);if(dn(10)&&CAMM!=='iso'){CAM_YAW=P.ry+PI;}}
+  if(dn(9))wheelToggle(true);if(dn(8))openMap('zone');if(dn(11))setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);if(dn(10)&&CAMM!=='iso'){CAM_YAW=P.ry+PI;}}
 kbLabels();
 
 /* ================= pantalla siempre encendida =================
