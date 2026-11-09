@@ -1,9 +1,9 @@
 {
- "build": "202611091515",
- "min": "202611091515",
- "title": "Pies firmes en el suelo",
+ "build": "202611091542",
+ "min": "202611091542",
+ "title": "Trono de Tau",
  "notes": [
-  "Quieto: el pie apoyado queda clavado en el suelo (altura y giro); ya no baila con la animación de reposo",
-  "Gestos: los pies ya no se hunden (risa, saludo) ni flotan (baile); las patadas y saltos de la animación se respetan"
+  "Bahía Negra: el Trono de Tau ahora existe — estrado de piedra negra con runas violetas, trono de obsidiana con el ojo de Tau y los signos de sus siete hijos",
+  "Abanico de plumas negras como su corona, cuernos de hueso y dos braseros de fuego violeta"
  ]
 }

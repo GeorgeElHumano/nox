@@ -313,6 +313,11 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Quieto, `ikDrop` y `B.o` siguen rápido (`dt*30`/`dt*40`; caminando siguen `dt*10`/`dt*12`). Constante `IK_SOLE=.025`.
 - Medido: suela quieta y en todos los gestos ±2 mm (descalzo y con botas). Sonda: `zt.js` con `FEETPROBE=1 HEROEQ=clase:set GEST=risa,baile SUM=1`.
 
+## Parche 202611091542: Trono de Tau (9/11)
+- Bahía Negra tiene `throne:true` en `ZONES`. `thronePos()` lo ubica 4,3 m detrás del jefe (`Z.boss`), mirando al centro del mapa; `tauThrone(zoneG)` se llama en `loadZone` después del `decoSpot` del jefe (que con `Z.throne` ya no pone rocas).
+- Piezas: estrado de 3 escalones octogonales (runas violetas en `emissiveMap`, `thrSigil`), trono de obsidiana con almohadón y bordes de bronce, respaldo en arco (`ExtrudeGeometry`, UV remapeado) con el ojo de Tau y los 7 signos de sus hijos, marco dorado (`TubeGeometry`), abanico de 13 plumas (textura de canvas con `alphaTest`), cuernos de hueso, orbes en los apoyabrazos y 2 braseros con fuego en sprites (`thrFlameT`, textura en caché) y brasas; 1 `PointLight` violeta. Todo late en un `AMB`. Los braseros entran en `FIRES` (sonido del fuego).
+- `colliders` radio 3,3. `nearSpecial` y `okSpot` dejan sin plantas un radio de ~6 m.
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.
