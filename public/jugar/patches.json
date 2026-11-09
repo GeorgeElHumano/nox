@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611091317",
+  "title": "Avisos de admin, trajes completos y pies",
+  "notes": [
+   "Las piernas de cada set ahora cubren muslos, cadera y rodillas con el mismo material de la armadura",
+   "Los pies ya no se hunden en el piso",
+   "Descripción del ítem al pasar el mouse en el baúl, la tienda, el caldero y el comercio",
+   "Los administradores pueden mandar avisos a todo el servidor con /sv"
+  ]
+ },
+ {
   "build": "202611091008",
   "title": "Capas, eventos, comercio y tiendas",
   "notes": [
