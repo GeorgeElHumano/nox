@@ -1,12 +1,12 @@
 {
- "build": "202611082009",
- "min": "202611082009",
- "title": "Gestos y botones nuevos",
+ "build": "202611082124",
+ "min": "202611082124",
+ "title": "Avisos y arreglos",
  "notes": [
-  "Rueda de gestos: saludo, baile, risa, llanto, burla, celebración y descanso (botón bajo el mapa o tecla G)",
-  "Los demás jugadores ven tus gestos",
-  "Botones de Personaje y Bolsa al lado de la vida",
-  "El contador de FPS va chiquito al lado de la hora",
-  "En iPhone ya se puede deslizar la lista de destinos del mapa"
+  "Ya no se congela el juego al poner joyas en los ítems",
+  "Pociones y joyas se apilan hasta 999 (y compra de ×100 en la tienda)",
+  "La pluma de la misión de clase cae menos seguido",
+  "En los gestos ya no desaparecen alas ni coronas",
+  "Avisos en pantalla: bienvenida a los Admin y cuenta regresiva de los eventos"
  ]
 }
