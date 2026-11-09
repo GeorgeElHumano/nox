@@ -1,8 +1,9 @@
 {
- "build": "202611091411",
- "min": "202611091411",
- "title": "Capa más suave",
+ "build": "202611091440",
+ "min": "202611091440",
+ "title": "Más zoom",
  "notes": [
-  "La capa del Mburuvicha ya no da un tirón al empezar a caminar o al detenerse"
+  "Podés acercar y alejar la cámara el doble que antes (clásica y 3ra persona)",
+  "Se quitó la cámara en 1ra persona"
  ]
 }
