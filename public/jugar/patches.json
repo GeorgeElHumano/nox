@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611091257",
+  "title": "Cursor guantelete de Tupã",
+  "notes": [
+   "Nuevo cursor para PC: el guantelete de Tupã, más grande y con la punta del dedo como punto de clic.",
+   "Animación de click de 2 cuadros: el guantelete se ve apretado, con destello en la gema, mientras mantenés el botón del mouse.",
+   "En celulares y tablets no cambia nada (no tienen cursor)."
+  ]
+ },
+ {
   "build": "202611091228",
   "title": "Nivel 200 y dos mapas nuevos",
   "notes": [
