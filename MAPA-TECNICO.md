@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 9 de noviembre de 2026.
+Última actualización: 9 de noviembre de 2026 (tarde).
 
 ## Repositorio y publicación
 
@@ -296,6 +296,16 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Mbói Tata: la cabeza usaba `mat()` (caché compartida) y cada serpiente le volvía a aplicar `crackGlow`; con varias, el sombreador duplicaba declaraciones y la cabeza no se dibujaba. Ahora `mat(...).clone()` y `crackGlow` se aplica una sola vez por material (`CG_ON`, WeakSet). Lo mismo para el arma de fuego de un mito (`tm2`). Prueba: `FOCUS=mboijagua node tools/zt.js SALIDA zona ybytyruzu`.
 - Misiones: `questWarp(q)` arma el botón de viaje (acción `warp`, spot del mob o `i=-1` para el jefe, mismo costo que el viaje a un spot) en el panel del Capitán y en `NPCV==='quests'` mientras la misión no está cumplida.
 - `tools/zt.js`: `HEROW=clase` (héroe nivel 200 con set 4 y alas), `QSHOT=1` (panel de Misiones), `FOCUS=mob`.
+
+## Parches 202611091317 y 202611091350 (9/11, tarde)
+
+- **Trajes completos**: en `cc0Armor`, el pantalón suma una cáscara (`cc0Shell`) en muslos y pelvis (`minW:.28`, para tomar también la rodilla) con el material del peto del set (`scale`/`ornate`/`metal`, o cuero). El pantalón inicial (t0 de cuero) no la lleva.
+- **Pies**: `ikSoleOf(r)` mide en la pose de enlace (`bindMatrix` y `boneInverses`) la distancia del hueso del pie a la suela; `footIK` nunca deja la suela bajo `H()+.025` y puede subir la cadera (`ikDrop` hasta +.25). Prueba: `tools/feetclose.js` (`FULL=1` con set, `BASE=` para comparar con otra versión).
+- **Aviso global**: chat `/sv texto` → `{t:'sv'}`; el Worker solo lo acepta si `a.role==='admin'` (1 cada 3 s) y manda `{t:'ann',k:'sv',n,m}` a todos; el juego lo muestra con `notice(...,'big sv')` (9 s) y lo deja en el chat.
+- **Descripción al pasar el mouse en cualquier menú**: `cellHTML` agrega una marca oculta `.tk` (`tipK(it)`, registro `TIPREG`); el manejador de `TIP` busca la marca dentro de `.cell/.slot/.row/.ms-row`. Las filas de compra de la tienda también la llevan.
+- **Bolsa al día**: `invSyncTick` (dentro de `hudV2Tick`, cada 200 ms) compara la firma de bolsa, equipo, oro y mascotas (`invSig`) y redibuja `#pInv`/`#pVault` si cambió; `afterGear` también llama a `renderInv`.
+- **Ítems tirados**: el juego manda `dr` con `pd:1`; el Worker los guarda con `own`, `solo:1`, `ownMs:60000`, `life:120000` (los demás drops siguen con 20 s de prioridad y 90 s de vida). `dp` respeta `ownMs` y, si es `solo`, no deja levantarlo al grupo. En el juego, `dropOwnLbl` muestra "Tuyo/De X · m:ss" o "Libre" bajo la etiqueta y `updateDrops` lo saca al pasar `life`.
+- Ganchos nuevos en `__NOX`: `npcT(id)` (abre un PNJ, por ejemplo `baul`), `invSyncT`. `tools/boot.js` acepta `BASE=`, `CH=` (canal del navegador) y usa `--disable-dev-shm-usage`. Con la bolsa abierta, el Chromium sin GPU dibuja muy lento: en las pruebas avanzar con `__NOX.step` en vez de esperar.
 
 ## Herramientas de prueba (`/home/claude/tools`)
 
