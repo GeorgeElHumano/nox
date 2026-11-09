@@ -1,9 +1,9 @@
 {
- "build": "202611091925",
- "min": "202611091925",
- "title": "Compañeros de grupo en pantalla",
+ "build": "202611092006",
+ "min": "202611092006",
+ "title": "Pantallas chicas y caminata de otros jugadores",
  "notes": [
-  "Grupo: debajo de tu tarjeta de vida aparecen tarjetas chicas de tus compañeros con su vida, maná y nivel",
-  "Se marcan en rojo si tienen poca vida, en gris si cayeron, y muestran el mapa si están en otro lado"
+  "En pantallas chicas (iPhone 11 y similares) los botones de acción se achican lo justo para no taparse con el minimapa y el oro",
+  "Los otros jugadores ya no caminan con los brazos abiertos en T por la ciudad"
  ]
 }

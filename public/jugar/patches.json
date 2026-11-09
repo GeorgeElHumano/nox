@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611092006",
+  "title": "Pantallas chicas y caminata de otros jugadores",
+  "notes": [
+   "En pantallas chicas (iPhone 11 y similares) los botones de acción se achican lo justo para no taparse con el minimapa y el oro",
+   "Los otros jugadores ya no caminan con los brazos abiertos en T por la ciudad"
+  ]
+ },
+ {
   "build": "202611091925",
   "title": "Compañeros de grupo en pantalla",
   "notes": [
