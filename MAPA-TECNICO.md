@@ -336,6 +336,11 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `#lifeCard` tiene `data-act="openChar"` y `pointer-events:auto`: tocarla abre la ficha del personaje.
 - Pruebas: `zt.js` con `VAULTTEST=1` (abre `npcT('baul')`, cuenta íconos) y `LCTEST=1` (clic en la tarjeta).
 
+## Parche 202611091925: compañeros de grupo en el HUD (9/11)
+- `#partyHud` (debajo de `#lcRow`, dentro de `.hud-l`): una tarjeta `.ph-c` por compañero (ícono de clase, nombre, ★ líder, nivel o mapa si está en otro, barras de vida y maná). Clases `low` (<30 %), `dead` (gris, "Caído"), `far` (otro mapa). Oculto con `body.half`.
+- Datos: `partyHudTick` (dentro de `hudV2Tick`) manda `{t:'ps',h,m,d}` en % cada 1 s si hay grupo; el Worker (`live/src/index.js`, máx. 2/s por jugador) lo reenvía a los demás del grupo con `id` y `L`. El cliente guarda `LIVE.pst[id]` y `partyHudDraw` redibuja (dato viejo de más de 10 s = barra apagada `.unk`). El mensaje `party` también redibuja.
+- Prueba: `zt.js` con `PHTEST=1` (grupo falso con `liveTest` 'party' y 'ps').
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.

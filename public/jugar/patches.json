@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611091925",
+  "title": "Compañeros de grupo en pantalla",
+  "notes": [
+   "Grupo: debajo de tu tarjeta de vida aparecen tarjetas chicas de tus compañeros con su vida, maná y nivel",
+   "Se marcan en rojo si tienen poca vida, en gris si cayeron, y muestran el mapa si están en otro lado"
+  ]
+ },
+ {
   "build": "202611091853",
   "title": "Mobs de 2 patas: mejor paso al correr",
   "notes": [

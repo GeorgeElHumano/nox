@@ -782,7 +782,25 @@ body.induel #track,body.induel #evClock{display:none}
 #lifeCard .lc-b.mp{height:6px}
 #lifeCard .lc-b i{position:absolute;inset:0 auto 0 0;border-radius:9px;transition:width .25s}
 #lifeCard .lc-b.hp i{background:linear-gradient(#ff7a6a,#c4241c)}#lifeCard .lc-b.mp i{background:linear-gradient(#8fb0ff,#2c4fd6)}
-#lifeCard:active{transform:scale(.97)}#lifeCard .lc-hpT{color:#ffb3a8}#lifeCard .lc-mpT{color:#a9b4ff}
+#lifeCard:active{transform:scale(.97)}#partyHud{display:flex;flex-direction:column;gap:5px;margin-top:6px;pointer-events:none}
+#partyHud .ph-c{width:min(150px,30vw);padding:4px 7px 5px;border-radius:9px;background:rgba(14,14,40,.62);border:1px solid rgba(246,216,146,.28);color:#f3ead2;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-sizing:border-box}
+#partyHud .ph-h{display:flex;align-items:center;gap:5px;min-width:0;font-size:10.5px;line-height:1.2}
+#partyHud .ph-av{width:16px;height:16px;flex:none;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#3a3f8c,#14163d);box-shadow:0 0 0 1px #f6d892}
+#partyHud .ph-av svg{width:11px;height:11px}
+#partyHud b{font-family:var(--display);font-size:10.5px;color:#f6d892;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+#partyHud .ph-ld{font-style:normal;color:#f2c25a;font-size:9px}
+#partyHud .ph-l{color:#c9c3e8;font-size:9.5px;white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis}
+#partyHud .ph-b{position:relative;height:5px;border-radius:6px;background:rgba(0,0,0,.55);overflow:hidden;margin-top:3px}
+#partyHud .ph-b.mp{height:3px;margin-top:2px}
+#partyHud .ph-b i{position:absolute;inset:0 auto 0 0;border-radius:6px;transition:width .4s}
+#partyHud .ph-b.hp i{background:linear-gradient(#ff7a6a,#c4241c)}#partyHud .ph-b.mp i{background:linear-gradient(#8fb0ff,#2c4fd6)}
+#partyHud .ph-b i.unk{opacity:.25}
+#partyHud .ph-c.low .ph-b.hp{box-shadow:0 0 0 1px #ff5a4a,0 0 6px rgba(255,80,60,.7)}
+#partyHud .ph-c.dead{opacity:.55;filter:grayscale(.8)}
+#partyHud .ph-c.far{opacity:.7}
+body.half #partyHud{display:none}
+@media (orientation:portrait) and (max-width:440px){#partyHud .ph-c{width:34vw}}
+#lifeCard .lc-hpT{color:#ffb3a8}#lifeCard .lc-mpT{color:#a9b4ff}
 #lifeCard.low .lc-b.hp{animation:lcLow 1s ease-in-out infinite}@keyframes lcLow{50%{box-shadow:0 0 0 1px #ff5a4a,0 0 10px rgba(255,80,60,.8)}}
 #track{display:flex;align-items:center;gap:6px;max-width:min(300px,44vw);padding:5px 11px 5px 9px;border:1px solid var(--gl2)!important;border-radius:99px!important;background:var(--tgbg)!important;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);font-size:11.5px!important;line-height:1.2!important;color:#f3ead2!important;white-space:nowrap;overflow:hidden}
 #track .qk{display:none!important}#track #trT{overflow:hidden;text-overflow:ellipsis}#track #trT br{display:none}
@@ -7045,7 +7063,8 @@ function liveMsg(m){const t=m.t;if(tradeMsg(m))return;if(t==='host'||t==='ms'||t
   if(t==='party'){const had=!!LIVE.party,old=had?new Map(LIVE.party.members.map(x=>[x.id,x.n])):new Map();LIVE.party=m.pid?m:null;if(!LIVE.party&&VOX.on)voiceStop(true);if(had&&!LIVE.party){chatAdd({ch:'s',m:'El grupo se disolvió.'});bigNote('El grupo se disolvió',true);}
     /* avisos grandes: quién entra y quién sale del grupo */if(LIVE.party){const now=new Map(LIVE.party.members.map(x=>[x.id,x.n]));if(!had){const ld=LIVE.party.members.find(x=>x.id===LIVE.party.leader);if(LIVE.party.leader===LIVE.me){for(const [id,n] of now)if(id!==LIVE.me)bigNote('<b>'+esc(n)+'</b> se unió al grupo');}else bigNote('Te uniste al grupo de <b>'+esc(ld?ld.n:'')+'</b>');try{sfx('potion');}catch(e){}}
       else{for(const [id,n] of now)if(!old.has(id)&&id!==LIVE.me){bigNote('<b>'+esc(n)+'</b> se unió al grupo');try{sfx('potion');}catch(e){}}for(const [id,n] of old)if(!now.has(id)&&id!==LIVE.me)bigNote('<b>'+esc(n)+'</b> dejó el grupo',true);}}
-    for(const o of LIVE.others.values()){o.inParty=!!(LIVE.party&&LIVE.party.members.some(x=>x.id===o.id));liveLabel(o);}liveUI();return;}
+    for(const o of LIVE.others.values()){o.inParty=!!(LIVE.party&&LIVE.party.members.some(x=>x.id===o.id));liveLabel(o);}PHUD.sent=0;partyHudDraw();liveUI();return;}
+  if(t==='ps'){(LIVE.pst=LIVE.pst||{})[m.id]={h:m.h,m:m.m,d:!!m.d,L:m.L,t:Date.now()};partyHudDraw();return;}
   if(t==='inv'){LIVE.inv={from:m.from,n:m.n};liveUI();try{if(!snd('mu_rare',{vol:.6}))sfx('potion');}catch(e){}return;}
   if(t==='vj'){liveUI();return;}
   if(t==='vl'){voiceDrop(m.id);liveUI();return;}
@@ -7234,7 +7253,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611091853';const UPD={shown:'',req:false};
+const NOX_BUILD='202611091925';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
@@ -7473,7 +7492,7 @@ const lsGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}},lsSe
 const IS_FINE=matchMedia('(hover:hover) and (pointer:fine)').matches;
 const WASD=()=>IS_FINE&&CAMM!=='iso'&&!PAD.on;
 function hudV2Init(){if($('#lifeCard'))return;
-  $('.hud-l').insertAdjacentHTML('afterbegin',`<div id="lcRow"><div id="lifeCard" class="tg2" data-act="openChar" role="button" aria-label="Personaje"><div class="lc-h"><span class="lc-av" id="lcAv"></span><b id="lcN"></b><span class="lc-l" id="lcL"></span></div><div class="lc-r"><div class="lc-b hp"><i id="lcHp"></i></div><span class="lc-hpT" id="lcHpT"></span><div class="lc-b mp"><i id="lcMp"></i></div><span class="lc-mpT" id="lcMpT"></span></div></div><div id="lcSide"><button class="sbtn" data-act="openChar" aria-label="Personaje" title="Personaje (C)">${UIC('person')}<i class="dot" id="lcPts" hidden></i></button><button class="sbtn" data-act="openInv" aria-label="Bolsa" title="Bolsa (I)">${UIC('bag')}</button></div></div>`);
+  $('.hud-l').insertAdjacentHTML('afterbegin',`<div id="lcRow"><div id="lifeCard" class="tg2" data-act="openChar" role="button" aria-label="Personaje"><div class="lc-h"><span class="lc-av" id="lcAv"></span><b id="lcN"></b><span class="lc-l" id="lcL"></span></div><div class="lc-r"><div class="lc-b hp"><i id="lcHp"></i></div><span class="lc-hpT" id="lcHpT"></span><div class="lc-b mp"><i id="lcMp"></i></div><span class="lc-mpT" id="lcMpT"></span></div></div><div id="lcSide"><button class="sbtn" data-act="openChar" aria-label="Personaje" title="Personaje (C)">${UIC('person')}<i class="dot" id="lcPts" hidden></i></button><button class="sbtn" data-act="openInv" aria-label="Bolsa" title="Bolsa (I)">${UIC('bag')}</button></div></div><div id="partyHud" hidden></div>`);
   $('.hud-r').insertAdjacentHTML('afterbegin',`<div id="sunWrap"><button id="sunBtn" aria-label="Menú">${sunSVG()}</button><span class="sl">MENÚ</span><span id="sunN" hidden></span><span id="dayDot" hidden></span></div>`);
   const mw=$('.mm-wrap');$('#mmZ').insertAdjacentHTML('afterend','<div id="mmClock"><i></i><b></b></div>');mw.insertAdjacentHTML('beforeend','<div id="mmFoot"></div>');const ft=$('#mmFoot');ft.appendChild($('#mbCam'));ft.insertAdjacentHTML('beforeend',`<button class="mb camq" id="mbGest" data-act="gestWheel" aria-label="Gestos" title="Gestos (G)">${UIC('smile')}</button>`);const gv=document.querySelector('.hud-r .hr-side .goldv');if(gv)mw.appendChild(gv);/* el oro en su propia fila, debajo de cámara y gestos: así los montos grandes no se cortan */
   $('.actions').appendChild($('#autoBtn'));
@@ -7484,7 +7503,16 @@ hudV2Init();
 const INVS={sig:'',t:0};function invSig(){const f=x=>x?(x.u||x.k+'.'+(x.sub||''))+':'+(x.n||1)+':'+(x.lv||0)+':'+(x.t||0):'';return C.inv.map(f).join('|')+'#'+EQK.map(k=>f(C.eq[k])).join('|')+'#'+C.gold+'#'+(C.pets?Object.keys(C.pets).filter(k=>C.pets[k]).join(','):'');}
 function invSyncTick(){if(!C||DRAG.src||(typeof VDRAG!=='undefined'&&VDRAG.s))return;const now=performance.now();if(now-INVS.t<200)return;INVS.t=now;const inv=!$('#pInv').hidden,vlt=$('#pVault')&&!$('#pVault').hidden;if(!inv&&!vlt){INVS.sig='';return;}
   const sg=invSig();if(sg===INVS.sig)return;const first=!INVS.sig;INVS.sig=sg;if(first)return;try{if(inv)renderInv();if(vlt)renderVault();}catch(e){}}
-function hudV2Tick(){const lc=$('#lifeCard');invSyncTick();if(!lc||!C)return;
+/* tarjetas chicas de los compañeros de grupo, debajo de la tarjeta de vida: nombre, nivel, vida y maná (llegan por 'ps' cada ~1 s) */
+const PHUD={sent:0,last:''};
+function partyHudDraw(){const el=$('#partyHud');if(!el)return;const pt=LIVE.party;if(!pt||!pt.members||pt.members.length<2){if(!el.hidden){el.hidden=true;el.innerHTML='';}return;}
+  const st=LIVE.pst||{},now=Date.now(),myZ=Z&&Z.id;
+  const html=pt.members.filter(x=>x.id!==LIVE.me).map(x=>{const s=st[x.id],fresh=s&&now-s.t<10000,h=fresh?s.h:null,m=fresh?s.m:null,dead=fresh&&s.d,far=x.zone&&myZ&&x.zone!==myZ,L=(s&&s.L)||x.L||0;
+    return `<div class="ph-c${dead?' dead':''}${far?' far':''}${h!=null&&h<30&&!dead?' low':''}" title="${esc(x.n)}"><div class="ph-h"><span class="ph-av">${x.c?SKIC('atk_'+x.c):''}</span><b>${esc(x.n)}</b>${x.id===pt.leader?'<i class="ph-ld">★</i>':''}<span class="ph-l">${dead?'Caído':far?esc(ZONES[x.zone]?ZONES[x.zone].name:''):'Nv '+L}</span></div><div class="ph-b hp"><i style="width:${h==null?100:h}%"${h==null?' class="unk"':''}></i></div><div class="ph-b mp"><i style="width:${m==null?100:m}%"${m==null?' class="unk"':''}></i></div></div>`;}).join('');
+  if(html!==PHUD.last){PHUD.last=html;el.innerHTML=html;}el.hidden=!html;}
+function partyHudTick(){if(!C||!LIVE.party){const el=$('#partyHud');if(el&&!el.hidden)partyHudDraw();return;}const now=Date.now();
+  if(now-PHUD.sent>1000){PHUD.sent=now;liveSend({t:'ps',h:Math.max(0,P.hp)/DS.maxHP*100,m:Math.min(1,P.mp/DS.maxMP)*100,d:P.dead?1:0});partyHudDraw();}}
+function hudV2Tick(){const lc=$('#lifeCard');invSyncTick();try{partyHudTick();}catch(e){}if(!lc||!C)return;
   const set=(id,v)=>{const e=$('#'+id);if(e._v!==v){e._v=v;e.textContent=v;}},wd=(id,v)=>{const e=$('#'+id),s=v.toFixed(1)+'%';if(e._w!==s){e._w=s;e.style.width=s;}};
   set('lcN',C.name);{const lv=$('#hLvl').textContent;set('lcL',innerWidth<=440&&innerHeight>innerWidth?lv.split(' · ')[0]:lv);}const hp=Math.max(0,P.hp)/DS.maxHP;wd('lcHp',hp*100);set('lcHpT',String(Math.max(0,Math.ceil(P.hp))));wd('lcMp',Math.min(1,P.mp/DS.maxMP)*100);set('lcMpT',String(Math.floor(P.mp)));
   lc.classList.toggle('low',P.hp>0&&hp<.3);if(lc._cls!==C.cls){lc._cls=C.cls;$('#lcAv').innerHTML=SKIC('atk_'+C.cls);}

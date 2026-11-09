@@ -321,6 +321,10 @@ export class World {
     if (raw.length > 4000 && t !== 'ms' && t !== 'mr' && !(raw.length < 26000 && (t === 'toff' || t === 'tok' || t === 'shop' || t === 'sok'))) return;
     if (t === 'treq' || t === 'tacc' || t === 'trej' || t === 'tx' || t === 'toff' || t === 'trdy' || t === 'tcnf' || t === 'tok' || t === 'tno') { await this.tradeMsg(ws, a, m); return; }
     if (t === 'shop' || t === 'shopv' || t === 'sbuy' || t === 'sok' || t === 'sno') { await this.shopMsg(ws, a, m); return; }
+    // vida y maná para la tarjeta de los compañeros de grupo (en porcentaje; máx. 2 por segundo)
+    if (t === 'ps') { const now = Date.now(); if (now - (a.psT || 0) < 450) return; a.psT = now; const [, p] = this.partyOf(a.uid); if (!p) return;
+      const pc = v => Math.max(0, Math.min(100, Math.round(+v || 0)));
+      this.partySend(p, { t: 'ps', id: a.uid, h: pc(m.h), m: pc(m.m), d: m.d ? 1 : 0, L: (a.s && a.s.L) | 0 }, a.uid); return; }
 
     // monstruos: los mueve el servidor; los jugadores mandan sus golpes y piden la lista completa
     if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
