@@ -1,0 +1,92 @@
+[
+ {
+  "build": "202611082124",
+  "title": "Avisos y arreglos",
+  "notes": [
+   "Ya no se congela el juego al poner joyas en los ítems",
+   "Pociones y joyas se apilan hasta 999 (y compra de ×100 en la tienda)",
+   "La pluma de la misión de clase cae menos seguido",
+   "En los gestos ya no desaparecen alas ni coronas",
+   "Avisos en pantalla: bienvenida a los Admin y cuenta regresiva de los eventos"
+  ]
+ },
+ {
+  "build": "202611082009",
+  "title": "Gestos y botones nuevos",
+  "notes": [
+   "Rueda de gestos: saludo, baile, risa, llanto, burla, celebración y descanso (botón bajo el mapa o tecla G)",
+   "Los demás jugadores ven tus gestos",
+   "Botones de Personaje y Bolsa al lado de la vida",
+   "El contador de FPS va chiquito al lado de la hora",
+   "En iPhone ya se puede deslizar la lista de destinos del mapa"
+  ]
+ },
+ {
+  "build": "202611081239",
+  "title": "Ranking de jugadores",
+  "notes": [
+   "Ranking con los personajes de más nivel, con luz verde si están jugando",
+   "Cantidad de jugadores en línea en la portada",
+   "Ranking en la rueda del sol y en la portada"
+  ]
+ },
+ {
+  "build": "202611081151",
+  "title": "Tienda, armaduras y empuñaduras",
+  "notes": [
+   "Vendé varios objetos a la vez en la tienda",
+   "Solo el Mburuvicha lleva capa",
+   "Las manos agarran bien el arma, el bastón y el arco",
+   "El peto del Gladiador ya no deja ver la piel en el pecho",
+   "Sin sonido repetido al pisar un objeto con el inventario lleno"
+  ]
+ },
+ {
+  "build": "202611080452",
+  "title": "Arreglos de NOX",
+  "notes": [
+   "Lagos de Ypacaraí, Trinidad y el Monday con orilla natural",
+   "Spots de caza más espaciosos y mapa del reino con scroll",
+   "Primera persona sin brazos ni cuervo tapando la vista",
+   "Minimapa siempre en la esquina y hora del juego debajo",
+   "Asunción mejor iluminada de noche y más luz sobre tu personaje",
+   "Punto rojo cuando hay misiones diarias para reclamar",
+   "La X para cerrar queda fija al bajar en los menús",
+   "La pantalla no se apaga mientras jugás"
+  ]
+ },
+ {
+  "build": "202611080140",
+  "title": "Parche del 8 de noviembre: HUD nuevo",
+  "notes": [
+   "Pantalla más limpia: tarjeta de vida, misión en una línea y el sol MENÚ con todos los menús en rueda",
+   "Menús a media pantalla y transparentes, con tu personaje siempre a la vista",
+   "El minimapa es una foto real de la zona: tocalo para ver el mapa, viajar y el mapa del reino",
+   "Íconos nuevos para cada técnica y ataque",
+   "PC y Mac: WASD y mouse en 3ra y 1ra persona",
+   "Soporte para mandos de Xbox, PlayStation y genéricos",
+   "El mando táctil aparece en una zona más chica"
+  ]
+ },
+ {
+  "build": "202611072039",
+  "title": "Parche del 7 de noviembre (noche)",
+  "notes": [
+   "1ra persona sin mira, más gran angular y con tus brazos a la vista al moverte",
+   "El modo automático sigue usando técnicas con el inventario u otro menú abierto",
+   "El servidor en vivo también pide la última versión"
+  ]
+ },
+ {
+  "build": "202611071956",
+  "title": "Parche del 7 de noviembre",
+  "notes": [
+   "Pantalla de carga con la foto del destino",
+   "Tres cámaras: clásica, 3ra y 1ra persona",
+   "Mapa completo al tocar el minimapa",
+   "Afuera de las murallas de Asunción ya se puede pelear",
+   "Chat de voz con volumen de 0 a 500 %",
+   "El juego avisa cuando sale un parche nuevo"
+  ]
+ }
+]
