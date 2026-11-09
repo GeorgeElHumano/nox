@@ -1,11 +1,8 @@
 {
- "build": "202611091317",
- "min": "202611091317",
- "title": "Avisos de admin, trajes completos y pies",
+ "build": "202611091339",
+ "min": "202611091339",
+ "title": "Vuelo más bajo",
  "notes": [
-  "Las piernas de cada set ahora cubren muslos, cadera y rodillas con el mismo material de la armadura",
-  "Los pies ya no se hunden en el piso",
-  "Descripción del ítem al pasar el mouse en el baúl, la tienda, el caldero y el comercio",
-  "Los administradores pueden mandar avisos a todo el servidor con /sv"
+  "Los personajes con alas o capa ahora vuelan más cerca del piso (60 % más bajo) en todo el juego"
  ]
 }

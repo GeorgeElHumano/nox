@@ -1,5 +1,23 @@
 [
  {
+  "build": "202611091339",
+  "title": "Vuelo más bajo",
+  "notes": [
+   "Los personajes con alas o capa ahora vuelan más cerca del piso (60 % más bajo) en todo el juego"
+  ]
+ },
+ {
+  "build": "202611091336",
+  "title": "Vuelo, misiones y vegetación",
+  "notes": [
+   "Con alas o capa tu personaje flota también quieto, en cualquier mapa y en Asunción; solo baja al pelear",
+   "Los PNJ con alas flotan apenas sobre el piso",
+   "Misiones: nuevo botón para viajar directo al spot o al jefe de tu misión",
+   "Arreglada la cabeza del Mbói Tata, que desaparecía cuando había varios en el mapa",
+   "Monday, Mbaracayú, Cerro Corá, Bahía Negra e Ybytyruzú vuelven a tener árboles, palmeras y pasto"
+  ]
+ },
+ {
   "build": "202611091317",
   "title": "Avisos de admin, trajes completos y pies",
   "notes": [
