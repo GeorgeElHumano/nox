@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 8 de noviembre de 2026.
+Última actualización: 9 de noviembre de 2026.
 
 ## Repositorio y publicación
 
@@ -13,7 +13,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
   - Traer `web/`, `scripts/web/`, `public/index.html` y `public/img/` desde `arte-cc0`, y nada de `public/jugar/`.
   - Hacer commit y push a `main`.
   - Después mergear `origin/main` en `arte-cc0`.
-- Estado al 8/11/2026: **juego y web publicados** (parche 202611082009: HUD v2, arreglos del 8/11, venta múltiple, capas, empuñaduras, ranking y gestos; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
+- Estado al 9/11/2026: **juego publicado** (parche 202611091008: capas del Mburuvicha, eventos, comercio y tiendas, pies al suelo; ver su sección). Antes, al 8/11: (parche 202611082009: HUD v2, arreglos del 8/11, venta múltiple, capas, empuñaduras, ranking y gestos; web con el capítulo Capturas). Antes, al 7/11: (main = `arte-cc0`, commit 30608ae, apps v1.0.7). Incluye Moñái dragón, escorpión nuevo, Mburuvicha por Energía, sonidos nuevos, portada azul, 3 mascotas, la optimización, arco y cascos corregidos, muerte en la arena e instalador de Windows.
 - Apps (`.github/workflows/release.yml`): corre al cambiar `VERSION`, `desktop/**`, `android/**` o el workflow en `main`. Windows sale como `NOX-Windows.zip` y como `NOX-Instalador.exe` (Inno Setup 6, `desktop/nox.iss`: instala sin admin en `%LOCALAPPDATA%\Programs\NOX`, acceso directo en el escritorio y en Inicio, desinstalable desde Windows). El bot sube `public/version.json` a `main` al terminar: mergear `origin/main` antes del próximo push. La web apunta a `releases/latest/download/…`: no cambiar un enlace hasta que la versión ya tenga el archivo.
   - Publicar el juego: `git push origin arte-cc0:main` (Cloudflare tarda ~1 minuto). Verificar con `tools/livegame.js` (PC, iPhone 15, Pixel 7, Galaxy S9+, iPad Mini; modo sin cuenta, no toca el servidor) y `tools/presan.js` (las 10 zonas sin errores, en local).
   - En las pruebas automáticas elegir Caballero: Mburuvicha pide nivel 50 en la cuenta y Gladiador nivel 40.
@@ -164,7 +164,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Claves de shader: `crackGlow` y `ghostify` arman `customProgramCacheKey` con la clave anterior del material (+ color en el fantasma). Antes, materiales con grietas compartían programa con otros y la cabeza del Mbói Tata salía transparente.
 - Anillo del set (`HERO.aura`): plano 14×14 en XZ; `auraFit` gira los vértices y les pone la altura del terreno (`H`) cada cuadro.
 - Caldero (`renderCaldero`): resultado y el ítem elegido arriba (`.cald-sel`), después solo el equipo de la bolsa y al final las invitaciones compactas (fichas). Al elegir, el panel sube.
-- Mburuvicha: 2ª y 3ª generación se llaman «Capa de Guyra Hũ Guasu» y «Capa de Ñanderuvusu». El modelo de capa en el casillero de alas está pendiente (muestra aprobada: capa que ondea al volar, sin abrirse como alas).
+- Mburuvicha: 2ª y 3ª generación se llaman «Capa de Guyra Hũ Guasu» y «Capa de Ñanderuvusu».  La capa ya está hecha (ver el parche del 9/11).
 - Pruebas: `tools/ntct.js` (avisos), `tools/caldt.js` (caldero), `tools/tatashot.js` (Mbói Tata), `tools/aurat.js`. Ganchos nuevos en `__NOX`: `notice`, `caldT`, `auraT`, `gemApply`, `addItemT`, `gestGo`.
 
 ### Ganchos de prueba
