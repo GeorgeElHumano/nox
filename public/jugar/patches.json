@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611091049",
+  "title": "Nueva base de los personajes",
+  "notes": [
+   "Los personajes sin equipo empiezan con lo mínimo: torso desnudo (la Arquera con un top), pantalón corto y descalzos",
+   "Cada pieza que te equipás viste su parte del cuerpo: botas, pantalón, armadura y guantes se notan apenas los ponés",
+   "El Mburuvicha ya no trae la corona de plumas de base"
+  ]
+ },
+ {
   "build": "202611091008",
   "title": "Capas, eventos, comercio y tiendas",
   "notes": [

@@ -1,18 +1,10 @@
 {
- "build": "202611091008",
- "min": "202611091008",
- "title": "Capas, eventos, comercio y tiendas",
+ "build": "202611091049",
+ "min": "202611091049",
+ "title": "Nueva base de los personajes",
  "notes": [
-  "Mburuvicha: ahora lleva capa en lugar de alas (azul, azul y dorado, roja, roja y dorado, negra y negra con dorado). Al volar se estira y ondea",
-  "Arena de Añá: 100 rivales, hasta 30 a la vez; el piso cae a las 25, 50 y 75 muertes. Nueva estatua, runas, lava, brasas y humo",
-  "Fortaleza de Tuguy: torres, arco, estandartes, castillo al fondo, muro de cierre y altar con runas y rayo",
-  "Los mobs de evento son 10 niveles más fuertes que tu personaje",
-  "Comercio entre jugadores: tocá a otro jugador para Comerciar, Ver tienda, Grupo o Duelo. Si alguien se desconecta, todo vuelve a su dueño",
-  "Tiendas personales: abrí la tuya desde 'Mi tienda' en la rueda y vendé con cartel en Asunción",
-  "Set completo: tocalo para ver sus stats",
-  "Mapa del reino: tocá una zona para ver su foto, nivel, costo y viajar",
-  "PC: descripción del ítem al pasar el mouse; soltá un ítem sobre el personaje para equiparlo",
-  "Los pies se apoyan en el suelo en pendientes",
-  "Arreglo: las alas ya no quedan torcidas al cambiar de equipo volando o caminando"
+  "Los personajes sin equipo empiezan con lo mínimo: torso desnudo (la Arquera con un top), pantalón corto y descalzos",
+  "Cada pieza que te equipás viste su parte del cuerpo: botas, pantalón, armadura y guantes se notan apenas los ponés",
+  "El Mburuvicha ya no trae la corona de plumas de base"
  ]
 }
