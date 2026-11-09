@@ -270,6 +270,8 @@ export class World {
       } else for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'eq', id: a.uid, s: a.s });
       const [pid, p] = this.partyOf(a.uid); if (p) this.partyBroadcast(pid, p);
       if (t === 'hi') this.send(ws, { t: 'online', n: this.all().filter(x => x.a.s).length, ts: Date.now() });
+      // bienvenida de un administrador a todo el servidor (como en MU); como mucho una vez cada 10 minutos por cuenta
+      if (t === 'hi' && a.role === 'admin' && a.s && a.s.n) { this.admWel = this.admWel || new Map(); const last = this.admWel.get(a.uid) || 0; if (Date.now() - last > 600000) { this.admWel.set(a.uid, Date.now()); for (const x of this.all()) this.send(x.ws, { t: 'ann', k: 'adm', n: a.s.n }); } }
       return;
     }
     if (t === 'c') { // chat
