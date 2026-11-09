@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611091228",
+  "title": "Nivel 200 y dos mapas nuevos",
+  "notes": [
+   "El nivel máximo sube a 200 y el reinicio ahora se hace en el nivel 200 con el Pa'i Antonio",
+   "Nuevo mapa Saltos del Mbocaruzú (Ybycuí), para niveles 100 a 150: portal desde Bahía Negra, con Yporã, Jaguarete Hũ, Mbói Hovy, Teju Hũ y el jefe Yaguareté-Abá",
+   "Nuevo mapa Salto Cristal (La Colmena), para niveles 150 a 200: portal desde el Mbocaruzú, con Ypo Vera, Yaguarú Vera, Mbói Itavera, Ita Jára y el jefe Y Jára",
+   "Botín propio de cada criatura nueva y 8 misiones nuevas del Capitán Cabañas"
+  ]
+ },
+ {
   "build": "202611091049",
   "title": "Nueva base de los personajes",
   "notes": [

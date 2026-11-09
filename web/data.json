@@ -5,7 +5,24 @@
    "sub": "Capital del reino",
    "lvl": 1,
    "cost": 0,
-   "spots": [],
+   "spots": [
+    [
+     "Afueras del oeste",
+     "aguara"
+    ],
+    [
+     "Chacra del este",
+     "aguara"
+    ],
+    [
+     "Monte del norte",
+     "taitetu"
+    ],
+    [
+     "Bañado del sur",
+     "taitetu"
+    ]
+   ],
    "portals": [
     "campos"
    ]
@@ -290,7 +307,71 @@
     ]
    ],
    "portals": [
-    "cerrocora"
+    "cerrocora",
+    "mbocaruzu"
+   ]
+  },
+  "mbocaruzu": {
+   "name": "Saltos del Mbocaruzú",
+   "sub": "Ybycuí, Paraguarí",
+   "lvl": 100,
+   "cost": 450000,
+   "spots": [
+    [
+     "Remanso de las Yporã",
+     "ypora"
+    ],
+    [
+     "Orilla del arroyo Corriente",
+     "ypora"
+    ],
+    [
+     "Monte del Jaguarete Hũ",
+     "jaguahu"
+    ],
+    [
+     "Piedras del Mbói Hovy",
+     "mboihovy"
+    ],
+    [
+     "Laja del Teju Hũ",
+     "tejuhu"
+    ]
+   ],
+   "portals": [
+    "bahianegra",
+    "saltocristal"
+   ]
+  },
+  "saltocristal": {
+   "name": "Salto Cristal",
+   "sub": "La Colmena, Paraguarí",
+   "lvl": 150,
+   "cost": 600000,
+   "spots": [
+    [
+     "Playa de Piedra",
+     "ypovera"
+    ],
+    [
+     "Naciente del Ypo Vera",
+     "ypovera"
+    ],
+    [
+     "Selva del Yaguarú Vera",
+     "yaguaruvera"
+    ],
+    [
+     "Cauce del Mbói Itavera",
+     "mboiitavera"
+    ],
+    [
+     "Laja de la Ita Jára",
+     "itajara"
+    ]
+   ],
+   "portals": [
+    "mbocaruzu"
    ]
   }
  },
@@ -301,6 +382,7 @@
    "boss": false,
    "ficha": "Aguara guasu: zorro de patas largas y negras, pelaje rojizo, crin oscura sobre el cuello y orejas grandes.",
    "zones": [
+    "asuncion",
     "campos"
    ]
   },
@@ -310,6 +392,7 @@
    "boss": false,
    "ficha": "Taitetu (pecarí de collar): cerdo de monte gris, pelaje áspero y una franja clara en el cuello.",
    "zones": [
+    "asuncion",
     "campos"
    ]
   },
@@ -527,6 +610,96 @@
    "ficha": "Tau: el espíritu del mal, que tomó forma de hombre hermoso para raptar a Kerana; alto, de piel oscura como la noche, corona de plumas negras y fuego violeta.",
    "zones": [
     "bahianegra"
+   ]
+  },
+  "ypora": {
+   "name": "Yporã",
+   "lvl": 104,
+   "boss": false,
+   "ficha": "Yporã: espíritu de mujer de los remansos, hecha de agua clara y espuma; canta en los saltos y arrastra al fondo al que se acerca a escucharla.",
+   "zones": [
+    "mbocaruzu"
+   ]
+  },
+  "jaguahu": {
+   "name": "Jaguarete Hũ",
+   "lvl": 116,
+   "boss": false,
+   "ficha": "Jaguarete Hũ: el yaguareté negro del monte de Ybycuí; dicen que es el alma de un cazador que no respetó la veda, y sus ojos rojos se ven antes que el cuerpo.",
+   "zones": [
+    "mbocaruzu"
+   ]
+  },
+  "mboihovy": {
+   "name": "Mbói Hovy",
+   "lvl": 128,
+   "boss": false,
+   "ficha": "Mbói Hovy: serpiente azul de las cascadas, larga como el arroyo; se enrosca bajo la espuma y muerde a quien cruza las piedras.",
+   "zones": [
+    "mbocaruzu"
+   ]
+  },
+  "tejuhu": {
+   "name": "Teju Hũ",
+   "lvl": 140,
+   "boss": false,
+   "ficha": "Teju Hũ: lagarto negro gigante que toma sol en las lajas calientes del arroyo Corriente; la lengua le quema como brasa.",
+   "zones": [
+    "mbocaruzu"
+   ]
+  },
+  "yaguaretaba": {
+   "name": "Yaguareté-Abá",
+   "lvl": 150,
+   "boss": true,
+   "ficha": "Yaguareté-Abá: chamán que con un rezo secreto se vuelve yaguareté; de noche caza junto a los saltos, conserva los ojos de hombre y el jeguaka de plumas en la cabeza. Si lo herís, al otro día amanece herido el hombre.",
+   "zones": [
+    "mbocaruzu"
+   ]
+  },
+  "ypovera": {
+   "name": "Ypo Vera",
+   "lvl": 156,
+   "boss": false,
+   "ficha": "Ypo Vera: el Ypo de las aguas cristalinas, brillante como el reflejo del sol en la pileta; parece vidrio que camina.",
+   "zones": [
+    "saltocristal"
+   ]
+  },
+  "yaguaruvera": {
+   "name": "Yaguarú Vera",
+   "lvl": 166,
+   "boss": false,
+   "ficha": "Yaguarú Vera: el yaguarú de la pileta del Salto Cristal, con aletas de cristal en el lomo; se esconde en lo turquesa y salta desde la espuma.",
+   "zones": [
+    "saltocristal"
+   ]
+  },
+  "mboiitavera": {
+   "name": "Mbói Itavera",
+   "lvl": 178,
+   "boss": false,
+   "ficha": "Mbói Itavera: serpiente de cristal que vive detrás de los chorros del Salto Cristal; cuando se mueve, la cascada parece cambiar de lugar.",
+   "zones": [
+    "saltocristal"
+   ]
+  },
+  "itajara": {
+   "name": "Ita Jára",
+   "lvl": 190,
+   "boss": false,
+   "ficha": "Ita Jára: el dueño de la piedra, coloso de arenisca en capas con vetas de cristal turquesa; despierta cuando alguien arranca piedras del salto.",
+   "zones": [
+    "saltocristal"
+   ]
+  },
+  "yjara": {
+   "name": "Y Jára",
+   "lvl": 200,
+   "boss": true,
+   "ficha": "Y Jára: el dueño del agua, el espíritu más viejo de los saltos; duerme bajo la pileta turquesa del Salto Cristal y se levanta con corona de cristal cuando los cazadores ensucian el agua.",
+   "zones": [
+    "saltocristal"
    ]
   },
   "anaretan": {
@@ -921,8 +1094,8 @@
     "boots": "Botas"
    },
    "wn": "Capa de Guyra Hũ",
-   "wn2": "Alas de Guyra Hũ Guasu",
-   "wn3": "Alas de Ñanderuvusu"
+   "wn2": "Capa de Guyra Hũ Guasu",
+   "wn3": "Capa de Ñanderuvusu"
   },
   "arquera": {
    "name": "Arquera",
@@ -1422,6 +1595,76 @@
    "slot": "armor",
    "uniq": "Coraza del Rey de las Serpientes",
    "flavor": "La piel dorada del que dominaba los caminos."
+  },
+  "ypora": {
+   "t1": "Espuma de Yporã",
+   "t2": "Lágrima de Yporã",
+   "slot": "gloves",
+   "uniq": "Manos de Yporã",
+   "flavor": "Frías como el remanso al amanecer."
+  },
+  "jaguahu": {
+   "t1": "Piel de Jaguarete Hũ",
+   "t2": "Colmillo de Jaguarete Hũ",
+   "slot": "boots",
+   "uniq": "Botas del Jaguarete Hũ",
+   "flavor": "Pisan sin ruido en el monte."
+  },
+  "mboihovy": {
+   "t1": "Escama de Mbói Hovy",
+   "t2": "Ojo de Mbói Hovy",
+   "slot": "pants",
+   "uniq": "Calzas del Mbói Hovy",
+   "flavor": "Resbalan como agua sobre la piedra."
+  },
+  "tejuhu": {
+   "t1": "Escama de Teju Hũ",
+   "t2": "Garra de Teju Hũ",
+   "slot": "helm",
+   "uniq": "Yelmo del Teju Hũ",
+   "flavor": "Guarda el calor de las lajas."
+  },
+  "yaguaretaba": {
+   "t1": "Piel del Yaguareté-Abá",
+   "t2": "Pluma del jeguaka del chamán",
+   "slot": "armor",
+   "uniq": "Coraza del Yaguareté-Abá",
+   "flavor": "Hecha con el cuero del chamán que se volvió fiera: el que la usa caza de noche."
+  },
+  "ypovera": {
+   "t1": "Gota de cristal",
+   "t2": "Núcleo del Ypo Vera",
+   "slot": "gloves",
+   "uniq": "Guantes de cristal",
+   "flavor": "Transparentes, pero más duros que la piedra."
+  },
+  "yaguaruvera": {
+   "t1": "Piel del Yaguarú Vera",
+   "t2": "Aleta de cristal",
+   "slot": "boots",
+   "uniq": "Botas del Yaguarú Vera",
+   "flavor": "Caminan sobre el agua sin hundirse."
+  },
+  "mboiitavera": {
+   "t1": "Escama de cristal",
+   "t2": "Cuerno de Mbói Itavera",
+   "slot": "pants",
+   "uniq": "Calzas de Mbói Itavera",
+   "flavor": "Brillan como la pileta al mediodía."
+  },
+  "itajara": {
+   "t1": "Laja de arenisca viva",
+   "t2": "Veta turquesa",
+   "slot": "helm",
+   "uniq": "Yelmo de la Ita Jára",
+   "flavor": "Tallado en la roca del salto."
+  },
+  "yjara": {
+   "t1": "Agua del Y Jára",
+   "t2": "Cristal de la corona",
+   "slot": "armor",
+   "uniq": "Coraza del Y Jára",
+   "flavor": "El agua del salto te obedece."
   }
  },
  "rar": {
@@ -1700,6 +1943,54 @@
    "n": 1,
    "gold": 60000000,
    "txt": "Tau, el espíritu del mal y padre de los siete, espera en su trono. Es la última noche."
+  },
+  {
+   "mob": "ypora",
+   "n": 45,
+   "gold": 70000000,
+   "txt": "Las Yporã cantan en los remansos del Mbocaruzú y arrastran al agua a los que se acercan. Callalas."
+  },
+  {
+   "mob": "jaguahu",
+   "n": 45,
+   "gold": 80000000,
+   "txt": "El Jaguarete Hũ ronda el monte de Ybycuí. Sus ojos rojos ya asustaron a todo Mbocaya Pucu."
+  },
+  {
+   "mob": "tejuhu",
+   "n": 45,
+   "gold": 95000000,
+   "txt": "Los Teju Hũ se adueñaron de las lajas del arroyo Corriente. Sacalos de ahí."
+  },
+  {
+   "mob": "yaguaretaba",
+   "n": 1,
+   "gold": 120000000,
+   "txt": "El Yaguareté-Abá, el chamán que se vuelve fiera, caza junto a los tres saltos. Ganale en su pozo antes de que amanezca."
+  },
+  {
+   "mob": "ypovera",
+   "n": 50,
+   "gold": 140000000,
+   "txt": "Los Ypo Vera brillan en la playa de piedra del Salto Cristal. No te dejes encandilar."
+  },
+  {
+   "mob": "mboiitavera",
+   "n": 50,
+   "gold": 155000000,
+   "txt": "La Mbói Itavera se esconde detrás de los chorros. Seguí el brillo."
+  },
+  {
+   "mob": "itajara",
+   "n": 50,
+   "gold": 170000000,
+   "txt": "Las Ita Jára despertaron: alguien arrancó piedras del salto. Calmalas."
+  },
+  {
+   "mob": "yjara",
+   "n": 1,
+   "gold": 250000000,
+   "txt": "Y Jára, el dueño del agua, se levantó de la pileta turquesa. Es la pelea más grande de NOX."
   }
  ]
 }
