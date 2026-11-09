@@ -268,7 +268,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - **Sombreadores**: `crackGlow` y `ghostify` arman `customProgramCacheKey` desde la clave previa (antes chocaban y la cabeza del Mbói Tata salía transparente).
 - **Set**: `setInfoHTML`/`setInfoToggle`, `ACT.setInfo`. **Mapa del reino**: `MAPV.pop` con tarjeta `.pyPop`, escucha en `svg.pym`. **PC**: `TIP` + `#itemTip` (`itemCard(it,ctx,true)`), `heroDropZone` para soltar y equipar.
 - **Comercio y tiendas**: cliente `TR`, `MYSHOP`, `SHOPV`, `plMenu` (tocar a otro jugador en `tapAt`), paneles `#pTrade`, `#pMyShop`, `#pShopV`. Worker (`live/src/index.js`): `tradeOf/tradeState/tradeSend/tradeEnd/tradeMsg`, `shopPub/shopMsg`; mensajes treq/tacc/trej/toff/trdy/tcnf/tcommit/tok/tno/tx/tend y shop/shopv/sbuy/ssell/sok/sno/sres; límite 26000 para toff/tok/shop/sok. Se reparte por la tabla D1 `deliveries` (ítems `{raw:item}`, oro `{k:'gold',n,inv:1}`), que el cliente recoge con `srvDeliveries`. Se cancela al cambiar de zona o desconectarse.
-- **Pies al suelo**: `footIK(r,dt)` al final de `oadHeroAnim` (héroe, PNJ y jugadores). IK de dos huesos (muslo, pantorrilla, pie; nombres CC0 `thigh_l/calf_l/foot_l` u OAD `thigh_L/leg_L/foot_L`), la cadera baja con `r.model.position.y += r.ikDrop`, el pie se inclina con la normal del terreno. Peso 1 quieto, 0,5 caminando, 0 en vuelo, muerte, gestos y fuera de `mode==='game'`. `window.__NOIK=1` lo apaga para comparar. Prueba: `tools/feet.js` y `tools/feetwalk.js`.
+- **Pies al suelo**: `footIK(r,dt)` al final de `oadHeroAnim` (héroe, PNJ y jugadores). IK de dos huesos (muslo, pantorrilla, pie; nombres CC0 `thigh_l/calf_l/foot_l` u OAD `thigh_L/leg_L/foot_L`), la cadera baja con `r.model.position.y += r.ikDrop`, el pie se inclina con la normal del terreno. Peso 1 quieto y en gestos, 0,5 caminando, 0 en vuelo, muerte y fuera de `mode==='game'`. `window.__NOIK=1` lo apaga para comparar. Prueba: `tools/feet.js` y `tools/feetwalk.js`.
 - **Parches**: `scripts/patch.sh` escribe también `public/jugar/patches.json` (botón "Historial de parches") y exige al menos una nota.
 
 ## Parche 202611091049: base sin equipo (9/11)
@@ -306,6 +306,17 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - **Bolsa al día**: `invSyncTick` (dentro de `hudV2Tick`, cada 200 ms) compara la firma de bolsa, equipo, oro y mascotas (`invSig`) y redibuja `#pInv`/`#pVault` si cambió; `afterGear` también llama a `renderInv`.
 - **Ítems tirados**: el juego manda `dr` con `pd:1`; el Worker los guarda con `own`, `solo:1`, `ownMs:60000`, `life:120000` (los demás drops siguen con 20 s de prioridad y 90 s de vida). `dp` respeta `ownMs` y, si es `solo`, no deja levantarlo al grupo. En el juego, `dropOwnLbl` muestra "Tuyo/De X · m:ss" o "Libre" bajo la etiqueta y `updateDrops` lo saca al pasar `life`.
 - Ganchos nuevos en `__NOX`: `npcT(id)` (abre un PNJ, por ejemplo `baul`), `invSyncT`. `tools/boot.js` acepta `BASE=`, `CH=` (canal del navegador) y usa `--disable-dev-shm-usage`. Con la bolsa abierta, el Chromium sin GPU dibuja muy lento: en las pruebas avanzar con `__NOX.step` en vez de esperar.
+
+## Parche 202611091515: pies firmes quieto y en gestos (9/11)
+- `footIK` ahora también corre en los gestos (antes `!(P.gest&&r.gOn)` lo apagaba y los pies se hundían: risa −3,4 cm, saludo −1,4; baile flotaba +5,5).
+- `still` = quieto o en gesto. Cada pie con la suela a menos de 4 cm del suelo queda **clavado** (`B.pl` 1→0 entre 4 y 9 cm): se lleva a `H()+so+IK_SOLE` en las dos direcciones, y su giro se fija en el espacio de `r.g` (`B.lq`, se captura al apoyar y se suelta con `pl<.2`). Así el idle (que mecía talón y punta ±1 cm) ya no hace "bailar" el pie. Pie levantado de verdad (patada, salto) queda libre.
+- Quieto, `ikDrop` y `B.o` siguen rápido (`dt*30`/`dt*40`; caminando siguen `dt*10`/`dt*12`). Constante `IK_SOLE=.025`.
+- Medido: suela quieta y en todos los gestos ±2 mm (descalzo y con botas). Sonda: `zt.js` con `FEETPROBE=1 HEROEQ=clase:set GEST=risa,baile SUM=1`.
+
+## Parche 202611091542: Trono de Tau (9/11)
+- Bahía Negra tiene `throne:true` en `ZONES`. `thronePos()` lo ubica 4,3 m detrás del jefe (`Z.boss`), mirando al centro del mapa; `tauThrone(zoneG)` se llama en `loadZone` después del `decoSpot` del jefe (que con `Z.throne` ya no pone rocas).
+- Piezas: estrado de 3 escalones octogonales (runas violetas en `emissiveMap`, `thrSigil`), trono de obsidiana con almohadón y bordes de bronce, respaldo en arco (`ExtrudeGeometry`, UV remapeado) con el ojo de Tau y los 7 signos de sus hijos, marco dorado (`TubeGeometry`), abanico de 13 plumas (textura de canvas con `alphaTest`), cuernos de hueso, orbes en los apoyabrazos y 2 braseros con fuego en sprites (`thrFlameT`, textura en caché) y brasas; 1 `PointLight` violeta. Todo late en un `AMB`. Los braseros entran en `FIRES` (sonido del fuego).
+- `colliders` radio 3,3. `nearSpecial` y `okSpot` dejan sin plantas un radio de ~6 m.
 
 ## Herramientas de prueba (`/home/claude/tools`)
 
