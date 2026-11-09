@@ -2834,7 +2834,7 @@ function oadHero(cls,eq){if(!OAD.on||OAD.failed)return null;const s=oadHeroSpec(
   oadActs(r,r.body,map);/* arranca directo en la pose tranquila (sin pasar por la guardia de combate) */oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
   if(cls==='mburuvicha')mbCapeOn(r,eq,r.anchor);
   else if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
-  if(r.chest){r.body.updateMatrixWorld(true);wingSocket(r);}/* alas y capa ancladas al pecho desde la pose base: siempre en la espalda */
+  if(r.chest){restPose(r.body);wingSocket(r);}/* alas y capa ancladas al pecho desde la pose base: siempre en la espalda */
   {const its=ARMK.map(k=>eq[k]).filter(Boolean);
     if(its.length===ARMK.length&&its.every(it=>it.epic&&it.t===its[0].t)){const c=tierGlow(cls,its[0].t);r.epicAura=makeAura(c==='dark'?0x9a4aff:c);r.g.add(r.epicAura);}
     /* set completo: efecto propio del set alrededor del personaje */
@@ -2962,6 +2962,9 @@ function auraTick(r,dt){const A=r.epicAura;if(!A)return;const lift=r.model?r.mod
 const OAD_WIN={atk1:{k:[.12,.9],w:[.18,.55],a:[.12,.78]},atk2:{k:[.18,.88]},spin:{k:[0,1]},heal:{w:[.08,.6]}};
 let ARMZ=1;const WG=window.__WG={ry:.3,rz:-.12,rx:-.4,fy:.16,fx:-.2};const _aq1=new THREE.Quaternion(),_aq2=new THREE.Quaternion(),_aq3=new THREE.Quaternion(),_av1=new THREE.Vector3(),_av2=new THREE.Vector3(),_av3=new THREE.Vector3();const STANDP=window.__STANDP={arquera:[-.17,-.06,-.12],caballero:[-.06,-.06,-.12],hechicero:[-.17,-.09,-.13]};const _fq2=new THREE.Quaternion();const FT=window.__FT={pit:.06,lean:.08,B:{arm_L:[-.1,0,-.28],arm_R:[-.1,0,.28],forearm_L:[-.25,0,0],forearm_R:[-.25,0,0],thigh_L:[.05,0,0],thigh_R:[.28,0,0],leg_L:[-.08,0,0],leg_R:[-.5,0,0],foot_L:[.9,0,0],foot_R:[.8,0,0],spine:[-.04,0,0],neck:[-.15,0,0],head:[-.12,0,0]}};const _ov=new THREE.Vector3(),_fq=new THREE.Quaternion(),_fe=new THREE.Euler(),_cq=new THREE.Quaternion(),_gq=new THREE.Quaternion();
 /* las alas (y la capa) se cuelgan del hueso del pecho: siguen al torso sin cálculos por cuadro */
+/* pose de enlace del esqueleto antes de medir dónde van alas y capa: el cuerpo clonado puede venir con la pose que tenía el modelo
+   (otra animación, a mitad de un viaje o de una muerte) y entonces las alas quedaban torcidas para siempre */
+function restPose(body){const seen=new Set();body.traverse(o=>{if(o.isSkinnedMesh&&o.skeleton&&!seen.has(o.skeleton)){seen.add(o.skeleton);o.skeleton.pose();}});if(body.userData&&body.userData.curl)cc0Recurl(body);body.updateMatrixWorld(true);}
 function wingSocket(r){if(r.sock||!r.chest)return;r.g.updateMatrixWorld(true);const sk=new THREE.Group();sk.name='wingSock';
   r.chest.getWorldPosition(_ov);r.g.worldToLocal(_ov);_ov.y-=.42;const Mw=new THREE.Matrix4().makeTranslation(_ov.x,_ov.y,_ov.z).premultiply(r.g.matrixWorld);
   const Lm=new THREE.Matrix4().copy(r.chest.matrixWorld).invert().multiply(Mw);Lm.decompose(sk.position,sk.quaternion,sk.scale);r.chest.add(sk);
@@ -3875,7 +3878,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   /* el carcaj va por encima de la capa (si la hay), nunca atravesándola */
   if(cls==='arquera')try{const q=cc0Model('c_k_quiver');if(q){q.userData.gHide=1;}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
   if(eq&&eq.wings&&cls!=='mburuvicha'){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
-  if(r.chest){r.body.updateMatrixWorld(true);wingSocket(r);}
+  if(r.chest){restPose(r.body);wingSocket(r);}
   {const its=ARMK.map(k=>eq&&eq[k]).filter(Boolean);
     if(its.length===ARMK.length&&its.every(it=>it.epic&&it.t===its[0].t)){const c=tierGlow(cls,its[0].t);r.epicAura=makeAura(c==='dark'?0x9a4aff:c);r.g.add(r.epicAura);}
     if(its.length===ARMK.length&&its.every(it=>it.t===its[0].t)&&SETFX[cls][its[0].t]){const lv=Math.min(...its.map(it=>it.lv||0));r.setFx=makeSetFx(SETFX[cls][its[0].t],tierGlow(cls,its[0].t),.55+Math.min(lv,13)/13*.75);r.g.add(r.setFx);}}
