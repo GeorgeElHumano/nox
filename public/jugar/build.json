@@ -1,10 +1,9 @@
 {
- "build": "202611091622",
- "min": "202611091622",
- "title": "Pose de vuelo nueva",
+ "build": "202611092006",
+ "min": "202611092006",
+ "title": "Pantallas chicas y caminata de otros jugadores",
  "notes": [
-  "El personaje vuela con el cuerpo apenas inclinado hacia adelante, los brazos junto al cuerpo (el del arma casi recto, el otro con el codo apenas flexionado) y las manos con un vaivén lento.",
-  "Una pierna va extendida y la otra apenas recogida, con las puntas de los pies hacia abajo.",
-  "El cuerpo flota: sube y baja unos 9 cm, el 5 % de su altura."
+  "En pantallas chicas (iPhone 11 y similares) los botones de acción se achican lo justo para no taparse con el minimapa y el oro",
+  "Los otros jugadores ya no caminan con los brazos abiertos en T por la ciudad"
  ]
 }

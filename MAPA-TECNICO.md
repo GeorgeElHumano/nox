@@ -319,6 +319,28 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Piezas: estrado de 3 escalones octogonales (runas violetas en `emissiveMap`, `thrSigil`), trono de obsidiana con almohadón y bordes de bronce, respaldo en arco (`ExtrudeGeometry`, UV remapeado) con el ojo de Tau y los 7 signos de sus hijos, marco dorado (`TubeGeometry`), abanico de 13 plumas (textura de canvas con `alphaTest`), cuernos de hueso, orbes en los apoyabrazos y 2 braseros con fuego en sprites (`thrFlameT`, textura en caché) y brasas; 1 `PointLight` violeta. Todo late en un `AMB`. Los braseros entran en `FIRES` (sonido del fuego).
 - `colliders` radio 3,3. `nearSpecial` y `okSpot` dejan sin plantas un radio de ~6 m.
 
+## Parche 202611091659: intercambio arreglado (9/11)
+- `renderTrade`: con los dos en listo, el botón mostraba "Confirmar en 3…" y nunca se redibujaba (nadie podía mandar `tcnf`). Ahora la cuenta usa `performance.now()` (el juego está en pausa con el menú abierto, `T` no sirve) y se redibuja sola con `TR.cdTo` (setTimeout de 250 ms). Aviso en la ventana: el intercambio se hace cuando los dos confirman.
+- Prueba: `zt.js` con `TRTEST=1` (abre un intercambio con un compañero falso vía `__NOX.liveAdd` y `liveTest`, lee el botón a 0, 1,2, 3,8 y 10 s).
+
+## Parche 202611091743: intercambio, pilas y zoom (9/11)
+- `closeAll` cancela el intercambio abierto (`tx`) si el panel `#pTrade` estaba visible (Esc, rueda, otro menú); en etapa `commit` no corta. `tend` con error deja el panel abierto (`TR.stage='end'`, `TR.err`) con el motivo arriba y botón Cerrar (`trEnd`).
+- `renderTrade` arma una barra `.tr-msg` arriba (ayuda, listos, esperando, entregando, error) en vez del texto de abajo que se cortaba en PC.
+- Pilas: `splitStack(arr,i,k)` copia el ítem (JSON, `u=++UID`) en el primer lugar libre del mismo arreglo. `itemCard` agrega "Separar" (`#spN`, acción `split`) para pilas en bolsa, venta, baúl (`vault`/`vinv`). En el intercambio, tocar una pila abre `TR.pick` (cuántos: `trPickOk`/`trPickAll`/`trPickNo`).
+- Zoom: viewport con `maximum-scale=1,user-scalable=no`; `<style id="noZoom">` (`touch-action:manipulation`, inputs a 16 px en táctil para que iOS no amplíe) y bloqueo de `gesture*`, pellizco y `dblclick`.
+- Prueba: `zt.js` con `TRTEST=1` (ahora también prueba la pila, el error y el separar).
+
+## Parche 202611091820: baúl a pantalla completa y tarjeta de vida (9/11)
+- `#pVault` es la única ventana a pantalla completa (`<style id="vaultFull">`: anula `.panel:not(.top)` y la animación `halfIn`); `#vGrid` a 10 columnas con scroll, casillas por `aspect-ratio`. El gris de `#vGrid .cell.has` sólo con candado (`#vStore.locked`).
+- `irIconsChanged` ahora redibuja también `#pVault`, `#pTrade`, `#pMyShop` y `#pShopV` cuando termina un ícono (antes el baúl se quedaba con el SVG genérico).
+- `#lifeCard` tiene `data-act="openChar"` y `pointer-events:auto`: tocarla abre la ficha del personaje.
+- Pruebas: `zt.js` con `VAULTTEST=1` (abre `npcT('baul')`, cuenta íconos) y `LCTEST=1` (clic en la tarjeta).
+
+## Parche 202611091925: compañeros de grupo en el HUD (9/11)
+- `#partyHud` (debajo de `#lcRow`, dentro de `.hud-l`): una tarjeta `.ph-c` por compañero (ícono de clase, nombre, ★ líder, nivel o mapa si está en otro, barras de vida y maná). Clases `low` (<30 %), `dead` (gris, "Caído"), `far` (otro mapa). Oculto con `body.half`.
+- Datos: `partyHudTick` (dentro de `hudV2Tick`) manda `{t:'ps',h,m,d}` en % cada 1 s si hay grupo; el Worker (`live/src/index.js`, máx. 2/s por jugador) lo reenvía a los demás del grupo con `id` y `L`. El cliente guarda `LIVE.pst[id]` y `partyHudDraw` redibuja (dato viejo de más de 10 s = barra apagada `.unk`). El mensaje `party` también redibuja.
+- Prueba: `zt.js` con `PHTEST=1` (grupo falso con `liveTest` 'party' y 'ps').
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.

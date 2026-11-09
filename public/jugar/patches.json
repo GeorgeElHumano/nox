@@ -1,5 +1,63 @@
 [
  {
+  "build": "202611092006",
+  "title": "Pantallas chicas y caminata de otros jugadores",
+  "notes": [
+   "En pantallas chicas (iPhone 11 y similares) los botones de acción se achican lo justo para no taparse con el minimapa y el oro",
+   "Los otros jugadores ya no caminan con los brazos abiertos en T por la ciudad"
+  ]
+ },
+ {
+  "build": "202611091925",
+  "title": "Compañeros de grupo en pantalla",
+  "notes": [
+   "Grupo: debajo de tu tarjeta de vida aparecen tarjetas chicas de tus compañeros con su vida, maná y nivel",
+   "Se marcan en rojo si tienen poca vida, en gris si cayeron, y muestran el mapa si están en otro lado"
+  ]
+ },
+ {
+  "build": "202611091853",
+  "title": "Mobs de 2 patas: mejor paso al correr",
+  "notes": [
+   "Los mobs de 2 patas patinan menos al correr: el paso se ajusta a la velocidad real del pie",
+   "Los magos y fantasmas (Ypo, Siervo, Y Jára, Jasy Jateré) usan un clip de correr con paso real"
+  ]
+ },
+ {
+  "build": "202611091820",
+  "title": "Baúl a pantalla completa",
+  "notes": [
+   "Baúl: ocupa toda la pantalla con casillas grandes y muestra los íconos reales de cada ítem",
+   "Los íconos reales también se cargan en el intercambio y en las tiendas de jugadores",
+   "Tocar la tarjeta de vida y maná abre la ficha del personaje"
+  ]
+ },
+ {
+  "build": "202611091809",
+  "title": "Mobs de 2 patas: pasos acordes a su velocidad",
+  "notes": [
+   "Los mobs de 2 patas ya no patinan: el paso de caminar y correr se ajusta a lo que avanzan de verdad"
+  ]
+ },
+ {
+  "build": "202611091743",
+  "title": "Intercambio, pilas y zoom",
+  "notes": [
+   "Intercambio: si uno lo cierra, se cancela para los dos",
+   "Intercambio: avisos y errores arriba de la ventana; si falla, queda abierta mostrando el motivo",
+   "Separar pilas: en la bolsa, la venta y el baúl (botón Separar) y al ofrecer en un intercambio (elegís cuántos)",
+   "Celulares: sin zoom con doble toque ni pellizco"
+  ]
+ },
+ {
+  "build": "202611091659",
+  "title": "Intercambio arreglado",
+  "notes": [
+   "Comercio: con los dos en Listo, el botón Confirmar intercambio ya se habilita a los 3 segundos (antes quedaba trabado en «Confirmar en 3…» y el intercambio no se hacía)",
+   "La ventana avisa que el intercambio se hace cuando los dos tocan Confirmar"
+  ]
+ },
+ {
   "build": "202611091622",
   "title": "Pose de vuelo nueva",
   "notes": [
