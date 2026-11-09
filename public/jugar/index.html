@@ -2998,6 +2998,35 @@ function wingSocket(r){if(r.sock||!r.chest)return;r.g.updateMatrixWorld(true);co
   r.chest.getWorldPosition(_ov);r.g.worldToLocal(_ov);_ov.y-=.42;const Mw=new THREE.Matrix4().makeTranslation(_ov.x,_ov.y,_ov.z).premultiply(r.g.matrixWorld);
   const Lm=new THREE.Matrix4().copy(r.chest.matrixWorld).invert().multiply(Mw);Lm.decompose(sk.position,sk.quaternion,sk.scale);r.chest.add(sk);
   while(r.anchor.children.length)sk.add(r.anchor.children[0]);if(r.anchor.parent)r.anchor.parent.remove(r.anchor);r.anchor=sk;r.sock=true;}
+/* pies al suelo (IK de dos huesos): cada pie busca la altura del terreno que tiene debajo; la cadera baja lo justo para que el pie de abajo apoye
+   y la rodilla del pie de arriba se dobla; el pie se inclina con la pendiente. Sólo en tierra (no en vuelo, muerte ni en la portada) */
+const _ik={a:new THREE.Vector3(),b:new THREE.Vector3(),c:new THREE.Vector3(),t:new THREE.Vector3(),u:new THREE.Vector3(),v:new THREE.Vector3(),n:new THREE.Vector3(),q:new THREE.Quaternion(),q2:new THREE.Quaternion(),q3:new THREE.Quaternion(),fq:[new THREE.Quaternion(),new THREE.Quaternion()]};
+function ikRotW(o,q){/* aplica una rotación en el espacio del mundo a un hueso */o.getWorldQuaternion(_ik.q2);_ik.q2.premultiply(q);o.parent.getWorldQuaternion(_ik.q3);o.quaternion.copy(_ik.q3.invert().multiply(_ik.q2));o.updateMatrixWorld(true);}
+function footIK(r,dt){
+  if(!r.ikB){const g=n=>r.body.getObjectByName(n);r.ikB=['L','R'].map(s=>{const l=s.toLowerCase(),t=g('thigh_'+l)||g('thigh_'+s),c=g('calf_'+l)||g('leg_'+s),f=g('foot_'+l)||g('foot_'+s);return t&&c&&f&&t.parent&&c.parent===t&&f.parent===c?{t,c,f,o:0}:null;});if(!r.ikB[0]||!r.ikB[1])r.ikB=[];}
+  const on=window.__NOIK?0:mode==='game'&&r.g.parent===scene&&r.ikB.length&&!(P.deadK>0)&&(r.flyK||0)<.05&&!(P.gest&&r.gOn)&&Z&&!Z.studio?((P.mv||0)>.05?.5:1):0;/* al caminar, a medias: con el paso completo en pendiente parecía marchar */
+  r.ikW=(r.ikW||0)+(on-(r.ikW||0))*Math.min(1,dt*6);const W=r.ikW;if(W<.01){r.ikDrop=0;return;}
+  r.g.updateMatrixWorld(true);const y0=r.g.position.y,d=[0,0],nrm=[];
+  for(let i=0;i<2;i++){const B=r.ikB[i];B.f.getWorldPosition(_ik.a);const gy=H(_ik.a.x,_ik.a.z);d[i]=clamp(gy-y0,-.45,.45);
+    /* normal del terreno bajo el pie */const e=.25;nrm[i]=new THREE.Vector3(H(_ik.a.x-e,_ik.a.z)-H(_ik.a.x+e,_ik.a.z),2*e,H(_ik.a.x,_ik.a.z-e)-H(_ik.a.x,_ik.a.z+e)).normalize();}
+  /* la cadera baja hasta el pie más bajo (suave, para no temblar al caminar) */
+  const want=Math.min(0,d[0],d[1])*W;r.ikDrop=(r.ikDrop||0)+(want-(r.ikDrop||0))*Math.min(1,dt*10);
+  if(Math.abs(r.ikDrop)>.001){r.model.position.y+=r.ikDrop;r.g.updateMatrixWorld(true);}
+  for(let i=0;i<2;i++){const B=r.ikB[i];B.o+=((d[i]*W-r.ikDrop)-B.o)*Math.min(1,dt*12);const off=B.o;
+    B.f.getWorldQuaternion(_ik.fq[i]);
+    if(Math.abs(off)>.004){
+      B.t.getWorldPosition(_ik.a);B.c.getWorldPosition(_ik.b);B.f.getWorldPosition(_ik.c);_ik.t.copy(_ik.c);_ik.t.y+=off;
+      const l1=_ik.a.distanceTo(_ik.b),l2=_ik.b.distanceTo(_ik.c),dw=clamp(_ik.a.distanceTo(_ik.t),Math.abs(l1-l2)+.01,(l1+l2)*.999),d0=_ik.a.distanceTo(_ik.c);
+      /* 1) rodilla: se dobla o estira hasta que cadera-tobillo mida lo pedido */
+      const ang=x=>Math.acos(clamp((l1*l1+l2*l2-x*x)/(2*l1*l2),-1,1)),beta=ang(d0)-ang(dw);
+      if(Math.abs(beta)>1e-4){_ik.u.subVectors(_ik.b,_ik.a);_ik.v.subVectors(_ik.c,_ik.b);_ik.n.crossVectors(_ik.u,_ik.v);
+        if(_ik.n.lengthSq()<1e-8){/* pierna recta: la bisagra es el costado del cuerpo, con la rodilla hacia adelante */_ik.n.set(1,0,0).applyQuaternion(r.g.getWorldQuaternion(_ik.q3));}
+        _ik.n.normalize();let bb=beta;const test=x=>{_ik.q.setFromAxisAngle(_ik.n,x);return _ik.b.clone().add(_ik.v.clone().applyQuaternion(_ik.q)).distanceTo(_ik.a);};if(Math.abs(test(-bb)-dw)<Math.abs(test(bb)-dw))bb=-bb;
+        _ik.q.setFromAxisAngle(_ik.n,bb);ikRotW(B.c,_ik.q);}
+      /* 2) muslo: gira para que el tobillo caiga sobre el punto pedido */
+      B.f.getWorldPosition(_ik.c);_ik.u.subVectors(_ik.c,_ik.a).normalize();_ik.v.subVectors(_ik.t,_ik.a).normalize();_ik.q.setFromUnitVectors(_ik.u,_ik.v);ikRotW(B.t,_ik.q);}
+    /* 3) pie: conserva la orientación de la animación y se apoya en la pendiente */
+    _ik.q.setFromUnitVectors(_ik.u.set(0,1,0),nrm[i]);_ik.q2.identity().slerp(_ik.q,.8*W);_ik.q2.multiply(_ik.fq[i]);B.f.parent.getWorldQuaternion(_ik.q3);B.f.quaternion.copy(_ik.q3.invert().multiply(_ik.q2));B.f.updateMatrixWorld(true);}}
 function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='hechicero'?'w':'a';
   if(r.grips){const calm=r.curK==='calm'||r.curK==='cwalk';for(const h of r.grips){const k=h.userData.kOnly?r.curK===h.userData.kOnly:!calm;h.quaternion.slerp(k?h.userData.qK:h.userData.qC,Math.min(1,dt*12));}}
   if(r.gOn&&!(P.gest&&r.cc0))gestOff(r);
@@ -3035,6 +3064,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     const want=act&&r.cls==='arquera'?1:0;r.aimK=(r.aimK||0)+(want-(r.aimK||0))*Math.min(1,dt*14);const k=r.aimK*(window.__AIMK!=null?window.__AIMK:.85);
     const B=r.fb;if(k>.01&&B.spine&&B.chest&&B.spine.parent){r.g.updateMatrixWorld(true);B.chest.getWorldQuaternion(_aq1);_av1.set(0,1,0).applyQuaternion(_aq1);r.g.getWorldQuaternion(_aq3);_av2.set(0,1,0).applyQuaternion(_aq3);
       _av3.copy(_av1).lerp(_av2,k).normalize();_aq2.setFromUnitVectors(_av1,_av3);B.spine.getWorldQuaternion(_aq1);_aq1.premultiply(_aq2);B.spine.parent.getWorldQuaternion(_aq3);B.spine.quaternion.copy(_aq3.invert().multiply(_aq1));}}
+  try{footIK(r,dt);}catch(e){window.__IKERR=String(e&&e.stack||e);r.ikB=[];}
   if(r.chest&&!r.sock){if(!act&&!(r.flyK>.01)&&(P.mv||0)<.05&&r.curK&&r.mixT>.3)wingSocket(r);else{r.chest.getWorldPosition(_ov);r.g.worldToLocal(_ov);r.anchor.position.set(_ov.x,_ov.y-.42,_ov.z);
     r.g.updateMatrixWorld();r.chest.getWorldQuaternion(_cq);r.g.getWorldQuaternion(_gq);_cq.premultiply(_gq.invert());if(!r.cq0&&!(r.flyK>.01)&&!act){r.cq0=_cq.clone().invert();}if(r.cq0){r.anchor.quaternion.copy(_cq).multiply(r.cq0);}}}
   if(r.cape){animCape(r.cape,T,P.mv,0,r.flyK||0);capeSparkTick(r,dt);}}
