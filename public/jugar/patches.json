@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611091659",
+  "title": "Intercambio arreglado",
+  "notes": [
+   "Comercio: con los dos en Listo, el botón Confirmar intercambio ya se habilita a los 3 segundos (antes quedaba trabado en «Confirmar en 3…» y el intercambio no se hacía)",
+   "La ventana avisa que el intercambio se hace cuando los dos tocan Confirmar"
+  ]
+ },
+ {
   "build": "202611091622",
   "title": "Pose de vuelo nueva",
   "notes": [

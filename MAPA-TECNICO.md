@@ -319,6 +319,10 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Piezas: estrado de 3 escalones octogonales (runas violetas en `emissiveMap`, `thrSigil`), trono de obsidiana con almohadón y bordes de bronce, respaldo en arco (`ExtrudeGeometry`, UV remapeado) con el ojo de Tau y los 7 signos de sus hijos, marco dorado (`TubeGeometry`), abanico de 13 plumas (textura de canvas con `alphaTest`), cuernos de hueso, orbes en los apoyabrazos y 2 braseros con fuego en sprites (`thrFlameT`, textura en caché) y brasas; 1 `PointLight` violeta. Todo late en un `AMB`. Los braseros entran en `FIRES` (sonido del fuego).
 - `colliders` radio 3,3. `nearSpecial` y `okSpot` dejan sin plantas un radio de ~6 m.
 
+## Parche 202611091659: intercambio arreglado (9/11)
+- `renderTrade`: con los dos en listo, el botón mostraba "Confirmar en 3…" y nunca se redibujaba (nadie podía mandar `tcnf`). Ahora la cuenta usa `performance.now()` (el juego está en pausa con el menú abierto, `T` no sirve) y se redibuja sola con `TR.cdTo` (setTimeout de 250 ms). Aviso en la ventana: el intercambio se hace cuando los dos confirman.
+- Prueba: `zt.js` con `TRTEST=1` (abre un intercambio con un compañero falso vía `__NOX.liveAdd` y `liveTest`, lee el botón a 0, 1,2, 3,8 y 10 s).
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.

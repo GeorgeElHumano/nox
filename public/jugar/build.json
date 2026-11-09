@@ -1,10 +1,9 @@
 {
- "build": "202611091622",
- "min": "202611091622",
- "title": "Pose de vuelo nueva",
+ "build": "202611091659",
+ "min": "202611091659",
+ "title": "Intercambio arreglado",
  "notes": [
-  "El personaje vuela con el cuerpo apenas inclinado hacia adelante, los brazos junto al cuerpo (el del arma casi recto, el otro con el codo apenas flexionado) y las manos con un vaivén lento.",
-  "Una pierna va extendida y la otra apenas recogida, con las puntas de los pies hacia abajo.",
-  "El cuerpo flota: sube y baja unos 9 cm, el 5 % de su altura."
+  "Comercio: con los dos en Listo, el botón Confirmar intercambio ya se habilita a los 3 segundos (antes quedaba trabado en «Confirmar en 3…» y el intercambio no se hacía)",
+  "La ventana avisa que el intercambio se hace cuando los dos tocan Confirmar"
  ]
 }

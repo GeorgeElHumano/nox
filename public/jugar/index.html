@@ -7191,7 +7191,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611091622';const UPD={shown:'',req:false};
+const NOX_BUILD='202611091659';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
@@ -7622,13 +7622,15 @@ function trSendOff(){const items=TR.my.map(u=>C.inv[invByU(u)]).filter(Boolean);
 function renderTrade(){const b=$('#trBody');if(!b||!TR.on)return;const mine=TR.my.map(u=>C.inv[invByU(u)]).filter(Boolean);
   const cell=(it,act,extra)=>`<button class="cell" ${act?`data-act="${act}" ${extra||''}`:'disabled'}>${it?cellHTML(it):''}</button>`;
   const grid=(l,act,key)=>{let h='';for(let i=0;i<8;i++){const it=l[i];h+=cell(it,it&&act?act:null,it&&key?key(it,i):'');}return h;};
-  const both=TR.rdy[LIVE.me]&&TR.rdy[TR.with],cd=both?Math.max(0,Math.ceil(TR.cdT-T)):0,myC=!!TR.cnf[LIVE.me];
+  const both=TR.rdy[LIVE.me]&&TR.rdy[TR.with],cd=both?Math.max(0,Math.ceil(TR.cdT-performance.now()/1000)):0,myC=!!TR.cnf[LIVE.me];
+  /* la cuenta regresiva se redibuja sola (antes quedaba trabada en "Confirmar en 3…" y nadie podía confirmar); usa el reloj real porque con el menú abierto el juego está en pausa */
+  clearTimeout(TR.cdTo);if(both&&cd>0&&TR.stage==='open')TR.cdTo=setTimeout(renderTrade,250);
   b.innerHTML=`<div class="tr-cols"><div class="tr-col ${TR.rdy[LIVE.me]?'lock':''}"><h4>Vos ofrecés ${TR.rdy[LIVE.me]?'<i>✔ Listo</i>':''}</h4><div class="tr-grid">${grid(mine,'trRem',it=>`data-u="${it.u}"`)}</div>
       <label class="tr-gold">₲ <input id="trGold" type="number" min="0" step="1000" value="${TR.gold||''}" placeholder="0" ${TR.stage!=='open'?'disabled':''}></label></div>
     <div class="tr-col ${TR.rdy[TR.with]?'lock':''}"><h4>${esc(TR.n)} ofrece ${TR.rdy[TR.with]?'<i>✔ Listo</i>':'<span>eligiendo…</span>'}</h4><div class="tr-grid">${grid(TR.their.items,'trSee',(it,i)=>`data-i="${i}"`)}</div><div class="tr-gold">₲ ${fmt(TR.their.gold||0)}</div></div></div>
-    <div class="tr-btns">${TR.stage!=='open'?'<button class="btn full" disabled>Entregando…</button>':both?`<button class="btn full ok" data-act="trCnf" ${cd||myC?'disabled':''}>${myC?'Esperando a '+esc(TR.n)+'…':cd?'Confirmar en '+cd+'…':'Confirmar intercambio'}</button>`:`<button class="btn full ${TR.rdy[LIVE.me]?'ghost':'ok'}" data-act="trRdy">${TR.rdy[LIVE.me]?'Quitar listo':'✔ Listo'}</button>`}<button class="btn ghost" data-act="trX">Cancelar</button></div>
+    <div class="tr-btns">${TR.stage!=='open'?'<button class="btn full" disabled>Entregando…</button>':both?`<button class="btn full ok" data-act="trCnf" ${cd||myC?'disabled':''}>${myC?'Esperando a '+esc(TR.n)+'…':cd?'Confirmar en '+cd+'…':'✔ Confirmar intercambio'}</button>`:`<button class="btn full ${TR.rdy[LIVE.me]?'ghost':'ok'}" data-act="trRdy">${TR.rdy[LIVE.me]?'Quitar listo':'✔ Listo'}</button>`}<button class="btn ghost" data-act="trX">Cancelar</button></div>
     <div class="ph">Tu bolsa · tocá un ítem para ofrecerlo (hasta 8)</div><div class="tr-bag">${C.inv.map((it,i)=>it&&TRADE_OK(it)&&!TR.my.includes(it.u)&&!MYSHOP.items.some(s=>s.u===it.u)?cell(it,'trAdd',`data-i="${i}"`):'').join('')||'<p class="pm">No tenés nada para ofrecer.</p>'}</div>
-    <p class="pm">Si alguno cambia algo, se desmarca el listo. Lo que recibas llega a tu bolsa (o al baúl si está llena).</p>`;
+    ${both&&TR.stage==='open'&&!myC?'<p class="pm" style="color:var(--gold2)">Los dos están listos: revisá lo que recibís y tocá <b>Confirmar intercambio</b>. Se hace cuando confirman los dos.</p>':''}<p class="pm">Si alguno cambia algo, se desmarca el listo. Lo que recibas llega a tu bolsa (o al baúl si está llena).</p>`;
   const g=$('#trGold');if(g)g.onchange=()=>{const v=Math.max(0,Math.min(C.gold,Math.round(+g.value||0)));TR.gold=v;g.value=v||'';trSendOff();};}
 function tradeOpen(m){Object.assign(TR,{on:true,with:m.with,n:m.n,my:[],gold:0,their:{items:[],gold:0},rdy:{},cnf:{},stage:'open',cdT:0});closeAll();plMenuClose();$('#trTitle').textContent='Intercambio con '+m.n;showPanel('pTrade');renderTrade();
   if(!snd('mu_rare',{vol:.5,jit:0}))sfx('item');}
@@ -7681,7 +7683,7 @@ Object.assign(ACT,{
 function tradeMsg(m){const t=m.t;
   if(t==='treq'){LIVE.trInv={from:m.from,n:m.n};let e=$('#trInvBox');if(e)e.remove();e=document.createElement('div');e.id='trInvBox';e.innerHTML=`<b>${esc(m.n)}</b> quiere comerciar con vos<div><button class="btn sm ok" data-act="trAcc">Aceptar</button><button class="btn sm ghost" data-act="trRej">No</button></div>`;document.body.appendChild(e);setTimeout(()=>{if($('#trInvBox')===e){e.remove();LIVE.trInv=null;}},30000);if(!snd('mu_rare',{vol:.5,jit:0}))sfx('rare');return true;}
   if(t==='topen'){tradeOpen(m);return true;}
-  if(t==='tst'){if(!TR.on)return true;const o=m.off||{};TR.their=o[TR.with]||{items:[],gold:0};const was=TR.rdy[LIVE.me]&&TR.rdy[TR.with];TR.rdy=m.rdy||{};TR.cnf=m.cnf||{};if(TR.rdy[LIVE.me]&&TR.rdy[TR.with]&&!was)TR.cdT=T+3;renderTrade();return true;}
+  if(t==='tst'){if(!TR.on)return true;const o=m.off||{};TR.their=o[TR.with]||{items:[],gold:0};const was=TR.rdy[LIVE.me]&&TR.rdy[TR.with];TR.rdy=m.rdy||{};TR.cnf=m.cnf||{};if(TR.rdy[LIVE.me]&&TR.rdy[TR.with]&&!was)TR.cdT=performance.now()/1000+3;renderTrade();return true;}
   if(t==='tcommit'){tradeCommit(m);return true;}
   if(t==='tend'){tradeClose();toast(m.ok?'<em style="color:var(--good)">¡Intercambio hecho!</em> Lo que recibiste está en tu bolsa':esc(m.m||'Se canceló el intercambio'));if(m.ok||m.refund)setTimeout(srvDeliveries,400);if(m.ok){if(!snd('mu_levelup',{vol:.5,jit:0}))sfx('level');}return true;}
   if(t==='shop'){const o=LIVE.others.get(m.id);if(o){o.sh=m.sh;liveLabel(o);}return true;}
