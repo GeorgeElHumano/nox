@@ -1,13 +1,18 @@
 {
- "build": "202611082247",
- "min": "202611082247",
- "title": "Caldero, parches y arreglos",
+ "build": "202611091008",
+ "min": "202611091008",
+ "title": "Capas, eventos, comercio y tiendas",
  "notes": [
-  "Nuevo botón «Historial de parches» en el inicio",
-  "La actualización obligatoria siempre muestra qué trae el parche",
-  "El Mbói Tata vuelve a mostrar su cabeza",
-  "El anillo del set completo se apoya sobre el terreno",
-  "Caldero de Jarýi Kuña más compacto: el ítem elegido aparece arriba",
-  "Mburuvicha: Capa de Guyra Hũ Guasu y Capa de Ñanderuvusu"
+  "Mburuvicha: ahora lleva capa en lugar de alas (azul, azul y dorado, roja, roja y dorado, negra y negra con dorado). Al volar se estira y ondea",
+  "Arena de Añá: 100 rivales, hasta 30 a la vez; el piso cae a las 25, 50 y 75 muertes. Nueva estatua, runas, lava, brasas y humo",
+  "Fortaleza de Tuguy: torres, arco, estandartes, castillo al fondo, muro de cierre y altar con runas y rayo",
+  "Los mobs de evento son 10 niveles más fuertes que tu personaje",
+  "Comercio entre jugadores: tocá a otro jugador para Comerciar, Ver tienda, Grupo o Duelo. Si alguien se desconecta, todo vuelve a su dueño",
+  "Tiendas personales: abrí la tuya desde 'Mi tienda' en la rueda y vendé con cartel en Asunción",
+  "Set completo: tocalo para ver sus stats",
+  "Mapa del reino: tocá una zona para ver su foto, nivel, costo y viajar",
+  "PC: descripción del ítem al pasar el mouse; soltá un ítem sobre el personaje para equiparlo",
+  "Los pies se apoyan en el suelo en pendientes",
+  "Arreglo: las alas ya no quedan torcidas al cambiar de equipo volando o caminando"
  ]
 }
