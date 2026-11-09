@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611091743",
+  "title": "Intercambio, pilas y zoom",
+  "notes": [
+   "Intercambio: si uno lo cierra, se cancela para los dos",
+   "Intercambio: avisos y errores arriba de la ventana; si falla, queda abierta mostrando el motivo",
+   "Separar pilas: en la bolsa, la venta y el baúl (botón Separar) y al ofrecer en un intercambio (elegís cuántos)",
+   "Celulares: sin zoom con doble toque ni pellizco"
+  ]
+ },
+ {
   "build": "202611091659",
   "title": "Intercambio arreglado",
   "notes": [

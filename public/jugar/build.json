@@ -1,9 +1,11 @@
 {
- "build": "202611091659",
- "min": "202611091659",
- "title": "Intercambio arreglado",
+ "build": "202611091743",
+ "min": "202611091743",
+ "title": "Intercambio, pilas y zoom",
  "notes": [
-  "Comercio: con los dos en Listo, el botón Confirmar intercambio ya se habilita a los 3 segundos (antes quedaba trabado en «Confirmar en 3…» y el intercambio no se hacía)",
-  "La ventana avisa que el intercambio se hace cuando los dos tocan Confirmar"
+  "Intercambio: si uno lo cierra, se cancela para los dos",
+  "Intercambio: avisos y errores arriba de la ventana; si falla, queda abierta mostrando el motivo",
+  "Separar pilas: en la bolsa, la venta y el baúl (botón Separar) y al ofrecer en un intercambio (elegís cuántos)",
+  "Celulares: sin zoom con doble toque ni pellizco"
  ]
 }

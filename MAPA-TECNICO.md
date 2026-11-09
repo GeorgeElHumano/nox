@@ -323,6 +323,13 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `renderTrade`: con los dos en listo, el botón mostraba "Confirmar en 3…" y nunca se redibujaba (nadie podía mandar `tcnf`). Ahora la cuenta usa `performance.now()` (el juego está en pausa con el menú abierto, `T` no sirve) y se redibuja sola con `TR.cdTo` (setTimeout de 250 ms). Aviso en la ventana: el intercambio se hace cuando los dos confirman.
 - Prueba: `zt.js` con `TRTEST=1` (abre un intercambio con un compañero falso vía `__NOX.liveAdd` y `liveTest`, lee el botón a 0, 1,2, 3,8 y 10 s).
 
+## Parche 202611091743: intercambio, pilas y zoom (9/11)
+- `closeAll` cancela el intercambio abierto (`tx`) si el panel `#pTrade` estaba visible (Esc, rueda, otro menú); en etapa `commit` no corta. `tend` con error deja el panel abierto (`TR.stage='end'`, `TR.err`) con el motivo arriba y botón Cerrar (`trEnd`).
+- `renderTrade` arma una barra `.tr-msg` arriba (ayuda, listos, esperando, entregando, error) en vez del texto de abajo que se cortaba en PC.
+- Pilas: `splitStack(arr,i,k)` copia el ítem (JSON, `u=++UID`) en el primer lugar libre del mismo arreglo. `itemCard` agrega "Separar" (`#spN`, acción `split`) para pilas en bolsa, venta, baúl (`vault`/`vinv`). En el intercambio, tocar una pila abre `TR.pick` (cuántos: `trPickOk`/`trPickAll`/`trPickNo`).
+- Zoom: viewport con `maximum-scale=1,user-scalable=no`; `<style id="noZoom">` (`touch-action:manipulation`, inputs a 16 px en táctil para que iOS no amplíe) y bloqueo de `gesture*`, pellizco y `dblclick`.
+- Prueba: `zt.js` con `TRTEST=1` (ahora también prueba la pila, el error y el separar).
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.
