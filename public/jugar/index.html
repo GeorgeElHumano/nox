@@ -7260,9 +7260,20 @@ let snapCam=true,camOY=0;const camT=new THREE.Vector3(),look=new THREE.Vector3()
 /* zoom: el doble de cerca y el doble de lejos que antes (.55–1.4) */const ZMIN=.275,ZMAX=2.8;let CAMZ=1;try{CAMZ=Math.min(ZMAX,Math.max(ZMIN,+localStorage.getItem('noxZoom')||1));}catch(e){}
 function setZoom(z){CAMZ=Math.min(ZMAX,Math.max(ZMIN,z));clearTimeout(setZoom.t);setZoom.t=setTimeout(()=>{try{localStorage.setItem('noxZoom',CAMZ.toFixed(2));}catch(e){}},400);}
 function updCamera(dt){
-  if(mode==='select'){const port=innerHeight>innerWidth,a=Math.sin(T*.15)*.3+(port?0:.18),rr=port?8:5,cy=port?2.2:1.6;camT.set(Math.sin(a)*rr,cy,6.2+Math.cos(a)*rr);camera.position.copy(camT);
-    const sh=!port&&innerWidth>=640?1.45:0;look.set(-Math.cos(a)*sh,.95,6.2+Math.sin(a)*sh);camera.lookAt(look);
-    const oy=port?Math.round(innerHeight*(window.__CREATING&&!$('#sel').hidden?.12:.30)):0;if(oy!==camOY){camOY=oy;if(oy)camera.setViewOffset(innerWidth,innerHeight,0,oy,innerWidth,innerHeight);else camera.clearViewOffset();}}
+  if(mode==='select'){const port=innerHeight>innerWidth,W=innerWidth,Hh=innerHeight,cre=window.__CREATING&&!$('#sel').hidden;
+    if(cre){/* creación de personaje: como antes */const a=Math.sin(T*.15)*.3+(port?0:.18),rr=port?8:5,cy=port?2.2:1.6;camT.set(Math.sin(a)*rr,cy,6.2+Math.cos(a)*rr);camera.position.copy(camT);
+      const sh=!port&&W>=640?1.45:0;look.set(-Math.cos(a)*sh,.95,6.2+Math.sin(a)*sh);camera.lookAt(look);
+      const oy=port?Math.round(Hh*.12):0,key=oy?'0,'+oy:0;if(key!==camOY){camOY=key;if(oy)camera.setViewOffset(W,Hh,0,oy,W,Hh);else camera.clearViewOffset();}}
+    else{/* portada: el personaje entero (con vuelo, alas y aureola) dentro del espacio libre de la pantalla.
+        Vertical: entre el borde de arriba y el logo. Horizontal: centrado en la franja vacía a la derecha de los botones */
+      const lift=HERO&&HERO.model?Math.max(0,HERO.model.position.y):0,y0=SELY-.05,y1=SELY+2.25+lift,hh=y1-y0,yc=(y0+y1)/2,tf=Math.tan(camera.fov*PI/360);
+      let fx0=0,fx1=1,fy0=.04,fy1=.96;
+      if(port){const lg=$('#sel .logo')||$('#sel .sel-head');const r=lg&&lg.getBoundingClientRect();fy1=r&&r.top>Hh*.15?Math.min(.6,r.top/Hh-.015):.34;fy0=Math.max(.025,(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--st'))||0)/Hh+.01);}
+      else{const si=$('#sel .sel-in');const r=si&&si.getBoundingClientRect();fx0=r&&r.right>0&&r.right<W*.85?r.right/W+.01:.55;fy0=.08;fy1=.92;}
+      /* distancia para que la altura del personaje ocupe el alto disponible (y que en horizontal también entre a lo ancho) */
+      let d=hh/((fy1-fy0)*2*tf);if(!port){const aw=(fx1-fx0)*W/Hh;d=Math.max(d,1.1/(aw*tf));}d=clamp(d,3.2,22);
+      const a=Math.sin(T*.15)*.25;camT.set(Math.sin(a)*d,yc,6.2+Math.cos(a)*d);camera.position.copy(camT);look.set(0,yc,6.2);camera.lookAt(look);
+      const ox=-Math.round(((fx0+fx1)/2-.5)*W),oy=Math.round((.5-(fy0+fy1)/2)*Hh),key=ox+','+oy;if(key!==camOY){camOY=key;camera.setViewOffset(W,Hh,ox,oy,W,Hh);}}}
   else if(STUDIO.on){if(camOY){camOY=0;camera.clearViewOffset();}camera.position.copy(STUDIO.cam);camera.lookAt(STUDIO.look);}
   else if(HC.on&&mode==='game')hcCamera(dt);
   else if(CAMM!=='iso'&&mode==='game'){if(camOY){camOY=0;camera.clearViewOffset();}const py=H(P.x,P.z)+(HERO&&HERO.flyK?HERO.flyK*1.2:0),sy=Math.sin(CAM_YAW),cy=Math.cos(CAM_YAW),cp=Math.cos(CAM_PITCH),sp=Math.sin(CAM_PITCH);
