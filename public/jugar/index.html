@@ -2688,7 +2688,7 @@ function snakeModel(m,gold){
       for(let k=0;k<3;k++){const w=part(limbGeo(.4,.008,.003,0),mat(0xf0e8d8),.16*s,-.04,.46,head);w.rotation.z=s*(1.3+k*.25);w.rotation.x=.3-k*.2;}}
     eyes(.17,.08,.28,.055);fangs(.09,-.14,.5,.12);fangs(.14,-.1,.44,.08);}
   else if(m.head==='fire'){/* Mbói Tata: cabeza de basalto partida por brasas, ojos de fuego blanco, llamas en la nuca */
-    const hm=gold?goldM():mat(0x1a0a06,{roughness:.6});if(!gold)crackGlow(hm,0xff6a1a,1.4,3);part(SPH(1,16,12),hm,0,0,0,head,.33,.25,.4);const mz=new THREE.Mesh(taperTube([[0,-.02,.2],[0,-.04,.42],[0,-.06,.54]],.19,.09,12,10),hm);head.add(mz);
+    /* material propio por serpiente: el de mat() es compartido y cada Mbói Tata le volvía a sumar las grietas (con varias en el mapa el sombreador se rompía y la cabeza desaparecía) */const hm=gold?goldM():mat(0x1a0a06,{roughness:.6}).clone();if(!gold)crackGlow(hm,0xff6a1a,1.4,3);part(SPH(1,16,12),hm,0,0,0,head,.33,.25,.4);const mz=new THREE.Mesh(taperTube([[0,-.02,.2],[0,-.04,.42],[0,-.06,.54]],.19,.09,12,10),hm);head.add(mz);
     const jw=new THREE.Mesh(taperTube([[0,-.12,.15],[0,-.14,.36],[0,-.11,.48]],.15,.07,10,8),hm);jaw.add(jw);for(const s of[-1,1])part(SPH(1,8,6),hm,.2*s,.16,.12,head,.1,.04,.12);
     const em=new THREE.MeshBasicMaterial({color:0xfff0c0,fog:false});for(const s of[-1,1]){const e=part(SPH(1,10,8),em,.19*s,.1,.24,head,.07,.06,.05);e.userData.solo=true;const gl=glowSprite(0xff8a2a,.5,.9);gl.position.set(.19*s,.1,.28);head.add(gl);}
     fangs(.1,-.16,.42,.14);const tg=part(limbGeo(.3,.025,.008,0),mat(0xffd060,{emissive:0xff8a2a,emissiveIntensity:1}),0,-.07,.3,jaw);tg.rotation.x=-PI/2+.15;
@@ -3111,12 +3111,12 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     if(r.curK!==want){oadPlay(r,want,.07);r.cur.paused=true;}const w=(!r.cc0&&OAD_WIN[want]&&OAD_WIN[want][pre])||[0,1],d=r.cur.getClip().duration;r.cur.time=d*(w[0]+(w[1]-w[0])*Math.max(0,Math.min(1,P.swingT)));}
   else{r.inAct=false;P.castHeal=false;const mv=P.mv||0,calm=mode!=='game'||(Z&&Z.safe)||(T-(P.lastHurt||-99)>2&&T-(P.lastAtk||-99)>1.6);if(r.flyK>.25&&mv>.05)oadPlay(r,r.acts.calm?'calm':'idle',.35,.15);else if(mv>.05&&Z&&Z.safe&&r.acts.cwalk)oadPlay(r,'cwalk',.3,.85+mv*.75);/* en la ciudad: paso erguido y relajado */else if(mv>.55)oadPlay(r,'run',.18,.75+mv*.45);else if(mv>.05)oadPlay(r,calm&&r.acts.cwalk?'cwalk':'walk',.25,.8+mv*.6);else oadPlay(r,calm&&r.acts.calm?'calm':'idle',.4,1);}
   {/* en combate se queda en postura de tierra: volar y disparar mezclados arqueaban el torso y separaban las alas */const fight=act||T-(P.lastAtk||-99)<1.2;
-   const fly=window.__FLYFORCE&&r.wings?1:r.wings&&mode==='game'&&Z&&!Z.safe&&!fight&&!(P.deadK>0)&&(P.mv||0)>.3?1:0;r.flyK=(r.flyK||0)+(fly-(r.flyK||0))*Math.min(1,dt*(fly?2.5:act?12:4));const k=r.flyK,ke=k*k*(3-2*k);
+   /* con alas o capa flota siempre (quieto o caminando, también en Asunción y en la portada); solo baja al pelear, morir o hacer un gesto */const fly=window.__FLYFORCE&&r.wings?1:r.wings&&(mode==='game'||mode==='select')&&!fight&&!(P.deadK>0)&&!(P.gest&&r.gOn)?1:0;r.flyK=(r.flyK||0)+(fly-(r.flyK||0))*Math.min(1,dt*(fly?2.5:act?12:4));const k=r.flyK,ke=k*k*(3-2*k);
     /* vuelo: el cuerpo va estable y apenas inclinado; sólo las alas aletean, a ritmo constante */
     const take=fly&&k<.95?1:0;r.flyHz=(r.flyHz||1.25)+((take?1.8:1.25)-(r.flyHz||1.25))*Math.min(1,dt*2);r.flyPh=(r.flyPh||0)+dt*TAU*r.flyHz;const ph=r.flyPh;
     const beat=Math.sin(ph+.45*Math.cos(ph));r.beat=beat;
     if(r.lastRy==null)r.lastRy=r.g.rotation.y;let dry=r.g.rotation.y-r.lastRy;dry=Math.atan2(Math.sin(dry),Math.cos(dry));r.lastRy=r.g.rotation.y;r.bank=(r.bank||0)+(clamp(-dry/Math.max(dt,.001)*.07,-.18,.18)-(r.bank||0))*Math.min(1,dt*2.5);
-    const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph-1.7)*.035+Math.sin(T*.8)*.035);
+    const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph-1.7)*.035+Math.sin(T*.8)*.035)*(r.npcP?.3:1);/* los PNJ apenas se despegan del piso */
     r.model.rotation.set(-(P.hitK||0)*.12+pit,0,((r.bank||0)+Math.sin(T*.7)*.015)*ke);r.model.position.set(0,(r.footY||0)+lift+h0-h0*Math.cos(pit),-h0*Math.sin(pit));
     if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);(r.wings.sides||[]).forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
   if(!r.fb){r.fb={};r.fbq=[];['thigh_L','thigh_R','leg_L','leg_R','foot_L','foot_R','arm_L','arm_R','forearm_L','forearm_R','spine','chest','neck','head'].forEach(n=>{const o=r.body.getObjectByName(n);r.fb[n]=o;if(o)r.fbq.push([o,o.quaternion.clone(),n]);});}
@@ -3307,7 +3307,8 @@ function tintBelow(root,frac,col,soft){root.updateMatrixWorld(true);const bb=new
     for(let i=0;i<n;i++){v.fromBufferAttribute(pos,i);if(x.isSkinnedMesh){x.boneTransform?x.boneTransform(i,v):0;}v.applyMatrix4(x.matrixWorld);const k=smooth(yc+sf,yc-sf,v.y);arr[i*3]=1-(1-C.r)*k;arr[i*3+1]=1-(1-C.g)*k;arr[i*3+2]=1-(1-C.b)*k;}
     g.setAttribute('color',new THREE.BufferAttribute(arr,3));x.material.vertexColors=true;x.material.needsUpdate=true;});}
 /* grietas brillantes procedurales (sin depender de UV): para demonios de lava y piedra encantada */
-function crackGlow(m,col,k,scale){const u={c:{value:C3(col)},k:{value:k||1},s:{value:scale||3}};const b=m.onBeforeCompile;
+const CG_ON=new WeakSet();
+function crackGlow(m,col,k,scale){/* una sola vez por material (las copias con clone() no cuentan): aplicarlo dos veces duplica las declaraciones del sombreador y el material deja de verse */if(CG_ON.has(m))return m;CG_ON.add(m);const u={c:{value:C3(col)},k:{value:k||1},s:{value:scale||3}};const b=m.onBeforeCompile;
   /* la clave del programa incluye la del material anterior: si no, un material con grietas reutilizaba el shader de otro con grietas y efecto fantasma (cabeza transparente del Mbói Tata) */const pk=String(m.customProgramCacheKey.call(m));
   m.onBeforeCompile=(sh,rr)=>{if(b)b(sh,rr);sh.uniforms.uCgC=u.c;sh.uniforms.uCgK=u.k;sh.uniforms.uCgS=u.s;
     sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vCgP;').replace('#include <skinning_vertex>','#include <skinning_vertex>\nvCgP=transformed;');
@@ -3519,7 +3520,7 @@ const MYTH={
    extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const h=bullHorns(U,0x0a0806,.8);h.position.y=A.top-.1*U;hp.add(h);}
     const bk=A(['prop-back','chest']);if(bk){const w=batWings(U,0x0e0604,.8,{em:0x7a1a06,bone:0x0a0604});bk.add(w);r.wings=w;}
     const hip=A(['hip']);if(hip){const t=demonTail(U,0x1a0a06);t.scale.setScalar(.8);t.position.set(0,-.02*U,-.08*U);hip.add(t);}
-    const t=weaponAt(body,U);if(t){const tm2=mat(0x1a0a06,{roughness:.5});shaftZ(1.6*U,.04*U,.03*U,tm2,t,.3*U).rotation.x=PI/2;const hd=part(SPH(1,8,6),tm2,0,0,-1.35*U,t,.12*U,.12*U,.16*U);crackGlow(tm2,0xff5a0a,1.6,2);const gl=glowSprite(0xff6a1a,.55*U,.8);gl.position.z=-1.35*U;t.add(gl);}}}},
+    const t=weaponAt(body,U);if(t){const tm2=mat(0x1a0a06,{roughness:.5}).clone();shaftZ(1.6*U,.04*U,.03*U,tm2,t,.3*U).rotation.x=PI/2;const hd=part(SPH(1,8,6),tm2,0,0,-1.35*U,t,.12*U,.12*U,.16*U);crackGlow(tm2,0xff5a0a,1.6,2);const gl=glowSprite(0xff6a1a,.55*U,.8);gl.position.z=-1.35*U;t.add(gl);}}}},
  alma:{ficha:'Alma en Pena: espectro azul de un viajero perdido, con túnica y espada vieja, condenado a vagar hasta que alguien rece por él.',
   human:{body:'m_robe',tex:'skeletal_arab_robes_01_01',props:['hd_x_su3'],team:0x2a6a8a,scale:1.05,anim:'n',ghost:0x8fe6ff,op:.85,fly:.35,aura:0x5ad8ff,auraS:1.9,sparkle:0x8fe6ff,
    extra(r,body,U,A){for(const s of['L','R']){const h=A(['hand_'+s]);if(h){const g=new THREE.Group();g.position.y=-.02*U;h.add(g);chain(g,U,7,0x8aa0b8);}}
@@ -4443,6 +4444,11 @@ const DMAP={asuncion:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['ftree']
  esteros:{lapacho:'lapacho',tajy:'tajy',palm:['fanpalm'],tree:['willow','ftree'],grass:['grass','reeds','grass2'],flower:['brom'],reed:['cattail','papyrus','reedg','cattail'],rock:['rockm'],skull:['bull']},
  ruinas:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['ftree','oak'],grass:['grass','grass2','grassf'],flower:['brom','flower'],reed:['reeds'],rock:['rocksav','rockm','rockl'],skull:['bull']},
  chaco:{lapacho:'lapacho',tajy:'tajy',palm:['fanpalm'],tree:['acacia','dead'],bottle:['acacia'],grass:['savanna','drygrass','savanna'],flower:['dry'],reed:['reeds'],rock:['rockdm','rockd'],skull:['bull']},
+ ybytyruzu:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['oak','ftree','oak'],grass:['grass','grassf','grass2'],flower:['flower','brom'],reed:['reeds'],rock:['rockm','rock','rocksav'],skull:['bull']},
+ monday:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['ftree','oak'],grass:['grass','grass2','grassf'],flower:['brom','flower'],reed:['cattail','reeds'],rock:['rockm','rock'],skull:['bull']},
+ mbaracayu:{lapacho:'lapacho',tajy:'tajy',palm:['palm','fanpalm'],tree:['ftree','willow','ftree','oak'],grass:['grass2','grassf','grass'],flower:['brom'],reed:['cattail','reedg'],rock:['rockm'],skull:['bull']},
+ cerrocora:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['oak','dead','oak'],grass:['grass','grass2','grassf'],flower:['flower'],reed:['reeds'],rock:['rocksav','rockm','rock'],skull:['bull']},
+ bahianegra:{lapacho:'lapacho',tajy:'tajy',palm:['fanpalm'],tree:['willow','dead','willow'],grass:['grass','reeds','grass2'],flower:['brom'],reed:['cattail','papyrus','reedg','cattail'],rock:['rockm'],skull:['bull']},
  mbocaruzu:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['ftree','oak','ftree'],grass:['grass','grass2','grassf'],flower:['brom','flower'],reed:['cattail','reeds'],rock:['rockm','rock','rocksav'],skull:['bull']},
  saltocristal:{lapacho:'lapacho',tajy:'tajy',palm:['palm','fanpalm'],tree:['ftree','willow','ftree'],grass:['grass2','grassf','grass'],flower:['brom','flower'],reed:['papyrus','cattail','reedg'],rock:['rockm','rock'],skull:['bull']}};
 /* utilería y plantas extra por zona: [id,cantidad,cx,cz,radio,escala min,max] y ubicaciones fijas [id,x,z,rot,escala] */
@@ -4457,6 +4463,11 @@ const DECZ={
   fixed:[['camp',-28,-24,0,1],['cartb',-24,-28,1.1,1],['wheel',-30,-27,0,1],['bull',6,-40,1,1]]},
  chaco:{scatter:[['rockdm',18,0,0,92,.55,1.1],['dry',60,0,0,92,.7,1.3],['drysm',50,0,0,92,.8,1.3],['rockd',22,0,0,92,.5,1.05],['rocks',30,0,0,92,1,2],['bull',14,0,0,88,.9,1.2],['dead',10,0,0,90,.8,1.2],['savanna',160,0,0,92,.8,1.3]],
   fixed:[['cartb',-30,30,1.3,1],['wheel',-27,33,0,1],['camp',-24,22,0,1],['bull',38,24,2,1.2]]},
+ ybytyruzu:{scatter:[['bush',36,0,0,90,.8,1.3],['bush2',20,0,0,90,.8,1.2],['rockm',24,0,0,90,.8,1.6],['rock',16,0,0,90,.7,1.4],['flower',30,0,0,85,.8,1.2],['grassf',100,0,0,90,.8,1.2]],fixed:[['camp',-30,24,0,1]]},
+ monday:{scatter:[['bush',36,0,0,90,.8,1.3],['bush2',22,0,0,90,.8,1.2],['brom',26,0,0,85,.8,1.3],['rockm',16,0,0,90,.8,1.5],['grassf',90,0,0,90,.8,1.2]],fixed:[['camp',-24,30,0,1]]},
+ mbaracayu:{scatter:[['bush',50,0,0,90,.8,1.4],['bush2',36,0,0,90,.8,1.3],['brom',40,0,0,85,.9,1.4],['rockm',12,0,0,90,.8,1.4],['grassf',80,0,0,90,.8,1.2]]},
+ cerrocora:{scatter:[['bush',26,0,0,90,.7,1.2],['rocksav',16,0,0,90,.8,1.5],['rockm',18,0,0,90,.8,1.6],['dead',10,0,0,88,.8,1.1],['grass2',120,0,0,90,.9,1.3]]},
+ bahianegra:{scatter:[['cattail',80,0,0,90,.8,1.3],['papyrus',36,0,0,90,.8,1.2],['reedg',26,0,0,90,.8,1.2],['dead',10,0,0,88,.8,1.2],['bush',16,0,0,90,.8,1.2]]},
  mbocaruzu:{scatter:[['bush',40,0,0,90,.8,1.3],['bush2',26,0,0,90,.8,1.2],['brom',30,0,0,85,.8,1.3],['flower',24,0,0,85,.8,1.2],['rockm',18,0,0,90,.8,1.5],['grassf',100,0,0,90,.8,1.2]],fixed:[['camp',-30,30,0,1],['cartb',52,46,1.1,1]]},
  saltocristal:{scatter:[['bush',50,0,0,90,.8,1.4],['bush2',36,0,0,90,.8,1.3],['brom',44,0,0,85,.9,1.4],['flower',20,0,0,85,.8,1.2],['rockm',16,0,0,90,.8,1.4],['grassf',90,0,0,90,.8,1.2]],fixed:[['camp',36,22,0,1]]}};
 const DCOLS={lapacho:[0xffffff,0xf0d0e0,0xffe0ee],tajy:[0xffffff,0xfff0c0]};
@@ -5324,7 +5335,7 @@ function decoSpot(G,V,sp,boss){
 function loadZone(id,pos){
   Z=Object.assign({id},ZONES[id]);if(Z.townR)Object.defineProperty(Z,'safe',{get(){try{return !(mode==='game'&&Math.hypot(P.x,P.z)>Z.townR);}catch(e){return true;}},configurable:true});clearZone();zoneG=new THREE.Group();scene.add(zoneG);
   applySky(Object.assign({clouds:Z.clouds},Z.sky));RIM.value.setHex(Z.sky.hor).multiplyScalar(LOOK.rim);seed=hashStr(id);P.spot=null;
-  DREC.list=[];DREC.on=OAD.on&&!OAD.failed&&oadHave(decFiles(id));
+  DREC.list=[];DREC.on=!!DECZ[id]&&OAD.on&&!OAD.failed&&oadHave(decFiles(id));
   swapTM();buildTerrain(zoneG);const V={};BUILD[id](zoneG,V);buildBorder(zoneG,V);
   for(const p of Z.portals)addPortal(zoneG,p[0],p[1],p[2]);
   (Z.spots||[]).forEach(sp=>decoSpot(zoneG,V,sp));if(Z.boss)decoSpot(zoneG,V,{x:Z.boss[1],z:Z.boss[2],r:8,deco:'lair'},true);
@@ -6326,7 +6337,7 @@ function renderNpc(){const b=$('#npcBody');
     const rew=`₲ ${fmt(q.gold)}`+q.items.map(([k,s,n])=>' · '+(n>1?n+'× ':'')+(k==='gem'?GEMS[s].name:POTS[s].name)).join('');const z=Object.keys(ZONES).find(id=>(ZONES[id].mobs||[]).some(m=>m[0]===q.mob)||(ZONES[id].boss&&ZONES[id].boss[0]===q.mob));
     b.innerHTML=`<div class="recipe"><h4>Misión ${C.q.i+1} de ${QUESTS.length}</h4><p class="it-d">${q.txt}</p><div class="it-l">Objetivo: ${q.n>1?`derrotá ${q.n} ${esc(MOBS[q.mob].name)}`:`derrotá a ${esc(MOBS[q.mob].name)}`} en <b>${esc(spotOf(q.mob))}</b>, ${esc(ZONES[z].name)}</div>
       ${C.q.on?`<div class="prog"><i style="width:${C.q.n/q.n*100}%"></i></div><div class="it-l req">${C.q.n} / ${q.n}</div>`:''}<div class="it-l" style="color:var(--gold)">Recompensa: ${rew}</div>
-      ${!C.q.on?'<button class="btn full" data-act="qAccept">Aceptar misión</button>':C.q.n>=q.n?'<button class="btn full" data-act="qTurn">Entregar misión</button>':'<p class="hint">Volvé cuando termines.</p>'}</div>`;}
+      ${!C.q.on?'<button class="btn full" data-act="qAccept">Aceptar misión</button>':C.q.n>=q.n?'<button class="btn full" data-act="qTurn">Entregar misión</button>':'<p class="hint">Volvé cuando termines.</p>'}${C.q.n<q.n?questWarp(q):''}</div>`;}
   else if(NPCV==='pai'){const sk=CSK[C.cls].map(id=>{const s=SKILLS[id],has=C.skills.includes(id);let st;
       if(has)st='<span class="sub" style="color:var(--good)">Aprendida</span>';else if(s.evo&&!C.evo)st='<span class="sub bad">Requiere evolución</span>';else if(C.L<s.lvl)st=`<span class="sub bad">Nivel ${s.lvl}</span>`;else st=`<button class="btn sm" data-act="learn" data-id="${id}" ${C.gold<s.price?'disabled':''}>Aprender ₲ ${fmt(s.price)}</button>`;
       return `<div class="skillrow"><span class="ico">${SKIC(id)}</span><div><div class="nm" style="font-weight:800">${s.name} <span class="sub">· ${s.mp} MP</span></div><div class="sub">${s.desc}</div></div>${st}</div>`;}).join('');
@@ -6345,12 +6356,16 @@ function renderNpc(){const b=$('#npcBody');
   else if(NPCV==='quests'){const q=QUESTS[C.q.i];let h='';
     if(!q)h='<p class="it-d">Completaste todas las misiones del Capitán Cabañas.</p>';
     else{const z=Object.keys(ZONES).find(id=>(ZONES[id].mobs||[]).some(m=>m[0]===q.mob)||(ZONES[id].boss&&ZONES[id].boss[0]===q.mob));
-      h=`<div class="recipe"><h4>Misión ${C.q.i+1}: ${esc(MOBS[q.mob].name)}</h4><p class="it-d">${q.txt}</p>${C.q.on?`<div class="prog"><i style="width:${C.q.n/q.n*100}%"></i></div><div class="it-l req">${C.q.n} / ${q.n} · ${esc(ZONES[z].name)}</div>`:'<p class="it-d">Hablá con el Capitán Cabañas, al lado del portón de Asunción, para aceptarla.</p>'}</div>`;}
+      h=`<div class="recipe"><h4>Misión ${C.q.i+1}: ${esc(MOBS[q.mob].name)}</h4><p class="it-d">${q.txt}</p>${C.q.on?`<div class="prog"><i style="width:${C.q.n/q.n*100}%"></i></div><div class="it-l req">${C.q.n} / ${q.n} · ${esc(ZONES[z].name)}</div>${C.q.n<q.n?questWarp(q):''}`:'<p class="it-d">Hablá con el Capitán Cabañas, al lado del portón de Asunción, para aceptarla.</p>'}</div>`;}
     if(C.L>=50&&!C.evo)h+=`<div class="recipe"><h4>Prueba de evolución</h4><p class="it-d">${C.evoQ?`Juntá 5 Plumas de Guyra Pytã (${countItem('quest','pluma')} / 5) y llevalas al Pa'i Antonio.`:"El Pa'i Antonio te espera en Asunción para tu prueba."}</p></div>`;
     h=dailyHTML()+'<div class="sect"><h3>Misión principal</h3>'+h+'</div>';
     h+=`<p class="hint">Teclado: WASD moverse · Espacio atacar · 1–4 técnicas · Q/E pociones · I inventario · C personaje · M viajes · H automático · F hablar.</p>`;b.innerHTML=h;}
   else if(NPCV==='chamana')renderCaldero();
 }
+/* botón para ir directo al spot (o al jefe) de la misión, con el mismo costo que el viaje a un spot */
+function questWarp(q){if(!q)return '';const z=Object.keys(ZONES).find(id=>(ZONES[id].spots||[]).some(sp=>sp.m===q.mob)||(ZONES[id].boss&&ZONES[id].boss[0]===q.mob));if(!z)return '';const Zd=ZONES[z];
+  let i=(Zd.spots||[]).findIndex(sp=>sp.m===q.mob);if(i<0)i=-1;const same=Z&&Z.id===z,cost=same?500:Zd.cost,low=C.L<Zd.lvl;
+  return `<button class="btn full ghost" data-act="warp" data-z="${z}" data-i="${i}" ${low||C.gold<cost?'disabled':''}><span style="display:inline-flex;width:18px;height:18px;vertical-align:-3px;margin-right:6px">${ICON_SVG('map')}</span>${low?`Viajar · pide nivel ${Zd.lvl}`:`Viajar a ${esc(i<0?Zd.boss[3]:Zd.spots[i].n)} · ₲ ${fmt(cost)}`}</button>`;}
 const INVR={ana:{n:'Máscara de Añá',sub:'mascara_ana',c:8,r:1,g:100000,d:'Arena de Añá: sobreviví a los campeones mientras el piso se derrumba.'},tuguy:{n:'Manto de Tuguy',sub:'manto_tuguy',c:5,r:2,g:150000,d:'Fortaleza de Tuguy: rompé el portón, vencé al guardián y llevá el Arma de Tupã al altar.'}};
 function matN(rare){return C.inv.reduce((a,x)=>a+(x&&x.k==='mat'&&MATS[x.sub]&&!!MATS[x.sub].rare===rare?(x.n||1):0),0);}
 function takeMats(rare,n){for(let i=0;i<C.inv.length&&n>0;i++){const x=C.inv[i];if(x&&x.k==='mat'&&MATS[x.sub]&&!!MATS[x.sub].rare===rare){const t=Math.min(n,x.n||1);x.n=(x.n||1)-t;n-=t;if(x.n<=0)C.inv[i]=null;}}}
@@ -7074,7 +7089,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611091317';const UPD={shown:'',req:false};
+const NOX_BUILD='202611091336';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}

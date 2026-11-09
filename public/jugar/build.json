@@ -1,11 +1,12 @@
 {
- "build": "202611091317",
- "min": "202611091317",
- "title": "Avisos de admin, trajes completos y pies",
+ "build": "202611091336",
+ "min": "202611091336",
+ "title": "Vuelo, misiones y vegetación",
  "notes": [
-  "Las piernas de cada set ahora cubren muslos, cadera y rodillas con el mismo material de la armadura",
-  "Los pies ya no se hunden en el piso",
-  "Descripción del ítem al pasar el mouse en el baúl, la tienda, el caldero y el comercio",
-  "Los administradores pueden mandar avisos a todo el servidor con /sv"
+  "Con alas o capa tu personaje flota también quieto, en cualquier mapa y en Asunción; solo baja al pelear",
+  "Los PNJ con alas flotan apenas sobre el piso",
+  "Misiones: nuevo botón para viajar directo al spot o al jefe de tu misión",
+  "Arreglada la cabeza del Mbói Tata, que desaparecía cuando había varios en el mapa",
+  "Monday, Mbaracayú, Cerro Corá, Bahía Negra e Ybytyruzú vuelven a tener árboles, palmeras y pasto"
  ]
 }
