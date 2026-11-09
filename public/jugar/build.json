@@ -1,8 +1,9 @@
 {
- "build": "202611091339",
- "min": "202611091339",
- "title": "Vuelo más bajo",
+ "build": "202611091350",
+ "min": "202611091350",
+ "title": "Bolsa al día e ítems tirados",
  "notes": [
-  "Los personajes con alas o capa ahora vuelan más cerca del piso (60 % más bajo) en todo el juego"
+  "La bolsa y el baúl abiertos se actualizan solos al recoger del piso o equipar arrastrando",
+  "Los ítems que tirás quedan 2 minutos en el piso: el primer minuto solo vos los podés levantar, después cualquiera"
  ]
 }
