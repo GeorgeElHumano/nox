@@ -83,7 +83,7 @@ export class World {
   byUid(uid) { return this.all().find(x => x.a.uid === uid); }
   byName(name) { const k = String(name).toLowerCase(); return this.all().find(x => (x.a.s && String(x.a.s.n).toLowerCase() === k) || String(x.a.acc).toLowerCase() === k); }
   inZone(zone, except) { return this.all().filter(x => x.a.zone && x.a.zone === zone && x.ws !== except); }
-  pub(a) { return { id: a.uid, s: a.s, p: a.p }; }
+  pub(a) { return { id: a.uid, s: a.s, p: a.p, sh: a.shop ? { title: a.shop.title, n: a.shop.items.length } : null }; }
   simZone(zone) { if (!zone) return false; if (zone.startsWith(RAID_KEY)) return this.sims.has(zone); const z = ZONES[zone]; return !!z && !z.safe && !z.event; }
   ensureSim(zone) { if (!this.simZone(zone)) return null; let sim = this.sims.get(zone); if (!sim) { sim = new Sim(zone); this.sims.set(zone, sim); } this.startLoop(); return sim; }
   startLoop() { if (this.loop) return; this.lastStep = Date.now(); this.loop = setInterval(() => { try { this.stepAll(); } catch (e) {} }, 100); }
@@ -222,12 +222,103 @@ export class World {
     this.partyBroadcast(pid, p);
   }
 
+  // ---- intercambio entre jugadores y tiendas personales (como en MU) ----
+  // El juego de cada jugador guarda su personaje; el servidor hace de escribano: en el intercambio cada uno
+  // primero entrega lo suyo (lo saca de su bolsa y guarda) y recién cuando los dos entregaron, el servidor reparte
+  // por la tabla de entregas (deliveries), que el juego retira una sola vez. Si alguien se cae a mitad, a quien
+  // ya entregó se le devuelve lo suyo por el mismo camino. Así nadie pierde ni duplica.
+  async deliver(uid, items, gold, label) {
+    const st = [], now = Date.now();
+    for (const it of items || []) st.push(this.env.DB.prepare('INSERT INTO deliveries(uid,oid,item,label,created) VALUES(?,?,?,?,?)').bind(uid, null, JSON.stringify({ raw: it }), label, now));
+    if (gold > 0) st.push(this.env.DB.prepare('INSERT INTO deliveries(uid,oid,item,label,created) VALUES(?,?,?,?,?)').bind(uid, null, JSON.stringify({ k: 'gold', n: Math.round(gold), inv: 1 }), label, now));
+    if (st.length) await this.env.DB.batch(st);
+  }
+  cleanItems(l, max) { const out = []; for (const it of (Array.isArray(l) ? l : []).slice(0, max)) { if (!it || typeof it !== 'object' || it.k === 'gold' || it.raw) continue; const s = JSON.stringify(it); if (s.length > 1500) continue; out.push(JSON.parse(s)); } return out; }
+  tradeOf(uid) { if (!this.trades) return [null, null]; for (const [k, tr] of this.trades) if (tr.a === uid || tr.b === uid) return [k, tr]; return [null, null]; }
+  tradeState(tr) { return { t: 'tst', off: { [tr.a]: tr.off[tr.a], [tr.b]: tr.off[tr.b] }, rdy: tr.rdy, cnf: tr.cnf, stage: tr.stage }; }
+  tradeSend(tr, o) { for (const u of [tr.a, tr.b]) { const x = this.byUid(u); if (x) this.send(x.ws, o); } }
+  async tradeEnd(k, tr, why) {
+    if (!this.trades || !this.trades.has(k)) return; this.trades.delete(k); if (tr.timer) clearTimeout(tr.timer);
+    if (tr.stage === 'commit') { // alguien no llegó a entregar: se devuelve lo entregado
+      for (const u of [tr.a, tr.b]) { const g = tr.got[u]; if (g) await this.deliver(u, g.items, g.gold, 'Intercambio devuelto'); }
+      this.tradeSend(tr, { t: 'tend', ok: false, refund: 1, m: why || 'El intercambio no se completó: lo que entregaste vuelve a tu bolsa.' });
+    } else this.tradeSend(tr, { t: 'tend', ok: false, m: why || 'Se canceló el intercambio.' });
+  }
+  async tradeMsg(ws, a, m) {
+    const t = m.t; this.trades = this.trades || new Map(); this.tinv = this.tinv || new Map();
+    if (t === 'treq') {
+      const x = this.byUid(String(m.id || '')); if (!x || !x.a.s || !a.s || x.a.uid === a.uid) return;
+      if (x.a.zone !== a.zone) { this.send(ws, { t: 'sys', m: 'Tienen que estar en el mismo mapa para comerciar.' }); return; }
+      if (a.p && x.a.p && Math.hypot(a.p.x - x.a.p.x, a.p.z - x.a.p.z) > 8) { this.send(ws, { t: 'sys', m: 'Acercate más a ' + x.a.s.n + ' para comerciar.' }); return; }
+      if (this.tradeOf(a.uid)[1] || this.tradeOf(x.a.uid)[1]) { this.send(ws, { t: 'sys', m: x.a.s.n + ' ya está comerciando.' }); return; }
+      this.tinv.set(x.a.uid, { from: a.uid, t: Date.now() }); this.send(x.ws, { t: 'treq', from: a.uid, n: a.s.n }); this.send(ws, { t: 'sys', m: 'Le pediste comerciar a ' + x.a.s.n + '.' }); return;
+    }
+    if (t === 'tacc' || t === 'trej') {
+      const iv = this.tinv.get(a.uid); this.tinv.delete(a.uid); if (!iv || Date.now() - iv.t > 60000) return; const x = this.byUid(iv.from); if (!x || !x.a.s) return;
+      if (t === 'trej') { this.send(x.ws, { t: 'sys', m: (a.s ? a.s.n : 'El jugador') + ' no quiso comerciar.' }); return; }
+      if (this.tradeOf(a.uid)[1] || this.tradeOf(x.a.uid)[1]) return;
+      const k = 'tr' + Date.now().toString(36) + Math.floor(Math.random() * 1e4);
+      const tr = { a: x.a.uid, b: a.uid, na: x.a.s.n, nb: a.s.n, off: { [x.a.uid]: { items: [], gold: 0 }, [a.uid]: { items: [], gold: 0 } }, rdy: {}, cnf: {}, got: {}, stage: 'open' };
+      this.trades.set(k, tr);
+      this.send(x.ws, { t: 'topen', with: a.uid, n: a.s.n }); this.send(ws, { t: 'topen', with: x.a.uid, n: x.a.s.n }); return;
+    }
+    const [k, tr] = this.tradeOf(a.uid); if (!tr) return;
+    if (t === 'tx') { await this.tradeEnd(k, tr, (a.s ? a.s.n : 'El otro jugador') + ' canceló el intercambio.'); return; }
+    if (tr.stage === 'open') {
+      if (t === 'toff') { tr.off[a.uid] = { items: this.cleanItems(m.items, 8), gold: Math.max(0, Math.min(2e9, Math.round(+m.gold || 0))) }; tr.rdy = {}; tr.cnf = {}; this.tradeSend(tr, this.tradeState(tr)); return; }
+      if (t === 'trdy') { tr.rdy[a.uid] = !!m.on; if (!m.on) tr.cnf = {}; this.tradeSend(tr, this.tradeState(tr)); return; }
+      if (t === 'tcnf') { if (!tr.rdy[tr.a] || !tr.rdy[tr.b]) return; tr.cnf[a.uid] = true; this.tradeSend(tr, this.tradeState(tr));
+        if (tr.cnf[tr.a] && tr.cnf[tr.b]) { tr.stage = 'commit'; tr.nonce = Math.random().toString(36).slice(2, 10);
+          this.tradeSend(tr, { t: 'tcommit', nonce: tr.nonce, off: { [tr.a]: tr.off[tr.a], [tr.b]: tr.off[tr.b] } });
+          tr.timer = setTimeout(() => { this.tradeEnd(k, tr, 'El otro jugador no respondió: se canceló el intercambio.').catch(() => {}); }, 15000); }
+        return; }
+      return;
+    }
+    if (tr.stage === 'commit' && t === 'tok' && m.nonce === tr.nonce && !tr.got[a.uid]) {
+      tr.got[a.uid] = { items: this.cleanItems(m.items, 8), gold: Math.max(0, Math.min(2e9, Math.round(+m.gold || 0))) };
+      if (tr.got[tr.a] && tr.got[tr.b]) { this.trades.delete(k); if (tr.timer) clearTimeout(tr.timer);
+        await this.deliver(tr.a, tr.got[tr.b].items, tr.got[tr.b].gold, 'Intercambio con ' + tr.nb);
+        await this.deliver(tr.b, tr.got[tr.a].items, tr.got[tr.a].gold, 'Intercambio con ' + tr.na);
+        this.tradeSend(tr, { t: 'tend', ok: true }); }
+      return;
+    }
+    if (tr.stage === 'commit' && t === 'tno') { await this.tradeEnd(k, tr, 'Un ítem ya no estaba en la bolsa: se canceló el intercambio.'); }
+  }
+  // tienda personal: el vendedor publica la lista (con precios); el comprador paga primero, el vendedor entrega y cobra
+  shopPub(a) { return a.shop ? { title: a.shop.title, n: a.shop.items.length } : null; }
+  async shopMsg(ws, a, m) {
+    const t = m.t; this.sbuys = this.sbuys || new Map();
+    if (t === 'shop') {
+      if (m.open && a.zone !== 'asuncion') { this.send(ws, { t: 'sys', m: 'Las tiendas solo se abren en Asunción.' }); return; }
+      a.shop = m.open ? { title: clip(m.title, 28) || 'Tienda', items: (Array.isArray(m.items) ? m.items : []).slice(0, 12).map(x => ({ item: this.cleanItems([x && x.item], 1)[0], price: Math.max(1, Math.min(2e9, Math.round(+(x && x.price) || 0))) })).filter(x => x.item && x.item.u != null) } : null;
+      this.save(ws, a); const o = { t: 'shop', id: a.uid, sh: this.shopPub(a) }; if (a.zone) for (const x of this.inZone(a.zone)) this.send(x.ws, o); return;
+    }
+    if (t === 'shopv') { const x = this.byUid(String(m.id || '')); if (!x || !x.a.shop || x.a.zone !== a.zone) { this.send(ws, { t: 'shopv', id: m.id, closed: 1 }); return; } this.send(ws, { t: 'shopv', id: x.a.uid, n: x.a.s && x.a.s.n, title: x.a.shop.title, items: x.a.shop.items }); return; }
+    if (t === 'sbuy') { // el comprador ya descontó el oro de su bolsa y guardó
+      const price = Math.max(0, Math.round(+m.price || 0)), nonce = clip(m.nonce, 16), x = this.byUid(String(m.id || ''));
+      const it = x && x.a.shop && x.a.shop.items.find(y => y.item.u === m.u && y.price === price);
+      if (!x || !it || x.a.zone !== a.zone) { await this.deliver(a.uid, [], price, 'Compra devuelta'); this.send(ws, { t: 'sres', ok: false, refund: 1, m: 'Ese ítem ya no está a la venta: tu plata vuelve a tu bolsa.' }); return; }
+      const sb = { buyer: a.uid, seller: x.a.uid, price, u: m.u, bn: a.s ? a.s.n : '' }; this.sbuys.set(nonce, sb);
+      sb.timer = setTimeout(async () => { if (!this.sbuys.has(nonce)) return; this.sbuys.delete(nonce); await this.deliver(a.uid, [], price, 'Compra devuelta'); const b = this.byUid(a.uid); if (b) this.send(b.ws, { t: 'sres', ok: false, refund: 1, m: 'El vendedor no respondió: tu plata vuelve a tu bolsa.' }); }, 12000);
+      this.send(x.ws, { t: 'ssell', nonce, u: m.u, price, bn: sb.bn }); return;
+    }
+    if (t === 'sok' || t === 'sno') { // el vendedor ya sacó el ítem y cobró (sok) o no lo tiene (sno)
+      const sb = this.sbuys.get(clip(m.nonce, 16)); if (!sb || sb.seller !== a.uid) return; this.sbuys.delete(clip(m.nonce, 16)); clearTimeout(sb.timer);
+      const b = this.byUid(sb.buyer);
+      if (t === 'sok') { const it = this.cleanItems([m.item], 1); await this.deliver(sb.buyer, it, 0, 'Compra a ' + (a.s ? a.s.n : 'un jugador')); if (b) this.send(b.ws, { t: 'sres', ok: true });
+        if (a.shop) { a.shop.items = a.shop.items.filter(y => y.item.u !== sb.u); if (!a.shop.items.length) a.shop = null; this.save(ws, a); const o = { t: 'shop', id: a.uid, sh: this.shopPub(a) }; if (a.zone) for (const x of this.inZone(a.zone)) this.send(x.ws, o); } }
+      else { await this.deliver(sb.buyer, [], sb.price, 'Compra devuelta'); if (b) this.send(b.ws, { t: 'sres', ok: false, refund: 1, m: 'Ese ítem ya no estaba: tu plata vuelve a tu bolsa.' }); }
+    }
+  }
+
   async webSocketMessage(ws, raw) {
     if (typeof raw !== 'string' || raw.length > 60000) return;
     let m; try { m = JSON.parse(raw); } catch { return; }
     const a = this.att(ws); if (!a) return;
     const t = m.t;
-    if (raw.length > 4000 && t !== 'ms' && t !== 'mr') return;
+    if (raw.length > 4000 && t !== 'ms' && t !== 'mr' && !(raw.length < 26000 && (t === 'toff' || t === 'tok' || t === 'shop' || t === 'sok'))) return;
+    if (t === 'treq' || t === 'tacc' || t === 'trej' || t === 'tx' || t === 'toff' || t === 'trdy' || t === 'tcnf' || t === 'tok' || t === 'tno') { await this.tradeMsg(ws, a, m); return; }
+    if (t === 'shop' || t === 'shopv' || t === 'sbuy' || t === 'sok' || t === 'sno') { await this.shopMsg(ws, a, m); return; }
 
     // monstruos: los mueve el servidor; los jugadores mandan sus golpes y piden la lista completa
     if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
@@ -257,7 +348,7 @@ export class World {
       if (JSON.stringify(a.s).length > 2500) a.s.eq = {};
       const old = a.zone, zone = m.zone ? clip(m.zone, 24) : a.zone;
       if (m.p) a.p = { x: +m.p.x || 0, z: +m.p.z || 0, ry: +m.p.ry || 0, mv: 0, ac: 0, d: 0 };
-      if (old !== zone) a.jt = Date.now();
+      if (old !== zone) { a.jt = Date.now(); a.shop = null; const [tk, tr] = this.tradeOf(a.uid); if (tr) this.tradeEnd(tk, tr, 'Se canceló el intercambio: ' + (a.s ? a.s.n : 'el otro jugador') + ' se fue del mapa.').catch(() => {}); }
       a.zone = zone; this.save(ws, a);
       if (old && old !== zone) for (const x of this.inZone(old, ws)) this.send(x.ws, { t: 'l', id: a.uid });
       if (old && old.startsWith('duel#') && old !== zone) { const [k, d] = this.duelOf(a.uid); if (d && k === old) this.duelEnd(k, d.a === a.uid ? d.b : d.a, 'abandono'); }
@@ -332,6 +423,7 @@ export class World {
   async webSocketError(ws) { this.gone(ws); }
   gone(ws) {
     const a = this.att(ws); if (!a) return;
+    { const [tk, tr] = this.tradeOf(a.uid); if (tr) this.tradeEnd(tk, tr, 'Se canceló el intercambio: el otro jugador se desconectó.').catch(() => {}); }
     { const [k, d] = this.duelOf(a.uid); if (d) this.duelEnd(k, d.a === a.uid ? d.b : d.a, 'abandono'); }
     if (a.zone) { for (const x of this.inZone(a.zone, ws)) this.send(x.ws, { t: 'l', id: a.uid }); }
     if (a.pid) {
