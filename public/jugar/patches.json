@@ -10,6 +10,43 @@
   ]
  },
  {
+  "build": "202611091312",
+  "title": "Cursor de Tupã y brillo de ítems",
+  "notes": [
+   "Nuevo cursor para PC: el guantelete de Tupã, más grande y con animación de click de 2 cuadros mientras mantenés el botón del mouse.",
+   "Los ítems del piso ya no tienen la columna de luz: ahora brillan desde su centro hacia afuera, con un resplandor que late y chispas. Cuanto más raro el ítem, más grande el brillo.",
+   "Celulares y tablets no cambian el cursor (no tienen)."
+  ]
+ },
+ {
+  "build": "202611091257",
+  "title": "Cursor guantelete de Tupã",
+  "notes": [
+   "Nuevo cursor para PC: el guantelete de Tupã, más grande y con la punta del dedo como punto de clic.",
+   "Animación de click de 2 cuadros: el guantelete se ve apretado, con destello en la gema, mientras mantenés el botón del mouse.",
+   "En celulares y tablets no cambia nada (no tienen cursor)."
+  ]
+ },
+ {
+  "build": "202611091228",
+  "title": "Nivel 200 y dos mapas nuevos",
+  "notes": [
+   "El nivel máximo sube a 200 y el reinicio ahora se hace en el nivel 200 con el Pa'i Antonio",
+   "Nuevo mapa Saltos del Mbocaruzú (Ybycuí), para niveles 100 a 150: portal desde Bahía Negra, con Yporã, Jaguarete Hũ, Mbói Hovy, Teju Hũ y el jefe Yaguareté-Abá",
+   "Nuevo mapa Salto Cristal (La Colmena), para niveles 150 a 200: portal desde el Mbocaruzú, con Ypo Vera, Yaguarú Vera, Mbói Itavera, Ita Jára y el jefe Y Jára",
+   "Botín propio de cada criatura nueva y 8 misiones nuevas del Capitán Cabañas"
+  ]
+ },
+ {
+  "build": "202611091049",
+  "title": "Nueva base de los personajes",
+  "notes": [
+   "Los personajes sin equipo empiezan con lo mínimo: torso desnudo (la Arquera con un top), pantalón corto y descalzos",
+   "Cada pieza que te equipás viste su parte del cuerpo: botas, pantalón, armadura y guantes se notan apenas los ponés",
+   "El Mburuvicha ya no trae la corona de plumas de base"
+  ]
+ },
+ {
   "build": "202611091008",
   "title": "Capas, eventos, comercio y tiendas",
   "notes": [
