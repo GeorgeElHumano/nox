@@ -106,7 +106,7 @@ export class World {
   // ---- objetos en el piso compartidos por mapa: el que lo hizo caer tiene prioridad unos segundos ----
   zoneDrops(zone, make) {
     this.drops = this.drops || new Map(); let dz = this.drops.get(zone);
-    if (dz) { const now = Date.now(), gone = []; for (const [id, d] of dz) if (now - d.ts > 90000) { dz.delete(id); gone.push(id); }
+    if (dz) { const now = Date.now(), gone = []; for (const [id, d] of dz) if (now - d.ts > (d.life || 90000)) { dz.delete(id); gone.push(id); }
       if (gone.length) { const out = JSON.stringify({ t: 'dg', key: zone, ids: gone, by: null }); for (const x of this.inZone(zone)) this.send(x.ws, out); }
       if (!dz.size && !make) { this.drops.delete(zone); return null; } }
     if (!dz && make) { dz = new Map(); this.drops.set(zone, dz); }
@@ -122,7 +122,9 @@ export class World {
       for (const d of l) { if (!d || typeof d !== 'object' || !d.o || JSON.stringify(d.o).length > 1500) continue;
         const o = d.o.gold != null ? { gold: Math.max(0, Math.min(5e8, Math.round(+d.o.gold || 0))) } : d.o.item && typeof d.o.item === 'object' ? { item: d.o.item } : null; if (!o) continue;
         const id = (++this.dropN || (this.dropN = 1)) + '' + Math.floor(Math.random() * 1e3);
-        const e = { id, x: +d.x || 0, z: +d.z || 0, o, own: d.free ? null : a.uid, ownN: a.s.n, pid: a.pid || null, ts: now };
+        /* tirado a mano por un jugador (pd): queda 2 minutos en el piso; el primer minuto solo lo puede levantar quien lo tiró, después cualquiera */
+        const e = d.pd ? { id, x: +d.x || 0, z: +d.z || 0, o, own: a.uid, ownN: a.s.n, pid: null, ts: now, solo: 1, ownMs: 60000, life: 120000 }
+          : { id, x: +d.x || 0, z: +d.z || 0, o, own: d.free ? null : a.uid, ownN: a.s.n, pid: a.pid || null, ts: now };
         dz.set(id, e); out.push(e); }
       if (!out.length) return;
       const s = JSON.stringify({ t: 'dr', key: a.zone, l: out }); for (const x of this.inZone(a.zone)) this.send(x.ws, s);
@@ -130,7 +132,7 @@ export class World {
     }
     const dz = this.zoneDrops(a.zone, false), d = dz && dz.get(String(m.id));
     if (!d) { this.send(ws, { t: 'dg', key: a.zone, ids: [String(m.id)], by: null, miss: 1 }); return; }
-    if (d.own && d.own !== a.uid && !(d.pid && d.pid === a.pid) && Date.now() - d.ts < 20000) { this.send(ws, { t: 'sys', m: 'Ese objeto es de ' + d.ownN + ' por unos segundos más.' }); this.send(ws, { t: 'dg', key: a.zone, ids: [], by: null }); return; }
+    if (d.own && d.own !== a.uid && !(!d.solo && d.pid && d.pid === a.pid) && Date.now() - d.ts < (d.ownMs || 20000)) { this.send(ws, { t: 'sys', m: d.solo ? d.ownN + ' tiró ese objeto: solo él lo puede levantar por ' + Math.ceil(((d.ownMs || 20000) - (Date.now() - d.ts)) / 1000) + ' s más.' : 'Ese objeto es de ' + d.ownN + ' por unos segundos más.' }); this.send(ws, { t: 'dg', key: a.zone, ids: [], by: null }); return; }
     dz.delete(d.id);
     const s = JSON.stringify({ t: 'dg', key: a.zone, ids: [d.id], by: a.uid }); for (const x of this.inZone(a.zone)) this.send(x.ws, s);
   }
