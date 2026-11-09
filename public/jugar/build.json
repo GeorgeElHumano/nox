@@ -1,9 +1,9 @@
 {
- "build": "202611091440",
- "min": "202611091440",
- "title": "Más zoom",
+ "build": "202611091515",
+ "min": "202611091515",
+ "title": "Pies firmes en el suelo",
  "notes": [
-  "Podés acercar y alejar la cámara el doble que antes (clásica y 3ra persona)",
-  "Se quitó la cámara en 1ra persona"
+  "Quieto: el pie apoyado queda clavado en el suelo (altura y giro); ya no baila con la animación de reposo",
+  "Gestos: los pies ya no se hunden (risa, saludo) ni flotan (baile); las patadas y saltos de la animación se respetan"
  ]
 }

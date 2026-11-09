@@ -3075,22 +3075,30 @@ function ikSoleOf(r){/* distancia del hueso del pie a la suela (lo más bajo del
       v.fromBufferAttribute(pa,i).applyMatrix4(m.bindMatrix);if(v.y<lo[side])lo[side]=v.y;}
     for(let i=0;i<2;i++){if(lo[i]>1e8)continue;const j=m.skeleton.bones.indexOf(fb[i]);if(j<0)continue;M.copy(m.skeleton.boneInverses[j]).invert();const so=(M.elements[13]-lo[i])*k;if(so>0&&so<.4&&(out[i]==null||so>out[i]))out[i]=so;}});
   return out;}
+const IK_SOLE=.025;
 function footIK(r,dt){
   if(!r.ikB){const g=n=>r.body.getObjectByName(n);r.ikB=['L','R'].map(s=>{const l=s.toLowerCase(),t=g('thigh_'+l)||g('thigh_'+s),c=g('calf_'+l)||g('leg_'+s),f=g('foot_'+l)||g('foot_'+s);return t&&c&&f&&t.parent&&c.parent===t&&f.parent===c?{t,c,f,o:0}:null;});if(!r.ikB[0]||!r.ikB[1])r.ikB=[];}
-  const on=window.__NOIK?0:mode==='game'&&r.g.parent===scene&&r.ikB.length&&!(P.deadK>0)&&(r.flyK||0)<.05&&!(P.gest&&r.gOn)&&Z&&!Z.studio?((P.mv||0)>.05?.5:1):0;/* al caminar, a medias: con el paso completo en pendiente parecía marchar */
+  const on=window.__NOIK?0:mode==='game'&&r.g.parent===scene&&r.ikB.length&&!(P.deadK>0)&&(r.flyK||0)<.05&&Z&&!Z.studio?((P.mv||0)>.05&&!(P.gest&&r.gOn)?.5:1):0;/* también en los gestos: sin IK los pies se hundían */
+  const still=(P.mv||0)<=.05||!!(P.gest&&r.gOn);/* al caminar, a medias: con el paso completo en pendiente parecía marchar */
   r.ikW=(r.ikW||0)+(on-(r.ikW||0))*Math.min(1,dt*6);const W=r.ikW;if(W<.01){r.ikDrop=0;return;}
   r.g.updateMatrixWorld(true);const y0=r.g.position.y,d=[0,0],nrm=[];
   /* suela: cuánto baja la malla (pie, bota) por debajo del hueso del pie; se mide una vez en la pose de reposo de la animación */
   if(r.ikSole==null)r.ikSole=ikSoleOf(r);
   for(let i=0;i<2;i++){const B=r.ikB[i];B.f.getWorldPosition(_ik.a);const gy=H(_ik.a.x,_ik.a.z);
     /* sube lo que pide el terreno (a medias al caminar) y nunca deja la suela por debajo del suelo */
-    let up=clamp(gy-y0,-.45,.45)*W;const so=r.ikSole&&r.ikSole[i];if(so!=null)up=Math.max(up,Math.min(.3,gy+so+.025-_ik.a.y));d[i]=up;
+    let up=clamp(gy-y0,-.45,.45)*W;const so=r.ikSole&&r.ikSole[i];if(so!=null){const fix=gy+so+IK_SOLE-_ik.a.y;up=Math.max(up,Math.min(.3,fix));
+      /* quieto o en un gesto: el pie que la animación deja cerca del suelo queda clavado ahí (sube o baja lo justo), así no "baila" con la respiración del idle;
+         el que la animación levanta de verdad (paso de baile, patada) sigue libre */
+      r.ikB[i].pl=0;if(still){const s=-fix,pl=s<.04?1:s>.09?0:1-(s-.04)/.05;r.ikB[i].pl=pl;up+=(Math.max(-.12,Math.min(.3,fix))-up)*pl*W;}}d[i]=up;
     /* normal del terreno bajo el pie */const e=.25;nrm[i]=new THREE.Vector3(H(_ik.a.x-e,_ik.a.z)-H(_ik.a.x+e,_ik.a.z),2*e,H(_ik.a.x,_ik.a.z-e)-H(_ik.a.x,_ik.a.z+e)).normalize();}
   /* la cadera baja hasta el pie más bajo, o sube si los dos se hunden (suave, para no temblar al caminar) */
-  const want=clamp(Math.min(d[0],d[1]),-.45,.25);r.ikDrop=(r.ikDrop||0)+(want-(r.ikDrop||0))*Math.min(1,dt*10);
+  const want=clamp(Math.min(d[0],d[1]),-.45,.25);r.ikDrop=(r.ikDrop||0)+(want-(r.ikDrop||0))*Math.min(1,dt*(still?30:10));/* quieto: sigue al instante (el pie ya clavado no tiembla) */
   if(Math.abs(r.ikDrop)>.001){r.model.position.y+=r.ikDrop;r.g.updateMatrixWorld(true);}
-  for(let i=0;i<2;i++){const B=r.ikB[i];B.o+=((d[i]-r.ikDrop)-B.o)*Math.min(1,dt*12);const off=B.o;
+  for(let i=0;i<2;i++){const B=r.ikB[i];B.o+=((d[i]-r.ikDrop)-B.o)*Math.min(1,dt*(still?40:12));const off=B.o;
     B.f.getWorldQuaternion(_ik.fq[i]);
+    /* pie apoyado: además de la altura se fija su giro (la animación de reposo mece talón y punta y la suela subía y bajaba); gira con el cuerpo */
+    const pl=(B.pl||0)*W;if(pl>.5){if(!B.lq){r.g.getWorldQuaternion(_ik.q3);B.lq=_ik.q3.invert().multiply(_ik.fq[i]).clone();}}else if(pl<.2)B.lq=null;
+    if(B.lq){r.g.getWorldQuaternion(_ik.q3);_ik.q3.multiply(B.lq);_ik.fq[i].slerp(_ik.q3,Math.min(1,pl));}
     if(Math.abs(off)>.004){
       B.t.getWorldPosition(_ik.a);B.c.getWorldPosition(_ik.b);B.f.getWorldPosition(_ik.c);_ik.t.copy(_ik.c);_ik.t.y+=off;
       const l1=_ik.a.distanceTo(_ik.b),l2=_ik.b.distanceTo(_ik.c),dw=clamp(_ik.a.distanceTo(_ik.t),Math.abs(l1-l2)+.01,(l1+l2)*.999),d0=_ik.a.distanceTo(_ik.c);
@@ -7095,7 +7103,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611091440';const UPD={shown:'',req:false};
+const NOX_BUILD='202611091515';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}

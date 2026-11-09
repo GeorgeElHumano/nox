@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611091515",
+  "title": "Pies firmes en el suelo",
+  "notes": [
+   "Quieto: el pie apoyado queda clavado en el suelo (altura y giro); ya no baila con la animación de reposo",
+   "Gestos: los pies ya no se hunden (risa, saludo) ni flotan (baile); las patadas y saltos de la animación se respetan"
+  ]
+ },
+ {
   "build": "202611091440",
   "title": "Más zoom",
   "notes": [
