@@ -153,6 +153,20 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Mapa en vertical: `.mp-b` desliza entero (mapa arriba y la lista completa abajo); antes `.mp-r` crecía y se cortaba sin scroll en iPhone.
 - Pruebas: `tools/gtest.js` (rueda y los 7 gestos), `tools/gest4.js`/`onegif3.js` (GIF de muestra).
 
+### Joyas, pilas, avisos, parches y caldero (8/11, noche; publicado)
+- Destellos de luz (`flashLight`) usan un grupo fijo de 2 `PointLight` (`FLASHL`) que siempre están en escena. Agregar o quitar luces en three r128 cambia `numPointLights` y recompila todos los materiales (el cuelgue al poner joyas).
+- `STACKMAX=999` para pociones y joyas; `addItem` llena pilas y después casilleros nuevos. Tienda con compra ×100.
+- Pluma de evolución: 2 % por mob y 50 % por jefe, hasta tener 5.
+- Gestos: solo se esconden objetos con `userData.piece==='weapon'` o `userData.gHide` (escudo, carcaj); alas y cascos quedan.
+- Avisos en pantalla: `notice(html,cls)` (`#notices`, máx. 5, `big` para Admin, `cd` para los últimos 10 segundos). `evCountTick` (cada 250 ms) avisa al cruzar `EVMARK_OPEN` (5,4,3,2,1 min, 30 s, 10…1) y `EVMARK_CLOSE` (desde 2 min).
+- Bienvenida Admin: el Worker, al recibir `hi` de una cuenta `role==='admin'`, manda `{t:'ann',k:'adm',n}` a todos (una vez cada 10 min por cuenta).
+- Parches: `scripts/patch.sh` exige al menos una novedad y agrega la entrada a `public/jugar/patches.json` (el más nuevo primero, hasta 80). Botón «Historial de parches» en `acctBar` → panel `#pPatch` (`patchLoad`). `updShow` busca las notas en `build.json` si el aviso llega sin ellas (caso 426 de la API).
+- Claves de shader: `crackGlow` y `ghostify` arman `customProgramCacheKey` con la clave anterior del material (+ color en el fantasma). Antes, materiales con grietas compartían programa con otros y la cabeza del Mbói Tata salía transparente.
+- Anillo del set (`HERO.aura`): plano 14×14 en XZ; `auraFit` gira los vértices y les pone la altura del terreno (`H`) cada cuadro.
+- Caldero (`renderCaldero`): resultado y el ítem elegido arriba (`.cald-sel`), después solo el equipo de la bolsa y al final las invitaciones compactas (fichas). Al elegir, el panel sube.
+- Mburuvicha: 2ª y 3ª generación se llaman «Capa de Guyra Hũ Guasu» y «Capa de Ñanderuvusu». El modelo de capa en el casillero de alas está pendiente (muestra aprobada: capa que ondea al volar, sin abrirse como alas).
+- Pruebas: `tools/ntct.js` (avisos), `tools/caldt.js` (caldero), `tools/tatashot.js` (Mbói Tata), `tools/aurat.js`. Ganchos nuevos en `__NOX`: `notice`, `caldT`, `auraT`, `gemApply`, `addItemT`, `gestGo`.
+
 ### Ganchos de prueba
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
