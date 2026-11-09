@@ -2282,14 +2282,17 @@ function buildHero(cls,eq){const cc=cc0Hero(cls,eq);if(cc)return cc;const oo=CC0
     else if(cls==='hechicero'){const s=staffMesh(w.t,w.lv,gc);s.position.set(0,0,.02);r.handR.add(s);r.staff=s;}
     else{const b=bowMesh(w.t,w.lv,gc);b.position.set(0,0,.02);r.handL.add(b);r.bow=b;}}
   if(eq.shield&&cls==='caballero'){const sh=shieldMesh(eq.shield.t);r.handL.add(sh);r.shield=sh;}
-  if(cls==='mburuvicha'&&tt('armor')>=0){r.cape=makeCape(cls==='caballero'?0x8e1a20:[0,0,0x1a2a5a,0x3a4a7a,0xb8902a][tt('armor')]||0x2a1a3a);r.torso.add(r.cape.mesh);}
-  if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.torso.add(W.g);r.wings=W;}
+  if(cls==='mburuvicha'){if(mbCapeOn(r,eq,r.torso))r.cape.mesh.position.y=.6;}
+  else if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.torso.add(W.g);r.wings=W;}
   r.cls=cls;bakeGroups(r.g);return r;}
 /* capa: tela con pliegues, angosta en los hombros, envuelve la espalda; textura con sombras de pliegue y ribete del color del set */
-function capeTex(col,trim){const key='cape'+col+'|'+trim;if(TXL[key])return TXL[key];const S=256,cv=txCv(S),x=cv.getContext('2d');
+function capeTex(col,trim,feather){const key='cape'+col+'|'+trim+(feather?'f':'');if(TXL[key])return TXL[key];const S=256,cv=txCv(S),x=cv.getContext('2d');
   for(let i=0;i<S;i++){const f=.8+.2*Math.sin(i/S*TAU*6+.6)+.05*Math.sin(i/S*TAU*17);for(let j=0;j<S;j+=4){const k=j/S;x.fillStyle=hexCss(lerpHex(lerpHex(col,0x000000,.02+.16*k),0xffffff,Math.max(0,f-.9)*.9));x.globalAlpha=1;x.fillRect(i,j,1,4);}
     x.fillStyle='#000';x.globalAlpha=Math.max(0,.9-f)*.9;x.fillRect(i,0,1,S);}
-  x.globalAlpha=1;const tc=trim==null?lerpHex(col,0xffffff,.45):trim,dk=lerpHex(tc,0x000000,.45);
+  x.globalAlpha=1;if(feather){/* plumas superpuestas en filas, con raquis claro y borde oscuro */for(let r=0;r<11;r++){const y=r*21-6,n=9;for(let i=-1;i<=n;i++){const cx=(i+(r%2?.5:0))*S/n,w=S/n*.62,h=30;
+      x.fillStyle=hexCss(lerpHex(col,(i+r)%3?0x000000:0xffffff,(i+r)%3?.18:.1));x.strokeStyle=hexCss(lerpHex(col,0x000000,.55));x.lineWidth=1.4;x.beginPath();x.moveTo(cx,y);x.quadraticCurveTo(cx+w,y+h*.45,cx,y+h);x.quadraticCurveTo(cx-w,y+h*.45,cx,y);x.fill();x.stroke();
+      x.strokeStyle=hexCss(lerpHex(col,0xffffff,.3));x.lineWidth=1;x.beginPath();x.moveTo(cx,y+3);x.lineTo(cx,y+h-3);x.stroke();}}}
+  const tc=trim==null?lerpHex(col,0xffffff,.45):trim,dk=lerpHex(tc,0x000000,.45);
   x.fillStyle=hexCss(dk);x.fillRect(0,S-30,S,30);x.fillStyle=hexCss(tc);x.fillRect(0,S-27,S,4);x.fillRect(0,S-7,S,3);
   for(let i=0;i<S;i+=16){x.beginPath();x.moveTo(i,S-15);x.lineTo(i+8,S-21);x.lineTo(i+16,S-15);x.lineTo(i+8,S-9);x.closePath();x.fill();}
   for(const e of[0,S-6]){x.fillStyle=hexCss(dk);x.fillRect(e,0,6,S);x.fillStyle=hexCss(tc);x.fillRect(e+(e?0:3),0,2,S);}
@@ -2302,14 +2305,28 @@ function capeFit(r){const c=r.cape;if(!c||!r.body)return;let base=null;r.body.tr
   const k=(r.model&&r.model.scale.x)||1;if(minZ<1e8){const z=Math.min(-.15,minZ*k-.035);c.mesh.position.z=z;}
   /* la parte de abajo (cintura y cola del cinturón) se abre un poco hacia atrás si sobresale más que la espalda */
   if(minL<1e8){const extra=Math.max(0,(c.mesh.position.z-(minL*k-.04)));c.lowBack=extra;}}
-function makeCape(col,trim){const geo=new THREE.PlaneGeometry(.5,1.15,10,14);geo.translate(0,-.575,0);const pa=geo.attributes.position.array;
+function makeCape(col,trim,feather){const geo=new THREE.PlaneGeometry(.5,1.15,10,14);geo.translate(0,-.575,0);const pa=geo.attributes.position.array;
   for(let i=0;i<pa.length;i+=3){const x0=pa[i],k=-pa[i+1]/1.15;pa[i]=x0*(.78+.22*k);pa[i+2]=pa[i]*pa[i]*1.15+.014*Math.sin(x0*39)*(.25+k);}
-  geo.computeVertexNormals();const base=pa.slice();const T=capeTex(col,trim);
+  geo.computeVertexNormals();const base=pa.slice();const T=capeTex(col,trim,feather);
   const m=new MSM({color:0xffffff,map:T.t,normalMap:T.n,normalScale:new THREE.Vector2(.6,.6),roughness:.88,metalness:0,side:THREE.DoubleSide});rimify(m);
   const mesh=new THREE.Mesh(geo,m);mesh.position.set(0,.6,-.15);mesh.castShadow=true;mesh.userData.solo=true;return{mesh,geo,base};}
-function animCape(c,t,mv,lean){if(!c)return;const a=c.geo.attributes.position.array,b=c.base;for(let i=0;i<a.length;i+=3){const x=b[i],y=b[i+1],k=-y/1.15;
-    a[i]=x*(1+k*.35);a[i+1]=y*(1-k*.08*mv);a[i+2]=b[i+2]-k*k*(.12+.55*mv)-Math.sin(t*(3+mv*5)-k*4+x*3)*.035*(k+.2)*(1+mv)-k*.05-(c.lowBack||0)*Math.min(1,k*1.8);}
-  c.geo.attributes.position.needsUpdate=true;c.geo.computeVertexNormals();}
+function animCape(c,t,mv,lean,fly){if(!c)return;fly=fly||0;const a=c.geo.attributes.position.array,b=c.base,fe=fly*fly*(3-2*fly),fq=c.sub?1:.7;for(let i=0;i<a.length;i+=3){const x=b[i],y=b[i+1],k=-y/1.15;
+    /* en vuelo la capa no se abre: se estira hacia atrás (casi horizontal) y una ola corre de los hombros a la punta */
+    const wv=Math.sin(t*(3+mv*5+fe*4)-k*(4+fe*3)+x*3)*(.035*(k+.2)*(1+mv)+fe*.09*k);
+    a[i]=x*(1+k*(.35+fe*.25));a[i+1]=y*(1-k*.08*mv)*(1-fe*.38*k*fq)+fe*wv*.6;a[i+2]=b[i+2]-k*k*(.12+.55*mv)*(1-fe)-fe*k*.85*fq-wv*(1-fe*.4)-k*.05-(c.lowBack||0)*Math.min(1,k*1.8);}
+  c.geo.attributes.position.needsUpdate=true;c.geo.computeVertexNormals();if(c.sub)animCape(c.sub,t,mv*.4,lean,fly*.35);}
+/* ===== capa del Mburuvicha: ocupa el lugar de las alas (mismas stats y vuelo) =====
+   1ª gen. Guyra Hũ: azul (+9: azul y dorado) · 2ª Guyra Hũ Guasu: roja (+9: roja y dorado), con manto de plumas
+   3ª Ñanderuvusu: negra (+9: negra y dorado), larga hasta el suelo. Sin capa equipada el Mburuvicha no lleva capa. */
+function mbCapeStyle(w){const g=Math.max(1,Math.min(3,w.g||1)),gold=(w.lv||0)>=9,C=[[0x2448a8,0x6a9ae8],[0xa01c20,0xe05a48],[0x18161c,0x6a6878]][g-1];
+  return {g,gold,col:C[0],trim:gold?0xe8b44a:C[1],len:[1,1.1,1.26][g-1],lv:w.lv||0};}
+function mbCapeOn(r,eq,parent){if(!eq||!eq.wings)return null;const S=mbCapeStyle(eq.wings);const c=makeCape(S.col,S.trim,true);c.style=S;c.mesh.scale.y=S.len;
+  const m=c.mesh.material;if(S.gold)m.roughness=.72;
+  if(S.g>=2){const sub=makeCape(lerpHex(S.col,0x000000,.15),S.trim,true);sub.mesh.scale.set(1.18,.3/S.len,1);sub.mesh.position.set(0,.01,-.012);c.mesh.add(sub.mesh);c.sub=sub;}
+  if(S.g>=3&&S.gold){const sun=glowSprite(0xffd36a,.16,.95);sun.position.set(0,-.02,-.02);c.mesh.add(sun);}
+  parent.add(c.mesh);r.cape=c;r.wings={capeW:true,P:{em:S.trim}};return c;}
+function capeSparkTick(r,dt){const c=r.cape;if(!c||!c.style||!c.style.gold||mode!=='game'||!r.g||r.g.parent!==scene||Q.level==='bajo')return;c.spk=(c.spk||0)-dt*(1+(r.flyK||0)*2);if(c.spk>0)return;c.spk=.16;
+  const p=new THREE.Vector3(0,-.75*c.style.len,0);c.mesh.localToWorld(p);parts(p.x+(Math.random()-.5)*.4,p.y+Math.random()*.5,p.z+(Math.random()-.5)*.4,{n:2,col:c.style.trim,spd:.3,up:.7,grav:-.4,life:.9,size:.16});}
 let HERO=null;
 /* al soltar una zona o un modelo también se sueltan sus texturas propias (las guardadas con keep() quedan):
    y la textura de huesos de cada esqueleto: sin esto cada viaje sumaba unas 100 texturas en la placa de video */
@@ -2767,8 +2784,8 @@ function oadHero(cls,eq){if(!OAD.on||OAD.failed)return null;const s=oadHeroSpec(
   const pre=VIS(cls)==='caballero'?'k':cls==='hechicero'?'w':'a';const fem=cls==='arquera';const map={idle:pre+'_idle',walk:pre+'_walk',run:pre+'_run',death:'death_a',calm:fem?'n_idle_f':'n_idle_m',cwalk:fem?'n_walk_f':'n_walk_m'};
   if(pre==='k'){map.atk1='k_atk1';map.atk2='k_atk2';map.spin='k_spin';}else if(pre==='w'){map.atk1='w_cast';map.heal='w_heal';}else map.atk1='a_shoot';
   oadActs(r,r.body,map);/* arranca directo en la pose tranquila (sin pasar por la guardia de combate) */oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
-  const at=s.at;/* capa del color de su set (oscurecida), así cada set se reconoce también por la silueta */if(cls==='mburuvicha'){const cc=new THREE.Color(tierGlow(cls,at)).multiplyScalar(at>=3?.95:.85);r.cape=makeCape(cc.getHex(),forjaOf(cls,at).t);r.anchor.add(r.cape.mesh);}
-  if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
+  if(cls==='mburuvicha')mbCapeOn(r,eq,r.anchor);
+  else if(eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
   if(r.chest){r.body.updateMatrixWorld(true);wingSocket(r);}/* alas y capa ancladas al pecho desde la pose base: siempre en la espalda */
   {const its=ARMK.map(k=>eq[k]).filter(Boolean);
     if(its.length===ARMK.length&&its.every(it=>it.epic&&it.t===its[0].t)){const c=tierGlow(cls,its[0].t);r.epicAura=makeAura(c==='dark'?0x9a4aff:c);r.g.add(r.epicAura);}
@@ -2918,7 +2935,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     if(r.lastRy==null)r.lastRy=r.g.rotation.y;let dry=r.g.rotation.y-r.lastRy;dry=Math.atan2(Math.sin(dry),Math.cos(dry));r.lastRy=r.g.rotation.y;r.bank=(r.bank||0)+(clamp(-dry/Math.max(dt,.001)*.07,-.18,.18)-(r.bank||0))*Math.min(1,dt*2.5);
     const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph-1.7)*.035+Math.sin(T*.8)*.035);
     r.model.rotation.set(-(P.hitK||0)*.12+pit,0,((r.bank||0)+Math.sin(T*.7)*.015)*ke);r.model.position.set(0,lift+h0-h0*Math.cos(pit),-h0*Math.sin(pit));
-    if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);r.wings.sides.forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
+    if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);(r.wings.sides||[]).forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
   if(!r.fb){r.fb={};r.fbq=[];['thigh_L','thigh_R','leg_L','leg_R','foot_L','foot_R','arm_L','arm_R','forearm_L','forearm_R','spine','chest','neck','head'].forEach(n=>{const o=r.body.getObjectByName(n);r.fb[n]=o;if(o)r.fbq.push([o,o.quaternion.clone(),n]);});}
   for(const [o,q] of r.fbq)o.quaternion.copy(q);/* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
   r.mixer.update(STUDIO.frozen?0:dt);r.mixT=(r.mixT||0)+dt;if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
@@ -2940,7 +2957,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
       _av3.copy(_av1).lerp(_av2,k).normalize();_aq2.setFromUnitVectors(_av1,_av3);B.spine.getWorldQuaternion(_aq1);_aq1.premultiply(_aq2);B.spine.parent.getWorldQuaternion(_aq3);B.spine.quaternion.copy(_aq3.invert().multiply(_aq1));}}
   if(r.chest&&!r.sock){if(!act&&!(r.flyK>.01)&&(P.mv||0)<.05&&r.curK&&r.mixT>.3)wingSocket(r);else{r.chest.getWorldPosition(_ov);r.g.worldToLocal(_ov);r.anchor.position.set(_ov.x,_ov.y-.42,_ov.z);
     r.g.updateMatrixWorld();r.chest.getWorldQuaternion(_cq);r.g.getWorldQuaternion(_gq);_cq.premultiply(_gq.invert());if(!r.cq0&&!(r.flyK>.01)&&!act){r.cq0=_cq.clone().invert();}if(r.cq0){r.anchor.quaternion.copy(_cq).multiply(r.cq0);}}}
-  if(r.cape)animCape(r.cape,T,P.mv);}
+  if(r.cape){animCape(r.cape,T,P.mv,0,r.flyK||0);capeSparkTick(r,dt);}}
 /* --- PNJ --- */
 /* los NPC de Asunción son guerreros de cada clase, con los sets y alas más lindos del reino, sin repetir ninguno */
 const NPC_GEAR={herrero:{cls:'caballero',t:6,wg:2,lv:11,face:3},boticaria:{cls:'arquera',t:6,wg:2,lv:13,face:1},pai:{cls:'hechicero',t:6,wg:2,lv:11,face:9},capitan:{cls:'gladiador',t:6,wg:2,lv:13,face:11},
@@ -3784,10 +3801,10 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   const pre=VIS(cls)==='caballero'?'k':cls==='hechicero'?'w':'a';const clips={};['c_anim1','c_anim2'].forEach(f=>(OAD.ok[f].animations||[]).forEach(c=>clips[c.name]=c));
   const map={};for(const k in ANI[pre])if(clips[ANI[pre][k]])map[k]=clips[ANI[pre][k]];if(cls==='arquera'){if(CC0.bow===undefined){try{CC0.bow=cc0MakeBow(r.body,clips);}catch(e){console.error(e);CC0.bow=null;}}if(CC0.bow)map.atk1=CC0.bow;}
   oadActs(r,body,map);r.gclips=clips;oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
-  const at=r.spec.at;if(cls==='mburuvicha'){const cc=new THREE.Color(tierGlow(cls,at)).multiplyScalar(at>=3?.95:.85);r.cape=makeCape(cc.getHex(),forjaOf(cls,at).t);r.anchor.add(r.cape.mesh);try{capeFit(r);}catch(e){console.error(e);}}
+  if(cls==='mburuvicha'&&mbCapeOn(r,eq,r.anchor)){try{capeFit(r);}catch(e){console.error(e);}}
   /* el carcaj va por encima de la capa (si la hay), nunca atravesándola */
   if(cls==='arquera')try{const q=cc0Model('c_k_quiver');if(q){q.userData.gHide=1;}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
-  if(eq&&eq.wings){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
+  if(eq&&eq.wings&&cls!=='mburuvicha'){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
   if(r.chest){r.body.updateMatrixWorld(true);wingSocket(r);}
   {const its=ARMK.map(k=>eq&&eq[k]).filter(Boolean);
     if(its.length===ARMK.length&&its.every(it=>it.epic&&it.t===its[0].t)){const c=tierGlow(cls,its[0].t);r.epicAura=makeAura(c==='dark'?0x9a4aff:c);r.g.add(r.epicAura);}
@@ -4282,6 +4299,7 @@ function irObject(it){const c=it.c,t=it.t;let o=null,mode='prop',region=null;
   else if((it.k==='weapon'||it.k==='shield')&&CC0.on&&!OAD.failed){o=cc0ItemObj(it);if(o==='WAIT')return 'WAIT';if(!o)return null;mode=it.k;}
   else if(it.k==='weapon'||it.k==='shield'){const f=iconFiles(it)[0];o=oadInst(f,{team:OAD_TEAM[c][t]});if(!o)return null;mode=it.k;}
   else if(false){const b=c==='hechicero'?'m_robe':c==='arquera'?'f_tunic':'m_tunic';o=oadInst('body_'+b,{team:OAD_TEAM[c][t]});if(!o)return null;const tx=oadTex(OAD_PLAN.tex[c][t]);o.userData.mats.forEach(m=>{m.map=tx;m.needsUpdate=true;});mode='body';region=it.k;}
+  else if(it.k==='wings'&&c==='mburuvicha'){o=new THREE.Group();const cp=mbCapeOn({},{wings:it},o);animCape(cp,1.2,0,0,0);cp.mesh.position.set(0,.55,0);cp.mesh.rotation.y=PI;o.scale.setScalar(1.3);mode='obj';}
   else if(it.k==='wings'){o=wingsMesh(c,it.lv||0,it.g).g;o.position.set(0,0,0);mode='wings';}
   else if(it.k==='pot'){const P=POTS[it.sub],sz=it.sub.endsWith('3')?1.2:it.sub.endsWith('2')?1.05:.9;o=new THREE.Group();const liq=P.kind==='hp'?0xd8202a:0x2a5ad8;
     const gl=new THREE.Mesh(new THREE.LatheGeometry([[.001,0],[.32,.02],[.42,.2],[.44,.42],[.36,.62],[.16,.74],[.12,.92],[.14,1.0]].map(p=>new THREE.Vector2(p[0],p[1])),20),new MSM({color:0xdff4ff,roughness:.05,metalness:.1,transparent:true,opacity:.38,side:THREE.DoubleSide}));
@@ -4326,7 +4344,7 @@ function irDispose(o){o.traverse(x=>{if(x.material&&!x.material.userData.keep&&x
 function irPreview(dt){const pv=$('#invPrev');if(!pv||$('#pInv').hidden||!C||!irInit())return;if(IR.r.domElement.parentNode!==pv){pv.innerHTML='';pv.appendChild(IR.r.domElement);}
   const key=C.cls+JSON.stringify(EQK.map(k=>C.eq[k]?[C.eq[k].t,C.eq[k].lv]:0));if(key!==IR.prevKey||!IR.prev){/* el mismo modelo que se ve en el juego (cuerpo CC0 con su equipo); el de 0 A.D. solo si el CC0 está apagado */let h=null;if(CC0.on){h=cc0Hero(C.cls,C.eq);if(!h){cc0Want(C.cls,C.eq,()=>{IR.prevKey=null;});return;}}else h=oadHero(C.cls,C.eq);if(h){if(IR.prev){IR.scene.remove(IR.prev.g);irDispose(IR.prev.g);}IR.prev=h;(h.faceMats||[]).forEach(m=>m.userData.npc=1);irClean(h.g);IR.scene.add(h.g);IR.prevKey=key;}else{oadWantHero(C.cls,C.eq);return;}}
   IR.t+=dt;if(IR.t<1/30)return;const step=IR.t;IR.t=0;const h=IR.prev;if(IR.rot==null)IR.rot=-.5;if(IR.dragging==null){IR.vel=(IR.vel||0)*.9;IR.rot+=IR.vel;if(performance.now()-(IR.lastT||0)>2500)IR.rot+=step*.35;}h.g.rotation.y=IR.rot;oadPlay(h,h.acts.calm?'calm':'idle',.2,1);h.mixer.update(step);if(h.chest&&!h.sock&&h.anchor){h.chest.getWorldPosition(_iv);h.g.worldToLocal(_iv);h.anchor.position.set(_iv.x,_iv.y-.42,_iv.z);}if(h.cape)animCape(h.cape,T,0);
-  if(h.wings){h.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry+(STUDIO.frozen?0:Math.sin(performance.now()/700)*.06));W.rotation.z=s*WG.rz;});if(h.wings.u){h.wings.u.uWT.value=performance.now()/1000;h.wings.u.uWP.value=performance.now()/700;h.wings.u.uWA.value=.05;}}
+  if(h.wings&&h.wings.sides){h.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry+(STUDIO.frozen?0:Math.sin(performance.now()/700)*.06));W.rotation.z=s*WG.rz;});if(h.wings.u){h.wings.u.uWT.value=performance.now()/1000;h.wings.u.uWP.value=performance.now()/700;h.wings.u.uWA.value=.05;}}
   IR.cam.fov=24;const r=IR.r;r.setViewport(0,0,IR.W,IR.H);r.setScissorTest(false);IR.cam.aspect=IR.W/IR.H;IR.cam.updateProjectionMatrix();IR.cam.position.set(0,1.15,6.6);IR.cam.lookAt(0,.98,0);r.setClearColor(0,0);r.render(IR.scene,IR.cam);IR.cam.fov=26;}
 function heroApplyTex(r,cls,eq){if(!r||!r.oad||!r.body||r.cc0)return;const ids=heroTexIds(cls,eq);const body=cls==='hechicero'?'m_robe':cls==='arquera'?'f_tunic':'m_tunic';
   bodyComposite(body,ids).then(t=>{r.body.userData.mats.forEach(m=>{m.map=t;m.needsUpdate=true;});gearGlow(r);}).catch(()=>{});}
@@ -5546,9 +5564,9 @@ function animHero(dt){if(!HERO)return;const r=HERO,cls=r.cls;const y=H(P.x,P.z);
   P.combat=Math.max(0,(P.combat||0)-dt);P.hitK=Math.max(0,(P.hitK||0)-dt*4);P.deadK=P.dead?Math.min(1,(P.deadK||0)+dt*1.8):0;
   const act=P.swingT>=0?(VIS(cls)==='caballero'?'slash':cls==='hechicero'?'cast':'bow'):null;
   if(r.oad)oadHeroAnim(r,dt,act);else{poseHuman(r,{t:T,mv:P.mv,walk:P.walk,act,actT:P.swingT,stance:Math.min(1,P.combat*1.5)*(VIS(cls)==='caballero'?1:.6),spin:P.spinT>=0,dead:smooth(0,1,P.deadK),hit:P.hitK});
-  animCape(r.cape,T,P.mv);}
+  animCape(r.cape,T,P.mv,0,r.flyK||0);}
   if(r.staff&&r.staff.userData.orb)r.staff.userData.orb.rotation.y+=dt*2;
-  if(r.wings){const fk=r.flyK||0,ke=fk*fk*(3-2*fk),gl=Math.sin(T*1.3)*.06;const beat=r.beat||0;
+  if(r.wings&&r.wings.sides){const fk=r.flyK||0,ke=fk*fk*(3-2*fk),gl=Math.sin(T*1.3)*.06;const beat=r.beat||0;
     /* reposo: alas abiertas en V hacia atrás e inclinadas, para que se lean desde la cámara de arriba; en vuelo: aleteo con ola */
     r.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry*(1-ke)+ke*(WG.fy-beat*.06)+gl*(1-ke));W.rotation.z=s*(WG.rz*(1-ke)+ke*(.1+beat*.5));W.rotation.x=0;});r.wings.g.rotation.x=WG.rx*(1-ke)+WG.fx*ke;
     const u=r.wings.u;if(u){const Tz=STUDIO.frozen?3:T;u.uWT.value=Tz;u.uWP.value=ke>.02?(r.flyPh||0)+.35:Tz*1.4;u.uWA.value=.05*(1-ke)+.36*ke;u.uWR.value=.35+.65*ke;}}
@@ -6400,7 +6418,7 @@ function liveAnim(dt){if(!LIVE.others.size)return;const k=1-Math.exp(-dt*12);
     r.g.position.set(o.x,H(o.x,o.z),o.z);r.g.rotation.y=o.ry;
     const cls=r.cls,act=o.P.swingT>=0?(VIS(cls)==='caballero'?'slash':cls==='hechicero'?'cast':'bow'):null;
     if(r.oad){const sP=P;P=o.P;try{oadHeroAnim(r,dt,act);}catch(e){}finally{P=sP;}if(o.P.gest&&o.P.gest.done)o.P.gest=null;}
-    else{o.walk+=dt*o.P.mv*9;poseHuman(r,{t:T,mv:o.P.mv,walk:o.walk,act,actT:o.P.swingT,stance:0,spin:false,dead:smooth(0,1,o.P.deadK),hit:0});animCape(r.cape,T,o.P.mv);}
+    else{o.walk+=dt*o.P.mv*9;poseHuman(r,{t:T,mv:o.P.mv,walk:o.walk,act,actT:o.P.swingT,stance:0,spin:false,dead:smooth(0,1,o.P.deadK),hit:0});animCape(r.cape,T,o.P.mv,0,r.flyK||0);capeSparkTick(r,dt);}
     if(r.staff&&r.staff.userData.orb)r.staff.userData.orb.rotation.y+=dt*2;
     if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;try{if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}
     if(o.bubT&&T>o.bubT){o.bub=null;o.bubT=0;liveLabel(o);}}}
@@ -6705,7 +6723,7 @@ async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/(
   $('#updLater').addEventListener('click',()=>{try{localStorage.setItem('nox-upd-skip',v.version);localStorage.setItem('nox-upd-t',Date.now());}catch(e){}d.remove();});}
 setTimeout(appUpdateCheck,3000);
 liveHUD();
-try{window.__NOX={caldT:(sel)=>{for(let i=0;i<4;i++){C.inv[i]=newEquip(C.cls,["armor","helm","pants","boots"][i],3);C.inv[i].lv=[10,4,0,12][i];}const n=npcs.find(n=>n.id==="chamana");openNpc(n);if(sel!=null){CALD.sel=sel;renderCaldero();}return !!n;},auraT:()=>{const a=HERO.aura;if(!a)return "sin aura";a.material.opacity=.6;auraFit(a);const P=a.geometry.attributes.position;let mn=9,mx=-9;for(let i=0;i<P.count;i++){mn=Math.min(mn,P.getY(i));mx=Math.max(mx,P.getY(i));}return [mn,mx,P.count];},notice:(h,c)=>notice(h,c),addItemT:it=>addItem(it),gestGo:k=>gestStart(k),gemApply:(slot,sub)=>{C.inv[0]=stackItem('gem',sub||'tupa',5);GEM={sub:sub||'tupa'};applyGem(C.eq[slot]);},rankTest:(l,names,n)=>{RANK.list=l;RANK.on=new Set(names);RANK.n=n;RANK.err=0;if(mode==='game'){closeAll();renderRank();showPanel('pRank');}else{SRV.on=true;acctBar();}},openRankRaw:()=>{closeAll();renderRank();showPanel('pRank');},openShop:n=>openShop(n),newEquip:(c,k,t)=>newEquip(c,k,t),H:(x,z)=>H(x,z),LAKE_Y,get SCN(){return scene},zoneSafe:()=>!!(Z&&Z.safe),bigMapClose:()=>closeBigMap(),zload:id=>zloadShow(id),liveTest:m=>{LIVE.me=LIVE.me||'me';liveMsg(m);},camSet:m=>setCam(m),camTurn:(x,y)=>camTurn(x,y),shpSet:on=>{SHPROXY_ON=on;zoneG.traverse(o=>{if(o.userData.src)o.userData.src.forEach(x=>x.castShadow=!on);});},get CAM(){return camera},duelSet:o=>{Object.assign(DUEL,o);LIVE.me=LIVE.me||'me';},duelTest:m=>{DUEL.key=m.key;DUEL.side='a';DUEL.room={a:'me',b:'x',start:0};LIVE.me='me';duelMsg(m);},bakeNow:()=>{delete window.__NOBAKE;npcs.forEach(n=>charBake(n.m));if(HERO)charBake(HERO);try{LIVE.others.forEach(o=>o.m&&charBake(o.m));}catch(e){}return freezeStatic();},get MRG(){return window.__MRG||0},get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get enemies(){return enemies},get AWAKE(){return AWAKE},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
+try{window.__NOX={rebuildHeroT:()=>rebuildHero(C.cls,C.eq),heroT:()=>HERO,caldT:(sel)=>{for(let i=0;i<4;i++){C.inv[i]=newEquip(C.cls,["armor","helm","pants","boots"][i],3);C.inv[i].lv=[10,4,0,12][i];}const n=npcs.find(n=>n.id==="chamana");openNpc(n);if(sel!=null){CALD.sel=sel;renderCaldero();}return !!n;},auraT:()=>{const a=HERO.aura;if(!a)return "sin aura";a.material.opacity=.6;auraFit(a);const P=a.geometry.attributes.position;let mn=9,mx=-9;for(let i=0;i<P.count;i++){mn=Math.min(mn,P.getY(i));mx=Math.max(mx,P.getY(i));}return [mn,mx,P.count];},notice:(h,c)=>notice(h,c),addItemT:it=>addItem(it),gestGo:k=>gestStart(k),gemApply:(slot,sub)=>{C.inv[0]=stackItem('gem',sub||'tupa',5);GEM={sub:sub||'tupa'};applyGem(C.eq[slot]);},rankTest:(l,names,n)=>{RANK.list=l;RANK.on=new Set(names);RANK.n=n;RANK.err=0;if(mode==='game'){closeAll();renderRank();showPanel('pRank');}else{SRV.on=true;acctBar();}},openRankRaw:()=>{closeAll();renderRank();showPanel('pRank');},openShop:n=>openShop(n),newEquip:(c,k,t)=>newEquip(c,k,t),H:(x,z)=>H(x,z),LAKE_Y,get SCN(){return scene},zoneSafe:()=>!!(Z&&Z.safe),bigMapClose:()=>closeBigMap(),zload:id=>zloadShow(id),liveTest:m=>{LIVE.me=LIVE.me||'me';liveMsg(m);},camSet:m=>setCam(m),camTurn:(x,y)=>camTurn(x,y),shpSet:on=>{SHPROXY_ON=on;zoneG.traverse(o=>{if(o.userData.src)o.userData.src.forEach(x=>x.castShadow=!on);});},get CAM(){return camera},duelSet:o=>{Object.assign(DUEL,o);LIVE.me=LIVE.me||'me';},duelTest:m=>{DUEL.key=m.key;DUEL.side='a';DUEL.room={a:'me',b:'x',start:0};LIVE.me='me';duelMsg(m);},bakeNow:()=>{delete window.__NOBAKE;npcs.forEach(n=>charBake(n.m));if(HERO)charBake(HERO);try{LIVE.others.forEach(o=>o.m&&charBake(o.m));}catch(e){}return freezeStatic();},get MRG(){return window.__MRG||0},get PETO(){return PETO},ACTS:()=>ACT,openShopId:id=>openShop(npcs.find(n=>n.id===id)),petShow:async k=>{await petGLB(PETMODEL[k].f);if(window.__PETSHOW){scene.remove(window.__PETSHOW);}const g=petBuild(k);g.position.set(0,PETMODEL[k].fly?.15:0,0);g.rotation.y=.5;scene.add(g);window.__PETSHOW=g;const b=new THREE.Box3().setFromObject(g);return [b.min.toArray(),b.max.toArray()];},clearDrops:()=>{for(const d of drops.slice())removeDrop(d);},set camz(v){CAMZ=v},step:(dt,draw)=>tickOnce(dt,dt,draw!==false),H:(x,z)=>H(x,z),get T(){return T},get cam(){return camera},fixChar:c=>fixChar(c),get C(){return C},renderChar:()=>renderChar(),get GAMEDATA(){return {CLASSES,SKILLS,CSK,SETN,SLOTN,WNAME,SHNAME,WINGN,WINGN2,WINGN3,TREQ_LVL,TIERGLOW,GEMS,POTS,LOOTDEF,MOBS,MYTH,ZONES,ZORDER,QUESTS,NPCS,NPC_GEAR,PETS,RAR,ANCS,LORE};},irPump,iconFiles,oadHave,get OAD(){return OAD},get IR(){return IR},get npcs(){return npcs},irIcon:it=>{irInit();return irRenderIcon(it);},get FORJA(){return FORJA},get WG(){return WG},setFace:i=>{HERO_FACE=i;},HEADS,get EQK(){return EQK},setEq:(cls,eq)=>{C.cls=cls;C.eq=eq;C.face=C.face||0;recalc();rebuildHero(cls,eq);},STUDIO,makeEnemy,loadZone,get RND(){return renderer},get SND(){return SND},set face(v){HERO_FACE=v},get HERO(){return HERO},get DS(){return DS},get zoneG(){return zoneG},get CC0(){return CC0},glb:n=>oadGLB(n),recalc:()=>recalc(),applyGemT:(sub,it)=>{GEM={sub};applyGem(it);},rollEquip:(...a)=>rollEquip(...a),rebuildHero:(c,e)=>rebuildHero(c,e),get MOBS(){return MOBS},get enemies(){return enemies},get AWAKE(){return AWAKE},get SETN(){return SETN},newEquip:(...a)=>newEquip(...a),get DUEL(){return DUEL},get drops(){return drops},get projs(){return projs},useSkill:i=>useSkill(i),rewardKill:(e,S)=>rewardKill(e,S),get enemies(){return enemies},get MOBNET(){return MOBNET},get C(){return C},applyMobDmg:(e,d)=>applyMobDmg(e,d,'',false),liveAdd:d=>liveAdd(d),liveS:()=>liveS(),get LIVE(){return LIVE},get VOX(){return VOX},get P(){return P},get Z(){return Z},ACT,chatSend,liveSend,voiceStart,travel};}catch(e){}
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
