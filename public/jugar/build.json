@@ -1,10 +1,10 @@
 {
- "build": "202611091257",
- "min": "202611091257",
- "title": "Cursor guantelete de Tupã",
+ "build": "202611091312",
+ "min": "202611091312",
+ "title": "Cursor de Tupã y brillo de ítems",
  "notes": [
-  "Nuevo cursor para PC: el guantelete de Tupã, más grande y con la punta del dedo como punto de clic.",
-  "Animación de click de 2 cuadros: el guantelete se ve apretado, con destello en la gema, mientras mantenés el botón del mouse.",
-  "En celulares y tablets no cambia nada (no tienen cursor)."
+  "Nuevo cursor para PC: el guantelete de Tupã, más grande y con animación de click de 2 cuadros mientras mantenés el botón del mouse.",
+  "Los ítems del piso ya no tienen la columna de luz: ahora brillan desde su centro hacia afuera, con un resplandor que late y chispas. Cuanto más raro el ítem, más grande el brillo.",
+  "Celulares y tablets no cambian el cursor (no tienen)."
  ]
 }
