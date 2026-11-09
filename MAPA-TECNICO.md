@@ -258,6 +258,17 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Íconos (7/11, noche azul y sol dorado; fuente `/home/claude/opt/icon/icon.svg`, se renderiza con `tools/svgpng.js`): `img/nox-icon-192/256/512.png` (nombres nuevos para saltar la caché), `nox-icon-maskable-512.png` (sin esquinas, Android), `apple-touch-icon.png` (180, sin esquinas, también en la raíz), favicon SVG embebido en el juego, `jugar/manifest.webmanifest`, `android/.../mipmap-*/ic_launcher.png` y `desktop/icon.ico/png` (las apps hay que volver a armarlas con `scripts/app.sh`).
 - `_headers`: `/img/*` se guarda 1 día en caché, por eso existe la huella en la dirección.
 
+## Parche 202611091008: capas, eventos, comercio y tiendas (9/11)
+
+- **Capa del Mburuvicha** (casillero `wings`, sin capa base): `mbCapeStyle`, `capeTex2` (ñandutí, borde trenzado, cuentas, borde dentado en 3ª gen.), `bannerTex`, `capeMesh2`, `mbCapeOn`, `capeSparkTick`; `animCape(c,t,mv,lean,fly)` mueve `subs` y `tips`. Colores por nivel: azul, rojo, negro; dorado (`0xe8b44a`) desde +9. Para pintar en canvas usar `mixHex` (lerp sRGB): `lerpHex` pasa por THREE.Color y oscurece.
+- **Eventos**: `EVSCHED`, `runeRingTex`, `evAir` (brasas y humo), `bannerEvTex`. Arena de Añá: `E.total=100`, máx. 30 vivos, el piso cae a las 25/50/75 muertes, 420 s. Tuguy: altar `Z.evAltar`, muro de cierre en z=-43.6. Mobs de evento `C.L+10`.
+- **Alas**: `restPose(body)` (`skeleton.pose()` + `cc0Recurl`) antes de cada `wingSocket`: el anclaje se mide en la pose base.
+- **Sombreadores**: `crackGlow` y `ghostify` arman `customProgramCacheKey` desde la clave previa (antes chocaban y la cabeza del Mbói Tata salía transparente).
+- **Set**: `setInfoHTML`/`setInfoToggle`, `ACT.setInfo`. **Mapa del reino**: `MAPV.pop` con tarjeta `.pyPop`, escucha en `svg.pym`. **PC**: `TIP` + `#itemTip` (`itemCard(it,ctx,true)`), `heroDropZone` para soltar y equipar.
+- **Comercio y tiendas**: cliente `TR`, `MYSHOP`, `SHOPV`, `plMenu` (tocar a otro jugador en `tapAt`), paneles `#pTrade`, `#pMyShop`, `#pShopV`. Worker (`live/src/index.js`): `tradeOf/tradeState/tradeSend/tradeEnd/tradeMsg`, `shopPub/shopMsg`; mensajes treq/tacc/trej/toff/trdy/tcnf/tcommit/tok/tno/tx/tend y shop/shopv/sbuy/ssell/sok/sno/sres; límite 26000 para toff/tok/shop/sok. Se reparte por la tabla D1 `deliveries` (ítems `{raw:item}`, oro `{k:'gold',n,inv:1}`), que el cliente recoge con `srvDeliveries`. Se cancela al cambiar de zona o desconectarse.
+- **Pies al suelo**: `footIK(r,dt)` al final de `oadHeroAnim` (héroe, PNJ y jugadores). IK de dos huesos (muslo, pantorrilla, pie; nombres CC0 `thigh_l/calf_l/foot_l` u OAD `thigh_L/leg_L/foot_L`), la cadera baja con `r.model.position.y += r.ikDrop`, el pie se inclina con la normal del terreno. Peso 1 quieto, 0,5 caminando, 0 en vuelo, muerte, gestos y fuera de `mode==='game'`. `window.__NOIK=1` lo apaga para comparar. Prueba: `tools/feet.js` y `tools/feetwalk.js`.
+- **Parches**: `scripts/patch.sh` escribe también `public/jugar/patches.json` (botón "Historial de parches") y exige al menos una nota.
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.
