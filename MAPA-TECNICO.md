@@ -330,7 +330,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Zoom: viewport con `maximum-scale=1,user-scalable=no`; `<style id="noZoom">` (`touch-action:manipulation`, inputs a 16 px en táctil para que iOS no amplíe) y bloqueo de `gesture*`, pellizco y `dblclick`.
 - Prueba: `zt.js` con `TRTEST=1` (ahora también prueba la pila, el error y el separar).
 
-## Parche 202611091816: baúl a pantalla completa y tarjeta de vida (9/11)
+## Parche 202611091820: baúl a pantalla completa y tarjeta de vida (9/11)
 - `#pVault` es la única ventana a pantalla completa (`<style id="vaultFull">`: anula `.panel:not(.top)` y la animación `halfIn`); `#vGrid` a 10 columnas con scroll, casillas por `aspect-ratio`. El gris de `#vGrid .cell.has` sólo con candado (`#vStore.locked`).
 - `irIconsChanged` ahora redibuja también `#pVault`, `#pTrade`, `#pMyShop` y `#pShopV` cuando termina un ícono (antes el baúl se quedaba con el SVG genérico).
 - `#lifeCard` tiene `data-act="openChar"` y `pointer-events:auto`: tocarla abre la ficha del personaje.
