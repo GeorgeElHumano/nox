@@ -2402,9 +2402,11 @@ function makeCape(col,trim,feather){const geo=new THREE.PlaneGeometry(.5,1.15,10
   geo.computeVertexNormals();const base=pa.slice();const T=capeTex(col,trim,feather);
   const m=new MSM({color:0xffffff,map:T.t,normalMap:T.n,normalScale:new THREE.Vector2(.6,.6),roughness:.88,metalness:0,side:THREE.DoubleSide});rimify(m);
   const mesh=new THREE.Mesh(geo,m);mesh.position.set(0,.6,-.15);mesh.castShadow=true;mesh.userData.solo=true;return{mesh,geo,base};}
-function animCape(c,t,mv,lean,fly){if(!c)return;fly=fly||0;const a=c.geo.attributes.position.array,b=c.base,fe=fly*fly*(3-2*fly),fq=c.sub||c.subs?1:.7;for(let i=0;i<a.length;i+=3){const x=b[i],y=b[i+1],k=-y/1.15;
+function animCape(c,t,mv,lean,fly){if(!c)return;fly=fly||0;
+  /* la fase de la ola se acumula (antes era t×frecuencia: al arrancar o frenar la frecuencia cambiaba de golpe y la capa daba un tirón rápido) y el movimiento se suaviza */
+  const cdt=c.lt==null?0:Math.max(0,Math.min(.1,t-c.lt));c.lt=t;c.mvS=c.mvS==null?mv:c.mvS+(mv-c.mvS)*Math.min(1,cdt*3);c.flS=c.flS==null?fly:c.flS+(fly-c.flS)*Math.min(1,cdt*4);mv=c.mvS;fly=c.flS;const a=c.geo.attributes.position.array,b=c.base,fe=fly*fly*(3-2*fly),fq=c.sub||c.subs?1:.7;c.ph=(c.ph||t*3)+cdt*(3+mv*5+fe*4);const ph=c.ph;for(let i=0;i<a.length;i+=3){const x=b[i],y=b[i+1],k=-y/1.15;
     /* en vuelo la capa no se abre: se estira hacia atrás (casi horizontal) y una ola corre de los hombros a la punta */
-    const wv=Math.sin(t*(3+mv*5+fe*4)-k*(4+fe*3)+x*3)*(.035*(k+.2)*(1+mv)+fe*.09*k);
+    const wv=Math.sin(ph-k*(4+fe*3)+x*3)*(.035*(k+.2)*(1+mv)+fe*.09*k);
     a[i]=x*(1+k*(.35+fe*.25));a[i+1]=y*(1-k*.08*mv)*(1-fe*.38*k*fq)+fe*wv*.6;a[i+2]=b[i+2]-k*k*(.12+.55*mv)*(1-fe)-fe*k*.85*fq-wv*(1-fe*.4)-k*.05-(c.lowBack||0)*Math.min(1,k*1.8);}
   c.geo.attributes.position.needsUpdate=true;c.geo.computeVertexNormals();if(c.sub)animCape(c.sub,t,mv*.4,lean,fly*.35);
   if(c.subs)for(const sb of c.subs)animCape(sb,t+.7,mv,lean,fly);if(c.tips)for(const [tp,i] of c.tips)tp.position.set(a[i*3],a[i*3+1]-.03,a[i*3+2]);}
