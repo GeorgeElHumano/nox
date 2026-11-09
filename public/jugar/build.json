@@ -1,8 +1,8 @@
 {
- "build": "202611091552",
- "min": "202611091552",
- "title": "Portada en celular",
+ "build": "202611091809",
+ "min": "202611091809",
+ "title": "Mobs de 2 patas: pasos acordes a su velocidad",
  "notes": [
-  "En el celular el personaje se ve entero en la portada: en vertical arriba del logo y en horizontal centrado en el espacio libre"
+  "Los mobs de 2 patas ya no patinan: el paso de caminar y correr se ajusta a lo que avanzan de verdad"
  ]
 }

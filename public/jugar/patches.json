@@ -1,5 +1,12 @@
 [
  {
+  "build": "202611091809",
+  "title": "Mobs de 2 patas: pasos acordes a su velocidad",
+  "notes": [
+   "Los mobs de 2 patas ya no patinan: el paso de caminar y correr se ajusta a lo que avanzan de verdad"
+  ]
+ },
+ {
   "build": "202611091552",
   "title": "Portada en celular",
   "notes": [

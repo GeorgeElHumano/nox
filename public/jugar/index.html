@@ -3841,11 +3841,24 @@ function oadUpgradeMobs(){if(!zoneG)return;for(const e of enemies){if(e.kind==='
   const scl=e.def.scale*(e.golden?1.15:1);m.g.scale.setScalar(scl);m.g.position.copy(e.g.position);m.g.rotation.y=e.g.rotation.y;m.g.visible=e.g.visible;m.g.traverse(o=>{if(o.isMesh)o.castShadow=true;});charBake(m);addBlob(m.g,m.rad*2.7);
   zoneG.remove(e.g);disposeTree(e.g);zoneG.add(m.g);Object.assign(e,{shL:null,shOn:null,g:m.g,rig:m.rig,mats:m.mats,kind:m.kind||'glb',oadUp:true,legs:m.legs,heads:m.heads,tail:m.tail,body:m.body,head:m.head,mixer:m.mixer,acts:m.acts,cur:m.cur,curK:m.curK,B:m.B,eye:m.eye,eyeBone:m.eyeBone,horn:m.horn,ghost:m.ghost,sparkle:m.sparkle||null,wings:m.wings||null,orbit:m.orbit||null,rad:m.rad*scl,hgt:m.hgt*scl});e.p=m.g.position;
   if(e.dead){e.g.visible=false;}}}
+/* pasos de los mobs de 2 patas: la velocidad del clip de caminar/correr se ajusta a lo que el mob avanza de verdad (antes era fija y, según escala y velocidad, los pies patinaban) */
+const MOBSTEP=new Map();
+function mobStepVc(e){const key=e.type;if(MOBSTEP.has(key))return MOBSTEP.get(key);let vc=null;
+  try{const root=e.mixer.getRoot(),bones=[],feet=[];root.traverse(o=>{if(!o.isBone)return;bones.push([o,o.position.clone(),o.quaternion.clone(),o.scale.clone()]);if(/^foot_[lr]$/i.test(o.name))feet.push(o);});
+    if(feet.length===2){vc={};const mx=new THREE.AnimationMixer(root),pos=new THREE.Vector3(),sc=e.g.scale.x||1;
+      for(const k of ['walk','run']){const a=e.acts[k];if(!a)continue;const clip=a.getClip(),d=clip.duration,act=mx.clipAction(clip);act.reset().play();let lo=1e9,hi=-1e9;
+        for(let i=0;i<=24;i++){act.time=d*i/24;mx.update(0);e.g.updateMatrixWorld(true);feet[0].getWorldPosition(pos);e.g.worldToLocal(pos);lo=Math.min(lo,pos.z);hi=Math.max(hi,pos.z);}
+        act.stop();vc[k]=(hi-lo)/(d/2)*sc;}
+      mx.stopAllAction();mx.uncacheRoot(root);}
+    bones.forEach(([o,p,q,s2])=>{o.position.copy(p);o.quaternion.copy(q);o.scale.copy(s2);});e.g.updateMatrixWorld(true);
+  }catch(x){vc=null;}
+  MOBSTEP.set(key,vc);return vc;}
+function mobStepTs(e,k,sp,dflt){const vc=mobStepVc(e);if(!vc||!(vc[k]>.35))return dflt;return clamp(sp/vc[k],.5,3);}
 function oadMobAnim(e,dt,sp){const lk=e.lunge>0?Math.sin((1-e.lunge/.35)*PI):0;
   if(!e.mixer){const w=Math.min(1,sp/2.5);e.rig.position.y=Math.abs(Math.sin(e.phase))*.07*w;e.rig.rotation.x=-lk*.14+Math.sin(T*1.3+e.hx)*.02;e.rig.position.z=lk*.55;return;}
   const B=e.B||{};if(e.lunge>0&&e.acts.attack){if(e.curK!=='attack')oadPlay(e,'attack',.08,e.acts.attack.getClip().duration/.75,true);}
-  else if(sp>e.speed*.6)oadPlay(e,'run',.2,((B.ts&&B.ts.run)||1)*Math.max(.7,sp/e.speed));
-  else if(sp>.05)oadPlay(e,'walk',.2,((B.ts&&B.ts.walk)||1)*Math.max(.6,sp/(e.speed*.3)));
+  else if(sp>e.speed*.6)oadPlay(e,'run',.2,mobStepTs(e,'run',sp,((B.ts&&B.ts.run)||1)*Math.max(.7,sp/e.speed)));
+  else if(sp>.05)oadPlay(e,'walk',.2,mobStepTs(e,'walk',sp,((B.ts&&B.ts.walk)||1)*Math.max(.6,sp/(e.speed*.3))));
   else oadPlay(e,'idle',.15,1);
   /* LOD de animación: los mobs lejanos o fuera de cámara se animan con menos frecuencia */
   {const dd=Math.hypot(e.p.x-P.x,e.p.z-P.z);e.mAcc=(e.mAcc||0)+dt;const step=P.target===e||dd<22?0:dd<40?.05:.1;if(e.mAcc>=step&&(dd<26||inView(e.p))){e.mixer.update(e.mAcc);e.mAcc=0;}}
@@ -7183,7 +7196,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611091552';const UPD={shown:'',req:false};
+const NOX_BUILD='202611091809';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
