@@ -1,5 +1,16 @@
 [
  {
+  "build": "202611101102",
+  "title": "Ficha de tus compañeros de grupo",
+  "notes": [
+   "Tocá el cuadro de un compañero (en el panel Grupo o en su tarjeta debajo de tu vida) para ver su ficha.",
+   "A la izquierda se ve su personaje en 3D con su set, alas o capa; se puede girar arrastrando.",
+   "A la derecha: nivel, reinicios, mapa donde está, Fuerza, Agilidad, Vitalidad, Energía, daño, defensa, vida, maná, velocidad y crítico.",
+   "Su equipo con el +nivel y sus mascotas; tocá un objeto para ver el detalle.",
+   "Funciona aunque esté en otro mapa y se actualiza sola si cambia de equipo."
+  ]
+ },
+ {
   "build": "202611101014",
   "title": "Arreglo: jugar en otro dispositivo",
   "notes": [

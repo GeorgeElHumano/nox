@@ -1,10 +1,12 @@
 {
- "build": "202611101014",
- "min": "202611101014",
- "title": "Arreglo: jugar en otro dispositivo",
+ "build": "202611101102",
+ "min": "202611101102",
+ "title": "Ficha de tus compañeros de grupo",
  "notes": [
-  "Al abrir NOX en otro dispositivo, el nuevo ya no queda bloqueado en el inicio",
-  "Ahora el que queda afuera es el dispositivo anterior, y lo que pase ahí no se guarda",
-  "Con el botón Jugar en este dispositivo recuperás la partida en cualquiera de los dos"
+  "Tocá el cuadro de un compañero (en el panel Grupo o en su tarjeta debajo de tu vida) para ver su ficha.",
+  "A la izquierda se ve su personaje en 3D con su set, alas o capa; se puede girar arrastrando.",
+  "A la derecha: nivel, reinicios, mapa donde está, Fuerza, Agilidad, Vitalidad, Energía, daño, defensa, vida, maná, velocidad y crítico.",
+  "Su equipo con el +nivel y sus mascotas; tocá un objeto para ver el detalle.",
+  "Funciona aunque esté en otro mapa y se actualiza sola si cambia de equipo."
  ]
 }
