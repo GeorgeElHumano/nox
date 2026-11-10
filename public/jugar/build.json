@@ -1,12 +1,11 @@
 {
- "build": "202611101102",
- "min": "202611101102",
- "title": "Ficha de tus compañeros de grupo",
+ "build": "202611101822",
+ "min": "202611101822",
+ "title": "Gestos nuevos: Celebración y Descanso",
  "notes": [
-  "Tocá el cuadro de un compañero (en el panel Grupo o en su tarjeta debajo de tu vida) para ver su ficha.",
-  "A la izquierda se ve su personaje en 3D con su set, alas o capa; se puede girar arrastrando.",
-  "A la derecha: nivel, reinicios, mapa donde está, Fuerza, Agilidad, Vitalidad, Energía, daño, defensa, vida, maná, velocidad y crítico.",
-  "Su equipo con el +nivel y sus mascotas; tocá un objeto para ver el detalle.",
-  "Funciona aunque esté en otro mapa y se actualiza sola si cambia de equipo."
+  "Celebración nueva, hecha a partir de un video: sube los dos brazos con las manos abiertas y los va alternando mientras se mece.",
+  "Descanso nuevo: se sienta en el piso con una pierna estirada y el brazo sobre la rodilla, respira y mira alrededor.",
+  "Sentado se queda en el piso hasta que te muevas, ataques o elijas otro gesto; con otro gesto primero se levanta.",
+  "Durante los gestos se guardan el arma, el escudo y el carcaj, y vuelven a las manos al terminar."
  ]
 }

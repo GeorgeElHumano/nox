@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611101822",
+  "title": "Gestos nuevos: Celebración y Descanso",
+  "notes": [
+   "Celebración nueva, hecha a partir de un video: sube los dos brazos con las manos abiertas y los va alternando mientras se mece.",
+   "Descanso nuevo: se sienta en el piso con una pierna estirada y el brazo sobre la rodilla, respira y mira alrededor.",
+   "Sentado se queda en el piso hasta que te muevas, ataques o elijas otro gesto; con otro gesto primero se levanta.",
+   "Durante los gestos se guardan el arma, el escudo y el carcaj, y vuelven a las manos al terminar."
+  ]
+ },
+ {
   "build": "202611101102",
   "title": "Ficha de tus compañeros de grupo",
   "notes": [
