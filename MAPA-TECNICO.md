@@ -378,3 +378,8 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Yvoty: en `oadHeroAnim`, junto a la estela de vuelo, si `wings.P.key==='fy2'` y no vuela, `parts` suelta un pétalo rosado cada ~0,45-0,85 s (`r.petT`).
 - Muestras: `gallery.js wings arquera` (con `WL`/`FR` en la copia de trabajo). Íconos del inventario (parche 202611100915): `irObject` usa `fairyWings(lv,g,true)` para la arquera: mismas texturas transparentes y material del personaje, alas abiertas de frente (`rotation.y ±.14`, sin inclinación) y sin chispas, halos ni resplandor, porque `Box3.setFromObject` contaba los sprites y el ala quedaba chica. El dueño prefirió el ícono transparente a uno opaco con colores vivos (probado y descartado). La web (`web/img/w/wing_arquera_*`, `web/data.json` wn/wn2/wn3) todavía muestra las alas viejas: correr `sync.sh alas:arquera` y `sync.sh datos`.
 
+
+## Web al día (10/11, rama `web-al-dia`, sin publicar)
+- Fotos rehechas con `sync.sh alas razas sets iconos` (+ `datos`): razas, 35 sets, 30 alas/capas, íconos de alas de Arquera y capas del Mburuvicha. Los personajes salen volando (como en el juego).
+- `gallery.js`: en `wingsonly` la capa del Mburuvicha es `H.cape.mesh` (antes fallaba con `H.wings.g`); se ocultan `#notices`, `#patchBox`, `#bigNotes`, `.bigNote`, `.gbub` (los avisos de evento salían en las fotos).
+- Mapa de la web: `PINS` son posiciones de dibujo, no reales; las tierras del sur van separadas (Campos [-57,-25], Ybytyruzú [-56.15,-25.85], Monday [-54.72,-25.3], Mbocaruzú [-57.3,-26.15], Salto Cristal [-56.55,-26.5]). Igual en `views.js` y `shell_js.js`. Textos: 12 tierras, 37 criaturas, 9 jefes.
