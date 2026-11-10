@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 10 de noviembre de 2026 (madrugada).
+Última actualización: 10 de noviembre de 2026 (mañana, alas de hada de la Arquera).
 
 ## Repositorio y publicación
 
