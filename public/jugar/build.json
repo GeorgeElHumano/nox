@@ -1,11 +1,12 @@
 {
- "build": "202611101822",
- "min": "202611101822",
- "title": "Gestos nuevos: Celebración y Descanso",
+ "build": "202611102024",
+ "min": "202611102024",
+ "title": "Compañeros en vivo y volver donde estabas",
  "notes": [
-  "Celebración nueva, hecha a partir de un video: sube los dos brazos con las manos abiertas y los va alternando mientras se mece.",
-  "Descanso nuevo: se sienta en el piso con una pierna estirada y el brazo sobre la rodilla, respira y mira alrededor.",
-  "Sentado se queda en el piso hasta que te muevas, ataques o elijas otro gesto; con otro gesto primero se levanta.",
-  "Durante los gestos se guardan el arma, el escudo y el carcaj, y vuelven a las manos al terminar."
+  "La ficha de un compañero de grupo ahora lo muestra en vivo: si camina, ataca, hace un gesto, vuela o cae, lo ves igual en su personaje.",
+  "Funciona aunque tu compañero esté en otro mapa; cuando hace un gesto o ataca, el personaje se da vuelta de frente solo.",
+  "Al volver a entrar aparecés en el mismo lugar donde te desconectaste, mirando hacia el mismo lado (se guarda en el servidor, sirve desde cualquier dispositivo).",
+  "Si se corta la señal o se apaga el celular, volvés casi donde estabas: la partida se guarda en el servidor cada minuto.",
+  "En eventos o si te desconectás muerto, aparecés en la entrada del mapa como siempre."
  ]
 }
