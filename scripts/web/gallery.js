@@ -22,7 +22,7 @@ let shot=null;
   await until('#nameIn');await p.evaluate(()=>{const b=document.querySelector(`[data-act=selClass][data-c=caballero]`);if(b)b.click();});await wait(500);
   await p.evaluate(()=>{const i=document.querySelector('#nameIn');i.value='Galeria';i.dispatchEvent(new Event('input'));document.querySelector('[data-act=selCreate]').click();});
   await until('#hud:not([hidden])');await wait(1500);
-  await p.addStyleTag({content:'#hud,#labels,#nums,#chatLog,#liveSt,#boot,#toast,#toasts,.toast,#zone,#fade{display:none!important}'+(process.env.ALPHA?'html,body,canvas,#game{background:transparent!important}#sel,.embers{display:none!important}':'')});
+  await p.addStyleTag({content:'#hud,#labels,#nums,#chatLog,#liveSt,#boot,#toast,#toasts,.toast,#zone,#fade,#notices,#patchBox,#bigNotes,.bigNote,.gbub{display:none!important}'+(process.env.ALPHA?'html,body,canvas,#game{background:transparent!important}#sel,.embers{display:none!important}':'')});
   await p.evaluate(z=>{window.__STUDIO_DARK=1;window.__ZOOM=z;window.__NOX.STUDIO.go();},process.env.ZOOM||'.8');await wait(2500);if(process.env.ALPHA){await p.evaluate(()=>{window.__NOX.STUDIO.alpha();window.__ALPHA_HIDE=1;});await wait(300);}
   if(MODE==='mobs'){const keys=await p.evaluate(()=>Object.keys(window.__NOX.MOBS));
     for(const k of keys){if(ONLY.length&&!ONLY.includes(k))continue;
@@ -65,7 +65,7 @@ let shot=null;
       await p.evaluate(([cls,g,lv])=>{const X=window.__NOX;const eq={};eq.wings={u:9999,k:'wings',c:cls,t:0,lv,g};X.setEq(cls,eq);X.STUDIO.hero();},[cls,g,lv]);
       for(let i=0;i<30;i++){await wait(500);const ok=await p.evaluate(()=>{const X=window.__NOX;return !!(X.HERO&&X.HERO.oad&&X.HERO.wings);});if(ok)break;}
       await wait(1200);
-      await p.evaluate(()=>{const X=window.__NOX,H=X.HERO,Wg=H.wings.g;(H.g.parent||H.g).traverse(o=>{if(!(o.isMesh||o.isSkinnedMesh||o.isPoints||o.isSprite||o.isLine))return;let q=o,inW=false;while(q){if(q===Wg){inW=true;break;}q=q.parent;}if(!inW)o.visible=false;});
+      await p.evaluate(()=>{const X=window.__NOX,H=X.HERO,Wg=H.wings.g||(H.cape&&H.cape.mesh);/* el Mburuvicha lleva capa en vez de alas */(H.g.parent||H.g).traverse(o=>{if(!(o.isMesh||o.isSkinnedMesh||o.isPoints||o.isSprite||o.isLine))return;let q=o,inW=false;while(q){if(q===Wg){inW=true;break;}q=q.parent;}if(!inW)o.visible=false;});
         H.g.updateMatrixWorld(true);const bb=new THREE.Box3();Wg.traverse(o=>{if(o.isMesh&&o.visible&&!o.isSprite)bb.expandByObject(o);});const c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());const S=X.STUDIO;const R=Math.max(sz.x,sz.y*1.3)+.2;S.look.copy(c);S.cam.set(c.x+Math.sin(Math.PI+.25)*R*1.65,c.y+R*.95,c.z+Math.cos(Math.PI+.25)*R*1.65);});
       await wait(400);await shot(`${OUT}/${cls}_g${g}_${lv}.png`);console.log('ala sola',cls,g,lv);}}
   if(MODE==='pets'){await p.evaluate(()=>{const X=window.__NOX;if(X.HERO)X.HERO.g.visible=false;X.STUDIO.clear&&X.STUDIO.clear();});
