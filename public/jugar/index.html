@@ -2387,7 +2387,7 @@ function wingExtraGeo(cls,s,st){const k=cls+s+st;if(WGEO[k])return WGEO[k];if(st
   WGEO[k]=keep(mergeGeos(parts));return WGEO[k];}
 /* ===== alas de hada de la arquera (10/11): 1ª gen Panambi (mariposa), 2ª Yvoty (pétalos de lapacho), 3ª Arasy (tornasol con colas) ===== */
 const FTEX={};
-function fairyTex(gen,lv){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:0);if(FTEX[key])return FTEX[key];
+function fairyTex(gen,lv,ico){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:0)+(ico?'i':'');if(FTEX[key])return FTEX[key];
   const Wc=512,Hc=1024,cv=document.createElement('canvas');cv.width=Wc;cv.height=Hc;const x=cv.getContext('2d');
   const ec=document.createElement('canvas');ec.width=Wc;ec.height=Hc;const e=ec.getContext('2d');e.fillStyle='#000';e.fillRect(0,0,Wc,Hc);
   const X=v=>v/1.1*Wc,Y=v=>(1.0-v)/2.2*Hc,R=[X(.02),Y(0)];
@@ -2403,7 +2403,7 @@ function fairyTex(gen,lv){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:0);i
       c.beginPath();c.moveTo(p0[0],p0[1]);let A=q(.25,.5,1),B=q(.85,1.15,1);c.bezierCurveTo(A[0],A[1],B[0],B[1],p1[0]+n[0]*w*.35,p1[1]+n[1]*w*.35);
       /* borde ondulado de la punta */const m1=q(1.04,.12,1),m2=q(1.04,-.12,1);c.quadraticCurveTo(m1[0],m1[1],p1[0],p1[1]);c.quadraticCurveTo(m2[0],m2[1],p1[0]-n[0]*w*.35,p1[1]-n[1]*w*.35);
       A=q(.85,1.15,-1);B=q(.25,.5,-1);c.bezierCurveTo(A[0],A[1],B[0],B[1],p0[0],p0[1]);c.closePath();
-      if(fill){const g=c.createLinearGradient(p0[0],p0[1],p1[0],p1[1]);g.addColorStop(0,'#8a1650');g.addColorStop(.3,'#c8337f');g.addColorStop(.75,'#ea70ae');g.addColorStop(1,'#ffc2e0');c.fillStyle=g;c.globalAlpha=.55;c.fill();c.globalAlpha=1;
+      if(fill){const g=c.createLinearGradient(p0[0],p0[1],p1[0],p1[1]);g.addColorStop(0,'#8a1650');g.addColorStop(.3,'#c8337f');g.addColorStop(.75,'#ea70ae');g.addColorStop(1,'#ffc2e0');c.fillStyle=g;c.globalAlpha=ico?.95:.55;c.fill();c.globalAlpha=1;
         c.save();c.clip();c.strokeStyle='rgba(120,20,70,.45)';c.lineWidth=1.4;for(let k=-3;k<=3;k++){const P=q(.95,k*.25,1);c.beginPath();c.moveTo(p0[0],p0[1]);c.quadraticCurveTo(...q(.5,k*.18,1),P[0],P[1]);c.stroke();}c.restore();
         c.strokeStyle=edge;c.lineWidth=3;c.stroke();}
       else{c.fillStyle=edge;c.fill();}};
@@ -2416,7 +2416,7 @@ function fairyTex(gen,lv){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:0);i
     if(g3){/* colas largas como cintas */for(const [k,w,c1,c2] of [[0,16,'#ffd85a','#ff5aa8'],[1,10,'#7af0ff','#8a5cf0']]){const g=x.createLinearGradient(X(.45),Y(-.7),X(.7),Y(-1.18));g.addColorStop(0,c1);g.addColorStop(1,c2);x.strokeStyle=g;x.lineWidth=w;x.lineCap='round';x.beginPath();x.moveTo(X(.42+k*.08),Y(-.68));x.bezierCurveTo(X(.48+k*.1),Y(-.9),X(.62+k*.08),Y(-1.0),X(.66+k*.14),Y(-1.16+k*.06));x.stroke();
       x.fillStyle=c2;x.beginPath();x.ellipse(X(.66+k*.14),Y(-1.16+k*.06),w*1.3,w*2,-.4,0,7);x.fill();
       if(glowV){e.strokeStyle=c1;e.lineWidth=w*.6;e.lineCap='round';e.beginPath();e.moveTo(X(.42+k*.08),Y(-.68));e.bezierCurveTo(X(.48+k*.1),Y(-.9),X(.62+k*.08),Y(-1.0),X(.66+k*.14),Y(-1.16+k*.06));e.stroke();}}}
-    const fillLobe=(pts,stops,rad)=>{lobe(x,pts);const g=x.createRadialGradient(R[0],R[1],4,R[0],R[1],rad);stops.forEach(([o,c])=>g.addColorStop(o,c));x.fillStyle=g;x.globalAlpha=g3?.5:.45;x.fill();x.globalAlpha=1;};
+    const fillLobe=(pts,stops,rad)=>{lobe(x,pts);const g=x.createRadialGradient(R[0],R[1],4,R[0],R[1],rad);stops.forEach(([o,c])=>g.addColorStop(o,c));x.fillStyle=g;x.globalAlpha=ico?.92:g3?.5:.45;x.fill();x.globalAlpha=1;};
     if(!g3){fillLobe(U,[[0,'#05264e'],[.3,'#0d62a8'],[.6,'#17a6d4'],[.85,'#4fd2ee'],[1,'#8ee8fa']],X(1.05));fillLobe(LO,[[0,'#05264e'],[.45,'#1170b0'],[.85,'#2fc0e4'],[1,'#7ae0f4']],X(.85));}
     else{fillLobe(U,[[0,'#fff2a8'],[.18,'#ffd85a'],[.36,'#4be0a0'],[.56,'#3fa0f0'],[.76,'#8a5cf0'],[.92,'#ff6ad0'],[1,'#ffd0f0']],X(1.1));fillLobe(LO,[[0,'#fff2a8'],[.25,'#ffd85a'],[.55,'#ff7a5a'],[.85,'#ff5aa8'],[1,'#ffc0e0']],X(.85));}
     /* venas */for(const [pts,a0,a1,n,len] of [[U,.05,1.35,7,X(1.05)],[LO,-1.2,-.05,5,X(.8)]]){x.save();lobe(x,pts);x.clip();veins(x,g3?'rgba(255,255,255,.8)':'rgba(8,20,45,.9)',g3?2.5:3.5,1,n,len,a0,a1);
@@ -2428,23 +2428,27 @@ function fairyTex(gen,lv){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:0);i
     else{x.fillStyle='#fff8d0';for(let i=0;i<26;i++){const px=.15+Math.abs(Math.sin(i*12.9))*.8,py=-.6+Math.abs(Math.sin(i*7.3))*1.45;x.globalAlpha=.85;x.beginPath();x.arc(X(px),Y(py),1.5+(i%3),0,7);x.fill();}x.globalAlpha=1;
       e.fillStyle='#fff6d0';for(let i=0;i<26;i++){const px=.15+Math.abs(Math.sin(i*12.9))*.8,py=-.6+Math.abs(Math.sin(i*7.3))*1.45;e.beginPath();e.arc(X(px),Y(py),2+(i%3),0,7);e.fill();}}
     /* el emisivo lleva también un tenue del color base */if(g3){e.globalAlpha=.35;e.drawImage(cv,0,0);e.globalAlpha=1;}}
+  /* el ícono no tiene luz propia: las venas encendidas (+7) se suman al color */
+  if(ico&&glowV){const tc=document.createElement('canvas');tc.width=Wc;tc.height=Hc;const t2=tc.getContext('2d');t2.drawImage(ec,0,0);t2.globalCompositeOperation='destination-in';t2.drawImage(cv,0,0);x.save();x.globalAlpha=.6;x.globalCompositeOperation='lighter';x.drawImage(tc,0,0);x.restore();}
   const mk=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);return t;};
   FTEX[key]={map:mk(cv),em:mk(ec)};return FTEX[key];}
 const FAIRY_GEO=(()=>{const g=new THREE.PlaneGeometry(1.1,2.2,12,22);g.translate(.55,-.1,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const X=p.getX(i),Y=p.getY(i);p.setZ(i,-.16*X*X+.04*Y*Y);}g.computeVertexNormals();return keep(g);})();
-function fairyWings(lv,gen){lv=lv||0;gen=Math.max(1,Math.min(3,gen||1));const g=new THREE.Group();g.position.set(0,.45,-.22);g.rotation.x=-.32;const sides=[];
-  const T=fairyTex(gen,lv),em=gen===1?0x5ae6ff:gen===2?0xff7ad0:0xffd06a,P={em,key:'fy'+gen};
+/* ico: versión para el ícono del inventario (membrana casi opaca, abierta de frente, sin chispas ni halos que agranden el encuadre) */
+function fairyWings(lv,gen,ico){lv=lv||0;gen=Math.max(1,Math.min(3,gen||1));const g=new THREE.Group();if(!ico){g.position.set(0,.45,-.22);g.rotation.x=-.32;}const sides=[];
+  const T=fairyTex(gen,lv,ico),em=gen===1?0x5ae6ff:gen===2?0xff7ad0:0xffd06a,P={em,key:'fy'+gen};
   const wu={uWP:{value:0},uWA:{value:0},uWT:{value:0},uWR:{value:.4}};
   const m=new MSM({map:T.map,emissiveMap:T.em,emissive:0xffffff,emissiveIntensity:.25+(lv>=7?.5:0)+(lv>=13?.4:0)+(gen===3?.25:0),transparent:true,alphaTest:.05,depthWrite:false,side:THREE.DoubleSide,roughness:.65,metalness:0});
   m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,wu);sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nuniform float uWP;uniform float uWA;uniform float uWT;uniform float uWR;').replace('#include <begin_vertex>','#include <begin_vertex>\n{float sx=abs(transformed.x);float w=smoothstep(0.05,1.1,sx);transformed.z+=sin(uWP-sx*1.6)*uWA*w*0.8+0.025*sin(uWT*9.0+sx*7.0+transformed.y*5.0)*w*uWR;}');
     if(gen===3)sh.fragmentShader=sh.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float f=dot(normalize(vViewPosition),normal);vec3 ir=0.5+0.5*cos(6.2832*(f*1.3+vec3(0.0,0.33,0.67)));totalEmissiveRadiance+=ir*0.18*diffuseColor.a;}');};
   m.customProgramCacheKey=()=>'fairy'+gen;
+  const mI=ico?new THREE.MeshBasicMaterial({map:T.map,transparent:true,alphaTest:.05,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}):null;
   const S=[.9,1.025,1.425][gen-1]*(1+Math.min(15,lv)*.006);
-  for(const s of[-1,1]){const W=new THREE.Group();W.position.x=.04*s;g.add(W);sides.push(W);W.rotation.y=s*.42;
-    const me=new THREE.Mesh(FAIRY_GEO,m);me.scale.set(S*s,S,S);me.renderOrder=2;W.add(me);
+  for(const s of[-1,1]){const W=new THREE.Group();W.position.x=.04*s;g.add(W);sides.push(W);W.rotation.y=s*(ico?.14:.42);
+    const me=new THREE.Mesh(FAIRY_GEO,mI||m);me.scale.set(S*s,S,S);me.renderOrder=2;W.add(me);if(ico)continue;
     /* chispas: +10 polen o estrellas en el borde; +13 el doble */
     const ns=lv>=13?9:lv>=10?5:0;for(let k=0;k<ns;k++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sfxTex('star'),color:em,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.9,fog:false}));const t=k/Math.max(1,ns-1);sp.scale.setScalar(.06+(k%3)*.035);sp.position.set(s*S*(.35+.6*Math.sin(.3+t*2.6)),S*(.95-t*1.6),.04);W.add(sp);}
     if(lv>=13){const au=glowSprite(em,1.6*S,.22);au.position.set(s*.5*S,.25*S,-.05);W.add(au);}}
-  if(gen===3){const sp=glowSprite(em,S*3.2,.2);sp.position.set(0,.2,-.12);g.add(sp);}
+  if(gen===3&&!ico){const sp=glowSprite(em,S*3.2,.2);sp.position.set(0,.2,-.12);g.add(sp);}
   return{g,sides,u:wu,P};}
 
 function wingsMesh(cls,lv,gen){if(cls==='arquera')return fairyWings(lv,gen);const g=new THREE.Group();g.position.set(0,.62,-.24);const sides=[];lv=lv||0;const g2=(gen||1)>=2,g3=(gen||1)>=3;const st=g3?3:Math.min(3,wingStage(lv)+(g2?1:0));const P=(WPALS[cls]||WPALS.caballero)[st];
@@ -4804,6 +4808,7 @@ function irObject(it){const c=it.c,t=it.t;let o=null,mode='prop',region=null;
   else if(it.k==='weapon'||it.k==='shield'){const f=iconFiles(it)[0];o=oadInst(f,{team:OAD_TEAM[c][t]});if(!o)return null;mode=it.k;}
   else if(false){const b=c==='hechicero'?'m_robe':c==='arquera'?'f_tunic':'m_tunic';o=oadInst('body_'+b,{team:OAD_TEAM[c][t]});if(!o)return null;const tx=oadTex(OAD_PLAN.tex[c][t]);o.userData.mats.forEach(m=>{m.map=tx;m.needsUpdate=true;});mode='body';region=it.k;}
   else if(it.k==='wings'&&c==='mburuvicha'){o=new THREE.Group();const cp=mbCapeOn({},{wings:it},o);animCape(cp,1.2,0,0,0);cp.mesh.position.set(0,.55,0);cp.mesh.rotation.y=PI;o.scale.setScalar(1.3);mode='obj';}
+  else if(it.k==='wings'&&c==='arquera'){o=fairyWings(it.lv||0,it.g,true).g;mode='wings';}
   else if(it.k==='wings'){o=wingsMesh(c,it.lv||0,it.g).g;o.position.set(0,0,0);mode='wings';}
   else if(it.k==='pot'){const P=POTS[it.sub],sz=it.sub.endsWith('3')?1.2:it.sub.endsWith('2')?1.05:.9;o=new THREE.Group();const liq=P.kind==='hp'?0xd8202a:0x2a5ad8;
     const gl=new THREE.Mesh(new THREE.LatheGeometry([[.001,0],[.32,.02],[.42,.2],[.44,.42],[.36,.62],[.16,.74],[.12,.92],[.14,1.0]].map(p=>new THREE.Vector2(p[0],p[1])),20),new MSM({color:0xdff4ff,roughness:.05,metalness:.1,transparent:true,opacity:.38,side:THREE.DoubleSide}));
