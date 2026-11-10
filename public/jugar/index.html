@@ -2433,18 +2433,17 @@ function fairyTex(gen,lv,ico){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:
   const mk=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);return t;};
   FTEX[key]={map:mk(cv),em:mk(ec)};return FTEX[key];}
 const FAIRY_GEO=(()=>{const g=new THREE.PlaneGeometry(1.1,2.2,12,22);g.translate(.55,-.1,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const X=p.getX(i),Y=p.getY(i);p.setZ(i,-.16*X*X+.04*Y*Y);}g.computeVertexNormals();return keep(g);})();
-/* ico: versión para el ícono del inventario (membrana casi opaca, abierta de frente, sin chispas ni halos que agranden el encuadre) */
+/* ico: versión para el ícono del inventario (transparente como en el personaje, abierta de frente, sin chispas ni halos que achiquen el encuadre) */
 function fairyWings(lv,gen,ico){lv=lv||0;gen=Math.max(1,Math.min(3,gen||1));const g=new THREE.Group();if(!ico){g.position.set(0,.45,-.22);g.rotation.x=-.32;}const sides=[];
-  const T=fairyTex(gen,lv,ico),em=gen===1?0x5ae6ff:gen===2?0xff7ad0:0xffd06a,P={em,key:'fy'+gen};
+  const T=fairyTex(gen,lv),em=gen===1?0x5ae6ff:gen===2?0xff7ad0:0xffd06a,P={em,key:'fy'+gen};
   const wu={uWP:{value:0},uWA:{value:0},uWT:{value:0},uWR:{value:.4}};
   const m=new MSM({map:T.map,emissiveMap:T.em,emissive:0xffffff,emissiveIntensity:.25+(lv>=7?.5:0)+(lv>=13?.4:0)+(gen===3?.25:0),transparent:true,alphaTest:.05,depthWrite:false,side:THREE.DoubleSide,roughness:.65,metalness:0});
   m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,wu);sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nuniform float uWP;uniform float uWA;uniform float uWT;uniform float uWR;').replace('#include <begin_vertex>','#include <begin_vertex>\n{float sx=abs(transformed.x);float w=smoothstep(0.05,1.1,sx);transformed.z+=sin(uWP-sx*1.6)*uWA*w*0.8+0.025*sin(uWT*9.0+sx*7.0+transformed.y*5.0)*w*uWR;}');
     if(gen===3)sh.fragmentShader=sh.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float f=dot(normalize(vViewPosition),normal);vec3 ir=0.5+0.5*cos(6.2832*(f*1.3+vec3(0.0,0.33,0.67)));totalEmissiveRadiance+=ir*0.18*diffuseColor.a;}');};
   m.customProgramCacheKey=()=>'fairy'+gen;
-  const mI=ico?new THREE.MeshBasicMaterial({map:T.map,transparent:true,alphaTest:.05,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}):null;
   const S=[.9,1.025,1.425][gen-1]*(1+Math.min(15,lv)*.006);
   for(const s of[-1,1]){const W=new THREE.Group();W.position.x=.04*s;g.add(W);sides.push(W);W.rotation.y=s*(ico?.14:.42);
-    const me=new THREE.Mesh(FAIRY_GEO,mI||m);me.scale.set(S*s,S,S);me.renderOrder=2;W.add(me);if(ico)continue;
+    const me=new THREE.Mesh(FAIRY_GEO,m);me.scale.set(S*s,S,S);me.renderOrder=2;W.add(me);if(ico)continue;
     /* chispas: +10 polen o estrellas en el borde; +13 el doble */
     const ns=lv>=13?9:lv>=10?5:0;for(let k=0;k<ns;k++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sfxTex('star'),color:em,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.9,fog:false}));const t=k/Math.max(1,ns-1);sp.scale.setScalar(.06+(k%3)*.035);sp.position.set(s*S*(.35+.6*Math.sin(.3+t*2.6)),S*(.95-t*1.6),.04);W.add(sp);}
     if(lv>=13){const au=glowSprite(em,1.6*S,.22);au.position.set(s*.5*S,.25*S,-.05);W.add(au);}}
@@ -7427,7 +7426,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611100840';const UPD={shown:'',req:false};
+const NOX_BUILD='202611100915';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
