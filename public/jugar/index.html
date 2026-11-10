@@ -799,6 +799,19 @@ body.induel #track,body.induel #evClock{display:none}
 #partyHud .ph-c.dead{opacity:.55;filter:grayscale(.8)}
 #partyHud .ph-c.far{opacity:.7}
 body.half #partyHud{display:none}
+#partyHud .ph-c{pointer-events:auto;cursor:pointer}#partyHud .ph-c:active{transform:scale(.97)}
+/* ficha de un compañero: modelo a la izquierda (arriba en vertical), stats y equipo en el panel */
+#mateView{position:fixed;left:0;top:0;bottom:0;right:50%;z-index:39;touch-action:none;cursor:grab;background:radial-gradient(ellipse 70% 55% at 50% 62%,#2c3070,#14163d 70%,#0b0b22)}#mateView:active{cursor:grabbing}
+#mateView canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#mateView .mv-n{position:absolute;left:0;right:0;top:calc(var(--st) + 12px);text-align:center;font:700 17px var(--display);color:#f6d892;text-shadow:0 2px 8px #000;pointer-events:none}
+#mateView .mv-n small{display:block;font:600 11px var(--body);letter-spacing:.08em;color:#c9c3e8;text-transform:uppercase;margin-top:2px}
+#mateView .mv-h{position:absolute;left:0;right:0;bottom:calc(var(--sb) + 10px);text-align:center;font-size:10px;letter-spacing:.06em;color:rgba(240,214,160,.7);pointer-events:none}
+#mateView .mv-l{position:absolute;left:0;right:0;top:50%;text-align:center;color:#c9c3e8;font-size:13px;pointer-events:none}
+@media (orientation:portrait){#mateView{right:0;bottom:58%}#mateView .mv-n{font-size:15px;top:calc(var(--st) + 6px)}#mateView .mv-h{bottom:8px}}
+#mtBody .eqgrid{margin:10px auto 0;width:max-content}#mtBody .mt-pets{display:flex;gap:6px;justify-content:center;margin-top:6px}#mtBody .mt-pets .slot{width:52px;height:52px}
+#mtBody .srow{grid-template-columns:minmax(0,1fr) 56px}#mtBody .mt-z{font-size:12px;color:var(--dim);margin:2px 0 6px}#mtBody .mt-msg{text-align:center;color:#c9c3e8;padding:30px 6px}
+#mtBody h4{margin:14px 0 4px;font:700 12px var(--body);letter-spacing:.1em;text-transform:uppercase;color:#f6d892}
+.pl-list li.pl-me{cursor:pointer}.pl-list li.pl-me .pl-v{font-size:10.5px;color:#f6d892;opacity:.8;margin-left:auto;padding-left:6px;white-space:nowrap}
 @media (orientation:portrait) and (max-width:440px){#partyHud .ph-c{width:34vw}}
 #lifeCard .lc-hpT{color:#ffb3a8}#lifeCard .lc-mpT{color:#a9b4ff}
 #lifeCard.low .lc-b.hp{animation:lcLow 1s ease-in-out infinite}@keyframes lcLow{50%{box-shadow:0 0 0 1px #ff5a4a,0 0 10px rgba(255,80,60,.8)}}
@@ -1070,6 +1083,11 @@ body.pad #joy{display:none!important}
   <div id="charBody"></div>
 </div></div>
 
+<div class="panel" id="pMate" hidden><div class="card">
+  <div class="card-h"><h2 id="mtTitle">Compañero</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
+  <div id="mtBody"></div>
+</div></div>
+<div id="mateView" hidden aria-label="Vista del compañero"><div class="mv-n" id="mvN"></div><div class="mv-l" id="mvL">Cargando…</div><div class="mv-h">⟲ Arrastrá para girar</div></div>
 <div class="panel" id="pTrade" hidden><div class="card"><div class="card-h"><h2 id="trTitle">Intercambio</h2><button class="x" data-act="trX" aria-label="Cancelar">×</button></div><div id="trBody"></div></div></div>
 <div class="panel" id="pMyShop" hidden><div class="card"><div class="card-h"><h2>Mi tienda</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div><div id="msBody"></div></div></div>
 <div class="panel" id="pShopV" hidden><div class="card"><div class="card-h"><h2 id="svTitle">Tienda</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div><div id="svBody"></div></div></div>
@@ -4800,7 +4818,7 @@ function irPump(){if(IR.busy||!IR.queue.length)return;if(!irInit()){IR.queue.len
   const go=()=>{let res;try{res=irRenderIcon(q.it);}catch(e){res=false;}if(res==='WAIT'){setTimeout(go,250);return;}IR.cache[q.k]=res||false;IR.queue.shift();IR.busy=false;irIconsChanged();if(IR.queue.length)setTimeout(irPump,16);};
   if(files.length&&!oadHave(files)){oadNeed(files,()=>setTimeout(go,30));setTimeout(()=>{if(IR.busy&&IR.queue[0]===q&&!oadHave(files)){IR.cache[q.k]=false;IR.queue.shift();IR.busy=false;irPump();}},15000);}else setTimeout(go,0);}
 setInterval(()=>{if(!IR.busy&&IR.queue.length)irPump();},400);/* por si la cola de íconos queda parada */
-let irIconsT=0;function irIconsChanged(){clearTimeout(irIconsT);irIconsT=setTimeout(()=>{if(!$('#pInv').hidden)renderInv();if(!$('#pShop').hidden&&typeof renderShop==='function')renderShop();/* también el baúl, el intercambio y las tiendas de jugadores: antes se quedaban con el dibujito genérico */try{if(!$('#pVault').hidden)renderVault();if(!$('#pTrade').hidden)renderTrade();if(!$('#pMyShop').hidden)renderMyShop();if(!$('#pShopV').hidden)renderShopV();}catch(e){}},60);}
+let irIconsT=0;function irIconsChanged(){clearTimeout(irIconsT);irIconsT=setTimeout(()=>{if(!$('#pInv').hidden)renderInv();if(!$('#pShop').hidden&&typeof renderShop==='function')renderShop();/* también el baúl, el intercambio y las tiendas de jugadores: antes se quedaban con el dibujito genérico */try{if(!$('#pVault').hidden)renderVault();if(!$('#pTrade').hidden)renderTrade();if(!$('#pMyShop').hidden)renderMyShop();if(!$('#pShopV').hidden)renderShopV();if(!$('#pMate').hidden)renderMate();}catch(e){}},60);}
 function irObject(it){const c=it.c,t=it.t;let o=null,mode='prop',region=null;
   if(['helm','armor','pants','gloves','boots'].includes(it.k)){o=forgeIcon(it);if(!o)return null;mode='obj';}
   else if((it.k==='weapon'||it.k==='shield')&&CC0.on&&!OAD.failed){o=cc0ItemObj(it);if(o==='WAIT')return 'WAIT';if(!o)return null;mode=it.k;}
@@ -6487,10 +6505,10 @@ function sndSetVol(){if(!AU.ctx)return;const t=AU.ctx.currentTime;AU.mus.gain.se
 function bigNote(html,bad){let box=document.getElementById('bigNotes');if(!box){box=document.createElement('div');box.id='bigNotes';document.body.appendChild(box);}const t=document.createElement('div');t.className='bigNote'+(bad?' bad':'');t.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c2.6 0 4.3 1.6 4.8 4.4"/></svg><span>'+html+'</span>';box.appendChild(t);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>t.remove(),4000);}
 function toast(html){const t=document.createElement('div');t.className='toast';t.innerHTML=html;const box=$('#toasts');box.appendChild(t);while(box.children.length>4)box.firstChild.remove();setTimeout(()=>t.remove(),2800);}
 function nearNpc(){let b=null,bd=3.4;for(const n of npcs){const d=Math.hypot(n.x-P.x,n.z-P.z);if(d<bd){bd=d;b=n;}}return b;}
-const anyPanel=()=>['pChar','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNpc','pItem','pVault','pMap'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});
+const anyPanel=()=>['pChar','pMate','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNpc','pItem','pVault','pMap'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});
 function refreshPause(){paused=anyPanel();if(paused){atkHeld=false;for(const k in keys)keys[k]=false;endJoy({pointerId:joy.id});}}
 function showPanel(id){$('#'+id).hidden=false;refreshPause();try{tabsFor(id);}catch(e){}}
-function closeAll(){try{if(TR.on&&!$('#pTrade').hidden){if(TR.stage==='open')liveSend({t:'tx'});if(TR.stage!=='commit')TR.on=false;}}catch(e){}/* cerrar el intercambio (Esc, la rueda, otro menú) lo cancela para los dos */['pChar','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNpc','pItem','pVault','pMap','partyBox','chatBox','wheel'].forEach(id=>{const e=$('#'+id);if(e)e.hidden=true;});VST.pin=null;VST.amt=null;GEM=null;CALD.sel=null;refreshPause();}
+function closeAll(){try{if(TR.on&&!$('#pTrade').hidden){if(TR.stage==='open')liveSend({t:'tx'});if(TR.stage!=='commit')TR.on=false;}}catch(e){}/* cerrar el intercambio (Esc, la rueda, otro menú) lo cancela para los dos */['pChar','pMate','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNpc','pItem','pVault','pMap','partyBox','chatBox','wheel'].forEach(id=>{const e=$('#'+id);if(e)e.hidden=true;});VST.pin=null;VST.amt=null;GEM=null;CALD.sel=null;refreshPause();}
 
 function setupSkillButtons(){
   $('#bAtk').innerHTML=SKIC('atk_'+C.cls)+'Atacar';
@@ -6607,12 +6625,13 @@ function itemCard(it,ctx,tip){if(!tip)ICTX=ctx;const L=[];const iu=iconURL(it);i
   if(it.luck)L.push(`<div class="it-l op">Suerte (+5% crítico, +25% de éxito con gemas)</div>`);
   if(it.op)L.push(`<div class="it-l op">Opción adicional +${it.op*4} ${it.k==='weapon'?'de daño':'de defensa'}</div>`);
   (it.ex||[]).forEach(o=>L.push(`<div class="it-l ex">${EXN[o]}</div>`));if(it.epic)L.push(`<div class="it-l ep">Épico: daño y defensa base +20%</div>`);
-  if(it.anc){const A=ANCS[it.anc],have=(DS&&DS.anc&&DS.anc[it.anc])||0;L.push(`<div class="it-l an">Conjunto antiguo de ${A.n} (${have} puesto${have===1?'':'s'})</div>`);A.b.forEach(([n,t])=>L.push(`<div class="it-l an ${have>=n?'':'off'}">${n} piezas: ${t}</div>`));}
-  if(isEq(it)){const r=reqOf(it);const own=C.cls===it.c;L.push(`<div class="it-l req ${own?'':'bad'}">Clase: ${CLASSES[it.c].name}</div><div class="it-l req ${C.L<r.lvl?'bad':''}">Nivel ${r.lvl}</div>`);if(r.stat)L.push(`<div class="it-l req ${C.st[r.main]<r.stat?'bad':''}">${STATN[r.main]} ${r.stat}</div>`);}
+  if(it.anc){const A=ANCS[it.anc],have=ctx&&ctx.src==='mate'?mateAnc(it.anc):(DS&&DS.anc&&DS.anc[it.anc])||0;L.push(`<div class="it-l an">Conjunto antiguo de ${A.n} (${have} puesto${have===1?'':'s'})</div>`);A.b.forEach(([n,t])=>L.push(`<div class="it-l an ${have>=n?'':'off'}">${n} piezas: ${t}</div>`));}
+  if(isEq(it)&&!(ctx&&ctx.src==='mate')){const r=reqOf(it);const own=C.cls===it.c;L.push(`<div class="it-l req ${own?'':'bad'}">Clase: ${CLASSES[it.c].name}</div><div class="it-l req ${C.L<r.lvl?'bad':''}">Nivel ${r.lvl}</div>`);if(r.stat)L.push(`<div class="it-l req ${C.st[r.main]<r.stat?'bad':''}">${STATN[r.main]} ${r.stat}</div>`);}
   const sp=sellPrice(it);if(sp)L.push(`<div class="it-l req">Valor de venta: ₲ ${fmt(sp)}</div>`);
   if(tip)return L.filter(x=>!/^<img/.test(x)).join('');
   const B=[];
-  if(ctx.src==='vault'){B.push(`<button class="btn" data-act="vTake" ${vaultLocked()?'disabled':''}>Sacar al inventario</button>`);if(vaultLocked())L.push('<div class="it-l req bad">El baúl tiene candado</div>');}
+  if(ctx.src==='mate'){}
+  else if(ctx.src==='vault'){B.push(`<button class="btn" data-act="vTake" ${vaultLocked()?'disabled':''}>Sacar al inventario</button>`);if(vaultLocked())L.push('<div class="it-l req bad">El baúl tiene candado</div>');}
   else if(ctx.src==='vinv'){B.push(`<button class="btn" data-act="vPut" ${it.k==='quest'?'disabled':''}>Guardar en el baúl</button>`);}
   else if(ctx.src==='shopsell'){B.push(`<button class="btn" data-act="sell" ${sp?'':'disabled'}>Vender por ₲ ${fmt(sp)}</button>`);}
   else if(ctx.src==='eq'){B.push(`<button class="btn" data-act="unequip">Quitar</button>`);}
@@ -6622,7 +6641,7 @@ function itemCard(it,ctx,tip){if(!tip)ICTX=ctx;const L=[];const iu=iconURL(it);i
     if(it.k==='gem'&&it.sub!=='kerana'&&it.sub!=='mainumby')B.push(`<button class="btn" data-act="gem">Usar en un ítem</button>`);
     if(it.k==='pet')B.push(`<button class="btn" data-act="petOn">${C.pets&&C.pets[it.sub]?'Cambiar por esta':'Llevar'}</button>`);
     B.push(`<button class="btn ghost" data-act="drop">${ctx.confirm?'Sí, tirarlo':'Tirar'}</button>`);}
-  if((it.n||1)>1&&ctx.src!=='eq'&&ctx.src!=='pet'&&!(ctx.src==='vault'&&vaultLocked()))L.push(`<div class="it-split">Separar <input id="spN" type="number" min="1" max="${it.n-1}" value="${Math.floor(it.n/2)}"> de ${it.n} <button class="btn sm" data-act="split">Separar</button></div>`);
+  if((it.n||1)>1&&ctx.src!=='eq'&&ctx.src!=='pet'&&ctx.src!=='mate'&&!(ctx.src==='vault'&&vaultLocked()))L.push(`<div class="it-split">Separar <input id="spN" type="number" min="1" max="${it.n-1}" value="${Math.floor(it.n/2)}"> de ${it.n} <button class="btn sm" data-act="split">Separar</button></div>`);
   B.push(`<button class="btn ghost" data-act="closeItem">Cerrar</button>`);
   $('#itemCard').innerHTML=L.join('')+`<div class="it-btns">${B.join('')}</div>`;$('#pItem').hidden=false;refreshPause();}
 function equipFromInv(i){const it=C.inv[i];if(!it||canEquip(it))return;const k=it.k;try{snd(['armor','pants','helm','boots','gloves','shield'].includes(k)&&it.t>=2?'equip':'equip_light',{vol:.7,min:.1});}catch(_){}const prev=C.eq[k];C.eq[k]=it;C.inv[i]=prev||null;afterGear();toast(`Equipaste <em style="color:${itemColor(it)}">${esc(itemName(it))}</em>`);}
@@ -7238,6 +7257,8 @@ function liveMsg(m){const t=m.t;if(tradeMsg(m))return;if(t==='host'||t==='ms'||t
     /* avisos grandes: quién entra y quién sale del grupo */if(LIVE.party){const now=new Map(LIVE.party.members.map(x=>[x.id,x.n]));if(!had){const ld=LIVE.party.members.find(x=>x.id===LIVE.party.leader);if(LIVE.party.leader===LIVE.me){for(const [id,n] of now)if(id!==LIVE.me)bigNote('<b>'+esc(n)+'</b> se unió al grupo');}else bigNote('Te uniste al grupo de <b>'+esc(ld?ld.n:'')+'</b>');try{sfx('potion');}catch(e){}}
       else{for(const [id,n] of now)if(!old.has(id)&&id!==LIVE.me){bigNote('<b>'+esc(n)+'</b> se unió al grupo');try{sfx('potion');}catch(e){}}for(const [id,n] of old)if(!now.has(id)&&id!==LIVE.me)bigNote('<b>'+esc(n)+'</b> dejó el grupo',true);}}
     for(const o of LIVE.others.values()){o.inParty=!!(LIVE.party&&LIVE.party.members.some(x=>x.id===o.id));liveLabel(o);}PHUD.sent=0;partyHudDraw();liveUI();return;}
+  if(t==='pfq'){if(C)liveSend({t:'pfr',to:m.id,p:mateProfile()});return;}
+  if(t==='pf'){mateMsg(m);return;}
   if(t==='ps'){(LIVE.pst=LIVE.pst||{})[m.id]={h:m.h,m:m.m,d:!!m.d,L:m.L,t:Date.now()};partyHudDraw();return;}
   if(t==='inv'){LIVE.inv={from:m.from,n:m.n};liveUI();try{if(!snd('mu_rare',{vol:.6}))sfx('potion');}catch(e){}return;}
   if(t==='vj'){liveUI();return;}
@@ -7371,13 +7392,91 @@ function voiceStop(silent){if(!VOX.on&&!VOX.peers.size)return;[...VOX.peers.keys
 function voiceMute(){VOX.muted=!VOX.muted;if(VOX.stream)VOX.stream.getAudioTracks().forEach(t=>t.enabled=!VOX.muted);liveUI();}
 
 /* interfaz: botones, chat, grupo e invitaciones */
+/* ================= ficha de un compañero de grupo (tocar su cuadro) =================
+   pf (pido la ficha) → el Worker le pasa pfq al compañero → contesta pfr → me llega pf con su ficha.
+   A la izquierda (arriba en vertical) su personaje en 3D, como al abrir la bolsa; a la derecha stats y equipo. */
+const MATE={on:false,id:null,p:null,err:'',asked:0,r:null,S:null,cam:null,h:null,key:'',rot:-.5,vel:0,drag:null,px:0,lastT:0,acc:0,W:0,H:0,ring:null};
+const PETK_OK=k=>PETK.includes(k);
+function mateProfile(){const eq={},pets={};EQK.forEach(k=>{if(C.eq[k])eq[k]=C.eq[k];});PETK.forEach(k=>{if(C.pets&&C.pets[k])pets[k]=C.pets[k];});
+  return {n:C.name,c:C.cls,L:C.L,r:C.resets|0,evo:C.evo?1:0,face:C.face!=null?C.face:hashName(C.name),st:{fue:C.st.fue|0,agi:C.st.agi|0,vit:C.st.vit|0,ene:C.st.ene|0},
+    ds:{mn:Math.round(DS.min*DS.dmgMul),mx:Math.round(DS.max*DS.dmgMul),def:DS.def|0,hp:DS.maxHP|0,mp:DS.maxMP|0,aps:+(1/DS.atkTime).toFixed(2),cr:Math.round(DS.crit*100),ex:Math.round(DS.exr*100)},
+    eq,pets,z:Z&&Z.id||null};}
+/* lo que llega de otro jugador se revisa antes de dibujarlo */
+function mateItemOk(it,k){if(!it||typeof it!=='object')return false;if(k&&it.k!==k)return false;if(it.k==='pet')return PETK_OK(it.sub);if(!isEq(it)||!CLASSES[it.c])return false;try{itemName(it);return true;}catch(e){return false;}}
+function mateClean(p){if(!p||typeof p!=='object'||!CLASSES[p.c])return null;const n=x=>Math.max(0,Math.min(1e9,Math.round(+x||0)));const eq={},pets={};
+  EQK.forEach(k=>{const it=p.eq&&p.eq[k];if(mateItemOk(it,k))eq[k]=it;});PETK.forEach(k=>{const it=p.pets&&p.pets[k];if(it&&it.k==='pet'&&it.sub===k)pets[k]=it;});
+  const st={},ds={};['fue','agi','vit','ene'].forEach(k=>st[k]=n(p.st&&p.st[k]));['mn','mx','def','hp','mp','cr','ex'].forEach(k=>ds[k]=n(p.ds&&p.ds[k]));ds.aps=Math.max(0,Math.min(20,+(p.ds&&p.ds.aps)||0));
+  return {n:String(p.n||'').slice(0,20),c:p.c,L:n(p.L),r:n(p.r),evo:!!p.evo,face:n(p.face),st,ds,eq,pets,z:ZONES[p.z]?p.z:null};}
+function mateItemOf(k,p){const P=MATE.p;if(!P)return null;return p?P.pets[p]||null:P.eq[k]||null;}
+function mateAnc(a){const P=MATE.p;if(!P)return 0;return EQK.filter(k=>P.eq[k]&&P.eq[k].anc===a).length;}
+function mateMember(id){return LIVE.party&&LIVE.party.members.find(x=>x.id===id);}
+function mateOpen(id){if(!id)return;if(id===LIVE.me){closeAll();ACT.openChar();return;}const mb=mateMember(id);
+  closeAll();MATE.id=id;MATE.p=null;MATE.err='';MATE.key='';MATE.rot=-.5;MATE.vel=0;
+  if(!LIVE.on)MATE.err='La ficha de los compañeros necesita la conexión en vivo.';else if(!mb)MATE.err='Ya no está en tu grupo.';else mateAsk();
+  showPanel('pMate');renderMate();}
+function mateAsk(){MATE.asked=Date.now();liveSend({t:'pf',id:MATE.id});}
+function mateMsg(m){if(m.id!==MATE.id)return;if(m.off){MATE.err='No se pudo leer su ficha: no está conectado ahora.';MATE.p=null;}else{const p=mateClean(m.p);if(!p)return;MATE.p=p;MATE.err='';}if(!$('#pMate').hidden)renderMate();}
+function renderMate(){const b=$('#mtBody');if(!b)return;const P=MATE.p,mb=mateMember(MATE.id);$('#mtTitle').textContent=P?P.n:mb?mb.n:'Compañero';
+  const back=`<div class="pb" style="margin-top:14px"><button class="btn sm ghost" data-act="mateBack">‹ Volver al grupo</button></div>`;
+  if(!P){b.innerHTML=`<div class="mt-msg">${MATE.err?esc(MATE.err):'Pidiendo su ficha…'}</div>${back}`;return;}
+  const cl=CLASSES[P.c],lay=[null,'helm','wings','shield','armor','weapon','gloves','pants','boots'];
+  const eqH=lay.map(k=>{if(!k)return '<span></span>';const it=P.eq[k],na=k==='shield'&&P.c!=='caballero'||k==='helm'&&P.c==='gladiador';
+    return `<button class="slot ${it?'':'empty'} ${na?'na':''}" ${it?`data-act="mateItem" data-k="${k}"`:'disabled'} aria-label="${SLOTLABEL[k]}">${it?cellHTML(it):`<span style="color:var(--dim)">${ICON_SVG(k==='weapon'?'weapon_'+P.c:k)}</span>`}<span class="sl">${SLOTLABEL[k]}</span></button>`;}).join('');
+  const pets=PETK.filter(k=>P.pets[k]).map(k=>`<button class="slot pslot" data-act="mateItem" data-p="${k}" aria-label="Mascota: ${PETS[k].n}" style="--pc:${PETS[k].col}"><img class="ico pimg" src="assets/ui/pet_${k}.webp" alt="" draggable="false"><span class="sl">${PETS[k].n.split(' ')[0]}</span></button>`).join('');
+  const D=P.ds,zn=P.z&&ZONES[P.z]?ZONES[P.z].name:(mb&&ZONES[mb.zone]?ZONES[mb.zone].name:'');
+  b.innerHTML=`<div class="ch-top"><div><div class="eyebrow">${P.evo?cl.evo:cl.name}${P.r?` · ${P.r} reinicio${P.r>1?'s':''}`:''}</div><h3>${esc(P.n)}</h3></div><div class="ch-lv"><small>Nivel</small><b>${P.L}</b></div></div>
+  ${zn?`<div class="mt-z">📍 ${esc(zn)}</div>`:''}
+  <h4>Stats</h4>
+  ${['fue','agi','vit','ene'].map(s=>`<div class="srow"><span class="sn">${STATN[s]}${cl.main===s?'<i>principal</i>':''}<small class="sx">${(STATFX[P.c]||{})[s]||''}</small></span><b>${P.st[s]}</b></div>`).join('')}
+  <div class="derived"><div><small>Daño</small><b>${D.mn} – ${D.mx}</b></div><div><small>Defensa</small><b>${D.def}</b></div><div><small>Vida</small><b>${D.hp}</b></div><div><small>Maná</small><b>${D.mp}</b></div>
+  <div><small>Ataques por segundo</small><b>${D.aps.toFixed(2)}</b></div><div><small>Crítico · Excelente</small><b>${D.cr}% · ${D.ex}%</b></div></div>
+  <h4>Equipo</h4><div class="eqgrid">${eqH}</div>${pets?`<div class="mt-pets">${pets}</div>`:''}
+  <p class="hint" style="text-align:center">Tocá un objeto para ver sus detalles.</p>${back}`;}
+/* vista 3D: un renderizador aparte (el de la bolsa también dibuja los íconos) */
+function mateInit(){if(MATE.r)return MATE.r;if(!OAD.on||OAD.failed)return null;try{const r=new THREE.WebGLRenderer({antialias:!IS_MOB,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio||1,IS_MOB?1.5:2));
+  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.15;r.setClearColor(0,0);
+  const S=new THREE.Scene();S.add(new THREE.HemisphereLight(0xfff2dc,0x2a1e16,.78));const k=new THREE.DirectionalLight(0xfff0d8,2.5);k.position.set(3.2,2.8,2);S.add(k);const fl=new THREE.DirectionalLight(0xffd8b8,.45);fl.position.set(-2.5,.6,3);S.add(fl);const rim=new THREE.DirectionalLight(0x9ab8ff,1.6);rim.position.set(-3,2,-3);S.add(rim);
+  const es=new THREE.Scene(),sg=new THREE.SphereGeometry(10,24,12),cols=[],pp=sg.attributes.position;for(let i=0;i<pp.count;i++){const y=pp.getY(i)/10;cols.push(.55+y*.4,.5+y*.35,.45+y*.45);}sg.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
+  es.add(new THREE.Mesh(sg,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide})));const pm=new THREE.PMREMGenerator(r);S.environment=pm.fromScene(es).texture;pm.dispose();sg.dispose();
+  /* aro de luz bajo los pies (oro de la web) */
+  const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d'),gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(246,216,146,.55)');gr.addColorStop(.55,'rgba(226,168,63,.22)');gr.addColorStop(.8,'rgba(226,168,63,.5)');gr.addColorStop(.86,'rgba(226,168,63,.08)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);
+  const rt=new THREE.CanvasTexture(cv);const ring=new THREE.Mesh(new THREE.PlaneGeometry(1.7,1.7),new THREE.MeshBasicMaterial({map:rt,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));ring.rotation.x=-PI/2;ring.position.y=.005;S.add(ring);MATE.ring=ring;
+  MATE.S=S;MATE.cam=new THREE.PerspectiveCamera(24,1,.05,60);r.domElement.className='mate3d';MATE.r=r;
+  const v=$('#mateView');v.prepend(r.domElement);
+  v.addEventListener('pointerdown',e=>{MATE.drag=e.pointerId;MATE.px=e.clientX;MATE.vel=0;MATE.lastT=performance.now();try{v.setPointerCapture(e.pointerId);}catch(_){}});
+  v.addEventListener('pointermove',e=>{if(MATE.drag!==e.pointerId)return;const dx=e.clientX-MATE.px;MATE.px=e.clientX;MATE.rot+=dx*.014;MATE.vel=dx*.014;MATE.lastT=performance.now();});
+  ['pointerup','pointercancel'].forEach(ev=>v.addEventListener(ev,e=>{if(MATE.drag===e.pointerId){MATE.drag=null;MATE.lastT=performance.now();}}));
+  v.addEventListener('dblclick',()=>{MATE.rot=-.5;MATE.vel=0;});}catch(e){console.error(e);MATE.r=null;}return MATE.r;}
+function mateEqFull(P){const e={};EQK.forEach(k=>e[k]=P.eq[k]||null);if(P.c==='gladiador')e.helm=null;if(P.c!=='caballero')e.shield=null;return e;}
+function mateDrop(){if(MATE.h){MATE.S.remove(MATE.h.g);irDispose(MATE.h.g);MATE.h=null;}MATE.key='';}
+function mateTick(dt){const v=$('#mateView');if(!v)return;const on=!$('#pMate').hidden&&mode==='game';MATE.on=on;v.hidden=!on;if(!on){if(MATE.h)mateDrop();return;}
+  const P=MATE.p,mb=mateMember(MATE.id);$('#mvN').innerHTML=P?`${esc(P.n)}<small>${esc(P.evo?CLASSES[P.c].evo:CLASSES[P.c].name)} · Nv ${P.L}</small>`:mb?esc(mb.n):'';
+  /* se vuelve a pedir cada 6 s mientras está abierta: si cambia de equipo se ve al momento */
+  if(LIVE.on&&mb&&Date.now()-MATE.asked>(P?6000:2500))mateAsk();
+  const lbl=$('#mvL');if(!P){lbl.hidden=false;lbl.textContent=MATE.err?'':'Cargando…';return;}
+  if(!mateInit()){lbl.hidden=false;lbl.textContent='Vista 3D no disponible';return;}
+  const eq=mateEqFull(P),key=P.c+'|'+P.face+'|'+JSON.stringify(EQK.map(k=>eq[k]?[eq[k].t|0,eq[k].lv|0,eq[k].g|0]:0));
+  if(key!==MATE.key){let h=null;const hf=HERO_FACE;HERO_FACE=P.face;try{if(CC0.on){if(cc0Want(P.c,eq,()=>{MATE.key='';}))h=cc0Hero(P.c,eq);}else{const sp=oadHeroSpec(P.c,eq);if(oadHave(sp.files))h=oadHero(P.c,eq);else oadNeed(sp.files,()=>{MATE.key='';});}}catch(e){console.error(e);}finally{HERO_FACE=hf;}
+    if(!h){lbl.hidden=false;lbl.textContent='Cargando personaje…';return;}
+    mateDrop();MATE.h=h;(h.faceMats||[]).forEach(m=>m.userData.npc=1);irClean(h.g);MATE.S.add(h.g);MATE.key=key;}
+  lbl.hidden=true;
+  MATE.acc+=dt;if(MATE.acc<1/30)return;const step=Math.min(.1,MATE.acc);MATE.acc=0;const h=MATE.h,r=MATE.r;
+  const W=v.clientWidth|0,Hh=v.clientHeight|0;if(!W||!Hh)return;if(W!==MATE.W||Hh!==MATE.H){r.setSize(W,Hh,false);MATE.W=W;MATE.H=Hh;}
+  if(MATE.drag==null){MATE.vel*=.9;MATE.rot+=MATE.vel;if(performance.now()-MATE.lastT>2500)MATE.rot+=step*.35;}h.g.rotation.y=MATE.rot;
+  oadPlay(h,h.acts.calm?'calm':'idle',.2,1);h.mixer.update(step);if(h.chest&&!h.sock&&h.anchor){h.chest.getWorldPosition(_iv);h.g.worldToLocal(_iv);h.anchor.position.set(_iv.x,_iv.y-.42,_iv.z);}if(h.cape)animCape(h.cape,T,0);
+  if(h.wings&&h.wings.sides){const t=performance.now();h.wings.sides.forEach((Wg,i)=>{const s=i?1:-1;Wg.rotation.y=s*(WG.ry+Math.sin(t/700)*.06);Wg.rotation.z=s*WG.rz;});if(h.wings.u){h.wings.u.uWT.value=t/1000;h.wings.u.uWP.value=t/700;h.wings.u.uWA.value=.05;}}
+  MATE.ring.material.opacity=.75+Math.sin(performance.now()/600)*.25;
+  /* encuadre: el cuerpo entero (con alas) entra siempre, en la mitad o en la franja de arriba */
+  const cam=MATE.cam,asp=W/Hh,port=innerHeight>innerWidth;cam.fov=24;cam.aspect=asp;cam.updateProjectionMatrix();
+  const half=1.3/Math.tan(cam.fov*PI/360),d=Math.max(half,(h.wings?1.35:.9)/(Math.tan(cam.fov*PI/360)*asp))*(port?1.02:1.1);
+  cam.position.set(0,1.05,d);cam.lookAt(0,port?.98:1.02,0);r.render(MATE.S,cam);}
 function liveUI(){const pc=$('#mbParty');if(!pc)return;const n=LIVE.party?LIVE.party.members.length:0;$('#partyN').hidden=!n;$('#partyN').textContent=n;
   const st=$('#liveSt');if(st){st.hidden=!(SRV.on&&NET.mode==='online');st.textContent=LIVE.on?`En vivo · ${LIVE.others.size} en este mapa${LIVE.online?` · ${LIVE.online} en el reino`:''}`:'Conectando en vivo…';st.classList.toggle('on',LIVE.on);}
   const iv=$('#liveInv');if(iv){iv.hidden=!LIVE.inv;if(LIVE.inv)$('#liveInvT').innerHTML=`<b>${esc(LIVE.inv.n)}</b> te invita a su grupo`;}
   const dv=$('#duelInv');if(dv){dv.hidden=!DUEL.inv;if(DUEL.inv)$('#duelInvT').innerHTML=`<b>${esc(DUEL.inv.n)}</b> (Nv ${DUEL.inv.L|0} · ${esc(CLASSES[DUEL.inv.c]?CLASSES[DUEL.inv.c].name:'')}) te desafía a un duelo en la Arena`;}
   const bx=$('#partyBox');if(!bx||bx.hidden)return;const me=LIVE.me;let h='';
   if(!LIVE.on)h='<p class="pm">El grupo y la voz necesitan la conexión en vivo. Entrá con tu cuenta.</p>';
-  else if(LIVE.party){const lead=LIVE.party.leader===me;h=`<div class="ph">Tu grupo · ${LIVE.party.members.length}/5</div><ul class="pl-list">${LIVE.party.members.map(x=>`<li><span><b>${esc(x.n)}</b>${x.id===LIVE.party.leader?' <em>líder</em>':''}<small>Nv ${x.L|0} · ${esc(ZONES[x.zone]?ZONES[x.zone].name:'—')}</small></span><span class="vi">${x.voice?'🎙':''}</span>${lead&&x.id!==me?`<button class="btn sm ghost" data-act="pKick" data-id="${x.id}">Sacar</button>`:''}</li>`).join('')}</ul>
+  else if(LIVE.party){const lead=LIVE.party.leader===me;h=`<div class="ph">Tu grupo · ${LIVE.party.members.length}/5</div><ul class="pl-list">${LIVE.party.members.map(x=>`<li${x.id!==me?` class="pl-me" data-act="mateView" data-id="${esc(x.id)}" title="Ver stats y equipo"`:''}><span><b>${esc(x.n)}</b>${x.id===LIVE.party.leader?' <em>líder</em>':''}<small>Nv ${x.L|0} · ${esc(ZONES[x.zone]?ZONES[x.zone].name:'—')}</small></span><span class="vi">${x.voice?'🎙':''}</span>${x.id!==me?'<span class="pl-v">Ver ›</span>':''}${lead&&x.id!==me?`<button class="btn sm ghost" data-act="pKick" data-id="${x.id}">Sacar</button>`:''}</li>`).join('')}</ul>
     ${LIVE.party.members.length>=2?`<div class="raidbox"><b>Guarida de Añaretã</b><span>Jefe de grupo. Su nivel es el del integrante más alto +2 y su vida crece con cada jugador. Marca sus ataques en el piso, llama criaturas y a los 6 minutos consume la sala. Si caen todos, pierden.</span>${lead?'<button class="btn sm" data-act="raidGo">Desafiar con mi grupo</button>':'<small>Solo el líder puede iniciar el desafío.</small>'}</div>`:''}
     ${LIVE.party.members.filter(x=>x.id!==me).length?`<div class="pb">${LIVE.party.members.filter(x=>x.id!==me).map(x=>`<button class="btn sm ghost" data-act="dChal" data-id="${x.id}">Duelo con ${esc(x.n)}</button>`).join('')}</div>`:''}
     <div class="pb">${VOX.on?`<button class="btn sm" data-act="vMute">${VOX.muted?'Activar micrófono':'Silenciar micrófono'}</button><button class="btn sm ghost" data-act="vLeave">Salir de la voz</button>`:'<button class="btn sm" data-act="vJoin">Entrar al chat de voz</button>'}<button class="btn sm ghost" data-act="pLeave">Salir del grupo</button></div>
@@ -7404,6 +7503,9 @@ function liveHUD(){if($('#mbChat'))return;const menu=document.querySelector('#hu
     closeChat(){$('#chatBox').hidden=true;},
     chatCh(d){LIVE.ch=d.c;document.querySelectorAll('#chatBox .tabs button').forEach(b=>b.classList.toggle('on',b.dataset.c===d.c));chatRender();},
     chatSend(){chatSend();},
+    mateView(d){mateOpen(d.id);},
+    mateItem(d){const it=mateItemOf(d.k,d.p);if(it)itemCard(it,{src:'mate'});},
+    mateBack(){closeAll();$('#partyBox').hidden=false;liveUI();tabsFor('partyBox');refreshPause();},
     openParty(){const was=!$('#partyBox').hidden;closeAll();const b=$('#partyBox');b.hidden=was;liveUI();if(!was)tabsFor('partyBox');},
     closeParty(){$('#partyBox').hidden=true;},
     pInv(d){liveSend({t:'inv',id:d.id});},
@@ -7641,7 +7743,7 @@ function tickOnce(dt,rdt,draw){
   if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
   try{
     if(mode==='game'&&C){updatePlayer(gdt);fpFace(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}(MOBNET.role==='guest'?updateEnemiesGuest:updateEnemies)(gdt);mobNetTick(dt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}
-    updNpcs(dt);faceTick(dt);updLife(mode==='select'?dt:gdt);if(!$('#pInv').hidden)irPreview(dt);animHero(mode==='select'?dt:gdt);liveTick(dt);if(mode==='game'){liveAnim(Math.min(.5,rdt));duelTick(dt);}updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);
+    updNpcs(dt);faceTick(dt);updLife(mode==='select'?dt:gdt);if(!$('#pInv').hidden)irPreview(dt);if(MATE.on||!$('#pMate').hidden)mateTick(dt);animHero(mode==='select'?dt:gdt);liveTick(dt);if(mode==='game'){liveAnim(Math.min(.5,rdt));duelTick(dt);}updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);
     padTick(dt);hcTick();updCamera(dt);updLabels();updNums(gdt);if(AU.ctx&&AU.on){musicTick();ambTick();sndTick(dt);}
     if(mode==='game'&&C){hudT+=dt;if(hudT>.07){hudT=0;hud();}mmT+=dt;if(mmT>.2){mmT=0;drawMinimap();}saveT+=dt;if(saveT>10){saveT=0;persist();}}
     if(NET.mode==='online'&&NET.dirty.size&&!NET.writing&&performance.now()-NET.last>6000)flushNet();
@@ -7694,7 +7796,7 @@ const PHUD={sent:0,last:''};
 function partyHudDraw(){const el=$('#partyHud');if(!el)return;const pt=LIVE.party;if(!pt||!pt.members||pt.members.length<2){if(!el.hidden){el.hidden=true;el.innerHTML='';}return;}
   const st=LIVE.pst||{},now=Date.now(),myZ=Z&&Z.id;
   const html=pt.members.filter(x=>x.id!==LIVE.me).map(x=>{const s=st[x.id],fresh=s&&now-s.t<10000,h=fresh?s.h:null,m=fresh?s.m:null,dead=fresh&&s.d,far=x.zone&&myZ&&x.zone!==myZ,L=(s&&s.L)||x.L||0;
-    return `<div class="ph-c${dead?' dead':''}${far?' far':''}${h!=null&&h<30&&!dead?' low':''}" title="${esc(x.n)}"><div class="ph-h"><span class="ph-av">${x.c?SKIC('atk_'+x.c):''}</span><b>${esc(x.n)}</b>${x.id===pt.leader?'<i class="ph-ld">★</i>':''}<span class="ph-l">${dead?'Caído':far?esc(ZONES[x.zone]?ZONES[x.zone].name:''):'Nv '+L}</span></div><div class="ph-b hp"><i style="width:${h==null?100:h}%"${h==null?' class="unk"':''}></i></div><div class="ph-b mp"><i style="width:${m==null?100:m}%"${m==null?' class="unk"':''}></i></div></div>`;}).join('');
+    return `<div class="ph-c${dead?' dead':''}${far?' far':''}${h!=null&&h<30&&!dead?' low':''}" title="Ver a ${esc(x.n)}" data-act="mateView" data-id="${esc(x.id)}" role="button"><div class="ph-h"><span class="ph-av">${x.c?SKIC('atk_'+x.c):''}</span><b>${esc(x.n)}</b>${x.id===pt.leader?'<i class="ph-ld">★</i>':''}<span class="ph-l">${dead?'Caído':far?esc(ZONES[x.zone]?ZONES[x.zone].name:''):'Nv '+L}</span></div><div class="ph-b hp"><i style="width:${h==null?100:h}%"${h==null?' class="unk"':''}></i></div><div class="ph-b mp"><i style="width:${m==null?100:m}%"${m==null?' class="unk"':''}></i></div></div>`;}).join('');
   if(html!==PHUD.last){PHUD.last=html;el.innerHTML=html;}el.hidden=!html;}
 function partyHudTick(){if(!C||!LIVE.party){const el=$('#partyHud');if(el&&!el.hidden)partyHudDraw();return;}const now=Date.now();
   if(now-PHUD.sent>1000){PHUD.sent=now;liveSend({t:'ps',h:Math.max(0,P.hp)/DS.maxHP*100,m:Math.min(1,P.mp/DS.maxMP)*100,d:P.dead?1:0});partyHudDraw();}}
@@ -7803,7 +7905,7 @@ const PAD={on:false,prev:[],mv:false,nav:0,wsel:-1};
 function padOn(v){if(PAD.on===v)return;PAD.on=v;document.body.classList.toggle('pad',v);kbLabels();if(v)toast('Mando conectado');}
 addEventListener('gamepaddisconnected',()=>{const g=navigator.getGamepads?[...navigator.getGamepads()].find(x=>x&&x.connected):null;if(!g)padOn(false);});
 function padFocusables(root){return [...root.querySelectorAll('button:not([disabled]),[data-act],.slot,[data-k],input')].filter(el=>el.offsetParent!==null&&!el.closest('[hidden]'));}
-function padRoot(){const ids=['pItem','pMap','pChar','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNpc','pVault','partyBox','chatBox'];for(const id of ids){const e=$('#'+id);if(e&&!e.hidden)return e;}return null;}
+function padRoot(){const ids=['pItem','pMap','pChar','pMate','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNpc','pVault','partyBox','chatBox'];for(const id of ids){const e=$('#'+id);if(e&&!e.hidden)return e;}return null;}
 function padMove(root,dx,dy){const els=padFocusables(root);if(!els.length)return;let cur=document.activeElement;if(!els.includes(cur)){els[0].focus();els[0].classList.add('pnav-f');return;}
   const r=cur.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let best=null,bs=1e9;
   for(const el of els){if(el===cur)continue;const q=el.getBoundingClientRect(),x=q.left+q.width/2-cx,y=q.top+q.height/2-cy;const along=x*dx+y*dy;if(along<=4)continue;const perp=Math.abs(x*dy-y*dx);const s=along+perp*2.2;if(s<bs){bs=s;best=el;}}

@@ -344,6 +344,13 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Datos: `partyHudTick` (dentro de `hudV2Tick`) manda `{t:'ps',h,m,d}` en % cada 1 s si hay grupo; el Worker (`live/src/index.js`, máx. 2/s por jugador) lo reenvía a los demás del grupo con `id` y `L`. El cliente guarda `LIVE.pst[id]` y `partyHudDraw` redibuja (dato viejo de más de 10 s = barra apagada `.unk`). El mensaje `party` también redibuja.
 - Prueba: `zt.js` con `PHTEST=1` (grupo falso con `liveTest` 'party' y 'ps').
 
+## Ficha de compañeros de grupo (10/11, sin publicar)
+- Tocar un compañero en el panel Grupo (`li.pl-me`, dice "Ver ›") o su tarjeta del HUD (`#partyHud .ph-c`, ahora con `pointer-events:auto`) llama a `ACT.mateView` → `mateOpen(id)`. Tocarse a uno mismo abre la ficha propia.
+- Protocolo (Worker `live/src/index.js`): `pf {id}` (máx. 1 cada 0,8 s, solo dentro del mismo grupo) → el Worker manda `pfq {id: quien pide}` al compañero (o `pf {id, off:1}` si no está conectado) → el compañero contesta `pfr {to, p: mateProfile()}` (hasta 26000 caracteres) → el Worker limpia (`cleanItems` por casillero, números acotados; nombre, clase y nivel salen de `a.s`) y manda `pf {id, p}`. Mientras la ficha está abierta se vuelve a pedir cada 6 s.
+- Cliente: `MATE`, `mateProfile` (stats, `DS` resumido, equipo completo, mascotas, zona), `mateClean` (revisa todo lo que llega), `renderMate` (panel `#pMate`: stats sin botones, daño/defensa/vida/maná/ataques/crítico, grilla de equipo como la bolsa, mascotas; botón "‹ Volver al grupo" = `ACT.mateBack`). Tocar un objeto: `ACT.mateItem` → `itemCard(it,{src:'mate'})` (solo mirar: sin requisitos ni botones; el conjunto antiguo cuenta las piezas del compañero con `mateAnc`).
+- Vista 3D: `#mateView` (mitad izquierda; en vertical, el 42 % de arriba; z-index 39, debajo de `#pItem`). Renderizador propio (`mateInit`, el de la bolsa también dibuja íconos), mismas luces y entorno que la bolsa, aro dorado bajo los pies. `mateTick` (en el bucle, junto a `irPreview`) arma el personaje con `cc0Hero` y la cara del compañero (`HERO_FACE` prestado), gira solo o arrastrando, 30 cuadros por segundo; al cerrar se suelta el modelo (`mateDrop`).
+- `pMate` está en `anyPanel`, `closeAll` y `padRoot`; `irIconsChanged` la redibuja.
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.

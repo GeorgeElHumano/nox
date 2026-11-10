@@ -324,9 +324,21 @@ export class World {
     let m; try { m = JSON.parse(raw); } catch { return; }
     const a = this.att(ws); if (!a) return;
     const t = m.t;
-    if (raw.length > 4000 && t !== 'ms' && t !== 'mr' && !(raw.length < 26000 && (t === 'toff' || t === 'tok' || t === 'shop' || t === 'sok'))) return;
+    if (raw.length > 4000 && t !== 'ms' && t !== 'mr' && !(raw.length < 26000 && (t === 'toff' || t === 'tok' || t === 'shop' || t === 'sok' || t === 'pfr'))) return;
     if (t === 'treq' || t === 'tacc' || t === 'trej' || t === 'tx' || t === 'toff' || t === 'trdy' || t === 'tcnf' || t === 'tok' || t === 'tno') { await this.tradeMsg(ws, a, m); return; }
     if (t === 'shop' || t === 'shopv' || t === 'sbuy' || t === 'sok' || t === 'sno') { await this.shopMsg(ws, a, m); return; }
+    // ficha de un compañero (stats y equipo): pf = la pido, pfq = se la pido al compañero, pfr = su respuesta; solo dentro del mismo grupo
+    if (t === 'pf') { const now = Date.now(); if (now - (a.pfT || 0) < 800) return; a.pfT = now; const id = String(m.id || ''); const [, p] = this.partyOf(a.uid);
+      if (!p || !p.members.has(id) || id === a.uid) return; const x = this.byUid(id); if (!x) { this.send(ws, { t: 'pf', id, off: 1 }); return; }
+      this.send(x.ws, { t: 'pfq', id: a.uid }); return; }
+    if (t === 'pfr') { const to = String(m.to || ''); const [, p] = this.partyOf(a.uid); if (!p || !p.members.has(to)) return; const x = this.byUid(to); if (!x) return;
+      const q = m.p && typeof m.p === 'object' ? m.p : {}; const num = v => Math.max(0, Math.min(1e9, Math.round(+v || 0)));
+      const eq = {}; for (const k of ['weapon', 'shield', 'helm', 'armor', 'pants', 'gloves', 'boots', 'wings']) { const it = this.cleanItems([q.eq && q.eq[k]], 1)[0]; if (it && it.k === k) eq[k] = it; }
+      const pets = {}; for (const k of ['imp', 'hada', 'rudolf']) { const it = this.cleanItems([q.pets && q.pets[k]], 1)[0]; if (it && it.k === 'pet') pets[k] = it; }
+      const st = {}; for (const k of ['fue', 'agi', 'vit', 'ene']) st[k] = num(q.st && q.st[k]);
+      const ds = {}; for (const k of ['mn', 'mx', 'def', 'hp', 'mp', 'cr', 'ex']) ds[k] = num(q.ds && q.ds[k]); ds.aps = Math.max(0, Math.min(20, +(q.ds && q.ds.aps) || 0));
+      const s = a.s || {};
+      this.send(x.ws, { t: 'pf', id: a.uid, p: { n: s.n || clip(q.n, 20), c: s.c || clip(q.c, 14), L: (s.L | 0) || num(q.L), r: num(q.r), evo: q.evo ? 1 : 0, face: num(q.face), st, ds, eq, pets, z: a.zone || null } }); return; }
     // vida y maná para la tarjeta de los compañeros de grupo (en porcentaje; máx. 2 por segundo)
     if (t === 'ps') { const now = Date.now(); if (now - (a.psT || 0) < 450) return; a.psT = now; const [, p] = this.partyOf(a.uid); if (!p) return;
       const pc = v => Math.max(0, Math.min(100, Math.round(+v || 0)));
