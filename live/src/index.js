@@ -330,7 +330,9 @@ export class World {
     // ficha de un compañero (stats y equipo): pf = la pido, pfq = se la pido al compañero, pfr = su respuesta; solo dentro del mismo grupo
     if (t === 'pf') { const now = Date.now(); if (now - (a.pfT || 0) < 800) return; a.pfT = now; const id = String(m.id || ''); const [, p] = this.partyOf(a.uid);
       if (!p || !p.members.has(id) || id === a.uid) return; const x = this.byUid(id); if (!x) { this.send(ws, { t: 'pf', id, off: 1 }); return; }
-      this.send(x.ws, { t: 'pfq', id: a.uid }); return; }
+      this.send(x.ws, { t: 'pfq', id: a.uid });
+      // mientras la ficha está abierta, el que mira recibe lo que hace el compañero (aunque esté en otro mapa): ver 'mp' en t === 'p'
+      const wm = (this.watch ||= new Map()); if (!wm.has(id)) wm.set(id, new Map()); wm.get(id).set(a.uid, now + 9000); return; }
     if (t === 'pfr') { const to = String(m.to || ''); const [, p] = this.partyOf(a.uid); if (!p || !p.members.has(to)) return; const x = this.byUid(to); if (!x) return;
       const q = m.p && typeof m.p === 'object' ? m.p : {}; const num = v => Math.max(0, Math.min(1e9, Math.round(+v || 0)));
       const eq = {}; for (const k of ['weapon', 'shield', 'helm', 'armor', 'pants', 'gloves', 'boots', 'wings']) { const it = this.cleanItems([q.eq && q.eq[k]], 1)[0]; if (it && it.k === k) eq[k] = it; }
@@ -338,7 +340,8 @@ export class World {
       const st = {}; for (const k of ['fue', 'agi', 'vit', 'ene']) st[k] = num(q.st && q.st[k]);
       const ds = {}; for (const k of ['mn', 'mx', 'def', 'hp', 'mp', 'cr', 'ex']) ds[k] = num(q.ds && q.ds[k]); ds.aps = Math.max(0, Math.min(20, +(q.ds && q.ds.aps) || 0));
       const s = a.s || {};
-      this.send(x.ws, { t: 'pf', id: a.uid, p: { n: s.n || clip(q.n, 20), c: s.c || clip(q.c, 14), L: (s.L | 0) || num(q.L), r: num(q.r), evo: q.evo ? 1 : 0, face: num(q.face), st, ds, eq, pets, z: a.zone || null } }); return; }
+      const pp = a.p ? { mv: a.p.mv, ac: a.p.ac, d: a.p.d, g: a.p.g } : null;
+      this.send(x.ws, { t: 'pf', id: a.uid, pp, p: { n: s.n || clip(q.n, 20), c: s.c || clip(q.c, 14), L: (s.L | 0) || num(q.L), r: num(q.r), evo: q.evo ? 1 : 0, face: num(q.face), st, ds, eq, pets, z: a.zone || null } }); return; }
     // vida y maná para la tarjeta de los compañeros de grupo (en porcentaje; máx. 2 por segundo)
     if (t === 'ps') { const now = Date.now(); if (now - (a.psT || 0) < 450) return; a.psT = now; const [, p] = this.partyOf(a.uid); if (!p) return;
       const pc = v => Math.max(0, Math.min(100, Math.round(+v || 0)));
@@ -364,6 +367,10 @@ export class World {
       if (!a.zone) return;
       const out = JSON.stringify({ t: 'p', id: a.uid, ...a.p });
       for (const x of this.inZone(a.zone, ws)) this.send(x.ws, out);
+      const w = this.watch && this.watch.get(a.uid);
+      if (w) { const now = Date.now(), mp = JSON.stringify({ t: 'mp', id: a.uid, mv: a.p.mv, ac: a.p.ac, d: a.p.d, g: a.p.g });
+        for (const [v, exp] of w) { if (exp < now) { w.delete(v); continue; } const y = this.byUid(v); if (y && y.a.zone !== a.zone) this.send(y.ws, mp); }
+        if (!w.size) this.watch.delete(a.uid); }
       return;
     }
     if (t === 'hi' || t === 'z' || t === 'eq') { // presentarse, cambiar de mapa o de equipo
