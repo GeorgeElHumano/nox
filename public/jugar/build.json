@@ -1,8 +1,10 @@
 {
- "build": "202611100915",
- "min": "202611100915",
- "title": "Íconos de las alas de la Arquera",
+ "build": "202611101014",
+ "min": "202611101014",
+ "title": "Arreglo: jugar en otro dispositivo",
  "notes": [
-  "Los íconos de las Alas de Panambi, Yvoty y Arasy ahora se ven más grandes en la bolsa, transparentes como en el personaje."
+  "Al abrir NOX en otro dispositivo, el nuevo ya no queda bloqueado en el inicio",
+  "Ahora el que queda afuera es el dispositivo anterior, y lo que pase ahí no se guarda",
+  "Con el botón Jugar en este dispositivo recuperás la partida en cualquiera de los dos"
  ]
 }

@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611101014",
+  "title": "Arreglo: jugar en otro dispositivo",
+  "notes": [
+   "Al abrir NOX en otro dispositivo, el nuevo ya no queda bloqueado en el inicio",
+   "Ahora el que queda afuera es el dispositivo anterior, y lo que pase ahí no se guarda",
+   "Con el botón Jugar en este dispositivo recuperás la partida en cualquiera de los dos"
+  ]
+ },
+ {
   "build": "202611100915",
   "title": "Íconos de las alas de la Arquera",
   "notes": [
