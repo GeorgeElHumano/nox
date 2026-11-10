@@ -1,9 +1,9 @@
 {
- "build": "202611100004",
- "min": "202611100004",
- "title": "Mobs que no se traban",
+ "build": "202611100032",
+ "min": "202611100032",
+ "title": "Una sola partida por cuenta",
  "notes": [
-  "Los mobs ya no se traban al caminar ni al correr: se mueven parejo entre las posiciones del servidor, sobre todo los humanoides como el Ita Jára.",
-  "Las animaciones de caminar y correr ya no saltan de una a otra a cada rato."
+  "Si abrís NOX en otro dispositivo, la partida anterior se cierra del todo: no sigue en local ni guarda nada",
+  "Con el botón Jugar en este dispositivo recuperás la partida y el otro queda afuera"
  ]
 }

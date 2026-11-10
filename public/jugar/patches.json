@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611100032",
+  "title": "Una sola partida por cuenta",
+  "notes": [
+   "Si abrís NOX en otro dispositivo, la partida anterior se cierra del todo: no sigue en local ni guarda nada",
+   "Con el botón Jugar en este dispositivo recuperás la partida y el otro queda afuera"
+  ]
+ },
+ {
   "build": "202611100004",
   "title": "Mobs que no se traban",
   "notes": [
