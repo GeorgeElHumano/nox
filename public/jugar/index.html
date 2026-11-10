@@ -3188,7 +3188,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     const bindQ=o=>{let q=null;r.body.traverse(m=>{if(q||!m.isSkinnedMesh||!m.skeleton)return;const bs=m.skeleton.bones,bi=m.skeleton.boneInverses,i=bs.indexOf(o);if(i<0)return;const B=new THREE.Matrix4().copy(bi[i]).invert(),pi=bs.indexOf(o.parent),L=pi>=0?new THREE.Matrix4().copy(bi[pi]).multiply(B):B;q=new THREE.Quaternion();L.decompose(new THREE.Vector3(),q,new THREE.Vector3());});return q;};
     for(const n in AL){let o=null;for(const a of AL[n]){o=r.body.getObjectByName(a);if(o)break;}if(o)r.fl.push([o,bindQ(o)||o.quaternion.clone(),n]);}r.flB={};for(const [o,,n] of r.fl)r.flB[n]=o;}
   for(const [o,q] of r.fbq)o.quaternion.copy(q);if(r.flS)for(let i=0;i<r.fl.length;i++)r.fl[i][0].quaternion.copy(r.flS[i]);/* los huesos de la pose vuelven a lo que dejó la animación el cuadro anterior (no al reposo en T): así las correcciones no se acumulan y un clip sin pista para un hueso no lo deja en pose T *//* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
-  if(!r.gripOk){r.gripOk=1;const t0=performance.now();try{gripFit(r);}catch(e){console.error('agarre',e);}(window.__GRIPMS=window.__GRIPMS||[]).push(Math.round(performance.now()-t0));}
+  if(!r.gripOk){r.gripOk=1;try{gripFit(r);}catch(e){console.error('agarre',e);}}
   r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);if(r.fist)for(const [b,q] of r.fist)b.quaternion.copy(q);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
   if((r.flyK||0)>.01){const k=r.flyK,ke=k*k*(3-2*k);
     const sw=Math.sin(T*1.1)*.03,mvk=Math.min(1,(P.mv||0)*1.2);
@@ -7359,7 +7359,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611100032';const UPD={shown:'',req:false};
+const NOX_BUILD='202611100701';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}

@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611100701",
+  "title": "Armas bien agarradas",
+  "notes": [
+   "Las manos ahora se cierran alrededor del arma: la espada se toma justo bajo la guarda y los dedos la envuelven.",
+   "El escudo se agarra por su manija: la mano ya no lo atraviesa al atacar, correr ni volar.",
+   "Bastón, cetro y arco quedan centrados en el puño, con los dedos cerrados."
+  ]
+ },
+ {
   "build": "202611100032",
   "title": "Una sola partida por cuenta",
   "notes": [
