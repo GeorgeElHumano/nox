@@ -42,6 +42,12 @@ export default {
     const id = env.WORLD.idFromName('reino');
     const h = new Headers(req.headers);
     h.set('x-uid', row.id); h.set('x-acc', row.name); h.set('x-role', row.role);
+    // una sola partida por cuenta: si este dispositivo ya no es el dueño de la partida, no entra (y no echa al que sí lo es)
+    const gs = url.searchParams.get('g') || '';
+    if (/^[0-9a-f]{16}$/.test(gs)) {
+      let cur = null; try { cur = await env.DB.prepare('SELECT gs FROM gsess WHERE uid=?').bind(row.id).first(); } catch {}
+      if (cur && cur.gs !== gs) { const pair = new WebSocketPair(); const [c, sv] = Object.values(pair); sv.accept(); sv.close(4000, 'Abriste el juego en otro lugar'); return new Response(null, { status: 101, webSocket: c }); }
+    }
     return env.WORLD.get(id).fetch(new Request(req.url, { headers: h }));
   }
 };

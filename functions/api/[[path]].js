@@ -19,6 +19,7 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS deliveries(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, oid INTEGER, item TEXT NOT NULL, label TEXT, created INTEGER)`,
   `CREATE TABLE IF NOT EXISTS resets(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT, name TEXT, wa TEXT, created INTEGER, status TEXT NOT NULL, handled INTEGER)`,
   `CREATE TABLE IF NOT EXISTS imported(uid TEXT NOT NULL, id TEXT NOT NULL, t INTEGER, PRIMARY KEY(uid,id))`,
+  `CREATE TABLE IF NOT EXISTS gsess(uid TEXT PRIMARY KEY, gs TEXT NOT NULL, t INTEGER)`,
   `CREATE TABLE IF NOT EXISTS downloads(id INTEGER PRIMARY KEY AUTOINCREMENT, plat TEXT NOT NULL, created INTEGER, ua TEXT)`,
   `CREATE INDEX IF NOT EXISTS dl_created ON downloads(created)`,
   `CREATE INDEX IF NOT EXISTS orders_status ON orders(status)`,
@@ -205,6 +206,20 @@ route('POST', 'orders/:id/cancel', async ({ db, me, p }) => {
 }, { auth: true });
 
 /* juego */
+/* una sola partida por cuenta: el último dispositivo que entra a jugar se queda con la partida; el anterior queda afuera y no puede guardar */
+const GS_RE = /^[0-9a-f]{16}$/;
+route('POST', 'game/claim', async ({ db, req, me }) => {
+  const gs = req.headers.get('x-nox-gs') || '';
+  if (!GS_RE.test(gs)) return fail('Partida no válida.');
+  await db.prepare('INSERT INTO gsess(uid,gs,t) VALUES(?,?,?) ON CONFLICT(uid) DO UPDATE SET gs=excluded.gs,t=excluded.t').bind(me.id, gs, now()).run();
+  return json({ ok: true });
+}, { auth: true });
+route('GET', 'game/claim', async ({ db, req, me }) => {
+  const gs = req.headers.get('x-nox-gs') || '';
+  const r = await db.prepare('SELECT gs FROM gsess WHERE uid=?').bind(me.id).first();
+  return json({ ok: !r || r.gs === gs });
+}, { auth: true });
+
 route('GET', 'game/docs', async ({ db, me }) => {
   // personajes traídos de la versión anterior: se agregan una sola vez
   for (const im of IMPORTS) {
@@ -429,6 +444,13 @@ export async function onRequest(ctx) {
       me = await auth(req, db);
       if (!me) return fail('Tenés que iniciar sesión.', 401);
       if (r.opt.admin && me.role !== 'admin') return fail('Solo el administrador puede hacer esto.', 403);
+    }
+    if (me && path.startsWith('game/') && path !== 'game/claim' && (req.method !== 'GET' || path === 'game/deliveries')) {
+      const gs = req.headers.get('x-nox-gs') || '';
+      if (GS_RE.test(gs)) {
+        const cur = await db.prepare('SELECT gs FROM gsess WHERE uid=?').bind(me.id).first();
+        if (cur && cur.gs !== gs) return json({ error: 'Abriste NOX en otro dispositivo.', other: true }, 409);
+      }
     }
     try { return await r.f({ db, req, env, url, me, p: m.groups || {} }); }
     catch (e) { return fail('Error del servidor: ' + (e && e.message || e), 500); }

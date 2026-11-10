@@ -1,10 +1,9 @@
 {
- "build": "202611092037",
- "min": "202611092037",
- "title": "Poses más naturales",
+ "build": "202611100032",
+ "min": "202611100032",
+ "title": "Una sola partida por cuenta",
  "notes": [
-  "Todos los personajes miran al frente: antes llevaban la cabeza gacha.",
-  "Arreglado: algunos personajes caminaban con los brazos en cruz (pose T).",
-  "La espada ya no atraviesa el cuerpo al correr, y al volar cuelga derecha y por fuera de las piernas."
+  "Si abrís NOX en otro dispositivo, la partida anterior se cierra del todo: no sigue en local ni guarda nada",
+  "Con el botón Jugar en este dispositivo recuperás la partida y el otro queda afuera"
  ]
 }
