@@ -1672,9 +1672,9 @@ const SETN={gladiador:['de Ñandu','de Kurusu','de Ara','del Tembetá','de Tupã
 const SLOTN={gladiador:{helm:'Yelmo',armor:'Peto',pants:'Faldar',gloves:'Brazales',boots:'Grebas'},mburuvicha:{helm:'Corona',armor:'Coraza',pants:'Quijotes',gloves:'Guanteletes',boots:'Botas'},caballero:{helm:'Yelmo',armor:'Coraza',pants:'Grebas',gloves:'Guanteletes',boots:'Botas'},hechicero:{helm:'Capucha',armor:'Túnica',pants:'Faldón',gloves:'Guantes',boots:'Sandalias'},arquera:{helm:'Diadema',armor:'Chaleco',pants:'Calzas',gloves:'Guantes',boots:'Botas'}};
 const WNAME={gladiador:['Espada de Ñandu','Espada de Kurusu','Espada Rúnica','Espada del Tembetá','Espada de Tupã Rendy','Espada de Karai Ru','Espada de Ñamandu Ru'],mburuvicha:['Cetro de Tuja','Cetro de Yvyrapã','Cetro del Cacique','Cetro de Guyra Hũ','Cetro del Mburuvicha','Cetro del Tuvicha Guasu','Cetro de Ñanderu'],caballero:['Espada Corta','Espada Larga','Espada de Misión','Espada del Guardián','Espada de Tau','Espada del Yvága',"Espada de Yvy Marane'ỹ"],hechicero:['Vara de Palo Santo','Bastón de Lapacho','Bastón de Paje','Bastón de Jasy','Bastón de Tupã','Bastón de Arandu','Bastón de Ñamandu'],arquera:['Arco Corto','Arco de Lapacho','Arco de Guyra','Arco de Kuarahy','Arco de Arasy','Arco de Jasy Porã','Arco del Yvága']};
 const SHNAME=['Escudo de Madera','Escudo de Bronce','Escudo de Misión','Escudo del Guardián','Escudo de Tau','Escudo del Yvága',"Escudo de Yvy Marane'ỹ"];
-const WINGN3={caballero:'Alas de Kuarahy',hechicero:'Alas de Jasy Ñamandu',arquera:'Alas de Mainumby',gladiador:'Alas de Ára Pytã',mburuvicha:'Capa de Ñanderuvusu'};
-const WINGN2={gladiador:'Alas de la Tormenta',mburuvicha:'Capa de Guyra Hũ Guasu',caballero:'Alas de Tau Pytã',hechicero:'Alas de Ñamandu',arquera:'Alas de Arasy'};
-const WINGN={gladiador:'Alas de Tupã',mburuvicha:'Capa de Guyra Hũ',caballero:'Alas de Guyra Pytã',hechicero:'Alas de Jasy',arquera:'Alas de Mainumby'};
+const WINGN3={caballero:'Alas de Kuarahy',hechicero:'Alas de Jasy Ñamandu',arquera:'Alas de Arasy',gladiador:'Alas de Ára Pytã',mburuvicha:'Capa de Ñanderuvusu'};
+const WINGN2={gladiador:'Alas de la Tormenta',mburuvicha:'Capa de Guyra Hũ Guasu',caballero:'Alas de Tau Pytã',hechicero:'Alas de Ñamandu',arquera:'Alas de Yvoty'};
+const WINGN={gladiador:'Alas de Tupã',mburuvicha:'Capa de Guyra Hũ',caballero:'Alas de Guyra Pytã',hechicero:'Alas de Jasy',arquera:'Alas de Panambi'};
 const GEMS={
  tupa:{name:'Gema de Tupã',col:'#3cc8ff',hex:0x1fb4ff,sell:9000,desc:'Sube un ítem de +0 a +6. Nunca falla.'},
  jasy:{name:'Gema de Jasy',col:'#c77dff',hex:0xa83cff,sell:7000,desc:'Sube un ítem de +6 a +9. 50% de éxito (75% si el ítem tiene Suerte). Si falla y el ítem es +7 o más, vuelve a +0; si no, baja un nivel.'},
@@ -2385,7 +2385,69 @@ function wingExtraGeo(cls,s,st){const k=cls+s+st;if(WGEO[k])return WGEO[k];if(st
   if(st>=2){for(let i=0;i<3;i++){add(.92-i*.12,(-215-i*12)*D,1.5-i*.2,.05,-.05-i*.01,.05);}}
   if(st>=3){for(let i=0;i<4;i++){const f=i/3;add(.2+f*.6,(-200+f*20)*D,1.2+f*.3,.035,-.06,.1);}}
   WGEO[k]=keep(mergeGeos(parts));return WGEO[k];}
-function wingsMesh(cls,lv,gen){const g=new THREE.Group();g.position.set(0,.62,-.24);const sides=[];lv=lv||0;const g2=(gen||1)>=2,g3=(gen||1)>=3;const st=g3?3:Math.min(3,wingStage(lv)+(g2?1:0));const P=(WPALS[cls]||WPALS.caballero)[st];
+/* ===== alas de hada de la arquera (10/11): 1ª gen Panambi (mariposa), 2ª Yvoty (pétalos de lapacho), 3ª Arasy (tornasol con colas) ===== */
+const FTEX={};
+function fairyTex(gen,lv){const key='fy'+gen+'_'+(lv>=13?3:lv>=10?2:lv>=7?1:0);if(FTEX[key])return FTEX[key];
+  const Wc=512,Hc=1024,cv=document.createElement('canvas');cv.width=Wc;cv.height=Hc;const x=cv.getContext('2d');
+  const ec=document.createElement('canvas');ec.width=Wc;ec.height=Hc;const e=ec.getContext('2d');e.fillStyle='#000';e.fillRect(0,0,Wc,Hc);
+  const X=v=>v/1.1*Wc,Y=v=>(1.0-v)/2.2*Hc,R=[X(.02),Y(0)];
+  const glowV=lv>=7,vcol=gen===1?'#b8faff':gen===2?'#fff0f8':'#fff6d0';
+  const lobe=(c,pts)=>{c.beginPath();c.moveTo(X(pts[0][0]),Y(pts[0][1]));for(let i=1;i<pts.length;i+=3)c.bezierCurveTo(X(pts[i][0]),Y(pts[i][1]),X(pts[i+1][0]),Y(pts[i+1][1]),X(pts[i+2][0]),Y(pts[i+2][1]));c.closePath();};
+  const UP=[[.02,0],[.12,.65],[.55,.98],[.92,.92],[1.1,.88],[1.08,.55],[.88,.32],[.68,.10],[.35,.02],[.02,-.02]];
+  const LO=[[.02,-.04],[.35,-.06],[.70,-.18],[.72,-.42],[.74,-.72],[.48,-.80],[.34,-.66],[.18,-.50],[.08,-.25],[.02,-.06]];
+  const UP3=[[.02,0],[.10,.72],[.55,1.0],[.98,.95],[1.12,.9],[1.1,.52],[.9,.3],[.68,.08],[.35,.02],[.02,-.02]];
+  const veins=(c,col,lw,a,n,len,a0,a1)=>{c.strokeStyle=col;c.lineWidth=lw;c.globalAlpha=a;for(let i=0;i<n;i++){const t=a0+(a1-a0)*i/(n-1),L=len*(.85+.15*Math.sin(i*1.7));c.beginPath();c.moveTo(R[0],R[1]);c.quadraticCurveTo(R[0]+Math.cos(t)*L*.5+10,R[1]-Math.sin(t)*L*.5,R[0]+Math.cos(t)*L,R[1]-Math.sin(t)*L);c.stroke();}c.globalAlpha=1;};
+  if(gen===2){/* Yvoty: pétalos de lapacho que salen del hombro, garganta amarilla */
+    const petal=(c,ang,len,w,fill,edge)=>{const d=[Math.cos(ang),-Math.sin(ang)],n=[-d[1],d[0]],p0=R,p1=[R[0]+d[0]*len,R[1]+d[1]*len];
+      const q=(a,b,k)=>[p0[0]+d[0]*len*a+n[0]*w*b*k,p0[1]+d[1]*len*a+n[1]*w*b*k];
+      c.beginPath();c.moveTo(p0[0],p0[1]);let A=q(.25,.5,1),B=q(.85,1.15,1);c.bezierCurveTo(A[0],A[1],B[0],B[1],p1[0]+n[0]*w*.35,p1[1]+n[1]*w*.35);
+      /* borde ondulado de la punta */const m1=q(1.04,.12,1),m2=q(1.04,-.12,1);c.quadraticCurveTo(m1[0],m1[1],p1[0],p1[1]);c.quadraticCurveTo(m2[0],m2[1],p1[0]-n[0]*w*.35,p1[1]-n[1]*w*.35);
+      A=q(.85,1.15,-1);B=q(.25,.5,-1);c.bezierCurveTo(A[0],A[1],B[0],B[1],p0[0],p0[1]);c.closePath();
+      if(fill){const g=c.createLinearGradient(p0[0],p0[1],p1[0],p1[1]);g.addColorStop(0,'#8a1650');g.addColorStop(.3,'#c8337f');g.addColorStop(.75,'#ea70ae');g.addColorStop(1,'#ffc2e0');c.fillStyle=g;c.globalAlpha=.55;c.fill();c.globalAlpha=1;
+        c.save();c.clip();c.strokeStyle='rgba(120,20,70,.45)';c.lineWidth=1.4;for(let k=-3;k<=3;k++){const P=q(.95,k*.25,1);c.beginPath();c.moveTo(p0[0],p0[1]);c.quadraticCurveTo(...q(.5,k*.18,1),P[0],P[1]);c.stroke();}c.restore();
+        c.strokeStyle=edge;c.lineWidth=3;c.stroke();}
+      else{c.fillStyle=edge;c.fill();}};
+    const P2=[[78,.92,150],[58,1.02,165],[36,1.06,170],[14,1.0,160],[-30,.74,120],[-52,.66,104],[-72,.52,84]];
+    for(const [a,l,w] of P2)petal(x,a*Math.PI/180,X(l),w,true,'#7a1f4f');
+    if(glowV)for(const [a,l,w] of P2){e.save();petal(e,a*Math.PI/180,X(l),w,false,'#3a0a22');e.restore();e.strokeStyle=vcol;e.lineWidth=3;e.globalAlpha=.85;const d=[Math.cos(a*Math.PI/180),-Math.sin(a*Math.PI/180)];e.beginPath();e.moveTo(R[0],R[1]);e.lineTo(R[0]+d[0]*X(l)*.95,R[1]+d[1]*X(l)*.95);e.stroke();e.globalAlpha=1;}
+    const yg=x.createRadialGradient(R[0],R[1],2,R[0],R[1],70);yg.addColorStop(0,'#fff6b0');yg.addColorStop(.5,'#ffd23a');yg.addColorStop(1,'rgba(255,190,40,0)');x.fillStyle=yg;x.beginPath();x.arc(R[0],R[1],70,0,7);x.fill();
+    const eg=e.createRadialGradient(R[0],R[1],2,R[0],R[1],60);eg.addColorStop(0,'#ffe080');eg.addColorStop(1,'rgba(0,0,0,0)');e.fillStyle=eg;e.beginPath();e.arc(R[0],R[1],60,0,7);e.fill();}
+  else{const g3=gen===3,U=g3?UP3:UP;
+    if(g3){/* colas largas como cintas */for(const [k,w,c1,c2] of [[0,16,'#ffd85a','#ff5aa8'],[1,10,'#7af0ff','#8a5cf0']]){const g=x.createLinearGradient(X(.45),Y(-.7),X(.7),Y(-1.18));g.addColorStop(0,c1);g.addColorStop(1,c2);x.strokeStyle=g;x.lineWidth=w;x.lineCap='round';x.beginPath();x.moveTo(X(.42+k*.08),Y(-.68));x.bezierCurveTo(X(.48+k*.1),Y(-.9),X(.62+k*.08),Y(-1.0),X(.66+k*.14),Y(-1.16+k*.06));x.stroke();
+      x.fillStyle=c2;x.beginPath();x.ellipse(X(.66+k*.14),Y(-1.16+k*.06),w*1.3,w*2,-.4,0,7);x.fill();
+      if(glowV){e.strokeStyle=c1;e.lineWidth=w*.6;e.lineCap='round';e.beginPath();e.moveTo(X(.42+k*.08),Y(-.68));e.bezierCurveTo(X(.48+k*.1),Y(-.9),X(.62+k*.08),Y(-1.0),X(.66+k*.14),Y(-1.16+k*.06));e.stroke();}}}
+    const fillLobe=(pts,stops,rad)=>{lobe(x,pts);const g=x.createRadialGradient(R[0],R[1],4,R[0],R[1],rad);stops.forEach(([o,c])=>g.addColorStop(o,c));x.fillStyle=g;x.globalAlpha=g3?.5:.45;x.fill();x.globalAlpha=1;};
+    if(!g3){fillLobe(U,[[0,'#05264e'],[.3,'#0d62a8'],[.6,'#17a6d4'],[.85,'#4fd2ee'],[1,'#8ee8fa']],X(1.05));fillLobe(LO,[[0,'#05264e'],[.45,'#1170b0'],[.85,'#2fc0e4'],[1,'#7ae0f4']],X(.85));}
+    else{fillLobe(U,[[0,'#fff2a8'],[.18,'#ffd85a'],[.36,'#4be0a0'],[.56,'#3fa0f0'],[.76,'#8a5cf0'],[.92,'#ff6ad0'],[1,'#ffd0f0']],X(1.1));fillLobe(LO,[[0,'#fff2a8'],[.25,'#ffd85a'],[.55,'#ff7a5a'],[.85,'#ff5aa8'],[1,'#ffc0e0']],X(.85));}
+    /* venas */for(const [pts,a0,a1,n,len] of [[U,.05,1.35,7,X(1.05)],[LO,-1.2,-.05,5,X(.8)]]){x.save();lobe(x,pts);x.clip();veins(x,g3?'rgba(255,255,255,.8)':'rgba(8,20,45,.9)',g3?2.5:3.5,1,n,len,a0,a1);
+      /* borde oscuro (mariposa) o de luz (tornasol) */x.lineWidth=g3?14:30;x.strokeStyle=g3?'rgba(255,255,255,.6)':'#0b1226';lobe(x,pts);x.stroke();x.restore();
+      if(glowV){e.save();lobe(e,pts);e.clip();veins(e,vcol,3,.9,n,len,a0,a1);e.lineWidth=10;e.strokeStyle=vcol;e.globalAlpha=.6;lobe(e,pts);e.stroke();e.restore();}}
+    /* ojos y puntos */
+    if(!g3){x.fillStyle='#ffffff';for(let i=0;i<9;i++){const t=i/8,px=.55+.48*Math.sin(.4+t*1.6),py=.92-t*.55;x.beginPath();x.arc(X(px*.95),Y(py),5+2*(i%2),0,7);x.fill();}
+      for(const [cx,cy,r] of [[.62,.62,26],[.46,-.42,18]]){const g=x.createRadialGradient(X(cx),Y(cy),2,X(cx),Y(cy),r);g.addColorStop(0,'#ffffff');g.addColorStop(.35,'#9af0ff');g.addColorStop(.7,'#0b3a6a');g.addColorStop(1,'rgba(11,58,106,0)');x.fillStyle=g;x.beginPath();x.arc(X(cx),Y(cy),r,0,7);x.fill();}}
+    else{x.fillStyle='#fff8d0';for(let i=0;i<26;i++){const px=.15+Math.abs(Math.sin(i*12.9))*.8,py=-.6+Math.abs(Math.sin(i*7.3))*1.45;x.globalAlpha=.85;x.beginPath();x.arc(X(px),Y(py),1.5+(i%3),0,7);x.fill();}x.globalAlpha=1;
+      e.fillStyle='#fff6d0';for(let i=0;i<26;i++){const px=.15+Math.abs(Math.sin(i*12.9))*.8,py=-.6+Math.abs(Math.sin(i*7.3))*1.45;e.beginPath();e.arc(X(px),Y(py),2+(i%3),0,7);e.fill();}}
+    /* el emisivo lleva también un tenue del color base */if(g3){e.globalAlpha=.35;e.drawImage(cv,0,0);e.globalAlpha=1;}}
+  const mk=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);return t;};
+  FTEX[key]={map:mk(cv),em:mk(ec)};return FTEX[key];}
+const FAIRY_GEO=(()=>{const g=new THREE.PlaneGeometry(1.1,2.2,12,22);g.translate(.55,-.1,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const X=p.getX(i),Y=p.getY(i);p.setZ(i,-.16*X*X+.04*Y*Y);}g.computeVertexNormals();return keep(g);})();
+function fairyWings(lv,gen){lv=lv||0;gen=Math.max(1,Math.min(3,gen||1));const g=new THREE.Group();g.position.set(0,.45,-.22);g.rotation.x=-.32;const sides=[];
+  const T=fairyTex(gen,lv),em=gen===1?0x5ae6ff:gen===2?0xff7ad0:0xffd06a,P={em,key:'fy'+gen};
+  const wu={uWP:{value:0},uWA:{value:0},uWT:{value:0},uWR:{value:.4}};
+  const m=new MSM({map:T.map,emissiveMap:T.em,emissive:0xffffff,emissiveIntensity:.25+(lv>=7?.5:0)+(lv>=13?.4:0)+(gen===3?.25:0),transparent:true,alphaTest:.05,depthWrite:false,side:THREE.DoubleSide,roughness:.65,metalness:0});
+  m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,wu);sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nuniform float uWP;uniform float uWA;uniform float uWT;uniform float uWR;').replace('#include <begin_vertex>','#include <begin_vertex>\n{float sx=abs(transformed.x);float w=smoothstep(0.05,1.1,sx);transformed.z+=sin(uWP-sx*1.6)*uWA*w*0.8+0.025*sin(uWT*9.0+sx*7.0+transformed.y*5.0)*w*uWR;}');
+    if(gen===3)sh.fragmentShader=sh.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float f=dot(normalize(vViewPosition),normal);vec3 ir=0.5+0.5*cos(6.2832*(f*1.3+vec3(0.0,0.33,0.67)));totalEmissiveRadiance+=ir*0.18*diffuseColor.a;}');};
+  m.customProgramCacheKey=()=>'fairy'+gen;
+  const S=[.9,1.025,1.425][gen-1]*(1+Math.min(15,lv)*.006);
+  for(const s of[-1,1]){const W=new THREE.Group();W.position.x=.04*s;g.add(W);sides.push(W);W.rotation.y=s*.42;
+    const me=new THREE.Mesh(FAIRY_GEO,m);me.scale.set(S*s,S,S);me.renderOrder=2;W.add(me);
+    /* chispas: +10 polen o estrellas en el borde; +13 el doble */
+    const ns=lv>=13?9:lv>=10?5:0;for(let k=0;k<ns;k++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sfxTex('star'),color:em,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.9,fog:false}));const t=k/Math.max(1,ns-1);sp.scale.setScalar(.06+(k%3)*.035);sp.position.set(s*S*(.35+.6*Math.sin(.3+t*2.6)),S*(.95-t*1.6),.04);W.add(sp);}
+    if(lv>=13){const au=glowSprite(em,1.6*S,.22);au.position.set(s*.5*S,.25*S,-.05);W.add(au);}}
+  if(gen===3){const sp=glowSprite(em,S*3.2,.2);sp.position.set(0,.2,-.12);g.add(sp);}
+  return{g,sides,u:wu,P};}
+
+function wingsMesh(cls,lv,gen){if(cls==='arquera')return fairyWings(lv,gen);const g=new THREE.Group();g.position.set(0,.62,-.24);const sides=[];lv=lv||0;const g2=(gen||1)>=2,g3=(gen||1)>=3;const st=g3?3:Math.min(3,wingStage(lv)+(g2?1:0));const P=(WPALS[cls]||WPALS.caballero)[st];
   const shape=WSHAPE[cls]||'eagle',veil=shape==='veil';const tex=featherTex(P,shape);const m=new MSM({map:tex,emissiveMap:tex,emissive:P.em,emissiveIntensity:(veil?.55:P.ei)+Math.min(15,lv)*.012,alphaTest:veil?.04:.42,transparent:veil,opacity:veil?.9:1,depthWrite:!veil,blending:THREE.NormalBlending,side:THREE.DoubleSide,roughness:P.rough,metalness:P.met});
   const S=(.44+st*.06+Math.min(15,lv)*.003)*(g3?1.36:g2?1.16:1);g.rotation.x=-.32;
   /* ola del ala: la punta va retrasada respecto de la raíz y las plumas ondean */
@@ -3181,7 +3243,8 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     if(r.lastRy==null)r.lastRy=r.g.rotation.y;let dry=r.g.rotation.y-r.lastRy;dry=Math.atan2(Math.sin(dry),Math.cos(dry));r.lastRy=r.g.rotation.y;r.bank=(r.bank||0)+(clamp(-dry/Math.max(dt,.001)*.07,-.18,.18)-(r.bank||0))*Math.min(1,dt*2.5);
     const pit=ke*(FT.pit+Math.sin(ph-2)*.012),h0=.95,lift=ke*(1+Math.sin(ph*.5-1.7)*.112)*(r.npcP?.3:.4);/* vuelo bajo: los personajes a 40 % de la altura original y los PNJ apenas se despegan del piso. Flota: sube y baja como mucho un 5 % de la altura (±4,5 cm), a la mitad del ritmo del aleteo */
     r.model.rotation.set(-(P.hitK||0)*.12+pit,0,((r.bank||0)+Math.sin(T*.7)*.015)*ke);r.model.position.set(0,(r.footY||0)+lift+h0-h0*Math.cos(pit),-h0*Math.sin(pit));
-    if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);(r.wings.sides||[]).forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
+    /* Yvoty (alas de pétalos de la arquera): sueltan pétalos de lapacho también quietas */if(ke<=.4&&r.wings&&r.wings.P&&r.wings.P.key==='fy2'&&r.g.parent===scene){r.petT=(r.petT||0)-dt;if(r.petT<=0){r.petT=.45+Math.random()*.4;const W=r.wings.sides[Math.random()<.5?0:1];if(W){_ov.set((W===r.wings.sides[0]?-1:1)*(.3+Math.random()*.5),.1+Math.random()*.5,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:1,col:Math.random()<.5?0xf49cc4:0xe86aa8,spd:.15,grav:.25,life:1.6,size:.09,op:.85});}}}
+     if(ke>.4){r.trailT=(r.trailT||0)-dt;if(r.trailT<=0&&r.g.parent===scene&&r.wings){r.trailT=.12;const col=(r.wings&&r.wings.P?r.wings.P.em:(WPAL[r.cls]||WPAL.caballero).em);(r.wings.sides||[]).forEach((W,i)=>{_ov.set((i?1:-1)*.7,.15,0);W.localToWorld(_ov);parts(_ov.x,_ov.y,_ov.z,{n:2,col,spd:.3,grav:.4,life:.5,size:.14,op:.7});});}}}
   if(!r.fb){r.fb={};r.fbq=[];['thigh_L','thigh_R','leg_L','leg_R','foot_L','foot_R','arm_L','arm_R','forearm_L','forearm_R','spine','chest','neck','head'].forEach(n=>{const o=r.body.getObjectByName(n);r.fb[n]=o;if(o)r.fbq.push([o,o.quaternion.clone(),n]);});}
   if(!r.fl){/* huesos de la pose de vuelo: el esqueleto actual usa nombres tipo UE (thigh_l, calf_l, upperarm_l, lowerarm_l, spine_01…); antes sólo se buscaban los del Biped y la pose no se aplicaba a nadie */
     r.fl=[];const AL={thigh_L:['thigh_L','thigh_l'],thigh_R:['thigh_R','thigh_r'],leg_L:['leg_L','calf_l'],leg_R:['leg_R','calf_r'],foot_L:['foot_L','foot_l'],foot_R:['foot_R','foot_r'],arm_L:['arm_L','upperarm_l'],arm_R:['arm_R','upperarm_r'],forearm_L:['forearm_L','lowerarm_l'],forearm_R:['forearm_R','lowerarm_r'],hand_R:['hand_R','hand_r'],spine:['spine','spine_01'],chest:['chest','spine_03'],neck:['neck','neck_01'],head:['head','Head']};
@@ -7359,7 +7422,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611100701';const UPD={shown:'',req:false};
+const NOX_BUILD='202611100840';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}

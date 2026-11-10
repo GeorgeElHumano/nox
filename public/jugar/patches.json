@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611100840",
+  "title": "Alas de hada para la Arquera",
+  "notes": [
+   "La Arquera estrena alas de hada en sus tres generaciones: Alas de Panambi (mariposa), Alas de Yvoty (pétalos de lapacho) y Alas de Arasy (tornasol con colas).",
+   "Las alas son transparentes, salen de los omóplatos y brillan más con el nivel: desde +7 se encienden las venas, desde +10 sueltan chispas y desde +13 llevan halo.",
+   "Las Alas de Yvoty sueltan pétalos de lapacho mientras estás quieta."
+  ]
+ },
+ {
   "build": "202611100701",
   "title": "Armas bien agarradas",
   "notes": [

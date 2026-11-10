@@ -1,10 +1,10 @@
 {
- "build": "202611100701",
- "min": "202611100701",
- "title": "Armas bien agarradas",
+ "build": "202611100840",
+ "min": "202611100840",
+ "title": "Alas de hada para la Arquera",
  "notes": [
-  "Las manos ahora se cierran alrededor del arma: la espada se toma justo bajo la guarda y los dedos la envuelven.",
-  "El escudo se agarra por su manija: la mano ya no lo atraviesa al atacar, correr ni volar.",
-  "Bastón, cetro y arco quedan centrados en el puño, con los dedos cerrados."
+  "La Arquera estrena alas de hada en sus tres generaciones: Alas de Panambi (mariposa), Alas de Yvoty (pétalos de lapacho) y Alas de Arasy (tornasol con colas).",
+  "Las alas son transparentes, salen de los omóplatos y brillan más con el nivel: desde +7 se encienden las venas, desde +10 sueltan chispas y desde +13 llevan halo.",
+  "Las Alas de Yvoty sueltan pétalos de lapacho mientras estás quieta."
  ]
 }
