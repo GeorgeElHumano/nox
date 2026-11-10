@@ -3182,7 +3182,8 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     const bindQ=o=>{let q=null;r.body.traverse(m=>{if(q||!m.isSkinnedMesh||!m.skeleton)return;const bs=m.skeleton.bones,bi=m.skeleton.boneInverses,i=bs.indexOf(o);if(i<0)return;const B=new THREE.Matrix4().copy(bi[i]).invert(),pi=bs.indexOf(o.parent),L=pi>=0?new THREE.Matrix4().copy(bi[pi]).multiply(B):B;q=new THREE.Quaternion();L.decompose(new THREE.Vector3(),q,new THREE.Vector3());});return q;};
     for(const n in AL){let o=null;for(const a of AL[n]){o=r.body.getObjectByName(a);if(o)break;}if(o)r.fl.push([o,bindQ(o)||o.quaternion.clone(),n]);}r.flB={};for(const [o,,n] of r.fl)r.flB[n]=o;}
   for(const [o,q] of r.fbq)o.quaternion.copy(q);if(r.flS)for(let i=0;i<r.fl.length;i++)r.fl[i][0].quaternion.copy(r.flS[i]);/* los huesos de la pose vuelven a lo que dejó la animación el cuadro anterior (no al reposo en T): así las correcciones no se acumulan y un clip sin pista para un hueso no lo deja en pose T *//* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
-  r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
+  if(!r.gripOk){r.gripOk=1;const t0=performance.now();try{gripFit(r);}catch(e){console.error('agarre',e);}(window.__GRIPMS=window.__GRIPMS||[]).push(Math.round(performance.now()-t0));}
+  r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);if(r.fist)for(const [b,q] of r.fist)b.quaternion.copy(q);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
   if((r.flyK||0)>.01){const k=r.flyK,ke=k*k*(3-2*k);
     const sw=Math.sin(T*1.1)*.03,mvk=Math.min(1,(P.mv||0)*1.2);
     /* pose absoluta de levitación (como en MU): parte del reposo del esqueleto y le suma la pose; se mezcla con la animación según ke */
@@ -4072,6 +4073,89 @@ function cc0GripQ(body,clip,t,bone,dir,side){const sk=[];body.traverse(o=>{if(o.
   const Y=new THREE.Vector3(...dir).normalize().applyQuaternion(rq),Zs=new THREE.Vector3(...side).applyQuaternion(rq);const X=new THREE.Vector3().crossVectors(Y,Zs).normalize();const Z=new THREE.Vector3().crossVectors(X,Y).normalize();
   const qW=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X,Y,Z));const qRest=qR.clone().multiply(qP.clone().invert()).multiply(qW);return qR.clone().invert().multiply(qRest);}
 /* el arma cambia de agarre según la animación: en guardia apunta arriba y adelante; en reposo o caminando, la punta va hacia abajo */
+/* ===== agarre anatómico (9/11): la mano se cierra alrededor de un cilindro (empuñadura de la espada o manija del escudo)
+   - el ángulo de cada falange se busca para envolver el cilindro sin atravesarlo (flexión = eje X local de cada falange, hacia la palma)
+   - la espada se toma justo bajo la guarda (se detecta en la malla: el corte más ancho, del lado del pomo); la hoja sale del lado del pulgar
+   - el escudo se toma por la manija (lo más atrás en el centro del escudo) y la placa queda del lado del dorso de la mano
+   - todo se calcula una sola vez y se guarda: dedos por mano y cilindro (GRIPC), forma por modelo (GRIPW). Armar un personaje después cuesta < 1 ms */
+const GRIPC={},GRIPW={},_gv=()=>new THREE.Vector3();
+function gripBindQ(body,b){let q=null;body.traverse(m=>{if(q||!m.isSkinnedMesh||!m.skeleton)return;const bs=m.skeleton.bones,bi=m.skeleton.boneInverses,i=bs.indexOf(b);if(i<0)return;const M=new THREE.Matrix4().copy(bi[i]).invert(),pi=bs.indexOf(b.parent),L=pi>=0?new THREE.Matrix4().copy(bi[pi]).multiply(M):M;q=new THREE.Quaternion();L.decompose(_gv(),q,_gv());});return q||b.quaternion.clone();}
+function gripHand(body,sd){const B=n=>body.getObjectByName(n),hand=B('hand_'+sd);if(!hand)return null;const F=['index','middle','ring','pinky'],ch={};for(const f of F){ch[f]=[1,2,3].map(i=>B(`${f}_0${i}_${sd}`));if(ch[f].some(x=>!x))return null;}
+  const th=[1,2,3].map(i=>B(`thumb_0${i}_${sd}`));const all=[...F.flatMap(f=>ch[f]),...th].filter(Boolean),q0=new Map(all.map(b=>[b,gripBindQ(body,b)]));all.forEach(b=>b.quaternion.copy(q0.get(b)));hand.updateMatrixWorld(true);
+  const L=b=>hand.worldToLocal(_gv().setFromMatrixPosition(b.matrixWorld)),tip=b=>b.children.find(k=>k.isBone)||b;
+  const I=L(ch.index[0]),Pk=L(ch.pinky[0]),Mi=L(ch.middle[0]),T=th[0]?L(th[0]):_gv();let n=I.clone().cross(Pk).normalize();if(T.dot(n)<0)n.negate();
+  return {hand,F,ch,th,all,q0,L,tip,I,Pk,Mi,K:I.clone().add(Pk).multiplyScalar(.5),n,f:Mi.clone().normalize(),a:I.clone().sub(Pk).normalize(),bs:_gv().setFromMatrixScale(hand.matrixWorld).x,sd};}
+/* eje del cilindro en el espacio de la mano: cruza la palma en diagonal (diag = cuánto se inclina hacia los dedos) */
+function gripAxis(H,rhM,diag){const rh=rhM/H.bs,g=H.a.clone().add(H.f.clone().multiplyScalar(diag)).normalize(),C=H.K.clone().add(H.f.clone().multiplyScalar(H.Mi.length()*.12)).add(H.n.clone().multiplyScalar(rh*1.15));return {g,C,rh};}
+function gripFingers(H,A,key){const ax=new THREE.Vector3(1,0,0),tq=new THREE.Quaternion(),{g,C,rh}=A;
+  const dist=p=>{const v=p.clone().sub(C);return v.sub(g.clone().multiplyScalar(v.dot(g))).length();};
+  const set=(b,axis,an)=>b.quaternion.copy(H.q0.get(b)).multiply(tq.setFromAxisAngle(axis,an));
+  let R=GRIPC[key];
+  if(!R){R={};const SG=1;/* flexión hacia la palma en las dos manos */
+    for(const fn of H.F){const c=H.ch[fn],tp=H.tip(c[2]);let best=null;
+      for(let a1=0;a1<=1.8;a1+=.15)for(let a2=0;a2<=1.9;a2+=.15)for(let a3=0;a3<=1.4;a3+=.15){set(c[0],ax,SG*a1);set(c[1],ax,SG*a2);set(c[2],ax,SG*a3);c[0].updateMatrixWorld(true);
+        let e=0;for(const b of [c[1],c[2],tp]){const d=dist(H.L(b));e+=(d-rh*1.4)**2;if(d<rh*.95)e+=(rh*.95-d)**2*40;}e+=.0004*(a1*a1+a2*a2+a3*a3)*rh*rh;if(!best||e<best[0])best=[e,a1,a2,a3];}
+      R[fn]=[SG*best[1],SG*best[2],SG*best[3]];c.forEach((b,i)=>set(b,ax,R[fn][i]));}
+    if(H.th[0]&&H.th[1]){const tt=H.tip(H.th[2]||H.th[1]),goal=C.clone().add(g.clone().multiplyScalar(rh*1.2*(A.thumbSide||1))).sub(H.n.clone().multiplyScalar(rh*.6));let best=null;
+      for(const A0 of [[0,0,1],[1,0,0],[0,1,0]])for(let b0=-1.2;b0<=1.2;b0+=.1)for(let b1=0;b1<=1.4;b1+=.14){set(H.th[0],new THREE.Vector3(...A0),b0);set(H.th[1],ax,b1);H.th[0].updateMatrixWorld(true);
+        const p=H.L(tt);let e=p.distanceTo(goal)**2;const d=dist(p);if(d<rh*.95)e+=(rh*.95-d)**2*40;if(!best||e<best[0])best=[e,A0,b0,b1];}
+      R.thumb=[best[1],best[2],best[3]];}
+    GRIPC[key]=R;}
+  for(const fn of H.F)H.ch[fn].forEach((b,i)=>set(b,ax,R[fn][i]));if(R.thumb&&H.th[0]&&H.th[1]){set(H.th[0],new THREE.Vector3(...R.thumb[0]),R.thumb[1]);set(H.th[1],ax,R.thumb[2]);}
+  H.hand.updateMatrixWorld(true);return R;}
+/* puntos de una malla en el espacio de 'root' (muestreados) */
+function gripPts(root,ref,max){ref.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(ref.matrixWorld).invert(),pts=[];root.traverse(m=>{if(!m.isMesh||!m.geometry)return;const pa=m.geometry.attributes.position,M=new THREE.Matrix4().multiplyMatrices(inv,m.matrixWorld),st=Math.max(1,pa.count/(max||3000)|0);for(let i=0;i<pa.count;i+=st)pts.push(_gv().fromBufferAttribute(pa,i).applyMatrix4(M));});return pts;}
+function gripSword(r,h,body){const obj=h.children[0];if(!obj)return false;const H=gripHand(body,'r');if(!H)return false;
+  const A=gripAxis(H,.023,.8),fing=gripFingers(H,A,'r|espada|'+H.Mi.length().toFixed(3));
+  obj.position.set(0,0,0);obj.quaternion.identity();const mdl=obj.userData.mdl||'?';let W=GRIPW['w|'+mdl];
+  if(!W){const pts=gripPts(obj,obj),box=new THREE.Box3().setFromPoints(pts),sz=box.getSize(_gv()),cen=box.getCenter(_gv());const lx=sz.x>sz.y?(sz.x>sz.z?'x':'z'):(sz.y>sz.z?'y':'z'),oth=['x','y','z'].filter(k=>k!==lx);
+    const N=30,mn=box.min[lx],mx=box.max[lx],Wd=new Array(N).fill(0),WA={};oth.forEach(k=>WA[k]=new Array(N).fill(0));
+    for(const p of pts){const i=Math.min(N-1,(p[lx]-mn)/(mx-mn)*N|0);const w=Math.hypot(p[oth[0]]-cen[oth[0]],p[oth[1]]-cen[oth[1]]);if(w>Wd[i])Wd[i]=w;oth.forEach(k=>{const ww=Math.abs(p[k]-cen[k]);if(ww>WA[k][i])WA[k][i]=ww;});}
+    let gi=0;for(let i=0;i<N;i++)if(Wd[i]>Wd[gi])gi=i;const lowGuard=gi<N/2,sgn=lowGuard?1:-1,guardAt=mn+(mx-mn)*(gi+(lowGuard?0:1))/N,pommel=lowGuard?mn:mx;
+    W=GRIPW['w|'+mdl]={lx,sgn,guardAt,pommel,wide:WA[oth[0]][gi]>WA[oth[1]][gi]?oth[0]:oth[1]};}
+  const s=h.scale.x,fistW=.085/H.bs/s,gripC=W.guardAt-W.sgn*Math.min(Math.abs(W.guardAt-W.pommel)*.5,fistW*.62);
+  const wAx=_gv(),eAx=_gv();wAx[W.lx]=W.sgn;eAx[W.wide]=1;const Mw=new THREE.Matrix4().makeBasis(eAx,wAx,eAx.clone().cross(wAx));
+  const e=H.f.clone().sub(A.g.clone().multiplyScalar(H.f.dot(A.g))).normalize(),Mh=new THREE.Matrix4().makeBasis(e,A.g,e.clone().cross(A.g));
+  h.quaternion.setFromRotationMatrix(Mh.multiply(Mw.clone().invert()));h.position.copy(A.C);const off=_gv();off[W.lx]=-gripC;obj.position.copy(off);
+  if(r.grips)r.grips=r.grips.filter(x=>x!==h);return H;}
+function gripShield(r,h,body){const in2=h.children[0];const o2=in2&&in2.children[0]||in2;if(!o2)return false;const H=gripHand(body,'l');if(!H)return false;
+  in2.position.set(0,0,0);in2.quaternion.identity();if(o2!==in2)o2.position.set(0,0,0);const mdl=o2.userData.mdl||'?';let W=GRIPW['s|'+mdl];
+  if(!W){const pts=gripPts(o2,in2,8000),box=new THREE.Box3().setFromPoints(pts),sz=box.getSize(_gv());const cx=(box.min.x+box.max.x)/2;
+    /* manija: lo más atrás en la zona central (los escudos curvos tienen los bordes más atrás que la manija) */
+    const cen=pts.filter(p=>Math.abs(p.x-cx)<sz.x*.3&&p.y>box.min.y+sz.y*.25&&p.y<box.max.y-sz.y*.25);let z0=1e9,z1=-1e9;for(const p of cen){if(p.z<z0)z0=p.z;if(p.z>z1)z1=p.z;}
+    const back=cen.filter(p=>p.z<z0+(z1-z0)*.3),bb=new THREE.Box3().setFromPoints(back);const bar=back.filter(p=>p.z<bb.min.z+(bb.max.z-bb.min.z)*.45&&Math.abs(p.x)<(bb.max.x-bb.min.x)*.42);
+    W=GRIPW['s|'+mdl]={c:new THREE.Box3().setFromPoints(bar.length?bar:back).getCenter(_gv())};}
+  const A=gripAxis(H,.025,.15);A.thumbSide=-1;gripFingers(H,A,'l|escudo|'+H.Mi.length().toFixed(3));
+  /* placa del lado del dorso: el lado de la palma es hacia donde quedaron las puntas de los dedos cerrados */
+  const mt=H.L(H.tip(H.ch.middle[2])),palm=mt.clone().sub(H.K).dot(H.n)>=0?H.n.clone():H.n.clone().negate();
+  const fwd=palm.clone().negate();fwd.sub(A.g.clone().multiplyScalar(fwd.dot(A.g))).normalize();let gx=A.g.clone();if(fwd.clone().cross(gx).dot(H.f)>0)gx.negate();
+  const q=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(gx,fwd.clone().cross(gx),fwd));
+  const hs=h.scale.x*_gv().setFromMatrixScale(h.parent.matrixWorld).x/H.bs;H.hand.add(h);h.quaternion.copy(q);h.scale.setScalar(hs);h.position.copy(A.C).sub(W.c.clone().multiplyScalar(hs).applyQuaternion(q));return H;}
+/* bastón (hechicero) y cetro (mburuvicha): se respeta la inclinación que ya traían (vertical, apoyado al costado) y sólo se corre el palo para que pase por el centro del puño; los dedos lo envuelven */
+function gripPole(r,h,body,sd){const w=h.children[0];if(!w)return false;const H=gripHand(body,sd);if(!H)return false;const key='p|'+r.cls;let W=GRIPW[key];
+  const ws=_gv().setFromMatrixScale(h.matrixWorld).x||1;
+  if(!W){const pts=gripPts(w,h,6000).filter(p=>Math.abs(p.y)<.06/ws);let rr=0;for(const p of pts)rr=Math.max(rr,Math.hypot(p.x,p.z));W=GRIPW[key]={rm:Math.max(.012,Math.min(.03,rr*ws))};}
+  const rh=W.rm/H.bs,C=H.K.clone().add(H.f.clone().multiplyScalar(H.Mi.length()*.12)).add(H.n.clone().multiplyScalar(rh*1.15));
+  const g=_gv().set(0,1,0).applyQuaternion(h.quaternion).normalize();/* eje del palo en el espacio de la mano */
+  const onAx=h.position.clone().add(g.clone().multiplyScalar(C.clone().sub(h.position).dot(g)));h.position.add(C.clone().sub(onAx));
+  gripFingers(H,{g,C,rh},sd+'|palo|'+r.cls+'|'+H.Mi.length().toFixed(3)+'|'+[g.x,g.y,g.z].map(v=>v.toFixed(1)).join(','));return H;}
+/* arco (arquera, mano izquierda): se respeta cómo lo lleva cada animación (vertical al costado, vertical al apuntar); sólo se centra la empuñadura del arco en el puño y los dedos la envuelven */
+function gripBow(r,h,body){const obj=h.children[0];if(!obj)return false;const H=gripHand(body,'l');if(!H)return false;obj.position.set(0,0,0);const mdl=obj.userData.mdl||'?';let W=GRIPW['b|'+mdl];
+  if(!W){const pts=gripPts(obj,obj,6000),box=new THREE.Box3().setFromPoints(pts),sz=box.getSize(_gv());const lx=sz.x>sz.y?(sz.x>sz.z?'x':'z'):(sz.y>sz.z?'y':'z'),oth=['x','y','z'].filter(k=>k!==lx);
+    const mid=(box.min[lx]+box.max[lx])/2,core=pts.filter(p=>Math.abs(p[lx]-mid)<sz[lx]*.06),cb=new THREE.Box3().setFromPoints(core.length?core:pts);
+    W=GRIPW['b|'+mdl]={lx,c:cb.getCenter(_gv()),rr:Math.max(cb.max[oth[0]]-cb.min[oth[0]],cb.max[oth[1]]-cb.min[oth[1]])/2};}
+  obj.position.copy(W.c).multiplyScalar(-1).applyQuaternion(obj.quaternion);
+  const s=h.scale.x,rm=Math.max(.014,Math.min(.03,W.rr*s*H.bs)),rh=rm/H.bs,C=H.K.clone().add(H.f.clone().multiplyScalar(H.Mi.length()*.12)).add(H.n.clone().multiplyScalar(rh*1.15));h.position.copy(C);
+  const lAx=_gv();lAx[W.lx]=1;const g=lAx.applyQuaternion(obj.quaternion).applyQuaternion(h.userData.qC||h.quaternion).normalize();
+  gripFingers(H,{g,C,rh},'l|arco|'+rm.toFixed(3)+'|'+H.Mi.length().toFixed(3)+'|'+[g.x,g.y,g.z].map(v=>v.toFixed(1)).join(','));return H;}
+/* se llama una vez por personaje (en su primer cuadro): ubica espada y escudo y deja los dedos guardados en r.fist */
+function gripFit(r){const body=r.body;if(!body||!body.userData.cc0||!r.forge)return;r.fist=[];
+  const push=H=>{if(H)for(const b of H.all)r.fist.push([b,b.quaternion.clone()]);};
+  const cls=r.cls;
+  if(cls==='caballero'||cls==='gladiador'){const hr=body.getObjectByName('hand_r'),h=r.forge.find(x=>x.userData.piece==='weapon'&&x.parent===hr);if(h)push(gripSword(r,h,body));}
+  else if(cls==='hechicero'||cls==='mburuvicha'){const hr=body.getObjectByName('hand_r'),h=r.forge.find(x=>x.userData.piece==='weapon'&&x.parent===hr);if(h)push(gripPole(r,h,body,'r'));}
+  else if(cls==='arquera'){const hl=body.getObjectByName('hand_l'),h=r.forge.find(x=>x.userData.piece==='weapon'&&x.parent===hl);if(h)push(gripBow(r,h,body));}
+  const fa=body.getObjectByName('lowerarm_l'),hs=r.forge.find(x=>x.userData.gHide&&x.parent===fa);if(hs)push(gripShield(r,hs,body));}
 function cc0Grip2(body,clip,t,bone,obj,dir,side,s,along,calm){const b=body.getObjectByName(bone);if(!b)return null;const qK=cc0GripQ(body,clip,t,bone,dir,side);
   body.updateMatrixWorld(true);const pw=new THREE.Vector3().setFromMatrixPosition(b.matrixWorld);const m1=body.getObjectByName(bone==='hand_l'?'middle_01_l':'middle_01_r');
   if(m1&&/hand/.test(bone)){const sd=bone==='hand_l'?'l':'r',fs=[];for(const f of ['index','middle','ring','pinky'])for(const i of [1,2,3]){const fb=body.getObjectByName(`${f}_0${i}_${sd}`);if(fb)fs.push(new THREE.Vector3().setFromMatrixPosition(fb.matrixWorld));}
@@ -4125,9 +4209,9 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   try{if(w){let obj=null,bone='hand_r',dir=[-.15,.62,.77],side=[1,0,0],s=1,sd='r',clip=clipsA.Sword_Idle,tt=.5;
       if(cls==='hechicero'){obj=cc0Staff(S,1.55,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.08];clip=clipsA.Spell_Simple_Idle_Loop;}
       else if(cls==='mburuvicha'){obj=cc0Cetro(S,1.5,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.15];clip=clipsA.Idle_Loop;}
-      else{const n=CC0_W[cls][wt];obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
+      else{const n=CC0_W[cls][wt];obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');if(obj)obj.userData.mdl=n;s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
       if(obj){cc0Grip(body,sd,1);body.updateMatrixWorld(true);const calm=cls==='hechicero'||cls==='mburuvicha'?null:cls==='arquera'?{clip:clipsA.Idle_Loop,t:.5,dir:[0,1,0],side:[1,0,0]}:{clip:clipsA.Idle_Loop,t:.5,dir:[0,-.82,.57],side:[1,0,0]};const h=cc0Grip2(body,clip,tt,bone,obj,dir,side,s,0,calm);if(h&&calm){if(cls==='arquera')h.userData.kOnly='atk1';(r.grips=r.grips||[]).push(h);}if(h){forgeGlow(h,cls,w);h.userData.piece='weapon';r.forge=r.forge||[];r.forge.push(h);}}}
-    if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0ShieldTint(cc0Model(n,null,false),Math.min(6,eq.shield.t|0));if(o2){const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){h.userData.gHide=1;forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
+    if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0ShieldTint(cc0Model(n,null,false),Math.min(6,eq.shield.t|0));if(o2){o2.userData.mdl=n;const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){h.userData.gHide=1;forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
     if(false&&cls==='mburuvicha'&&!(eq&&eq.helm)){/* sin corona de plumas en la base (9/11) */const h=cc0Hold(body,'Head',cc0Jeguaka(.124),[0,.175,-.01],[0,0,0],1);}}catch(e){console.error(e);}
   const ANI={k:{idle:'Sword_Idle',calm:'Idle_Loop',walk:'Walk_Loop',cwalk:'Walk_Formal_Loop',run:'Jog_Fwd_Loop',death:'Death01',atk1:'Sword_Regular_A',atk2:'Sword_Regular_B',spin:'Sword_Heavy_Combo'},
     w:{idle:'Spell_Simple_Idle_Loop',calm:'Idle_Loop',walk:'Walk_Loop',cwalk:'Walk_Formal_Loop',run:'Jog_Fwd_Loop',death:'Death01',atk1:'Spell_Simple_Shoot',heal:'Spell_Simple_Shoot'},
