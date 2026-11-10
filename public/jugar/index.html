@@ -3921,8 +3921,8 @@ function mobStepTs(e,k,sp,dflt){const vc=mobStepVc(e);if(!vc||!(vc[k]>.5))return
 function oadMobAnim(e,dt,sp){const lk=e.lunge>0?Math.sin((1-e.lunge/.35)*PI):0;
   if(!e.mixer){const w=Math.min(1,sp/2.5);e.rig.position.y=Math.abs(Math.sin(e.phase))*.07*w;e.rig.rotation.x=-lk*.14+Math.sin(T*1.3+e.hx)*.02;e.rig.position.z=lk*.55;return;}
   const B=e.B||{};if(e.lunge>0&&e.acts.attack){if(e.curK!=='attack')oadPlay(e,'attack',.08,e.acts.attack.getClip().duration/.75,true);}
-  else if(sp>e.speed*.6)oadPlay(e,'run',.2,mobStepTs(e,'run',sp,((B.ts&&B.ts.run)||1)*Math.max(.7,sp/e.speed)));
-  else if(sp>.05)oadPlay(e,'walk',.2,mobStepTs(e,'walk',sp,((B.ts&&B.ts.walk)||1)*Math.max(.6,sp/(e.speed*.3))));
+  else if(sp>e.speed*(e.curK==='run'?.4:.6))oadPlay(e,'run',.2,mobStepTs(e,'run',sp,((B.ts&&B.ts.run)||1)*Math.max(.7,sp/e.speed)));
+  else if(sp>(e.curK==='walk'||e.curK==='run'?.05:.15))oadPlay(e,'walk',.2,mobStepTs(e,'walk',sp,((B.ts&&B.ts.walk)||1)*Math.max(.6,sp/(e.speed*.3))));
   else oadPlay(e,'idle',.15,1);
   /* LOD de animación: los mobs lejanos o fuera de cámara se animan con menos frecuencia */
   {const dd=Math.hypot(e.p.x-P.x,e.p.z-P.z);e.mAcc=(e.mAcc||0)+dt;const step=P.target===e||dd<22?0:dd<40?.05:.1;if(e.mAcc>=step&&(dd<26||inView(e.p))){e.mixer.update(e.mAcc);e.mAcc=0;}}
@@ -6995,10 +6995,11 @@ function mobNetTick(dt){
   if(out.length||key)liveSend({t:'ms',k:key?1:0,l:out});}
 function mobFromEntry(en){const [n,type,x10,z10,r100,hp,max,f]=en;if(!MOBS[type])return null;const x=x10/10,z=z10/10,lo=en[9]|0;
   const e=lo?makeEnemy(type,x,z,!!(f&2),null,{lvl:lo}):makeEnemy(type,x,z,!!(f&2));if(f&4){e.st.dmg*=1.45;e.st.xp=Math.round(e.st.xp*3.5);}if(MOBS[type].boss&&lo)e.respawn=1e9;e.nid=n;e.max=max;e.hp=hp;e.elite=!!(f&4);e.summon=!!(f&16);e.tx=x;e.tz=z;e.tr=r100/100;e.g.rotation.y=e.tr;e.lungeN=en[8];e.contrib={};return e;}
+const MOB_LAG=.25;
 function mobApply(list,key){const seen=new Set();
   for(const en of list){const [n,type,x10,z10,r100,hp,max,f,ln]=en;seen.add(n);let e=mobByN(n);
     if(!e){if(f&1)continue;e=mobFromEntry(en);if(!e)continue;}
-    e.tx=x10/10;e.tz=z10/10;e.tr=r100/100;e.max=max;
+    {const nx=x10/10,nz=z10/10;/* velocidad pareja hasta la posición nueva: se reparte en MOB_LAG (un poco más que los 0,2 s entre avisos), así nunca llega antes del aviso siguiente y no frena */if(nx!==e.tx||nz!==e.tz)e.mvSp=Math.hypot(nx-e.p.x,nz-e.p.z)/MOB_LAG;e.tx=nx;e.tz=nz;}e.tr=r100/100;e.max=max;
     if(f&1){if(!e.dead){e.hp=0;killMobFx(e);}}
     else{if(e.dead){e.dead=false;e.deadT=0;e.g.visible=true;e.rig.rotation.set(0,0,0);e.rig.position.set(0,0,0);e.rig.scale.set(1,1,1);e.p.set(e.tx,H(e.tx,e.tz),e.tz);e.contrib={};}
       if(e.predT&&T<e.predT)e.hp=Math.min(e.hp,hp);else e.hp=hp;}
@@ -7016,8 +7017,9 @@ function updateEnemiesGuest(dt){const k=1-Math.exp(-dt*10);
     if(e.dead){e.deadT+=dt;const q=Math.min(1,e.deadT/.6);if(e.kind==='glb')oadMobDead(e,dt,q);else if(e.kind==='biped')poseHuman(e,{t:T,dead:smooth(0,1,q),lean:e.hunch||0});else if(e.kind==='snake')e.rig.scale.y=1-q*.6;else e.rig.rotation.z=smooth(0,1,q)*PI/2;
       if(e.deadT>1.4)e.rig.position.y-=dt*.8;if(e.deadT>3)e.g.visible=false;continue;}
     const p=e.p;if(e.tx==null){e.tx=p.x;e.tz=p.z;e.tr=e.g.rotation.y;}
-    if(Math.hypot(e.tx-p.x,e.tz-p.z)>8){p.x=e.tx;p.z=e.tz;}const ox=p.x,oz=p.z;p.x+=(e.tx-p.x)*k;p.z+=(e.tz-p.z)*k;p.y=H(p.x,p.z);
-    const sp=dt>0?Math.hypot(p.x-ox,p.z-oz)/dt:0;e.g.rotation.y=lerpAngle(e.g.rotation.y,e.tr,Math.min(1,dt*10));
+    let gx=e.tx-p.x,gz=e.tz-p.z,gd=Math.hypot(gx,gz);if(gd>8){p.x=e.tx;p.z=e.tz;gd=0;}
+    /* antes: p+=(t-p)*k → arrancaba rápido y frenaba antes de cada aviso, y la animación saltaba entre correr, caminar y quieto (se trababan) */let mv=0;if(gd>1e-3&&dt>0){mv=Math.min(gd,Math.max(e.mvSp||0,gd/.6)*dt);p.x+=gx/gd*mv;p.z+=gz/gd*mv;}p.y=H(p.x,p.z);
+    const sp=e.aSp=(e.aSp||0)+((dt>0?mv/dt:0)-(e.aSp||0))*Math.min(1,dt*8);e.g.rotation.y=lerpAngle(e.g.rotation.y,e.tr,Math.min(1,dt*10));
     const dl=Math.hypot(P.x-p.x,P.z-p.z);e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;
     animEnemy(e,dt,sp);if(e.hitK>0){e.hitK=Math.max(0,e.hitK-dt*7);const h=e.hitK;e.rig.scale.set(1+h*.07,1-h*.09,1+h*.07);}else if(e.rig.scale.y!==1)e.rig.scale.set(1,1,1);
     const fl=e.flash>0?.7:0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent)m.emissive.setRGB(fl,fl*.9,fl*.8);});
