@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 10 de noviembre de 2026 (noche, parche 202611102346: sets parejos en la cintura).
+Última actualización: 11 de noviembre de 2026 (auditoría de sets y mobs, sin publicar).
 
 ## Repositorio y publicación
 
@@ -373,6 +373,16 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Ahora, salvo el gladiador, el peto toma de la malla del casillero `armor` los huesos `spine_01..03`, `pelvis`, muslos y clavículas: toda la túnica (pecho, panza, cintura y faldón) lleva el material del set. El cinturón se arma también sobre la túnica (`src: slotIs('pants','armor')` si hay peto), así queda una banda encima con la hebilla.
 - Gladiador: tenía un hueco real entre el torso y el pantalón (la piel de la cintura se borraba). `cc0Human` deja la piel de `pelvis` cuando `S.keep===CC0_TORSO`, su peto toma también `pelvis`, y el cinturón de cuero `Belt_1` se cubre con una cáscara del set y se oculta.
 - Prueba: puppeteer-core + Chrome del sistema (swiftshader), three r128 de npm por intercepción, `__NOX.rebuildHero(cls,eq)` con `newEquip(cls,k,t)` (no hace falta `C`), `__HOLD=true`, `__NOX.step` y `__NOX.RND.render` con la cámara a 1,3 m del hueso `spine_02` (scripts fuera del repo, `/home/claude/h`).
+
+## Auditoría de sets y mobs (11/11, madrugada; SIN publicar, rama arte-cc0)
+- **Traje completo** (`cc0Armor`): `cc0Shell` lleva la cuenta de qué triángulos de cada prenda ya tienen placa (`m.userData.cov`) y acepta `rest:1` (cubre sólo lo que falta) y `skip` (huesos a saltar). `cc0Rest(r,slot,mat,{hands})` cubre el resto de una prenda con el material del set: mangas, codos, correas y cuello del peto (después de las hombreras), puños y manos del guante (guantelete fino si el brazal es de metal; `CC0_HANDB`), rodillas del pantalón y caña de la bota. Antes asomaban la tela base y el cuero marrón en codos, rodillas, puños, correas y botas.
+- Gladiador: la manga del peto y el guantelete salen de la piel (`skinSrc`); el cinturón del set sólo reemplaza al de cuero si el set es de metal o hay peto de placas.
+- Hechicero (sets sin grebas): la bota toma el material del set desde el set 1 (antes siempre beige).
+- Cascos: `helmCrestGeo` (cimera curva que sigue el domo; antes un rectángulo plano flotando), `helmCheekGeo` y `helmNeckGeo` (carrilleras y cubrenuca curvas; antes tablas). Usados en `crest`, `full` y `horn`.
+- Collar de colmillos (`chest:'bones'`): se ciñe al pecho real (mide el frente de la malla en la pose de enlace y achata el collar en z); antes flotaba un palmo delante del cuerpo.
+- Mobs: Luisón sin costillas ni collar de huesos (colgaban de `Neck*` y flotaban al sentarse o morir) y hocico óseo y colmillos reubicados sobre el hocico; Ao Ao sin garras en `Foot_L/R` (son controles de IK, quedaban sueltas en el piso). Los otros 35 mobs y jefes se revisaron en su zona (quieto, caminando, atacando y muerto) sin anomalías.
+- Pendiente: el carcaj de la arquera sigue de color salmón (el modelo usa textura, el tinte por color no alcanza); la ficha del Guardián de Kerana dice «coloso de piedra» y el modelo es un soldado con escudo.
+- Banco de pruebas (fuera del repo, `/home/claude/h`): `srv.js` (Chrome persistente con puppeteer-core, `POST /eval`, `/shot?p=`, `/reload`, `/help`), `help.js` (`__T.set/view`, `__Z.zone/prep/shot`: mobs reales de la zona con el héroe invulnerable), `batch.sh`, `zmobs.sh`, `sheet.py`. Ojo: después de `rebuildHero` esperar ~1 s antes de `__HOLD=true`, si no el arma queda con la geometría liberada y no se dibuja; los mobs creados sueltos con `makeEnemy` fuera de su zona muestran adornos corridos (artefacto de la prueba).
 
 ## Herramientas de prueba (`/home/claude/tools`)
 

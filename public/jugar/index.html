@@ -3578,12 +3578,11 @@ const MYTH={
  luison:{ficha:'Luisón, séptimo hijo de Tau y Kerana: hombre-perro de los cementerios, flaco, negro y de ojos rojos; señor de la muerte.',
   beast:'b_luison',len:2.6,ts:{walk:1.4,run:1.15},eye:0xff2a12,tex:()=>peloTex('luison',{base:0x1e181a,dark:0x060405,hi:0x6a5a60,len:18,n:5000,amt:.8,S:512}),aura:0x3a6a2a,auraS:2.8,sparkle:0x6aff6a,
   extra(r,o,U,A){const T=tm(peloTex('luisonB',{base:0x0a0808,dark:0x020202,hi:0x3a3036,len:14}));const sp=[['Neck1',0],['Neck2',0],['Neck3',0]];for(const [bn] of sp){const b=A([bn]);if(!b)continue;for(let i=0;i<3;i++){const c=part(CONE(.025*U,.14*U,5),T,(i-1)*.03*U,.1*U,0,b);c.rotation.x=-.6;}}
-    const hd=A(['Head']);if(hd){for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.015*U,.07*U,4),mat(0xe8e0c8),(.05+k*.03)*s*U,-.09*U,(.22+k*.04)*U,hd);t.rotation.x=PI;}
-      const bm=mat(0xd8d0b8,{roughness:.6});part(SPH(1,10,8),bm,0,-.02*U,.2*U,hd,.07*U,.05*U,.12*U);/* hocico descarnado */
-      for(const s of[-1,1]){const r=part(SPH(1,8,6),mat(0x050303),.06*s*U,.0,.1*U,hd,.035*U,.035*U,.02*U);}}
-    const nk=A(['Neck1','Neck2']);if(nk){const bm=mat(0xd8d0b8,{roughness:.6});for(let i=0;i<7;i++){const a=(i/6-.5)*PI*1.3;const bn=part(limbGeo(.08*U,.012*U,.01*U,.3),bm,Math.sin(a)*.13*U,-.02*U-Math.cos(a)*.05*U,Math.cos(a)*.13*U*.3,nk);bn.rotation.z=Math.sin(a)*.5;}}
-    const sp3=A(['Neck3']);if(sp3){const bm=mat(0xc8c0a8,{roughness:.7});for(let i=0;i<4;i++){const rb=part(gcc('rib',()=>new THREE.TorusGeometry(1,.09,6,14,PI*1.1)),bm,0,-.02*U,-.22*U-i*.1*U,sp3,.2*U,.17*U,.1*U);rb.rotation.set(PI/2,0,PI*.95);}}
-    const hd2=A(['Head']);if(hd2){const dm=new MSM({color:0x9aff8a,transparent:true,opacity:.7,emissive:0x3aff3a,emissiveIntensity:.5});for(let k=0;k<3;k++){part(SPH(1,6,5),dm,(k-1)*.03*U,-.15*U-k*.02*U,(.26-k*.02)*U,hd2,.012*U,.03*U,.012*U);}}}},
+    const hd=A(['Head']);if(hd){for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.015*U,.07*U,4),mat(0xe8e0c8),(.045+k*.025)*s*U,-.115*U,(.12+k*.04)*U,hd);t.rotation.x=PI;}
+      const bm=mat(0xd8d0b8,{roughness:.6});part(SPH(1,10,8),bm,0,-.055*U,.1*U,hd,.062*U,.04*U,.11*U);/* hocico descarnado */
+      for(const s of[-1,1]){const r=part(SPH(1,8,6),mat(0x050303),.045*s*U,-.03*U,.03*U,hd,.03*U,.03*U,.02*U);}}
+    /* sin costillas ni collar de huesos: colgaban del cuello y quedaban flotando sobre el lomo al sentarse o morir */
+    const hd2=A(['Head']);if(hd2){const dm=new MSM({color:0x9aff8a,transparent:true,opacity:.7,emissive:0x3aff3a,emissiveIntensity:.5});for(let k=0;k<3;k++){part(SPH(1,6,5),dm,(k-1)*.03*U,-.17*U-k*.02*U,(.17-k*.02)*U,hd2,.012*U,.03*U,.012*U);}}}},
  teju:{ficha:'Teju Jagua, primogénito: lagarto enorme con siete cabezas de perro y ojos de fuego; señor de las cuevas y los frutos. Manso a pesar de su aspecto.',custom:(def,gold)=>tejuModel(def,gold)},
  escorpion:null,
  aoao:{ficha:'Ao Ao: bestia lanuda parecida a una oveja grande, con colmillos y garras; caza en manada por los cerros. Solo se salva quien trepa a una palmera pindó.',
@@ -3592,7 +3591,7 @@ const MYTH={
     for(const [bn,n,rr] of [['Ursidae_Spine_1',6,.12],['Ursidae_Spine_2',6,.13],['Ursidae_Spine_3',6,.13],['Ursidae_Neck',5,.11]]){const b=A([bn]);if(!b)continue;for(let i=0;i<n;i++){const a=(i/(n-1)-.5)*2.4;part(SPH(1,10,8),wm,Math.sin(a)*.2*U+(Math.random()-.5)*.04*U,.06*U+Math.cos(a)*.1*U,(Math.random()-.5)*.1*U,b,rr*U*(.8+Math.random()*.3),rr*U*.7,rr*U*(.9+Math.random()*.3));}}
     const hd=A(['Ursidae_Head']);if(hd){part(SPH(1,10,8),wm,0,.12*U,-.02*U,hd,.17*U,.14*U,.16*U);for(const s of[-1,1]){const e=part(SPH(1,8,6),wm,.16*s*U,.1*U,-.04*U,hd,.05*U,.08*U,.03*U);e.rotation.z=-.6*s;}}
     const hd2=A(['Ursidae_Head']);if(hd2)for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.018*U,(.1-k*.03)*U,5),mat(0xf0e8d0),(.06+k*.04)*s*U,-.06*U,(.24+k*.03)*U,hd2);t.rotation.x=PI;}
-    for(const f of['Ursidae_Foot_L','Ursidae_Foot_R','Foot_L','Foot_R']){const b=A([f]);if(!b)continue;for(let k=0;k<3;k++){const c=part(CONE(.02*U,.09*U,4),mat(0x2a2018),(k-1)*.05*U,.0,.1*U,b);c.rotation.x=-PI/2;}}}},
+    /* garras sólo en huesos que deforman la malla: 'Foot_L/R' son controles de IK y dejaban garras sueltas en el piso */for(const f of['Ursidae_Foot_L','Ursidae_Foot_R']){const b=A([f]);if(!b)continue;for(let k=0;k<3;k++){const c=part(CONE(.02*U,.09*U,4),mat(0x2a2018),(k-1)*.05*U,.0,.1*U,b);c.rotation.x=-PI/2;}}}},
  mboitui:{ficha:"Mbói Tu'i, segundo hijo: serpiente gigante con cabeza de loro, plumas verdes, pico enorme y lengua roja como la sangre; señor de las aguas.",snake:{head:'parrot',skin:()=>scalesTex('mboituiS',{base:0x2a7a2a,dark:0x0a2a10,hi:0x9ae860,size:11,belly:0xe0d890,stripes:6,stripeC:0x0a3a14}),eye:0xffe25a,beak:0x6a6a70}},
  pombero:{ficha:'Pombero: hombrecito del monte, bajo y fornido, oscurísimo y muy peludo, con sombrero de paja grande y manos y pies enormes. Camina sin hacer ruido, imita a los pájaros y le gustan el tabaco y la miel.',
   human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','pomberoFur',furRecolor(0x060403,0x1a1410,0x4a3a2a)),props:['hd_m_wide'],team:0x1a1410,scale:.78,bulk:[1.35,1,1.35],anim:'n',
