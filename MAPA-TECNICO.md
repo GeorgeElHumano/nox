@@ -463,3 +463,10 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 - Carcaj: la textura salmón se pasa a gris y se tiñe con el color del set (`onBeforeCompile`).
 - Brillo: en `forgeGlow` la tela/cuero toma 0,4 del brillo del metal; `cc0Glow` bajó de .32 a .15.
 - Pendiente conocido: en +15 algunos sets de tela/cuero siguen muy teñidos (Arandu, Guyra Hũ, Tembetá); ícono del peto del Gladiador chico; escudos del Caballero oscuros; faldellines y tabardos son rígidos (no siguen las piernas al correr); solo se revisó en pose quieta.
+
+## Agarres revisados (11/11, noche; SIN publicar)
+- Espadas hechas para NOX (`cc0Sword`, Caballero y Gladiador): llevan `userData.grip={lx:'y',sgn:1,guardAt:1.58,pommel:.2,wide:'x'}` y `gripSword` lo usa en vez de buscar la guarda por el corte más ancho (con las hojas anchas del Gladiador la hoja podía ganarle a la guarda).
+- Arco (`cc0Bow`): `userData.grip={c:[x de la empuñadura,0,0],rr}`; antes el centro se medía con la cuerda incluida. `gripBow` rehecho: en reposo el arco va dentro del puño, atravesado en la palma (eje `gripAxis`, cuerda hacia la muñeca) y esa orientación queda en `h.userData.qC`; al disparar gira a `qK` (vertical) sobre el mismo punto. Antes iba paralelo a los dedos y la mano quedaba abierta al lado.
+- Escudo, bastón y cetro: revisados de cerca, sin cambios.
+- Gancho de prueba `__NOX.actT(t,n)`: pone al héroe en la pose de ataque (`swingT=t`) llamando a `oadHeroAnim` n veces. En el banco, antes de dibujar a mano hay que llamar `__NOX.RND.info.reset()`: si no, el esqueleto no se actualiza y la malla queda en la pose anterior mientras las piezas rígidas sí se mueven. Scripts `hand.sh`, `hand1.sh`, `atk.sh`.
+- Visto y pendiente: el brazal de cuero muestra astillas de la cáscara sobre las hebillas (se nota solo muy de cerca); no se revisó el agarre corriendo ni volando.
