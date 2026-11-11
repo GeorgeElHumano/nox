@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 10 de noviembre de 2026 (noche, sets parejos en la cintura, sin publicar).
+Última actualización: 10 de noviembre de 2026 (noche, parche 202611102346: sets parejos en la cintura).
 
 ## Repositorio y publicación
 
@@ -368,7 +368,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Al entrar (`enterGame`), `posStart()` sólo usa el lugar si `pos.zone === C.zone` (el mapa sigue saliendo de `C.zone`, que `loadZone` guarda; los eventos no lo tocan) y está dentro de ±104 m; `loadZone(zona,[x,z])`. Si el lugar quedó bloqueado (`blocked(x,z,.35)`) aparece en `Z.spawn`. Al cambiar de mapa la zona deja de coincidir y se usa la entrada normal; al morir se vuelve a Asunción como siempre.
 - Prueba: modo sin cuenta, mover `P`, `pagehide`, recargar y `__NOX.enterT(0)` → mismo x, z y giro. Ganchos nuevos en `__NOX`: `MATE`, `Pref()` (el `P` actual), `enterT(i)`, `SKEY`.
 
-## Arreglo sin publicar: sets parejos en la cintura (10/11, noche)
+## Parche 202611102346: sets parejos en la cintura (10/11, noche, publicado)
 - Problema (captura del dueño, Mburuvicha con set completo): entre el pecho y el cinturón asomaba la túnica de tela (y el faldón), porque el peto (`cc0Armor`) sólo tomaba `spine_02/03` y el cinturón sólo `pelvis+spine_01` con peso ≥ .85: la franja de la panza no cumplía ninguna de las dos.
 - Ahora, salvo el gladiador, el peto toma de la malla del casillero `armor` los huesos `spine_01..03`, `pelvis`, muslos y clavículas: toda la túnica (pecho, panza, cintura y faldón) lleva el material del set. El cinturón se arma también sobre la túnica (`src: slotIs('pants','armor')` si hay peto), así queda una banda encima con la hebilla.
 - Gladiador: tenía un hueco real entre el torso y el pantalón (la piel de la cintura se borraba). `cc0Human` deja la piel de `pelvis` cuando `S.keep===CC0_TORSO`, su peto toma también `pelvis`, y el cinturón de cuero `Belt_1` se cubre con una cáscara del set y se oculta.

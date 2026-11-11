@@ -1,12 +1,10 @@
 {
- "build": "202611102024",
- "min": "202611102024",
- "title": "Compañeros en vivo y volver donde estabas",
+ "build": "202611102346",
+ "min": "202611102346",
+ "title": "Sets parejos en la cintura",
  "notes": [
-  "La ficha de un compañero de grupo ahora lo muestra en vivo: si camina, ataca, hace un gesto, vuela o cae, lo ves igual en su personaje.",
-  "Funciona aunque tu compañero esté en otro mapa; cuando hace un gesto o ataca, el personaje se da vuelta de frente solo.",
-  "Al volver a entrar aparecés en el mismo lugar donde te desconectaste, mirando hacia el mismo lado (se guarda en el servidor, sirve desde cualquier dispositivo).",
-  "Si se corta la señal o se apaga el celular, volvés casi donde estabas: la partida se guarda en el servidor cada minuto.",
-  "En eventos o si te desconectás muerto, aparecés en la entrada del mapa como siempre."
+  "La armadura del peto ahora cubre toda la túnica: pecho, panza, cintura y faldón con el material del set",
+  "Ya no asoma la tela entre el pecho y el cinturón",
+  "Gladiador: se cerró el hueco entre el torso y el pantalón y el cinturón lleva el material del set"
  ]
 }
