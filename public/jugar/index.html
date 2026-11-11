@@ -3855,6 +3855,11 @@ function fFeather(cols){const k='f'+cols.join(',');if(FMAT[k])return FMAT[k];con
 function featherMesh(m,L,w){const o=new THREE.Mesh(gcc('feath'+L.toFixed(3)+w.toFixed(3),()=>{const sh=new THREE.Shape();sh.moveTo(0,0);sh.quadraticCurveTo(w*.55,L*.35,w*.3,L*.8);sh.quadraticCurveTo(w*.1,L*.95,0,L);sh.quadraticCurveTo(-w*.1,L*.95,-w*.3,L*.8);sh.quadraticCurveTo(-w*.55,L*.35,0,0);const g=new THREE.ShapeGeometry(sh,6);return g;}),m);o.castShadow=true;return o;}
 const gemAt=(g,col,x,y,z,r)=>{const o=part(gcc('gem8',()=>new THREE.OctahedronGeometry(1,0)),fGem(col),x,y,z,g,r,r*1.4,r);o.userData.gem=1;const sp=glowSprite(col,r*5,.55);sp.position.set(x,y,z);g.add(sp);sp.userData.gemGlow=1;return o;};
 /* ---- piezas (todas en unidades del cuerpo U, ejes del modelo: y arriba, z adelante; origen en el punto de anclaje) ---- */
+/* cimera curva que sigue el domo (antes era un rectángulo plano flotando sobre el casco) y carrilleras curvas (antes dos tablas) */
+function helmCrestGeo(k,hh){return gcc('crestArc'+k+hh,()=>{const a0=-1.85,a1=.6,N=18,sh=new THREE.Shape();for(let i=0;i<=N;i++){const a=a0+(a1-a0)*i/N;const x=Math.sin(a),y=Math.cos(a);if(i)sh.lineTo(x,y);else sh.moveTo(x,y);}
+  for(let i=N;i>=0;i--){const u=i/N,a=a0+(a1-a0)*u,r=1+.03+hh*Math.pow(Math.sin(PI*Math.pow(u,k)),.7);sh.lineTo(Math.sin(a)*r,Math.cos(a)*r);}const q=new THREE.ExtrudeGeometry(sh,{depth:.12,bevelEnabled:false,curveSegments:4});q.translate(0,0,-.06);q.rotateY(-PI/2);return q;});}
+function helmCheekGeo(){return gcc('cheekArc',()=>{const q=new THREE.CylinderGeometry(1,.86,1,7,1,true,PI*.3,PI*.36);q.translate(0,-.5,0);return q;});}
+function helmNeckGeo(){return gcc('neckArc',()=>{const q=new THREE.CylinderGeometry(1,1.12,1,12,1,true,PI*.66,PI*.68);q.translate(0,-.5,0);return q;});}
 function forgeHelm(S,U,top,cls,brow){const g=new THREE.Group();const M=fMetal(S.m,S.t),O=fOrnate(S.m,S.t,S.glow),L=fLeather(S.a),C=fCloth(S.a);let R=.118*U;
   /* casco cerrado o corona con gorro: si se conoce la línea de las cejas, el casco se ajusta al cráneo (de la coronilla a las cejas) en vez de bajar hasta la nariz */
   const fit=brow!=null&&top!=null&&top>brow&&['cap','round','crest','full','horn','wing','crown'].includes(S.helm);if(fit)R=Math.min(R,Math.max(R*.5,(top-brow)/.9));
@@ -3866,12 +3871,12 @@ function forgeHelm(S,U,top,cls,brow){const g=new THREE.Group();const M=fMetal(S.
     case 'cap':{dome(L,1.04,dh||.6);const rim=part(gcc('caprim',()=>new THREE.TorusGeometry(1,.06,8,28)),fLeather(S.b),0,y0+R*.1,0,g,R*1.06,R*1.06,R*1.1);rim.rotation.x=PI/2;break;}
     case 'round':{dome(M,1.06,dh||.58);const rim=part(gcc('rrim',()=>new THREE.TorusGeometry(1,.07,8,28)),O,0,y0+R*.05,0,g,R*1.08,R*1.08,R*1.12);rim.rotation.x=PI/2;const nasal=part(gcc('nasal',()=>new THREE.BoxGeometry(.18,1,.1)),M,0,y0-R*.35,R*1.05,g,R*.35,R*.9,R*.35);const knob=part(SPH(1,8,6),O,0,y0+R*1.12,0,g,R*.18);break;}
     case 'crest':{dome(M,1.06,dh||.58);const rim=part(gcc('rrim',()=>new THREE.TorusGeometry(1,.07,8,28)),O,0,y0+R*.05,0,g,R*1.08,R*1.08,R*1.12);rim.rotation.x=PI/2;
-      const cr=part(gcc('crest',()=>new THREE.BoxGeometry(.12,1,1)),O,0,y0+R*1.1,-R*.1,g,R*.6,R*.55,R*1.6);for(const s of[-1,1]){const ch=part(gcc('cheek',()=>new THREE.BoxGeometry(.1,1,.8)),M,s*R*.98,y0-R*.45,R*.25,g,R*.6,R*.9,R*.8);}
+      const cr=part(helmCrestGeo(.8,.3),O,0,y0,0,g,R*.9,R*1.06*1.05,R*1.06*1.08);cr.castShadow=true;for(const s of[-1,1]){const ch=part(helmCheekGeo(),M,0,y0+R*.03,0,g,s*R*1.08,R*.8,R*1.11);ch.material.side=THREE.DoubleSide;}
       const cx=part(gcc('crossv',()=>new THREE.BoxGeometry(.12,.5,.12)),fGem(S.t),0,y0+R*.2,R*1.08,g,R*.5,R*.9,R*.4);part(gcc('crossh',()=>new THREE.BoxGeometry(.5,.12,.12)),fGem(S.t),0,y0+R*.32,R*1.08,g,R*.7,R*.5,R*.4);break;}
-    case 'full':{dome(M,1.08,dh||.62);for(const s of[-1,1]){const ch=part(gcc('cheek',()=>new THREE.BoxGeometry(.1,1,.8)),M,s*R*1.0,y0-R*.5,R*.2,g,R*.7,R*1.0,R*.9);}
+    case 'full':{dome(M,1.08,dh||.62);for(const s of[-1,1]){const ch=part(helmCheekGeo(),M,0,y0+R*.03,0,g,s*R*1.1,R*.9,R*1.13);ch.material.side=THREE.DoubleSide;}{const nk=part(helmNeckGeo(),M,0,y0+R*.03,0,g,R*1.1,R*.6,R*1.13);nk.material.side=THREE.DoubleSide;}
       const nasal=part(gcc('nasal',()=>new THREE.BoxGeometry(.18,1,.1)),O,0,y0-R*.3,R*1.06,g,R*.4,R*1.0,R*.35);const brow=part(gcc('brow',()=>new THREE.BoxGeometry(1,.14,.14)),O,0,y0+R*.05,R*1.0,g,R*1.9,R*.9,R*.9);const rim=part(gcc('rrim',()=>new THREE.TorusGeometry(1,.07,8,28)),O,0,y0+R*.05,0,g,R*1.1,R*1.1,R*1.14);rim.rotation.x=PI/2;
-      const pl=part(gcc('plume',()=>new THREE.BoxGeometry(.1,.5,1.1)),fFeather([S.t,S.g,S.m]),0,y0+R*1.25,-R*.3,g,R*.6,R*.9,R*1.1);break;}
-    case 'horn':{dome(M,1.08,dh||.62);for(const s of[-1,1]){const ch=part(gcc('cheek',()=>new THREE.BoxGeometry(.1,1,.8)),M,s*R*1.0,y0-R*.5,R*.2,g,R*.7,R*1.0,R*.9);}
+      const pl=part(helmCrestGeo(.7,.5),fGem(S.t),0,y0,0,g,R*1.3,R*1.08*1.05,R*1.08*1.08);pl.castShadow=true;break;}
+    case 'horn':{dome(M,1.08,dh||.62);for(const s of[-1,1]){const ch=part(helmCheekGeo(),M,0,y0+R*.03,0,g,s*R*1.1,R*.9,R*1.13);ch.material.side=THREE.DoubleSide;}{const nk=part(helmNeckGeo(),M,0,y0+R*.03,0,g,R*1.1,R*.6,R*1.13);nk.material.side=THREE.DoubleSide;}
       const nasal=part(gcc('nasal',()=>new THREE.BoxGeometry(.18,1,.1)),O,0,y0-R*.3,R*1.06,g,R*.4,R*1.0,R*.35);const h=bullHorns(U,S.b,.5);h.position.y=y0+R*.2;g.add(h);h.traverse(o=>{if(o.isMesh)o.material=fOrnate(S.b,S.t);});gemAt(g,S.t,0,y0+R*.5,R*1.0,.028*U);break;}
     case 'wing':{dome(M,1.06,dh||.6);const rim=part(gcc('rrim',()=>new THREE.TorusGeometry(1,.07,8,28)),O,0,y0+R*.05,0,g,R*1.08,R*1.08,R*1.12);rim.rotation.x=PI/2;
       for(const s of[-1,1]){const w=part(gcc('hwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,0);sh.lineTo(.3,.9);sh.lineTo(1.1,1.5);sh.lineTo(1.6,1.1);sh.lineTo(1.3,.5);sh.lineTo(1.5,0);sh.lineTo(0,-.2);return new THREE.ShapeGeometry(sh);}),O,s*R*1.02,y0+R*.3,0,g,R*.9*s,R*.8,R*.9);w.rotation.y=s*PI/2;w.material.side=THREE.DoubleSide;}
@@ -4316,7 +4321,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   oadActs(r,body,map);r.gclips=clips;oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
   if(cls==='mburuvicha'&&mbCapeOn(r,eq,r.anchor)){try{capeFit(r);}catch(e){console.error(e);}}
   /* el carcaj va por encima de la capa (si la hay), nunca atravesándola */
-  if(cls==='arquera')try{const q=cc0Model('c_k_quiver');if(q){q.userData.gHide=1;}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
+  if(cls==='arquera')try{const q=cc0Model('c_k_quiver');/* carcaj de cuero (antes salía rosado liso) */if(q){q.userData.gHide=1;q.traverse(x=>{if(x.isMesh&&x.material&&x.material.color){const c=x.material.color;if(c.r>c.g*1.25&&c.r>c.b*1.25){c.setHex(0x6a4424).convertSRGBToLinear();x.material.roughness=.8;}}});}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
   if(eq&&eq.wings&&cls!=='mburuvicha'){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
   if(r.chest){restPose(r.body);wingSocket(r);}
   {const its=ARMK.map(k=>eq&&eq[k]).filter(Boolean);
@@ -4334,8 +4339,10 @@ function cc0APose(body,on){const sk=[];body.traverse(o=>{if(o.isSkinnedMesh)sk.p
    Así el peto, las hombreras, los brazales, las grebas y el cinturón siguen las formas del cuerpo y la animación, sin flotar ---- */
 function cc0Shell(r,set,opt){const outs=[];const mats={};r.body.updateMatrixWorld(true);const meshes=[];r.body.traverse(m=>{if(m.isSkinnedMesh&&!m.userData.shell&&opt.src(m))meshes.push(m);});
   for(const m of meshes){const g=m.geometry;if(!g.index)continue;const si=g.attributes.skinIndex,sw=g.attributes.skinWeight,pa=g.attributes.position,na=g.attributes.normal,names=m.skeleton.bones.map(b=>b.name);
-    const W=v=>{let w=0,w2=0;for(let k=0;k<4;k++){const n=names[cc0Comp(si,v,k)|0],x=cc0Comp(sw,v,k);if(set.includes(n))w+=x;if(opt.need&&opt.need.includes(n))w2+=x;}return opt.need?(w>=opt.minW&&w2>=opt.needW?1:0):(w>=opt.minW?1:0);};
-    const ok=new Uint8Array(pa.count);for(let v=0;v<pa.count;v++)ok[v]=W(v);const idx=g.index.array,nw=[];for(let t=0;t<idx.length;t+=3)if(ok[idx[t]]&&ok[idx[t+1]]&&ok[idx[t+2]])nw.push(idx[t],idx[t+1],idx[t+2]);if(nw.length<30)continue;
+    const W=v=>{let w=0,w2=0,wx=0;for(let k=0;k<4;k++){const n=names[cc0Comp(si,v,k)|0],x=cc0Comp(sw,v,k);if(set.includes(n))w+=x;if(opt.need&&opt.need.includes(n))w2+=x;if(opt.skip&&opt.skip.includes(n))wx+=x;}if(opt.skip&&wx>=.5)return 0;if(opt.rest&&!set.length)return 1;return opt.need?(w>=opt.minW&&w2>=opt.needW?1:0):(w>=opt.minW?1:0);};
+    /* cov: qué triángulos de la prenda ya tienen placa encima; con opt.rest se cubre sólo lo que falta (codos, rodillas, puños, correas) */
+    const idx=g.index.array,cov=m.userData.cov&&m.userData.cov.length===idx.length/3?m.userData.cov:(m.userData.cov=new Uint8Array(idx.length/3));
+    const ok=new Uint8Array(pa.count);for(let v=0;v<pa.count;v++)ok[v]=W(v);const nw=[],tk=[];for(let t=0;t<idx.length;t+=3)if(ok[idx[t]]&&ok[idx[t+1]]&&ok[idx[t+2]]&&!(opt.rest&&cov[t/3])){nw.push(idx[t],idx[t+1],idx[t+2]);tk.push(t/3);}if(nw.length<(opt.rest?3:30))continue;for(const t of tk)cov[t]=1;
     const sc=new THREE.Vector3().setFromMatrixScale(m.bindMatrix).x||1,inf=(opt.inflate||.01)/sc;const P=new Float32Array(pa.count*3),UV=new Float32Array(pa.count*2),t=new THREE.Vector3(),n=new THREE.Vector3(),nm=new THREE.Matrix3().getNormalMatrix(m.bindMatrix);
     for(let v=0;v<pa.count;v++){n.fromBufferAttribute(na,v);t.fromBufferAttribute(pa,v).addScaledVector(n,inf);P[v*3]=t.x;P[v*3+1]=t.y;P[v*3+2]=t.z;t.applyMatrix4(m.bindMatrix);n.applyMatrix3(nm).normalize();const k=opt.uvk||3.2;
       if(Math.abs(n.x)>Math.abs(n.z)){UV[v*2]=t.z*k;UV[v*2+1]=t.y*k;}else{UV[v*2]=t.x*k;UV[v*2+1]=t.y*k;}}
@@ -4344,6 +4351,10 @@ function cc0Shell(r,set,opt){const outs=[];const mats={};r.body.updateMatrixWorl
     const sm=new THREE.SkinnedMesh(ng,mat);sm.userData.shell=1;sm.castShadow=true;sm.receiveShadow=true;sm.frustumCulled=false;sm.position.copy(m.position);sm.quaternion.copy(m.quaternion);sm.scale.copy(m.scale);m.parent.add(sm);sm.bind(m.skeleton,m.bindMatrix);outs.push(sm);}
   return outs;}
 const CC0_SIDES=b=>[b+'_l',b+'_r'];
+const CC0_HANDB=['hand_l','hand_r'].concat(['index','middle','pinky','ring','thumb'].flatMap(f=>[1,2,3,4].flatMap(i=>[`${f}_0${i}_l`,`${f}_0${i}_r`,`${f}_0${i}_leaf_l`,`${f}_0${i}_leaf_r`])));
+/* resto de una prenda: todo triángulo que quedó sin placa recibe el material del set (traje parejo, sin tela a la vista). Las manos aparte, con una capa fina (guantelete) o sin tocar */
+function cc0Rest(r,slot,mat,o){o=o||{};const src=m=>m.userData.slot===slot&&!!m.userData.file;let out=cc0Shell(r,[],{src,rest:1,skip:CC0_HANDB,inflate:o.inflate||.011,mat,uvk:o.uvk||4});
+  if(o.hands)out=out.concat(cc0Shell(r,CC0_HANDB,{src,rest:1,minW:.5,inflate:.0035,mat:o.hands,uvk:7}));return out;}
 function cc0ArmorMat(S,kind,cls){if(kind==='metal')return fMetal(S.m,S.t);if(kind==='ornate')return fOrnate(S.m,S.t,S.glow);if(kind==='scale'){const m=tm(scalesTex('chScale'+S.m,{base:S.m,dark:S.b,hi:S.t,size:7,rep:2}),{metal:.7,rough:.4});m.userData.forge=1;regMetal(m);return m;}return fLeather(S.a);}
 function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.slot)||(cls==='gladiador'&&!m.userData.file&&/Superhero/.test(m.material.name||'')&&ss.includes('armor'));
   const grp=(meshes,it)=>{if(!meshes.length)return;const g=new THREE.Group();g.userData.piece='shell';meshes.forEach(m=>{m.userData.lv=it.lv||0;});const holder={traverse:f=>meshes.forEach(f)};forgeGlow(holder,cls,it);r.forge.push(g);};
@@ -4353,22 +4364,40 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
       /* los demás: el peto toma toda la túnica (pecho, panza, cintura y faldón) para que no quede tela entre el pecho y el cinturón */
       const sh=cc0Shell(r,(cls==='gladiador'?['spine_01','spine_02','spine_03','pelvis']:['spine_01','spine_02','spine_03','pelvis'].concat(CC0_SIDES('thigh'))).concat(CC0_SIDES('clavicle')),{src:slotIs('armor'),minW:cls==='gladiador'?.4:.55,inflate:.013,mat:cc0ArmorMat(S,kind,cls)});grp(sh,eq.armor);
       /* adornos del peto (emblema, gemas, cruz) sobre el frente de la placa */
+      r.restArmor={mat:cc0ArmorMat(S,kind,cls),it:eq.armor};r.restArmorWas=1;
       CC0.noPlate=true;try{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);if(ch&&c.children.length){c.position.set(0,-.02,cc0Front(sh,'spine_03')-.105+.006);ch.add(c);add(c,eq.armor);}}finally{CC0.noPlate=false;}}
-    else{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);if(ch){c.position.set(0,.01,.06);ch.add(c);add(c,eq.armor);}}
+    else{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);let return_=0;if(ch){c.position.set(0,.01,.06);
+        /* collar de colmillos: se ciñe al pecho real (antes flotaba un palmo delante del cuerpo) */
+        if(S.chest==='bones'){const ms=[];r.body.traverse(m=>{if(m.isSkinnedMesh&&!m.userData.shell&&m.geometry.index&&(m.userData.slot==='armor'||(!m.userData.file&&/Superhero/.test(m.material.name||''))))ms.push(m);});
+          const bp=ms[0]&&cc0BindPos(ms[0],'spine_03');if(bp){let z=-1e9;const v=new THREE.Vector3();for(const m of ms){const pa=m.geometry.attributes.position,ix=m.geometry.index.array;for(let i=0;i<ix.length;i++){v.fromBufferAttribute(pa,ix[i]).applyMatrix4(m.bindMatrix);if(Math.abs(v.x)<.07&&v.y>bp.y+.03&&v.y<bp.y+.14)z=Math.max(z,v.z);}}
+            if(z>-1e8){const fr=z-bp.z+.004;c.position.z=0;c.position.y=-.06;c.scale.z=Math.max(.3,Math.min(1.1,fr/.1685));}}}
+        if(!return_){ch.add(c);add(c,eq.armor);}}}
     if(['round','square','layer','spike','big'].includes(S.pads)){const kind=S.pads==='big'||S.pads==='layer'?'ornate':'metal';
       const sh=cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('clavicle')),{src:slotIs('armor','gloves'),minW:.6,inflate:.018,mat:cc0ArmorMat(S,kind,cls),uvk:4});grp(sh,eq.armor);
       if(S.pads==='spike'||S.pads==='big')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=new THREE.Group();const M=fOrnate(S.m,S.t,S.glow);for(let k=0;k<3;k++){const sp=part(CONE(.016,.06-k*.012,5),M,s*(.02+k*.045),.075-k*.01,0,p);sp.rotation.z=-s*(.15+k*.25);}if(S.pads==='big')gemAt(p,S.t,0,.07,.04,.016);at.add(p);add(p,eq.armor);}}}
     else if(S.pads!=='none')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;at.add(p);add(p,eq.armor);}}}
-  if(eq.gloves){const S=forjaOf(cls,eq.gloves.t);if(S.brace!=='none'){const sh=cc0Shell(r,CC0_SIDES('lowerarm'),{src:slotIs('gloves','armor'),minW:.6,inflate:.012,mat:cc0ArmorMat(S,S.brace==='ornate'?'ornate':S.brace==='metal'?'metal':'leather',cls),uvk:5});grp(sh,eq.gloves);}}
+  /* el resto del peto (mangas, codos, correas, cuello) va después de hombreras: lo que ellas no tomaron */
+  const skinSrc=m=>!m.userData.file&&/Superhero/.test(m.material.name||'');
+  if(r.restArmor){grp(cc0Rest(r,'armor',r.restArmor.mat),r.restArmor.it);
+    /* gladiador: su peto sale de la piel, así que la manga también (antes quedaba un aro de piel en el codo) */
+    if(cls==='gladiador')grp(cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('lowerarm')),{src:skinSrc,rest:1,minW:.6,inflate:.011,mat:r.restArmor.mat,uvk:4}),r.restArmor.it);delete r.restArmor;}
+  if(eq.gloves){const S=forjaOf(cls,eq.gloves.t);if(S.brace!=='none'){const bk=S.brace==='ornate'?'ornate':S.brace==='metal'?'metal':'leather',bm=cc0ArmorMat(S,bk,cls);const sh=cc0Shell(r,CC0_SIDES('lowerarm'),{src:slotIs('gloves','armor'),minW:.6,inflate:.012,mat:bm,uvk:5});grp(sh,eq.gloves);
+      if(S.brace!=='wrap')grp(cc0Rest(r,'gloves',bm,{uvk:5,hands:bk==='leather'?null:bm}),eq.gloves);
+      if(cls==='gladiador'&&bk!=='leather')grp(cc0Shell(r,CC0_HANDB,{src:skinSrc,rest:1,minW:.5,inflate:.0035,mat:bm,uvk:7}),eq.gloves);}}
   if(eq.pants){const S=forjaOf(cls,eq.pants.t);
-    const bl=cc0Shell(r,['pelvis','spine_01'],{src:eq.armor?slotIs('pants','armor'):slotIs('pants'),minW:.85,need:['spine_01'],needW:.18,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});grp(bl,eq.pants);
+    const bl=cc0Shell(r,['pelvis','spine_01'],{src:eq.armor&&(cls!=='gladiador'||S.belt==='metal'||r.restArmorWas)?slotIs('pants','armor'):slotIs('pants'),minW:.85,need:['spine_01'],needW:.18,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});grp(bl,eq.pants);
     /* gladiador: el cinturón de cuero original (Belt_1) se cubre entero con el material del set y se oculta, así no asoma marrón ni quedan rendijas en la cintura */
-    if(cls==='gladiador'){const bm=[];r.body.traverse(m=>{if(m.isSkinnedMesh&&!m.userData.shell&&/Belt/.test(m.name))bm.push(m);});const gb=cc0Shell(r,['pelvis','spine_01','spine_02'],{src:m=>bm.includes(m),minW:.5,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});if(gb.length){bm.forEach(m=>{m.visible=false;});grp(gb,eq.pants);}}
+    if(cls==='gladiador'&&(S.belt==='metal'||r.restArmorWas)){const bm=[];r.body.traverse(m=>{if(m.isSkinnedMesh&&!m.userData.shell&&/Belt/.test(m.name))bm.push(m);});const gb=cc0Shell(r,['pelvis','spine_01','spine_02'],{src:m=>bm.includes(m),minW:.5,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});if(gb.length){bm.forEach(m=>{m.visible=false;});grp(gb,eq.pants);}}
     /* traje completo: los muslos y la cadera llevan el mismo material del set (antes quedaba la tela marrón del pantalón base entre el cinturón y las grebas) */
-    {const tk=['plate','cross','scale','ornate','gem'].includes(S.chest)?(S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal'):'leather';if(eq.pants.t>0||tk!=='leather'){const th=cc0Shell(r,CC0_SIDES('thigh').concat(['pelvis']),{src:slotIs('pants'),minW:.28,inflate:.013,mat:cc0ArmorMat(S,tk,cls),uvk:4});grp(th,eq.pants);}}
+    {const tk=['plate','cross','scale','ornate','gem'].includes(S.chest)?(S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal'):'leather';if(eq.pants.t>0||tk!=='leather'){const th=cc0Shell(r,CC0_SIDES('thigh').concat(['pelvis']),{src:slotIs('pants'),minW:.28,inflate:.013,mat:cc0ArmorMat(S,tk,cls),uvk:4});grp(th,eq.pants);r.restPants={mat:cc0ArmorMat(S,tk,cls),it:eq.pants};}}
     if(bl.length){const hb=anchorFn(r.body)(['hip']);if(hb){const bk=new THREE.Group();gemAt(bk,S.t,0,.06,cc0Front(bl,'pelvis')+.008,.018);hb.add(bk);add(bk,eq.pants);}}
-    if(S.greave!=='none'){const sh=cc0Shell(r,CC0_SIDES('calf'),{src:slotIs('pants','boots'),minW:.6,inflate:.012,mat:cc0ArmorMat(S,S.greave==='ornate'?'ornate':'metal',cls),uvk:5});grp(sh,eq.pants);}}
-  if(eq.boots){const S=forjaOf(cls,eq.boots.t);if(S.greave!=='none'){const sh=cc0Shell(r,CC0_SIDES('foot').concat(CC0_SIDES('ball')),{src:slotIs('boots'),minW:.6,inflate:.007,mat:cc0ArmorMat(S,S.greave==='ornate'?'ornate':'metal',cls),uvk:6});grp(sh,eq.boots);}}}
+    if(S.greave!=='none'){const sh=cc0Shell(r,CC0_SIDES('calf'),{src:slotIs('pants','boots'),minW:.6,inflate:.012,mat:cc0ArmorMat(S,S.greave==='ornate'?'ornate':'metal',cls),uvk:5});grp(sh,eq.pants);}
+    if(r.restPants){grp(cc0Rest(r,'pants',r.restPants.mat),r.restPants.it);delete r.restPants;}}
+  if(eq.boots){const S=forjaOf(cls,eq.boots.t);if(S.greave!=='none'){const gm=cc0ArmorMat(S,S.greave==='ornate'?'ornate':'metal',cls);const sh=cc0Shell(r,CC0_SIDES('foot').concat(CC0_SIDES('ball')),{src:slotIs('boots'),minW:.6,inflate:.007,mat:gm,uvk:6});grp(sh,eq.boots);
+      /* caña, rodillera y resto de la bota con el mismo metal (antes quedaba el cuero marrón de la bota base) */
+      grp(cc0Rest(r,'boots',gm,{uvk:5,inflate:.008}),eq.boots);}
+    /* sets sin grebas (hechicero): la bota toma el material del set en vez de quedar siempre beige */
+    else if(eq.boots.t>0){const pk=['plate','cross','scale','ornate','gem'].includes(S.chest)?(S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal'):null;grp(cc0Rest(r,'boots',pk?cc0ArmorMat(S,pk,cls):fLeather(S.b),{uvk:5,inflate:.008}),eq.boots);}}}
 /* frente de una placa (z más adelante, en ejes del personaje, relativo al hueso del pecho o la cadera) */
 function cc0Front(sh,bone){let z=-1e9;const v=new THREE.Vector3();for(const m of sh){const pa=m.geometry.attributes.position,idx=m.geometry.index.array;for(let i=0;i<idx.length;i+=6){v.fromBufferAttribute(pa,idx[i]).applyMatrix4(m.bindMatrix);if(Math.abs(v.x)<.06)z=Math.max(z,v.z);}}const bp=bone&&sh[0]?cc0BindPos(sh[0],bone):null;return (z>-1e8?z:.12)-(bp?bp.z:0);}
 /* ================= criaturas CC0: animales de Quaternius (Ultimate Animated Animals) y seres míticos con el cuerpo CC0 ================= */
