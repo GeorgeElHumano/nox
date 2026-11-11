@@ -4278,7 +4278,7 @@ function cc0Human(cls,eq,o){o=o||{};const S=CC0_CLS[cls],F=o.face||cc0Face(cls),
   if(HB){CC0_SHORT.on=1;try{add(fem?'c_o_female_peasant':'c_o_male_peasant',n=>(/Legs/.test(n)&&!has('pants'))||(fem&&/Body/.test(n)&&!has('armor')),slot);}finally{CC0_SHORT.on=0;}}
   for(const [h,c] of F.hair)add('c_h_'+h,null,()=>'hair');
   /* cuerpo base: solo cabeza y cuello (o el torso en el gladiador) */
-  for(const m of sk.slice()){if(m.userData.file)continue;const mn=m.material&&m.material.name||'';if(/Superhero/.test(mn)){/* piel a la vista según lo que falta equipar */let kp=S.keep;if(!['armor','gloves','pants','boots'].every(has)){kp=S.keep.slice();const P=(...x)=>x.forEach(v=>{if(!kp.includes(v))kp.push(v);});const LR=n=>[n+'_l',n+'_r'];
+  for(const m of sk.slice()){if(m.userData.file)continue;const mn=m.material&&m.material.name||'';if(/Superhero/.test(mn)){/* piel a la vista según lo que falta equipar */let kp=S.keep;/* gladiador: la piel de la cintura se queda (si no, entre el torso y el pantalón quedaba un hueco) */if(S.kind==='ranger'&&S.keep===CC0_TORSO&&!kp.includes('pelvis'))kp=kp.concat(['pelvis']);if(!['armor','gloves','pants','boots'].every(has)){kp=kp.slice();const P=(...x)=>x.forEach(v=>{if(!kp.includes(v))kp.push(v);});const LR=n=>[n+'_l',n+'_r'];
       if(!has('armor')){if(!fem)P('spine_01','spine_02','spine_03');P(...LR('clavicle'),...LR('upperarm'));}
       if(!has('gloves')||!has('armor'))P(...CC0_ARMS);
       if(!has('pants'))P(...LR('thigh'),...LR('calf'));if(!has('boots'))P(...LR('calf'),...LR('foot'),...LR('ball'),...LR('ball_leaf'));}
@@ -4350,7 +4350,8 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
   if(eq.armor){const S=forjaOf(cls,eq.armor.t);
     if(['plate','cross','scale','ornate','gem'].includes(S.chest)){const kind=S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal';
       /* el gladiador va con el torso desnudo: su peto baja hasta el cinturón para que no quede la panza al aire como un top */
-      const sh=cc0Shell(r,(cls==='gladiador'?['spine_01','spine_02','spine_03']:['spine_02','spine_03']).concat(CC0_SIDES('clavicle')),{src:slotIs('armor'),minW:cls==='gladiador'?.4:.55,inflate:.013,mat:cc0ArmorMat(S,kind,cls)});grp(sh,eq.armor);
+      /* los demás: el peto toma toda la túnica (pecho, panza, cintura y faldón) para que no quede tela entre el pecho y el cinturón */
+      const sh=cc0Shell(r,(cls==='gladiador'?['spine_01','spine_02','spine_03','pelvis']:['spine_01','spine_02','spine_03','pelvis'].concat(CC0_SIDES('thigh'))).concat(CC0_SIDES('clavicle')),{src:slotIs('armor'),minW:cls==='gladiador'?.4:.55,inflate:.013,mat:cc0ArmorMat(S,kind,cls)});grp(sh,eq.armor);
       /* adornos del peto (emblema, gemas, cruz) sobre el frente de la placa */
       CC0.noPlate=true;try{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);if(ch&&c.children.length){c.position.set(0,-.02,cc0Front(sh,'spine_03')-.105+.006);ch.add(c);add(c,eq.armor);}}finally{CC0.noPlate=false;}}
     else{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);if(ch){c.position.set(0,.01,.06);ch.add(c);add(c,eq.armor);}}
@@ -4360,7 +4361,9 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
     else if(S.pads!=='none')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;at.add(p);add(p,eq.armor);}}}
   if(eq.gloves){const S=forjaOf(cls,eq.gloves.t);if(S.brace!=='none'){const sh=cc0Shell(r,CC0_SIDES('lowerarm'),{src:slotIs('gloves','armor'),minW:.6,inflate:.012,mat:cc0ArmorMat(S,S.brace==='ornate'?'ornate':S.brace==='metal'?'metal':'leather',cls),uvk:5});grp(sh,eq.gloves);}}
   if(eq.pants){const S=forjaOf(cls,eq.pants.t);
-    const bl=cc0Shell(r,['pelvis','spine_01'],{src:slotIs('pants'),minW:.85,need:['spine_01'],needW:.18,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});grp(bl,eq.pants);
+    const bl=cc0Shell(r,['pelvis','spine_01'],{src:eq.armor?slotIs('pants','armor'):slotIs('pants'),minW:.85,need:['spine_01'],needW:.18,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});grp(bl,eq.pants);
+    /* gladiador: el cinturón de cuero original (Belt_1) se cubre entero con el material del set y se oculta, así no asoma marrón ni quedan rendijas en la cintura */
+    if(cls==='gladiador'){const bm=[];r.body.traverse(m=>{if(m.isSkinnedMesh&&!m.userData.shell&&/Belt/.test(m.name))bm.push(m);});const gb=cc0Shell(r,['pelvis','spine_01','spine_02'],{src:m=>bm.includes(m),minW:.5,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});if(gb.length){bm.forEach(m=>{m.visible=false;});grp(gb,eq.pants);}}
     /* traje completo: los muslos y la cadera llevan el mismo material del set (antes quedaba la tela marrón del pantalón base entre el cinturón y las grebas) */
     {const tk=['plate','cross','scale','ornate','gem'].includes(S.chest)?(S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal'):'leather';if(eq.pants.t>0||tk!=='leather'){const th=cc0Shell(r,CC0_SIDES('thigh').concat(['pelvis']),{src:slotIs('pants'),minW:.28,inflate:.013,mat:cc0ArmorMat(S,tk,cls),uvk:4});grp(th,eq.pants);}}
     if(bl.length){const hb=anchorFn(r.body)(['hip']);if(hb){const bk=new THREE.Group();gemAt(bk,S.t,0,.06,cc0Front(bl,'pelvis')+.008,.018);hb.add(bk);add(bk,eq.pants);}}

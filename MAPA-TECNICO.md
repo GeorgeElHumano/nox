@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 10 de noviembre de 2026 (tarde, gestos Celebración y Descanso nuevos).
+Última actualización: 10 de noviembre de 2026 (noche, sets parejos en la cintura, sin publicar).
 
 ## Repositorio y publicación
 
@@ -367,6 +367,12 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - `C.pos={zone,x,z,ry}` va dentro de la partida (local y en el servidor, `PUT game/docs/:id` guarda el personaje entero). `posMark()` lo anota si está en juego, vivo, fuera de eventos y se movió más de 0,5 m: en `pagehide`, al ocultar la pestaña, en `toMenu`, en `srvLogout` y cada 10 s (con `persist`). Cada 60 s, si hay cambios pendientes, `flushNet()` los manda al servidor (antes sólo se mandaba al ocultar o cerrar la pestaña).
 - Al entrar (`enterGame`), `posStart()` sólo usa el lugar si `pos.zone === C.zone` (el mapa sigue saliendo de `C.zone`, que `loadZone` guarda; los eventos no lo tocan) y está dentro de ±104 m; `loadZone(zona,[x,z])`. Si el lugar quedó bloqueado (`blocked(x,z,.35)`) aparece en `Z.spawn`. Al cambiar de mapa la zona deja de coincidir y se usa la entrada normal; al morir se vuelve a Asunción como siempre.
 - Prueba: modo sin cuenta, mover `P`, `pagehide`, recargar y `__NOX.enterT(0)` → mismo x, z y giro. Ganchos nuevos en `__NOX`: `MATE`, `Pref()` (el `P` actual), `enterT(i)`, `SKEY`.
+
+## Arreglo sin publicar: sets parejos en la cintura (10/11, noche)
+- Problema (captura del dueño, Mburuvicha con set completo): entre el pecho y el cinturón asomaba la túnica de tela (y el faldón), porque el peto (`cc0Armor`) sólo tomaba `spine_02/03` y el cinturón sólo `pelvis+spine_01` con peso ≥ .85: la franja de la panza no cumplía ninguna de las dos.
+- Ahora, salvo el gladiador, el peto toma de la malla del casillero `armor` los huesos `spine_01..03`, `pelvis`, muslos y clavículas: toda la túnica (pecho, panza, cintura y faldón) lleva el material del set. El cinturón se arma también sobre la túnica (`src: slotIs('pants','armor')` si hay peto), así queda una banda encima con la hebilla.
+- Gladiador: tenía un hueco real entre el torso y el pantalón (la piel de la cintura se borraba). `cc0Human` deja la piel de `pelvis` cuando `S.keep===CC0_TORSO`, su peto toma también `pelvis`, y el cinturón de cuero `Belt_1` se cubre con una cáscara del set y se oculta.
+- Prueba: puppeteer-core + Chrome del sistema (swiftshader), three r128 de npm por intercepción, `__NOX.rebuildHero(cls,eq)` con `newEquip(cls,k,t)` (no hace falta `C`), `__HOLD=true`, `__NOX.step` y `__NOX.RND.render` con la cámara a 1,3 m del hueso `spine_02` (scripts fuera del repo, `/home/claude/h`).
 
 ## Herramientas de prueba (`/home/claude/tools`)
 
