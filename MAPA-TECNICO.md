@@ -394,6 +394,13 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Aleteo (11/11, tarde): en el bloque de alas de `oadHeroAnim` cada grupo de `sides` lleva `userData.ws` (lado) y `wk` (0 par principal, 1 de abajo, 2 de arriba); antes el lado salía del índice en la lista (`i?1:-1`) y con 2 o 3 pares batían cruzados. Aves: además de `beat` (arriba/abajo) usan `wsw` (coseno de la misma fase): barrido adelante/atrás en `rotation.y`, giro en `rotation.x` y pliegue al subir (`scale.x` hasta −20 %). Hada (`P.key` empieza con `fy`): aleteo de mariposa, las alas se juntan atrás y se abren (`rotation.y` .1→1.1, a 1,5× del ritmo). GIF de prueba: `gif.sh` del banco (16 cuadros a 1/20 s = un ciclo; hada 32).
 - Pendiente de pulir: Arasy (fase 3 de la Arquera) se ve casi blanca, el tornasol se pierde; Kuarahy (fase 3 del Caballero) sale rojo anaranjado y no negro con filo de brasa. Íconos de inventario de las alas nuevas sin revisar.
 
+## Rediseño de sets, piloto Caballero (11/11, tarde; SIN publicar)
+- Pedido del dueño: cada raza gira en torno a un color en sus 7 sets (Caballero como está, Hechicero azul, Arquera verde agua y siempre algo sexy, Gladiador lila con blanco y gris, Mburuvicha negro con rojo), cada set con diseño propio (no sólo color, como en MU), destellos del color del set, e ícono de la bolsa idéntico a la pieza puesta.
+- `cc0Extras(r,cls,eq,add)` (se llama al final de `cc0Armor`): piezas de diseño por set definidas en `FORJA[...].x`: `tas:{n,len,st:'lame'|'point'}` faldón de placas en los muslos, `knee` y `elbow` (`'round'|'spike'|'wing'`), `gor` (alto de la gola), `back` (`'sun'|'spikes'|'fins'`), `tab` (tabardo de tela con cruz). Cuelgan de `anchorFn(r.body)([hueso])` (ejes del modelo). Sólo el Caballero tiene `x` por ahora.
+- Íconos: `forgeIconReal(it)` arma `cc0Hero(cls,{[it.k]:it})` y deja sólo las mallas de esa pieza (`userData.slot===k` con archivo, o `userData.ik===k`, que ponen `add` de `forgeApply` y `grp` de `cc0Armor`); guarda la caja real en `root.userData.box` y `irFrame` la usa. Si no queda nada, cae al `forgeIcon` viejo. Falta: el ícono de guantes sale chico (los dos brazos separados) y el escudo/espada todavía no coinciden del todo con lo puesto.
+- `forgeGlow`: intensidad por nivel bajada (.04 a .24 entre +4 y +15, antes hasta .9) para que el brillo no tape el dibujo del metal.
+- Catálogo de prueba: `cat.sh DIR "clases"` del banco (4 vistas en +0, frente en +7/+11/+15 e íconos con `__NOX.irIcon`); unos 14 minutos por raza.
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.
