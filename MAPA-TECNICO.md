@@ -385,6 +385,13 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Pendiente: el carcaj de la arquera sigue de color salmón (el modelo usa textura, el tinte por color no alcanza); la ficha del Guardián de Kerana dice «coloso de piedra» y el modelo es un soldado con escudo.
 - Banco de pruebas (fuera del repo, `/home/claude/h`): `srv.js` (Chrome persistente con puppeteer-core, `POST /eval`, `/shot?p=`, `/reload`, `/help`), `help.js` (`__T.set/view`, `__Z.zone/prep/shot`: mobs reales de la zona con el héroe invulnerable), `batch.sh`, `zmobs.sh`, `sheet.py`. Ojo: después de `rebuildHero` esperar ~1 s antes de `__HOLD=true`, si no el arma queda con la geometría liberada y no se dibuja; los mobs creados sueltos con `makeEnemy` fuera de su zona muestran adornos corridos (artefacto de la prueba).
 
+## Alas rediseñadas (11/11; SIN publicar, rama arte-cc0)
+- Módulo `WART` (antes de `wingsMesh`): `plumeWings(cls,lv,gen)` para Caballero, Hechicero y Gladiador y `fairyArt(gen,lv,ico)` para la Arquera. `wingsMesh` desvía a `WART.plumeWings` si `WART.PAL[cls]` existe; `fairyWings` usa `WART.fairyArt` en vez de `fairyTex` (que queda sin uso, igual que `featherTex`, `wingSideGeo`, `wingFrame`, `WPALS`, `WSHAPE`).
+- Plumas: una textura pintada en canvas por clase+fase+escalón de nivel (1024 px, 768 en celular; caché `TX`): primarias, secundarias, terciarias y 3 filas de cobertoras, armazón y 2 gemas (`wing`, `feather`; estilos `soft` hechicero y `blade` gladiador con vetas). Un plano curvo por lado (`GEO`, raíz en el origen), material opaco con `alphaTest .4` (sin problemas de orden de transparencias), mapa emisivo = color tenue + raquis/bordes encendidos desde +7. Fase 2 suma un par abajo (62 %), fase 3 otro arriba (50 %). Devuelve `{g,sides,u,P}` como antes (vuelo, reposo y estela sin cambios). Chispas desde +10, halo suave en +13 y fase 3.
+- Hada: mismos tres diseños (mariposa, flor de lapacho, tornasol con colas) redibujados con `lobe` (membrana, venas, celdas, borde con lunares, ocelos), sobre `FAIRY_GEO` de siempre.
+- Capa del Mburuvicha: en `animCape`, `fe` se multiplica por `(.22+.78*min(1,mv))`: flotando quieto cae en diagonal; al avanzar se estira como antes.
+- Pendiente de pulir: Arasy (fase 3 de la Arquera) se ve casi blanca, el tornasol se pierde; Kuarahy (fase 3 del Caballero) sale rojo anaranjado y no negro con filo de brasa. Íconos de inventario de las alas nuevas sin revisar.
+
 ## Herramientas de prueba (`/home/claude/tools`)
 
 - `up.sh`: levanta el servidor local en `:8788` con `public/`.
