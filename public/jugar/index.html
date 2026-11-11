@@ -3165,7 +3165,7 @@ function oadHero(cls,eq){if(!OAD.on||OAD.failed)return null;const s=oadHeroSpec(
 const GEARGLOW=[[7,0x4a7aff,.22],[9,0xffb43a,.3],[11,0xff5a2a,.36],[13,0xc070ff,.45]];
 /* brillo del equipo: el color sale de la clase y del nivel de armadura; la intensidad, del + (se nota desde +4, claro en +7, fuerte desde +9) */
 /* identidad de cada set: color propio y efecto propio; el +nivel solo sube la intensidad */
-const TIERGLOW={gladiador:[0x8a6a4a,0xff6a1a,0x2ae6ff,0xff2aa0,0xf4f8ff,0x2aff8a,0xffd23a],mburuvicha:[0x6a5a4a,0x9a2a2a,0x8a3aff,0x2a2a3a,0xffd23a,0xff1a3a,0xe8f0ff],caballero:[0x8a5226,0xd8642a,0xcfe2ff,0x2aff9a,0xff1a10,0x9a3aff,0xfff0a0],hechicero:[0xb08a5a,0xf6f2ff,0x3ae07a,0x4a52ff,0xffe22a,0xff2a4a,0x7af8ff],arquera:[0xc8a070,0xff4a1a,0x46f040,0xffb020,0xff3ad0,0x6ad0ff,0xf4fbff]};
+const TIERGLOW={};/* el destello de cada set es el color de ese set (FORJA.g); se llena al definir FORJA */
 const SETFX={gladiador:[null,'embers','bolts','runes','stars','halo','orbit'],mburuvicha:[null,null,'smoke','embers','sun','halo','orbit'],caballero:[null,null,'gold','runes','embers','halo','orbit'],hechicero:[null,'lace','smoke','stars','bolts','halo','orbit'],arquera:[null,'feathers','leaves','sun','stars','halo','orbit']};
 const SETDESC={halo:'aureola del cielo',orbit:'luces que orbitan',gold:'brillo dorado',runes:'runas de jade',embers:'brasas de Tau',lace:'encaje de ñandutí',smoke:'humo del paje',stars:'destellos de luna',bolts:'rayos de Tupã',feathers:'plumas de colores',leaves:'hojas de la selva',sun:'resplandor del sol'};
 const setHasId=(cls,t)=>!!(SETFX[cls]&&SETFX[cls][t]);/* tiene efecto propio */
@@ -3901,38 +3901,39 @@ const FORJA={
   {n:'Yvága',a:0xf0e0a0,b:0xc0a060,m:0xffd060,t:0xffffff,g:0xfff0a0,helm:'wing',pads:'wing',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:3,len:.4,st:'point'},knee:'wing',elbow:'wing',gor:.09,back:'fins',cui:'wings',padK:1.45}},
   {n:"Yvy Marane'ỹ",a:0x0c1e4a,b:0x061028,m:0x2a5ad8,t:0xbfe0ff,g:0x4aa0ff,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1,x:{tas:{n:3,len:.44,st:'lame'},knee:'round',elbow:'round',gor:.11,back:'sun',cui:'sun',pad2:'tier'}}],
  hechicero:[
-  {n:'Lino',a:0xb09a70,b:0x7a6a48,m:0x8a7a5a,t:0xe8dcc0,g:0xb08a5a,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'none',belt:'rope'},
-  {n:'Ñandutí',a:0xf0ecf8,b:0xb0a8c0,m:0xd8d0e8,t:0xffffff,g:0xf6f2ff,helm:'hood',pads:'none',chest:'gem',brace:'wrap',greave:'none',belt:'rope'},
-  {n:'Paje',a:0x2a5a3a,b:0x142a1c,m:0x8a6a40,t:0xd8c080,g:0x3ae07a,helm:'feather',pads:'leaf',chest:'bones',brace:'leather',greave:'none',belt:'leather'},
-  {n:'Jasy',a:0x1a1e5a,b:0x0c0e2e,m:0xc8d0f0,t:0x8fb0ff,g:0x4a52ff,helm:'moon',pads:'orb',chest:'gem',brace:'ornate',greave:'none',belt:'metal'},
-  {n:'Tupã',a:0x5a4a10,b:0x2a2006,m:0xffd040,t:0xfff0a0,g:0xffe22a,helm:'crown',pads:'spike',chest:'ornate',brace:'ornate',greave:'none',belt:'metal'},
-  {n:'Arandu',a:0x5a1020,b:0x2a0810,m:0xd0a060,t:0xff4a6a,g:0xff2a4a,helm:'antler',pads:'orb',chest:'gem',brace:'ornate',greave:'none',belt:'metal'},
-  {n:'Ñamandu',a:0x0a3a4a,b:0x041a22,m:0xd8f0ff,t:0x7af8ff,g:0x7af8ff,helm:'halo',pads:'orb',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',halo:1}],
+  {n:'Lino',a:0x8a7aa0,b:0x4a3e5c,m:0x8a7a9a,t:0xd8c8f0,g:0xa890d8,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'none',belt:'rope',x:{tab:'plain'}},
+  {n:'Ñandutí',a:0xe6dcf6,b:0xa898c8,m:0xd8ccf0,t:0xffffff,g:0xd8c0ff,helm:'hood',pads:'none',chest:'gem',brace:'wrap',greave:'none',belt:'rope',x:{mat:'cloth',cui:'amulet',skirt:{n:8,len:.4,st:'cloth'}}},
+  {n:'Paje',a:0x6a2a8a,b:0x341446,m:0x9a7a50,t:0xe8d090,g:0xc050ff,helm:'wizhat',pads:'feather',chest:'bones',brace:'leather',greave:'none',belt:'leather',x:{skirt:{n:12,len:.3,st:'feather'},tab:'plain'}},
+  {n:'Jasy',a:0x2a1a6a,b:0x140c36,m:0x5a48c8,t:0xd0d8ff,g:0x7a6aff,helm:'moon',pads:'orb',chest:'gem',brace:'ornate',greave:'none',belt:'metal',x:{mat:'cloth',cui:'rune',back:'moon',tab:'rune',gor:.05}},
+  {n:'Tupã',a:0x4a1a7a,b:0x240c3c,m:0x7a30d0,t:0xffd040,g:0xb050ff,helm:'mitre',pads:'spike',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',x:{cui:'pectoral',back:'rays',skirt:{n:8,len:.42,st:'cloth'},elbow:'round'}},
+  {n:'Arandu',a:0x3a0a4a,b:0x1c0424,m:0x581470,t:0xff5ad8,g:0xe040ff,helm:'antler',pads:'none',chest:'gem',brace:'ornate',greave:'none',belt:'metal',x:{mat:'cloth',cui:'gems',back:'shards',pad2:'gemstack',skirt:{n:6,len:.46,st:'leaf'},gor:.07}},
+  {n:'Ñamandu',a:0x5a20c0,b:0x2a0c60,m:0x8a48ff,t:0xf4e8ff,g:0xb070ff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',halo:1,x:{cui:'star',back:'ring',skirt:{n:10,len:.48,st:'cloth'},gor:.09,pad2:'tier',elbow:'wing'}}],
  arquera:[
-  {n:"Ao Po'i",a:0xd8c8a0,b:0x8a7a58,m:0x8a6a40,t:0xf0e8d8,g:0xc8a070,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'leather',belt:'leather'},
-  {n:'Plumas',a:0xb04a1a,b:0x5a2408,m:0x8a6a40,t:0xffb040,g:0xff4a1a,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather'},
-  {n:'Selva',a:0x2a6a2a,b:0x143a14,m:0x8a7a40,t:0x9aff6a,g:0x46f040,helm:'antler',pads:'leaf',chest:'straps',brace:'leather',greave:'leather',belt:'leather'},
-  {n:'Kuarahy',a:0x8a4a10,b:0x4a2608,m:0xffc040,t:0xfff0a0,g:0xffb020,helm:'crown',pads:'round',chest:'ornate',brace:'metal',greave:'metal',belt:'metal'},
-  {n:'Arasy',a:0x6a1a4a,b:0x340a26,m:0xf0d0e8,t:0xff6ad0,g:0xff3ad0,helm:'tiara',pads:'wing',chest:'gem',brace:'ornate',greave:'ornate',belt:'metal'},
-  {n:'Jasy Porã',a:0x1a2a5a,b:0x0c142e,m:0xd8e0f0,t:0x8ad8ff,g:0x6ad0ff,helm:'moon',pads:'orb',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal'},
-  {n:'Yvága',a:0xf0f0f8,b:0xb0b0c8,m:0xffe8a0,t:0xffffff,g:0xf4fbff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1}],
+  {n:"Ao Po'i",a:0xbfe0d8,b:0x6a9a90,m:0x8a8a70,t:0xe8fff8,g:0x7ad8c8,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'leather',belt:'leather',x:{bare:['thigh'],skirt:{n:10,len:.15,st:'cloth'}}},
+  {n:'Plumas',a:0x2a9a8a,b:0x145048,m:0x8a7a50,t:0xffe0a0,g:0x30e0c0,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather',x:{bare:['spine_02','thigh'],skirt:{n:12,len:.2,st:'feather'}}},
+  {n:'Selva',a:0x1a7a6a,b:0x0c3e36,m:0x6a9a80,t:0x9affd8,g:0x40ffb0,helm:'leafcrown',pads:'leaf',chest:'straps',brace:'leather',greave:'leather',belt:'leather',x:{bare:['spine_02','upperarm'],skirt:{n:9,len:.26,st:'leaf'},knee:'round'}},
+  {n:'Kuarahy',a:0x1a8a8a,b:0x0c4444,m:0x48c0b8,t:0xffe080,g:0x50f0e0,helm:'antler',pads:'round',chest:'plate',brace:'metal',greave:'metal',belt:'metal',x:{bare:['thigh'],cui:'vee',skirt:{n:10,len:.17,st:'strip'},knee:'round',padK:.85}},
+  {n:'Arasy',a:0x0a5a6a,b:0x042c34,m:0x9ae8e0,t:0xff9ad8,g:0x60ffe8,helm:'tiara',pads:'wing',chest:'gem',brace:'ornate',greave:'ornate',belt:'metal',x:{bare:['spine_02','thigh'],cui:'gems',skirt:{n:10,len:.2,st:'strip'},knee:'wing',elbow:'wing',padK:.8}},
+  {n:'Jasy Porã',a:0x0a3a5a,b:0x041c2c,m:0x58b8d8,t:0xd8fbff,g:0x40d8ff,helm:'butterfly',pads:'orb',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{bare:['upperarm','thigh'],cui:'leaf',skirt:{n:8,len:.19,st:'cloth'},tas:{n:1,len:.12,st:'point'},knee:'spike',gor:.04}},
+  {n:'Yvága',a:0xd8fff8,b:0x80c0b8,m:0x7ff0e0,t:0xffffff,g:0x80ffe8,helm:'star',pads:'wing',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1,x:{bare:['spine_02','thigh'],cui:'star',skirt:{n:9,len:.3,st:'leaf'},knee:'wing',elbow:'wing',gor:.05,padK:1.1}}],
  gladiador:[
-  {n:'Ñandu',a:0x6a4a2a,b:0x3a2a18,m:0x8a6a40,t:0xc0a070,g:0x8a6a4a,helm:'band',pads:'none',chest:'straps',brace:'leather',greave:'leather',belt:'leather'},
-  {n:'Kurusu',a:0x8a2a1a,b:0x4a1208,m:0xc08a3a,t:0xffd060,g:0xff6a1a,helm:'band',pads:'round',chest:'plate',brace:'metal',greave:'metal',belt:'metal'},
-  {n:'Ara',a:0x1a6a8a,b:0x0a3444,m:0xd8b050,t:0xff4a3a,g:0x2ae6ff,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather'},
-  {n:'Tembetá',a:0x5a1a4a,b:0x2c0a24,m:0x9a8a60,t:0xff2aa0,g:0xff2aa0,helm:'band',pads:'square',chest:'plate',brace:'ornate',greave:'metal',belt:'metal'},
-  {n:'Tupã Rendy',a:0xd8e0f0,b:0x8a90a0,m:0xf0f4ff,t:0x8fe6ff,g:0xf4f8ff,helm:'crown',pads:'spike',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal'},
-  {n:'Karai Ru',a:0x0a3a2a,b:0x041c14,m:0x9ad8b0,t:0x2aff8a,g:0x2aff8a,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal'},
-  {n:'Ñamandu Ru',a:0x4a3a08,b:0x2a2004,m:0xffd23a,t:0xfff8d0,g:0xffd23a,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1}],
+  {n:'Ñandu',a:0x6a6070,b:0x3a3440,m:0x8a8490,t:0xc8b8e0,g:0xa890d0,helm:'band',pads:'none',chest:'straps',brace:'leather',greave:'leather',belt:'leather',x:{skirt:{n:9,len:.2,st:'strip'}}},
+  {n:'Kurusu',a:0x8a7aaa,b:0x4a4060,m:0xd0cce0,t:0xd0b8ff,g:0xb090ff,helm:'laurel',pads:'round',chest:'straps',brace:'metal',greave:'metal',belt:'metal',x:{mono:1,padOnly:1,cui:'harness',skirt:{n:11,len:.26,st:'strip'},knee:'round',padK:1.55}},
+  {n:'Ara',a:0x9a80c8,b:0x4a3a68,m:0xd8d4e0,t:0xb080ff,g:0xc8a0ff,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather',x:{skirt:{n:13,len:.26,st:'feather'},elbow:'round',padK:1.2}},
+  {n:'Tembetá',a:0x5a4a7a,b:0x2c2440,m:0xa8a0c0,t:0xc070ff,g:0xa060ff,helm:'mohawk',pads:'square',chest:'plate',brace:'ornate',greave:'metal',belt:'metal',x:{cui:'discs',tas:{n:2,len:.24,st:'lame'},knee:'spike',elbow:'spike'}},
+  {n:'Tupã Rendy',a:0xe8e4f4,b:0x9a94ac,m:0xf4f2ff,t:0xb890ff,g:0xd8c0ff,helm:'horns2',pads:'spike',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{cui:'vee',pad2:'blade',skirt:{n:9,len:.3,st:'strip'},elbow:'spike',knee:'round',back:'blades',gor:.05}},
+  {n:'Karai Ru',a:0x5a3a9a,b:0x2c1c4e,m:0x9a70e0,t:0xf0f0ff,g:0xb080ff,helm:'circlet',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{cui:'pectoral',tas:{n:3,len:.34,st:'point'},knee:'wing',elbow:'round',gor:.07}},
+  {n:'Ñamandu Ru',a:0x3a2a5a,b:0x1c1430,m:0xc8b0ff,t:0xffffff,g:0xd0a8ff,helm:'crown',pads:'layer',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1,x:{cui:'star',pad2:'tier',back:'ring',tas:{n:3,len:.4,st:'lame'},skirt:{n:5,len:.34,st:'cloth',rear:1},knee:'wing',elbow:'wing',gor:.1}}],
  mburuvicha:[
-  {n:'Tuja',a:0x5a4a3a,b:0x2e2418,m:0x8a6a40,t:0xc8a070,g:0x6a5a4a,helm:'band',pads:'none',chest:'straps',brace:'leather',greave:'leather',belt:'rope'},
-  {n:'Yvyrapã',a:0x6a1a1a,b:0x340a0a,m:0xa06a3a,t:0xe8a040,g:0x9a2a2a,helm:'feather',pads:'round',chest:'plate',brace:'leather',greave:'leather',belt:'leather'},
-  {n:'Cacique',a:0x3a1a6a,b:0x1c0a34,m:0xd8b050,t:0xff8a3a,g:0x8a3aff,helm:'feather',pads:'feather',chest:'bones',brace:'metal',greave:'metal',belt:'metal'},
-  {n:'Guyra Hũ',a:0x14141a,b:0x08080c,m:0x3a3a48,t:0x8a8aff,g:0x2a2a3a,helm:'raven',pads:'feather',chest:'scale',brace:'ornate',greave:'metal',belt:'metal'},
-  {n:'Mburuvicha Guasu',a:0x8a6a10,b:0x463406,m:0xffd23a,t:0xfff0a0,g:0xffd23a,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal'},
-  {n:'Tuvicha Guasu',a:0x6a0a1a,b:0x34040c,m:0xd04a4a,t:0xff6a6a,g:0xff1a3a,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal'},
-  {n:'Ñanderu',a:0xe8eaf0,b:0x9a9cb0,m:0xffffff,t:0xc8e0ff,g:0xe8f0ff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1}]
+  {n:'Tuja',a:0x3a2e2c,b:0x1c1614,m:0x5a4a44,t:0xa04030,g:0x8a3028,helm:'band',pads:'none',chest:'straps',brace:'leather',greave:'leather',belt:'rope',x:{tab:'plain'}},
+  {n:'Yvyrapã',a:0x4a1212,b:0x240808,m:0x3a3030,t:0xd04030,g:0xc02a20,helm:'feather',pads:'round',chest:'plate',brace:'leather',greave:'leather',belt:'leather',x:{mat:'leather',cui:'harness',skirt:{n:10,len:.24,st:'strip'},padK:1.1}},
+  {n:'Cacique',a:0x1a1416,b:0x0c0a0a,m:0x8a1c1c,t:0xff5a3a,g:0xff3020,helm:'fan2',pads:'feather',chest:'bones',brace:'metal',greave:'metal',belt:'metal',x:{skirt:{n:14,len:.32,st:'feather'},cui:'pectoral',knee:'round'}},
+  {n:'Guyra Hũ',a:0x101014,b:0x06060a,m:0x24242c,t:0xe02030,g:0xd01828,helm:'raven',pads:'feather',chest:'scale',brace:'ornate',greave:'metal',belt:'metal',x:{back:'feathers',cui:'gems',tas:{n:2,len:.26,st:'point'},elbow:'spike',gor:.05}},
+  {n:'Mburuvicha Guasu',a:0x3a0a0a,b:0x1a0505,m:0xd02a22,t:0xff7a50,g:0xff2a1a,helm:'skull',pads:'spike',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{cui:'discs',pad2:'skull',skirt:{n:8,len:.36,st:'strip'},knee:'spike',gor:.06}},
+  {n:'Tuvicha Guasu',a:0x0c0c0e,b:0x040404,m:0x18181c,t:0xff2a2a,g:0xff1010,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{cui:'rune',back:'rays',tab:'rune',tas:{n:3,len:.36,st:'lame'},knee:'round',elbow:'spike',gor:.09}},
+  {n:'Ñanderu',a:0x1a0206,b:0x0a0002,m:0x38040a,t:0xffd0c0,g:0xff3a3a,helm:'sunfan',pads:'layer',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1,x:{cui:'star',back:'shards',pad2:'blade',skirt:{n:10,len:.44,st:'leaf'},knee:'wing',elbow:'wing',gor:.11}}]
 };
+for(const c in FORJA)TIERGLOW[c]=FORJA[c].map(S=>S.g);
 const forjaOf=(cls,t)=>{const a=FORJA[cls]||FORJA.caballero;const S=a[Math.max(0,Math.min(a.length-1,t|0))];if(S.glow==null)S.glow=(t|0)>=4?S.g:0;S.cls=cls;S.tier=t|0;return S;};
 /* ---- materiales ---- */
 const FMAT={};
@@ -4008,6 +4009,37 @@ function forgeHelm(S,U,top,cls,brow){const g=new THREE.Group();const M=fMetal(S.
     case 'raven':{const b=part(gcc('band2',()=>new THREE.TorusGeometry(1,.06,8,28)),fMetal(S.m,S.t),0,y0+R*.3,0,g,R*1.04,R*1.04,R*1.08);b.rotation.x=PI/2;const fm=fFeather([0x14141c,0x2a2a3a,0x3a3a50,0x0a0a10]);
       for(let i=0;i<15;i++){const a=(i/14-.5)*PI*1.45;const f=featherMesh(fm,(.2+.1*Math.cos(a))*U,.05*U);f.position.set(Math.sin(a)*R*.98,y0+R*.35,-Math.cos(a)*R*.95);f.rotation.set(-.35-Math.cos(a)*.25,a+PI,0,'YXZ');g.add(f);}
       const bk=part(CONE(.035*U,.14*U,6),fOrnate(S.m,S.t),0,y0+R*.6,R*1.1,g);bk.rotation.x=PI/2;for(const s of[-1,1])gemAt(g,S.t,s*R*.45,y0+R*.6,R*.95,.014*U);break;}
+    case 'wizhat':{/* sombrero de paje: ala ancha y copa caída hacia atrás */const br=part(gcc('wbrim',()=>new THREE.CylinderGeometry(1,1.06,.07,26)),C,0,y0+R*.5,0,g,R*1.85,R,R*1.85);br.rotation.x=-.08;
+      const co=part(gcc('wcone',()=>{const q=new THREE.ConeGeometry(1,1,20,8);q.translate(0,.5,0);const p=q.attributes.position;for(let i=0;i<p.count;i++){const y=p.getY(i);p.setZ(i,p.getZ(i)-y*y*.55);p.setY(i,y-y*y*.12);}q.computeVertexNormals();return q;}),C,0,y0+R*.5,0,g,R*1.04,R*2.5,R*1.08);co.castShadow=true;
+      const bd=part(gcc('rrim',()=>new THREE.TorusGeometry(1,.07,8,28)),O,0,y0+R*.62,0,g,R*1.02,R*1.02,R*1.06);bd.rotation.x=PI/2;gemAt(g,S.g,0,y0+R*.72,R*1.02,.022*U);break;}
+    case 'mitre':{dome(C,1.0,fit?.42:.55);const mg=gcc('mitre',()=>{const sh=new THREE.Shape();sh.moveTo(-1,0);sh.lineTo(-1,.6);sh.quadraticCurveTo(-.7,1.5,0,2.1);sh.quadraticCurveTo(.7,1.5,1,.6);sh.lineTo(1,0);return new THREE.ShapeGeometry(sh,8);});
+      for(const z of[1,-1]){const p=part(mg,O,0,y0+R*.35,z*R*.78,g,R*.92,R*.85,1);p.material.side=THREE.DoubleSide;p.rotation.x=-z*.16;p.castShadow=true;}
+      const bd=part(gcc('rrim',()=>new THREE.TorusGeometry(1,.07,8,28)),M,0,y0+R*.38,0,g,R*1.04,R*1.04,R*1.08);bd.rotation.x=PI/2;gemAt(g,S.t,0,y0+R*1.05,R*.86,.03*U);gemAt(g,S.g,0,y0+R*2.2,0,.02*U);break;}
+    case 'circlet':{const ring=part(gcc('tiara',()=>new THREE.TorusGeometry(1,.045,8,28)),O,0,y0+R*.45,0,g,R*1.02,R*1.02,R*1.06);ring.rotation.x=PI/2;
+      for(let i=-2;i<=2;i++){const a=i*.42;const sp=part(CONE(.016*U,(.13-Math.abs(i)*.035)*U,4),i?M:O,Math.sin(a)*R*1.03,y0+R*.5+(.065-Math.abs(i)*.017)*U,Math.cos(a)*R*1.05,g);}gemAt(g,S.g,0,y0+R*.5,R*1.1,.024*U);break;}
+    case 'laurel':{const b=part(gcc('band2',()=>new THREE.TorusGeometry(1,.06,8,28)),M,0,y0+R*.32,0,g,R*1.04,R*1.04,R*1.08);b.rotation.x=PI/2;
+      for(const s of[-1,1])for(let k=0;k<7;k++){const a=s*(.45+k*.38);const lf=part(SPH(1,7,5),k%2?O:M,Math.sin(a)*R*1.07,y0+R*(.42+k*.035),Math.cos(a)*R*1.1,g,.014*U,.05*U,.024*U);lf.rotation.set(.25,a,-s*.55,'YXZ');}gemAt(g,S.g,0,y0+R*.34,R*1.1,.018*U);break;}
+    case 'mohawk':{const b=part(gcc('band2',()=>new THREE.TorusGeometry(1,.06,8,28)),M,0,y0+R*.32,0,g,R*1.04,R*1.04,R*1.08);b.rotation.x=PI/2;const st=part(helmCrestGeo(.8,.06),M,0,y0,0,g,R*.5,R*1.1,R*1.14);
+      const cr=part(helmCrestGeo(.75,.55),fFeather([S.t,S.g,S.a]),0,y0,0,g,R*.55,R*1.12,R*1.16);cr.castShadow=true;gemAt(g,S.g,0,y0+R*.34,R*1.1,.02*U);break;}
+    case 'horns2':{const b=part(gcc('band2',()=>new THREE.TorusGeometry(1,.06,8,28)),O,0,y0+R*.32,0,g,R*1.04,R*1.04,R*1.08);b.rotation.x=PI/2;const h=bullHorns(U,S.b,.5);h.position.y=y0+R*.22;g.add(h);h.traverse(o=>{if(o.isMesh)o.material=fMetal(S.m,S.t);});gemAt(g,S.t,0,y0+R*.36,R*1.1,.026*U);break;}
+    case 'leafcrown':{const ring=part(gcc('tiara',()=>new THREE.TorusGeometry(1,.045,8,28)),O,0,y0+R*.42,0,g,R*1.02,R*1.02,R*1.06);ring.rotation.x=PI/2;const lm=FMAT['leaf'+S.t]||(FMAT['leaf'+S.t]=new MSM({color:S.t,roughness:.6,side:THREE.DoubleSide,emissive:S.g,emissiveIntensity:.12}));
+      for(let i=0;i<9;i++){const a=(i/8-.5)*PI*1.5;const f=featherMesh(lm,(.1+.05*Math.cos(a))*U,.05*U);f.position.set(Math.sin(a)*R*1.02,y0+R*.42,Math.cos(a)*R*1.05);f.rotation.set(.3,a,0,'YXZ');g.add(f);}gemAt(g,S.g,0,y0+R*.45,R*1.1,.02*U);break;}
+    case 'butterfly':{const ring=part(gcc('tiara',()=>new THREE.TorusGeometry(1,.045,8,28)),O,0,y0+R*.45,0,g,R*1.02,R*1.02,R*1.06);ring.rotation.x=PI/2;
+      for(const s of[-1,1])for(let k=0;k<2;k++){const w=part(gcc('hwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,0);sh.lineTo(.3,.9);sh.lineTo(1.1,1.5);sh.lineTo(1.6,1.1);sh.lineTo(1.3,.5);sh.lineTo(1.5,0);sh.lineTo(0,-.2);return new THREE.ShapeGeometry(sh);}),k?fGem(S.t):O,s*R*1.0,y0+R*(.5-k*.25),-R*.1,g,R*(.55-k*.2)*s,R*(.6-k*.2)*(k?-1:1),R*.6);w.rotation.y=s*(PI/2-.5);w.material.side=THREE.DoubleSide;}
+      gemAt(g,S.g,0,y0+R*.6,R*1.05,.026*U);break;}
+    case 'star':{const ring=part(gcc('tiara',()=>new THREE.TorusGeometry(1,.045,8,28)),O,0,y0+R*.45,0,g,R*1.02,R*1.02,R*1.06);ring.rotation.x=PI/2;
+      for(let i=0;i<7;i++){const a=(i/6-.5)*PI*1.15;const L=(i%2?.1:.16)*U;const sp=part(CONE(.016*U,L,4),i%2?O:fGem(S.t),Math.sin(a)*(R*1.15+L*.5),y0+R*.35+Math.cos(a)*(R*1.15+L*.5),-R*.55,g);sp.rotation.z=-a;}
+      gemAt(g,S.g,0,y0+R*.62,R*1.05,.03*U);const sp=glowSprite(S.g,R*2.6,.3);sp.position.set(0,y0+R*1.2,-R*.55);g.add(sp);break;}
+    case 'fan2':{const b=part(gcc('band2',()=>new THREE.TorusGeometry(1,.06,8,28)),fMetal(S.m,S.t),0,y0+R*.3,0,g,R*1.04,R*1.04,R*1.08);b.rotation.x=PI/2;const f1=fFeather([S.t,S.m,0x141414,S.g]),f2=fFeather([0x141414,0x2a2a2a,S.m,0x0a0a0a]);
+      for(let rw=0;rw<2;rw++)for(let i=0;i<13;i++){const a=(i/12-.5)*PI*1.4;const f=featherMesh(rw?f1:f2,((rw?.16:.27)+.1*Math.cos(a))*U,.05*U);f.position.set(Math.sin(a)*R*(.98+rw*.04),y0+R*.35,-Math.cos(a)*R*(.95+rw*.04));f.rotation.set(-.3-Math.cos(a)*.22-rw*.18,a+PI,0,'YXZ');g.add(f);}
+      gemAt(g,S.g,0,y0+R*.34,R*1.08,.022*U);break;}
+    case 'skull':{const b=part(gcc('band2',()=>new THREE.TorusGeometry(1,.06,8,28)),O,0,y0+R*.3,0,g,R*1.04,R*1.04,R*1.08);b.rotation.x=PI/2;const bm=mat(0xe8e0c8,{roughness:.55}),dk=mat(0x0a0606,{roughness:.9});
+      part(SPH(1,12,9),bm,0,y0+R*.82,R*.3,g,R*.6,R*.5,R*.7);part(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),bm,0,y0+R*.6,R*.95,g,R*.42,R*.3,R*.6);for(const s of[-1,1]){part(SPH(1,8,6),dk,s*R*.26,y0+R*.84,R*.86,g,R*.14,R*.14,R*.1);const gm=part(SPH(1,6,5),fGem(S.g),s*R*.26,y0+R*.84,R*.9,g,R*.06);gm.userData.gem=1;
+        const hn=new THREE.Mesh(taperTube([[s*.05,0,0],[s*.13,.03,-.02],[s*.2,.1,-.03],[s*.22,.2,-.01]],.03,.005,10,6),bm);hn.position.set(0,y0+R*.9,R*.2);hn.scale.setScalar(U);g.add(hn);}
+      const fm=fFeather([S.t,S.m,0x141414]);for(let i=0;i<7;i++){const a=(i/6-.5)*PI*.9;const f=featherMesh(fm,(.16+.08*Math.cos(a))*U,.05*U);f.position.set(Math.sin(a)*R*.95,y0+R*.4,-Math.cos(a)*R*.95);f.rotation.set(-.4,a+PI,0,'YXZ');g.add(f);}break;}
+    case 'sunfan':{const ring=part(gcc('crown',()=>new THREE.CylinderGeometry(1,1,1,24,1,true)),O,0,y0+R*.5,0,g,R*1.05,R*.34,R*1.08);ring.material.side=THREE.DoubleSide;const fm=fFeather([S.g,S.t,0x141414,S.m]);
+      for(let i=0;i<13;i++){const a=(i/12-.5)*PI*1.3;const L=(.26+.1*Math.cos(a*1.5))*U;const f=featherMesh(fm,L,.06*U);f.position.set(Math.sin(a)*R*.7,y0+R*.3+Math.cos(a)*R*.7,-R*.75);f.rotation.z=-a;g.add(f);if(i%2===0){const sp=part(CONE(.012*U,.09*U,4),fGem(S.g),Math.sin(a)*(R*.7+L),y0+R*.3+Math.cos(a)*(R*.7+L),-R*.75,g);sp.rotation.z=-a;}}
+      gemAt(g,S.t,0,y0+R*.55,R*1.1,.03*U);const sp=glowSprite(S.g,R*3,.28);sp.position.set(0,y0+R*.9,-R*.75);g.add(sp);break;}
     case 'halo':{const ring=part(gcc('halo',()=>new THREE.TorusGeometry(1,.06,8,40)),fGem(S.t),0,y0+R*1.55,-R*.2,g,R*1.1,R*1.1,R*1.1);ring.rotation.x=PI/2+.25;ring.material.emissiveIntensity=.7;const sp=glowSprite(S.t,R*3.4,.3);sp.position.set(0,y0+R*1.5,-R*.2);g.add(sp);
       const ring2=part(gcc('tiara',()=>new THREE.TorusGeometry(1,.045,8,28)),O,0,y0+R*.45,0,g,R*1.02,R*1.02,R*1.06);ring2.rotation.x=PI/2;gemAt(g,S.t,0,y0+R*.6,R*1.05,.03*U);
       for(let i=0;i<6;i++){const a=i/6*TAU;const sp2=part(CONE(.018*U,.08*U,4),O,Math.sin(a)*R*1.02,y0+R*.68,Math.cos(a)*R*1.02,g);}break;}}
@@ -4046,7 +4078,7 @@ function forgeChest(S,U,cls){const g=new THREE.Group();const M=fMetal(S.m,S.t),O
     case 'cross':{plate(M);const v=part(gcc('xv',()=>new THREE.BoxGeometry(.14,1,.08)),fGem(S.t),0,0,.105*U,g,w*.5,h*1.3,U*.3);const hz=part(gcc('xh',()=>new THREE.BoxGeometry(1,.14,.08)),fGem(S.t),0,h*.3,.105*U,g,w*.9,h*.5,U*.3);break;}
     case 'scale':{const p=plate(M);p.material=tm(scalesTex('chScale'+S.m,{base:S.m,dark:S.b,hi:S.t,size:7,rep:2}),{metal:.7,rough:.4});p.material.userData.forge=1;const rim=CC0.noPlate?new THREE.Object3D():part(gcc('plrim',()=>new THREE.TorusGeometry(1,.035,6,28,PI)),O,0,h*.1,.06*U,g,w*.88,h*.55,.5);rim.rotation.y=PI;rim.rotation.x=.25;break;}
     case 'ornate':{plate(O);emblem(g,S,cls,w,h,U);const rim=CC0.noPlate?new THREE.Object3D():part(gcc('plrim',()=>new THREE.TorusGeometry(1,.035,6,28,PI)),M,0,h*.1,.06*U,g,w*.88,h*.55,.5);rim.rotation.y=PI;rim.rotation.x=.25;gemAt(g,S.t,0,h*.25,.115*U,.03*U);for(const s of[-1,1])gemAt(g,S.g,s*w*.55,h*.55,.09*U,.016*U);break;}
-    case 'gem':{const ch=part(gcc('chain',()=>new THREE.TorusGeometry(1,.035,6,28,PI)),O,0,h*.9,.07*U,g,w*.7,h*1.1,.5);ch.rotation.z=PI;gemAt(g,S.t,0,h*.05,.1*U,.035*U);break;}
+    case 'gem':{const ch=part(gcc('chain',()=>new THREE.TorusGeometry(1,.035,6,28,PI)),O,0,h*.9,.07*U,g,w*.4,h*.9,.5);ch.rotation.z=PI;gemAt(g,S.t,0,h*.05,.1*U,.035*U);break;}
     case 'bones':{/* collar de colmillos y huesos que cuelga del cuello */const bm=mat(0xe8e0c8,{roughness:.55});const cord=part(gcc('bcord',()=>new THREE.TorusGeometry(1,.05,6,24,PI)),fLeather(S.b),0,h*1.05,.02*U,g,w*.62,h*.62,w*.62);cord.rotation.set(PI/2-.35,0,PI);
       for(let i=0;i<9;i++){const a=(i/8-.5)*PI*.82,L=(.05+.025*Math.cos(a*1.6))*U;const x=Math.sin(a)*w*.6,y=h*1.05-(1-Math.cos(a))*h*.55,z=.02*U+Math.cos(a)*w*.55;const t=part(CONE(.011*U,L,5),i%2?bm:mat(0xd8c8a0,{roughness:.6}),x,y-L*.5,z,g);t.rotation.set(-.35,0,PI+Math.sin(a)*.25);}
       gemAt(g,S.t,0,h*.72,.1*U,.018*U);break;}}
@@ -4076,7 +4108,7 @@ function forgeApply(r,cls,eq){if(!r||!r.body)return;const body=r.body,k=oadHuman
   r.g.updateMatrixWorld(true);const bb=new THREE.Box3();if(body.userData.cc0){/* cuerpo CC0: la altura del cráneo sale de la cabeza misma, sin el pelo ni la capucha (si no, la vincha y el casco flotan) */body.traverse(m=>{if(m.isMesh&&!m.userData.file&&/Superhero/.test(m.material&&m.material.name||''))bb.expandByObject(m);});}if(bb.isEmpty())bb.setFromObject(body);const hp=oadPoint(body,'helmet')||boneOf(body,['head']);const v=new THREE.Vector3();if(hp)hp.getWorldPosition(v);const top=Math.max(.05,(bb.max.y-v.y)/k);
   /* línea de las cejas: el casco cerrado termina justo arriba, para que se vean los ojos */let brow=null;if(body.userData.cc0){const eb=new THREE.Box3();body.traverse(m=>{if(m.isMesh&&/^(Eyes|Eyebrows)$/.test(m.name))eb.expandByObject(m);});if(!eb.isEmpty())brow=(eb.max.y+.008-v.y)/k;}
   const add=(g,it)=>{if(!g)return;g.userData.ik=it.k;g.userData.lv=it.lv||0;g.userData.set=it.t|0;r.forge.push(g);forgeGlow(g,cls,it);};
-  if(eq.helm){const S=forjaOf(cls,eq.helm.t);const at=A(['prop-helmet','helmet','head']);if(at&&!(cls==='gladiador'&&!['band','crown','halo','feather'].includes(S.helm))){const h=forgeHelm(S,U,top,cls,brow);if(body.userData.cc0)h.traverse(o=>{o.castShadow=false;});/* el casco no tapa de sombra la cara */at.add(h);add(h,eq.helm);}}
+  if(eq.helm){const S=forjaOf(cls,eq.helm.t);const at=A(['prop-helmet','helmet','head']);if(at&&!(cls==='gladiador'&&!['band','crown','halo','feather','laurel','mohawk','horns2','circlet'].includes(S.helm))){const h=forgeHelm(S,U,top,cls,brow);if(body.userData.cc0)h.traverse(o=>{o.castShadow=false;});/* el casco no tapa de sombra la cara */at.add(h);add(h,eq.helm);}}
   if(body.userData.cc0){cc0Armor(r,cls,eq,add);return;}
   if(eq.armor){const S=forjaOf(cls,eq.armor.t);for(const s of[-1,1]){const at=A([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,U,s,cls);const bk=bodyK(cls,'arm');p.position.set(s*.03*U*bk,.005*U,0);p.rotation.z=-s*.42;p.scale.setScalar(bk);at.add(p);add(p,eq.armor);}}
     const ch=A(['chest']);if(ch){const c=forgeChest(S,U,cls);const bk=bodyK(cls,'chest'),fc=body.userData.cc0?CC0_FIT.chest:[0,0,0];c.position.set(fc[0],.09*U+fc[1],.09*U*bk+fc[2]);c.scale.set(bk,1,bk);ch.add(c);add(c,eq.armor);}}
@@ -4089,7 +4121,7 @@ function forgeBoot(S,U){const g=new THREE.Group();const st=S.greave==='none'?'le
   if(st==='ornate'){const sp=part(CONE(.012*U,.05*U,4),fOrnate(S.m,S.t),0,.09*U,-.03*U,g);sp.rotation.x=-.6;}g.userData.piece='boots';return g;}
 /* brillo por +nivel: las gemas siempre brillan; desde +4 el metal del set toma luz, fuerte en +7 y más */
 function forgeGlow(g,cls,it){const lv=it.lv||0,col=new THREE.Color(forjaOf(cls,it.t).g);/* el brillo ya no tapa el dibujo del metal: sube parejo hasta +15 */const k=lv>=15?.24:lv>=13?.2:lv>=11?.16:lv>=9?.12:lv>=7?.08:lv>=4?.04:0;
-  g.traverse(o=>{if(!o.isMesh||!o.material)return;const m=o.material;if(m.userData&&m.userData.gem)return;if(k>0){const c=m.clone();c.userData=Object.assign({},m.userData);c.emissive=col.clone();c.emissiveIntensity=k;if(m.userData.rim)rimify(c,1.2);if(c.metalness>=.5)regMetal(c);o.material=c;}});
+  g.traverse(o=>{if(!o.isMesh||!o.material)return;const m=o.material;if(m.userData&&m.userData.gem)return;if(k>0){const c=m.clone();c.userData=Object.assign({},m.userData);c.emissive=col.clone();c.emissiveIntensity=k*(c.metalness<.3?.4:1)/* la tela y el cuero toman menos luz que el metal, si no el color tapa la prenda */;if(m.userData.rim)rimify(c,1.2);if(c.metalness>=.5)regMetal(c);o.material=c;}});
   if(it.epic||it.ex&&it.ex.length){g.traverse(o=>{if(o.isSprite&&o.userData.gemGlow)o.scale.multiplyScalar(1.5);});}}
 /* ===== piezas de diseño por set (11/11): faldón de placas, gola, rodilleras, coderas y adorno de espalda. Se definen en FORJA con `x:{...}`.
    Cuelgan de anclas con los ejes del modelo (y arriba, z adelante) en cada hueso, así siguen la animación. ===== */
@@ -4101,6 +4133,16 @@ function cc0Extras(r,cls,eq,add){const A=anchorFn(r.body);const DS=m=>{m.side=TH
         const p=part(geo,i%2?O:M,0,.05-i*L/n,0,g,.152+i*.012,h*(last?1.5:1),.152+i*.012);p.castShadow=true;DS(p.material);}
       const rim=part(gcc('tasR',()=>new THREE.TorusGeometry(1,.07,5,12,PI*.68)),O,0,.05,0,g,.154,.154,.154);rim.rotation.set(PI/2,0,PI*.5-PI*.34);
       g.position.set(sg*.02,0,-.01);g.rotation.y=sg*1.0;at.add(g);add(g,eq.pants);}
+    if(X.skirt){const at=A(['pelvis']);if(at){const K=X.skirt,n=K.n,L=K.len,g=new THREE.Group(),fk=cls==='arquera'?1.2:cls==='gladiador'?1.12:1,rx=.175*fk,rz=.135*fk,wd=TAU*.155*fk/n;const box=gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1));
+        const pg=gcc('skP',()=>{const q=new THREE.PlaneGeometry(1,1,1,3);q.translate(0,-.5,0);return q;}),lg=gcc('skL',()=>{const sh=new THREE.Shape();sh.moveTo(-.5,0);sh.lineTo(.5,0);sh.quadraticCurveTo(.55,-.6,0,-1);sh.quadraticCurveTo(-.55,-.6,-.5,0);return new THREE.ShapeGeometry(sh,6);});
+        const cm=FMAT['skc'+S.a]||(FMAT['skc'+S.a]=(()=>{const m=fCloth(S.a).clone();m.side=THREE.DoubleSide;return m;})()),lm=FMAT['skl'+S.b]||(FMAT['skl'+S.b]=(()=>{const m=fLeather(S.b).clone();m.side=THREE.DoubleSide;return m;})()),fm=K.st==='feather'?fFeather([S.t,S.m,S.g,S.a]):null;
+        for(let i=0;i<n;i++){const a=(i+.5)/n*TAU;if(K.open&&Math.abs(Math.sin(a))<.5&&Math.cos(a)>0)continue;if(K.rear&&Math.cos(a)>-.1)continue;const h=new THREE.Group();h.position.set(Math.sin(a)*rx,.05,Math.cos(a)*rz);h.rotation.set(-.2,a,0,'YXZ');const LL=L*(K.st==='leaf'||K.st==='feather'?(i%2?.82:1):1);
+          if(K.st==='strip'){part(pg,lm,0,0,0,h,wd*.78,LL,1);part(box,O,0,-LL+.012,.004,h,wd*.78,.03,.01);part(box,M,0,-LL*.45,.004,h,wd*.3,.03,.008);}
+          else if(K.st==='leaf'){part(lg,i%2?cm:lm,0,0,0,h,wd*1.5,LL,1);part(box,O,0,-.01,.004,h,wd*1.3,.02,.008);gemAt(h,S.g,0,-LL*.82,.006,.011);}
+          else if(K.st==='feather'){const f=featherMesh(fm,LL,wd*1.25);f.rotation.x=PI;h.add(f);}
+          else{part(pg,cm,0,0,0,h,wd*1.3,LL,1);part(box,O,0,-LL+.012,.003,h,wd*1.3,.024,.006);}
+          g.add(h);}
+        at.add(g);add(g,eq.pants);}}
     if(X.knee)for(const bn of CC0_SIDES('calf')){const at=A([bn]);if(!at)continue;const g=new THREE.Group();const c=cap(O,g,0,0,.055,.07,.085,.065);c.rotation.x=PI/2;
       if(X.knee==='spike'){const sp=part(CONE(.022,.13,5),M,0,.02,.11,g);sp.rotation.x=PI/2-.5;}
       if(X.knee==='wing')for(const s of[-1,1]){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),M,s*.04,0,.06,g,s*.1,.13,.1);w.rotation.y=s*.9;DS(w.material);}
@@ -4113,7 +4155,16 @@ function cc0Extras(r,cls,eq,add){const A=anchorFn(r.body);const DS=m=>{m.side=TH
   if(eq.armor){const S=forjaOf(cls,eq.armor.t),X=S.x||{},M=fMetal(S.m,S.t),O=fOrnate(S.m,S.t,S.glow);
     if(X.cui){const at=A(['spine_03']);if(at){const g=new THREE.Group();const hemi=gcc('xhemi',()=>new THREE.SphereGeometry(1,18,12,0,PI));const pl=(m,x,y,z,sx,sy,sz)=>{const p=part(hemi,m,x,y,z,g,sx,sy,sz);p.castShadow=true;DS(p.material);return p;};const box=gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1));
         const band=(m,y,r,h)=>{const b=part(gcc('xband',()=>new THREE.CylinderGeometry(1,1.04,1,14,1,true,-PI*.42,PI*.84)),m,0,y,-.02,g,r,h,r*.86);DS(b.material);return b;};
-        const k=X.cui;const top=pl(k==='ribs'||k==='lames'?M:O,0,.045,.0,.178,k==='lames'?.12:.165,.165);
+        const k=X.cui;const zf=({hechicero:.135,arquera:.15,gladiador:.2,mburuvicha:.135})[cls]||.165;const top=['round','keel','lames','ribs','wings','sun'].includes(k)?pl(k==='ribs'||k==='lames'?M:O,0,.045,.0,.178,k==='lames'?.12:.165,.165):null;const cyl=gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14));const GM=fGem(S.g);
+        if(k==='amulet'){const rg=part(gcc('amR',()=>new THREE.TorusGeometry(1,.16,6,20)),O,0,.03,zf,g,.045,.045,.03);gemAt(g,S.g,0,.03,zf+.005,.026);for(let i=-1;i<=1;i++)gemAt(g,S.t,i*.04,-.04-(i?0:.02),zf-.005,.011);for(const s of[-1,1]){const c=part(box,O,s*.055,.1,zf-.02,g,.008,.15,.008);c.rotation.z=s*.62;}}
+        if(k==='rune'){const rg=part(gcc('runeR',()=>new THREE.TorusGeometry(1,.07,5,26)),GM,0,.04,zf,g,.075,.075,.02);rg.userData.gem=1;for(let i=0;i<3;i++){const a=i/3*TAU+PI/2;const b=part(box,GM,Math.cos(a+PI/3)*.036,.04+Math.sin(a+PI/3)*.036,zf,g,.11,.009,.006);b.rotation.z=a+PI/3+PI/2;b.userData.gem=1;}gemAt(g,S.t,0,.04,zf+.006,.014);}
+        if(k==='pectoral'){const pc=part(gcc('pect',()=>new THREE.RingGeometry(.55,1,22,1,PI,PI)),O,0,.14,zf-.012,g,.15,.15,1);DS(pc.material);pc.rotation.x=-.2;for(let i=0;i<5;i++){const a=PI+(i+.5)/5*PI;gemAt(g,i===2?S.g:S.t,Math.cos(a)*.115,.14+Math.sin(a)*.115,zf+.004-.03*Math.abs(Math.cos(a)),i===2?.02:.012);}}
+        if(k==='gems'){for(let i=0;i<3;i++)gemAt(g,i?S.t:S.g,0,.09-i*.065,zf+.004,.024-i*.006);for(const s of[-1,1])for(let i=0;i<2;i++)gemAt(g,S.t,s*(.05+i*.04),.11+i*.03,zf-.005-i*.012,.012);}
+        if(k==='harness'){for(const s of[-1,1]){const st=part(box,M,s*.0,.03,zf-.004,g,.036,.36,.012);st.rotation.z=s*.72;}const d=part(cyl,O,0,.03,zf+.006,g,.05,.02,.05);d.rotation.x=PI/2;gemAt(g,S.g,0,.03,zf+.02,.018);}
+        if(k==='discs'){for(const s of[-1,1]){const d=part(cyl,O,s*.078,.07,zf-.012,g,.058,.016,.058);d.rotation.x=PI/2;d.rotation.z=-s*.25;gemAt(g,S.g,s*.078,.07,zf+.002,.016);}const c=part(box,M,0,.07,zf-.006,g,.06,.014,.01);const c2=part(box,M,0,-.02,zf-.01,g,.014,.18,.01);}
+        if(k==='vee'){for(const s of[-1,1]){const b=part(box,O,s*.058,.07,zf-.008,g,.03,.2,.014);b.rotation.z=-s*.62;const b2=part(box,M,s*.075,.085,zf-.012,g,.012,.2,.01);b2.rotation.z=-s*.62;}gemAt(g,S.g,0,-.005,zf+.006,.024);}
+        if(k==='leaf'){const lm=FMAT['leafm'+S.m]||(FMAT['leafm'+S.m]=(()=>{const m=fMetal(S.m,S.t).clone();m.side=THREE.DoubleSide;m.userData=Object.assign({},fMetal(S.m,S.t).userData);return m;})());for(let i=-2;i<=2;i++){const f=featherMesh(lm,.13-Math.abs(i)*.02,.06);f.position.set(i*.042,.12-Math.abs(i)*.012,zf-.004-Math.abs(i)*.012);f.rotation.set(0,0,PI+i*.22);g.add(f);}gemAt(g,S.g,0,.115,zf+.008,.02);}
+        if(k==='star'){const gm=part(SPH(1,10,8),GM,0,.05,zf+.004,g,.032,.032,.02);gm.userData.gem=1;for(let i=0;i<8;i++){const a=i/8*TAU;const L=i%2?.05:.085;const ry=part(CONE(.01,L,4),i%2?O:M,Math.cos(a)*(.04+L/2),.05+Math.sin(a)*(.04+L/2),zf-.02*Math.abs(Math.cos(a)),g);ry.rotation.z=a-PI/2;}const rg=part(gcc('runeR',()=>new THREE.TorusGeometry(1,.07,5,26)),O,0,.05,zf-.004,g,.06,.06,.02);}
         if(k==='round'){const d=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),M,0,.06,.165,g,.055,.02,.055);d.rotation.x=PI/2;gemAt(g,S.t,0,.06,.18,.018);}
         if(k==='keel'){const r=part(box,M,0,.045,.15,g,.03,.3,.03);r.rotation.y=PI/4;}
         if(k==='lames'){for(let i=0;i<4;i++)band(i%2?M:O,-.085-i*.05,.165-i*.004,.06);gemAt(g,S.g,0,.07,.168,.02);}
@@ -4123,16 +4174,25 @@ function cc0Extras(r,cls,eq,add){const A=anchorFn(r.body);const DS=m=>{m.side=TH
         at.add(g);add(g,eq.armor);}}
     if(X.pad2)for(const s of[-1,1]){const at=A([s<0?'arm_L':'arm_R']);if(!at)continue;const g=new THREE.Group();
         if(X.pad2==='horn'){for(let i=0;i<2;i++){const h=part(CONE(.035-i*.008,.24-i*.07,6),M,s*(.03+i*.07),.11-i*.02,0,g);h.rotation.z=-s*(.35+i*.5);}}
+        if(X.pad2==='blade'){for(let i=0;i<2;i++){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),i?O:M,s*(.04+i*.06),.07-i*.02,0,g,s*(.2-i*.05),.26-i*.08,.2);DS(w.material);w.rotation.z=-s*(.1+i*.5);}}
+        if(X.pad2==='skull'){const bm=mat(0xe8e0c8,{roughness:.55});part(SPH(1,10,8),bm,s*.05,.07,.0,g,.06,.055,.065);for(const z of[-1,1]){const e=part(SPH(1,6,5),fGem(S.g),s*.1,.075,z*.025,g,.012);e.userData.gem=1;}for(let i=0;i<3;i++){const t=part(CONE(.008,.03,4),bm,s*.1,.03,(i-1)*.02,g);t.rotation.x=PI;}}
+        if(X.pad2==='gemstack'){for(let i=0;i<3;i++)gemAt(g,i%2?S.t:S.g,s*(.03+i*.05),.1+i*.055,-.01*i,.03-i*.007);const rg=part(gcc('runeR',()=>new THREE.TorusGeometry(1,.07,5,26)),O,s*.03,.06,0,g,.07,.07,.07);rg.rotation.x=PI/2;}
         if(X.pad2==='tier'){for(let i=0;i<3;i++){const c=cap(i%2?M:O,g,s*(.02+i*.05),.05-i*.012,0,.1-i*.012,.07,.11-i*.012);c.rotation.z=-s*(.2+i*.3);}}
         at.add(g);add(g,eq.armor);}
     if(X.gor){const at=A(['neck_01']);if(at){const g=new THREE.Group();const c=part(gcc('gorg',()=>{const q=new THREE.CylinderGeometry(1,1.28,1,18,1,true,PI*.22,PI*1.56);q.translate(0,.5,0);return q;}),O,0,-.035,.005,g,.074,X.gor,.082);c.castShadow=true;DS(c.material);
         const rim=part(gcc('gorR',()=>new THREE.TorusGeometry(1,.06,5,20,PI*1.56)),M,0,-.035+X.gor,.005,g,.074,.082,.074);rim.rotation.set(PI/2,0,-PI*.28);at.add(g);add(g,eq.armor);}}
     if(X.back){const at=A(['spine_03']);if(at){const g=new THREE.Group();g.position.set(0,-.04,-.19);
         if(X.back==='sun'){const ring=part(gcc('sunR',()=>new THREE.TorusGeometry(1,.06,6,28)),O,0,.12,0,g,.24,.24,.24);for(let i=0;i<12;i++){const a=i/12*TAU;const ry=part(CONE(.02,(i%2?.1:.16),4),M,Math.cos(a)*(.24+(i%2?.05:.08)),.12+Math.sin(a)*(.24+(i%2?.05:.08)),0,g);ry.rotation.z=a-PI/2;}const gm=part(SPH(1,10,8),fGem(S.g),0,.12,0,g,.045,.045,.02);gm.userData.gem=1;}
+        if(X.back==='moon'){const mn=part(gcc('bmoon',()=>new THREE.TorusGeometry(1,.09,6,26,PI*1.3)),fGem(S.t),0,.22,-.04,g,.24,.24,.1);mn.rotation.z=PI*.85;mn.material.emissiveIntensity=.55;mn.userData.gem=1;gemAt(g,S.g,0,.2,-.04,.03);}
+        if(X.back==='ring'){const rg=part(gcc('sunR',()=>new THREE.TorusGeometry(1,.06,6,28)),O,0,.2,-.05,g,.3,.3,.14);for(let i=0;i<6;i++){const a=i/6*TAU+.3;gemAt(g,i%2?S.t:S.g,Math.cos(a)*.3,.2+Math.sin(a)*.3,-.05,.022);}}
+        if(X.back==='shards')for(let i=0;i<5;i++){const a=(i-2)*.5;const c=part(gcc('gem8',()=>new THREE.OctahedronGeometry(1,0)),fGem(i%2?S.t:S.g),Math.sin(a)*.3,.16+Math.cos(a)*.22,-.07,g,.03,.11-Math.abs(i-2)*.02,.022);c.rotation.z=-a;c.userData.gem=1;}
+        if(X.back==='rays')for(let i=0;i<9;i++){const a=(i-4)*.26;const L=.36-Math.abs(i-4)*.035;const sp=part(CONE(.012,L,4),i%2?O:M,Math.sin(a)*(.12+L/2),.1+Math.cos(a)*(.12+L/2),-.02,g);sp.rotation.z=-a;}
+        if(X.back==='feathers'){const fm=fFeather([S.t,0x141414,S.m,0x0a0a0a]);for(let i=0;i<9;i++){const a=(i-4)*.3;const f=featherMesh(fm,.44-Math.abs(i-4)*.04,.085);f.position.set(Math.sin(a)*.06,.02+Math.cos(a)*.04,-.01);f.rotation.set(-.25,0,-a);g.add(f);}}
+        if(X.back==='blades')for(const s of[-1,1]){const b=part(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),M,s*.02,.12,-.02,g,.05,.62,.012);b.rotation.z=s*.6;const h=part(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),O,-s*.14,.33,-.02,g,.14,.03,.02);h.rotation.z=s*.6;const tp=part(CONE(.027,.1,4),M,s*.215,-.17,-.02,g);tp.rotation.z=s*.6+PI;tp.scale.z=.3;}
         if(X.back==='spikes')for(let i=0;i<5;i++){const a=(i-2)*.42;const sp=part(CONE(.024,.26-Math.abs(i-2)*.04,5),M,Math.sin(a)*.12,.06+Math.cos(a)*.1,.02,g);sp.rotation.set(-.55,0,-a);}
         if(X.back==='fins')for(const s of[-1,1])for(let i=0;i<3;i++){const w=part(gcc('bfin',()=>{const sh=new THREE.Shape();sh.moveTo(0,0);sh.quadraticCurveTo(.5,.5,1,1.1);sh.quadraticCurveTo(.5,.3,.25,-.2);sh.closePath();return new THREE.ShapeGeometry(sh,6);}),i%2?O:M,s*.06,.16-i*.07,0,g,s*(.2-i*.04),.2-i*.035,.2);w.rotation.set(0,s*.35,s*(.1-i*.5));DS(w.material);}
         at.add(g);add(g,eq.armor);}}
-    if(X.tab){const at=A(['pelvis']);if(at){const cm=fCloth(S.a),tr=fMetal(S.t,S.t);for(const z of[1,-1]){const g=new THREE.Group();const p=part(gcc('tabP',()=>{const q=new THREE.PlaneGeometry(1,1,1,4);q.translate(0,-.5,0);return q;}),cm,0,.06,z*.125,g,.2,.46,1);DS(p.material);p.rotation.x=-z*.06;const b=part(gcc('tabB',()=>new THREE.BoxGeometry(1,1,1)),tr,0,-.4,z*.128+z*.02,g,.2,.02,.006);const v=part(gcc('tabB',()=>new THREE.BoxGeometry(1,1,1)),tr,0,-.17,z*.128+z*.008,g,.022,.24,.004);const hz=part(gcc('tabB',()=>new THREE.BoxGeometry(1,1,1)),tr,0,-.12,z*.128+z*.008,g,.11,.022,.004);at.add(g);add(g,eq.armor);}}}}}
+    if(X.tab){const at=A(['pelvis']);if(at){const cm=fCloth(S.a),tr=fMetal(S.t,S.t);for(const z of[1,-1]){const g=new THREE.Group();const p=part(gcc('tabP',()=>{const q=new THREE.PlaneGeometry(1,1,1,4);q.translate(0,-.5,0);return q;}),cm,0,.06,z*.125,g,.2,.46,1);DS(p.material);p.rotation.x=-z*.06;const b=part(gcc('tabB',()=>new THREE.BoxGeometry(1,1,1)),tr,0,-.4,z*.128+z*.02,g,.2,.02,.006);if(X.tab===1){const v=part(gcc('tabB',()=>new THREE.BoxGeometry(1,1,1)),tr,0,-.17,z*.128+z*.008,g,.022,.24,.004);const hz=part(gcc('tabB',()=>new THREE.BoxGeometry(1,1,1)),tr,0,-.12,z*.128+z*.008,g,.11,.022,.004);}if(X.tab==='rune'){const rg=part(gcc('runeR',()=>new THREE.TorusGeometry(1,.07,5,26)),fGem(S.g),0,-.2,z*.136,g,.06,.06,.01);rg.userData.gem=1;gemAt(g,S.t,0,-.2,z*.138,.014);}at.add(g);add(g,eq.armor);}}}}}
 /* ícono = la pieza real: se arma el personaje con esa sola pieza y se deja únicamente lo que le pertenece */
 function forgeIconReal(it){const cls=it.c;if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;const eq={};eq[it.k]=it;if(!cc0Want(cls,eq,()=>{}))return 'WAIT';const r=cc0Hero(cls,eq);if(!r)return null;const g=r.g||r.model||r.body;if(!g)return null;
   const mine=o=>{if(o.userData.slot===it.k&&o.userData.file)return true;let p=o;while(p){if(p.userData&&p.userData.ik===it.k)return true;p=p.parent;}return false;};
@@ -4252,6 +4312,11 @@ function cc0Comp(a,i,k){const v=k===0?a.getX(i):k===1?a.getY(i):k===2?a.getZ(i):
 function cc0Keep(m,kp,kw){const key=m.geometry.uuid+"|"+kp.join(",")+"|"+kw;if(CC0.geo[key])return CC0.geo[key];const g=m.geometry.clone(),si=g.attributes.skinIndex,sw=g.attributes.skinWeight,names=m.skeleton.bones.map(b=>b.name);
   const ok=new Uint8Array(si.count);for(let v=0;v<si.count;v++){let w=0;for(let k=0;k<4;k++)if(kp.includes(names[cc0Comp(si,v,k)|0]))w+=cc0Comp(sw,v,k);ok[v]=w>=kw?1:0;}
   const idx=g.index.array,nw=[];for(let t=0;t<idx.length;t+=3)if(ok[idx[t]]&&ok[idx[t+1]]&&ok[idx[t+2]])nw.push(idx[t],idx[t+1],idx[t+2]);g.setIndex(nw);CC0.geo[key]=keep(g)||g;return CC0.geo[key];}
+/* quita de una prenda los triángulos de los huesos que el set deja al aire (muslos, panza, brazos) */
+function cc0Drop(m,bones,kw){const key=m.geometry.uuid+"|drop|"+bones.join(",")+"|"+kw;if(CC0.geo[key])return CC0.geo[key];const g=m.geometry.clone(),si=g.attributes.skinIndex,sw=g.attributes.skinWeight,names=m.skeleton.bones.map(b=>b.name);
+  const dr=new Uint8Array(si.count);for(let v=0;v<si.count;v++){let w=0;for(let k=0;k<4;k++)if(bones.includes(names[cc0Comp(si,v,k)|0]))w+=cc0Comp(sw,v,k);dr[v]=w>=kw?1:0;}
+  const idx=g.index.array,nw=[];for(let t=0;t<idx.length;t+=3)if(!(dr[idx[t]]&&dr[idx[t+1]]&&dr[idx[t+2]]))nw.push(idx[t],idx[t+1],idx[t+2]);g.setIndex(nw);CC0.geo[key]=keep(g)||g;return CC0.geo[key];}
+function cc0Bare(cls,eq){const o=[];if(!eq)return o;const f=(k,ok)=>{if(!eq[k])return;const X=forjaOf(cls,eq[k].t).x;if(X&&X.bare)for(const b of X.bare){if(!ok.includes(b))continue;if(/^spine/.test(b))o.push(b);else o.push(b+'_l',b+'_r');}};f('armor',['spine_01','spine_02','upperarm']);f('pants',['thigh']);return o;}
 function cc0BindPos(m,name){const i=m.skeleton.bones.findIndex(b=>b.name===name);if(i<0)return null;return new THREE.Vector3().setFromMatrixPosition(new THREE.Matrix4().copy(m.skeleton.boneInverses[i]).invert());}
 function cc0HeadFrame(body,eyes){const head=cc0BindPos(body,'Head'),neck=cc0BindPos(body,'neck_01');if(!head||!neck)return null;const up=head.clone().sub(neck).normalize();
   const ep=eyes.geometry.attributes.position,c=new THREE.Vector3(),t=new THREE.Vector3();for(let i=0;i<ep.count;i++){t.fromBufferAttribute(ep,i).applyMatrix4(eyes.bindMatrix);c.add(t);}c.multiplyScalar(1/ep.count);
@@ -4291,21 +4356,24 @@ function cc0Staff(S,L,t){t=t==null?3:t;const g=new THREE.Group();const gold=t>=6
   const mt=new MSM({color:S.m,metalness:.9,roughness:.28});regMetal(mt);const wood=[0x24160c,0x3a2414,0x2a1a10,0x1a2a24,0x1a0c0c,0x2a1a3a][Math.min(5,t)];
   const st=new THREE.Mesh(geo,gold?mt:new MSM({color:wood,roughness:.5}));st.position.y=L/2;g.add(st);
   const ys=t>=1?[L*.62,L*.9].concat(t>=3?[L*.3,L*.76]:[]):[];for(const y of ys){const b=new THREE.Mesh(new THREE.TorusGeometry(.027,.007,6,16),mt);b.rotation.x=PI/2;b.position.y=y;g.add(b);}
-  const nc=t>=1?3+(t>=4?1:0):0;for(let k=0;k<nc;k++){const cl=new THREE.Mesh(new THREE.TorusGeometry(.09+t*.004,.011,6,16,PI*.7),mt);cl.position.y=L+.02;cl.rotation.order='YXZ';cl.rotation.y=k*TAU/nc;cl.rotation.z=PI*.15;g.add(cl);}
+  const nc=t===1?3:t===4?4:t===5?2:0;for(let k=0;k<nc;k++){const cl=new THREE.Mesh(new THREE.TorusGeometry(.09+t*.004,.011,6,16,PI*.7),mt);cl.position.y=L+.02;cl.rotation.order='YXZ';cl.rotation.y=k*TAU/nc;cl.rotation.z=PI*.15;g.add(cl);}
   const gm=new MSM({color:S.g,emissive:S.g,emissiveIntensity:.55+t*.06,roughness:.1,metalness:.1,transparent:true,opacity:.92});gm.userData.gem=1;
   const cr=new THREE.Mesh(new THREE.OctahedronGeometry(.06+t*.006,0),gm);cr.scale.y=1.7;cr.position.y=L+.08;cr.userData.gem=1;g.add(cr);
-  if(t>=2){const rg=new THREE.Mesh(new THREE.TorusGeometry(.13+t*.006,.006,6,32),new MSM({color:S.g,emissive:S.g,emissiveIntensity:.9,roughness:.2}));rg.material.userData.gem=1;rg.position.y=L+.08;rg.rotation.x=PI/2.4;g.add(rg);
+  if(t===2||t===4||t===6){const rg=new THREE.Mesh(new THREE.TorusGeometry(.13+t*.006,.006,6,32),new MSM({color:S.g,emissive:S.g,emissiveIntensity:.9,roughness:.2}));rg.material.userData.gem=1;rg.position.y=L+.08;rg.rotation.x=PI/2.4;g.add(rg);
     if(t>=4){const r2=rg.clone();r2.rotation.set(PI/2.4,0,PI/2);r2.scale.setScalar(.85);g.add(r2);}}
-  if(t>=3&&t<6){const mn=new THREE.Mesh(new THREE.TorusGeometry(.11,.022,8,24,PI*1.2),mt);mn.position.set(0,L+.1,-.03);mn.rotation.z=PI*.9;g.add(mn);}
+  if(t===3){const mn=new THREE.Mesh(new THREE.TorusGeometry(.11,.022,8,24,PI*1.2),mt);mn.position.set(0,L+.1,-.03);mn.rotation.z=PI*.9;g.add(mn);}
   if(t>=5){for(const s of[-1,1]){const fin=new THREE.Mesh(new THREE.ConeGeometry(.03,.26,4),mt);fin.position.set(s*.12,L-.05,0);fin.rotation.z=-s*1.1;fin.scale.z=.3;g.add(fin);const f2=fin.clone();f2.position.y-=.07;f2.scale.multiplyScalar(.75);f2.rotation.z=-s*1.35;g.add(f2);}}
   if(gold){const sun=new THREE.Group();sun.position.y=L+.08;for(let k=0;k<12;k++){const ray=new THREE.Mesh(new THREE.ConeGeometry(.012,.09,4),mt);const a=k/12*TAU;ray.position.set(Math.cos(a)*.17,Math.sin(a)*.17,0);ray.rotation.z=a-PI/2;sun.add(ray);}
     const disc=new THREE.Mesh(new THREE.TorusGeometry(.15,.012,6,40),mt);sun.add(disc);g.add(sun);}
+  if(t===2){/* báculo de paje: voluta */const cv=new THREE.Mesh(new THREE.TorusGeometry(.085,.016,6,20,PI*1.5),st.material);cv.position.set(.085,L+.0,0);cv.rotation.z=PI*.5;g.add(cv);cr.position.set(.085,L+.0,0);cr.scale.set(.7,.9,.7);}
+  if(t===4){/* rayo de Tupã: horquilla */for(const s2 of[-1,1]){const pr=new THREE.Mesh(new THREE.ConeGeometry(.014,.3,5),mt);pr.position.set(s2*.1,L+.16,0);pr.rotation.z=s2*.22;g.add(pr);}}
+  if(t===5){/* cristales que flotan */for(let k=0;k<3;k++){const c2=new THREE.Mesh(new THREE.OctahedronGeometry(.028,0),gm);c2.scale.y=1.8;const a=k/3*TAU;c2.position.set(Math.cos(a)*.15,L+.1+k*.05,Math.sin(a)*.15);c2.userData.gem=1;g.add(c2);}}
   const sp=glowSprite(S.g,.42+t*.06,.5+t*.03);sp.position.y=L+.08;sp.userData.gemGlow=1;g.add(sp);g.traverse(o=>{if(o.isMesh)o.castShadow=true;});return g;}
 function cc0Cetro(S,L,t){t=t==null?3:t;const g=new THREE.Group();const gold=new MSM({color:S.m,metalness:.9,roughness:.3});regMetal(gold);
   const st=new THREE.Mesh(new THREE.CylinderGeometry(.016,.022,L,10),t>=6?gold:new MSM({color:[0x4a2a14,0x3a2010,0x5a3418,0x2a1a10,0x1a0a08,0x3a2414][Math.min(5,t)],roughness:.6}));st.position.y=L/2;g.add(st);
   const bands=t>=1?[L*.78,L*.92].concat(t>=3?[L*.55]:[]):[L*.92];for(const y of bands){const b=new THREE.Mesh(new THREE.TorusGeometry(.024,.008,6,16),gold);b.rotation.x=PI/2;b.position.y=y;g.add(b);}
   /* plumas de guacamayo y de tucán: más y más largas en cada set */
-  const tex=[cc0FeatherTex('#7a1a10','#d8381c','#1c1c1c'),cc0FeatherTex('#a86a10','#f0c030','#2a40a0')];const nf=4+t,fl=.18+t*.018;
+  const tex=[cc0FeatherTex('#7a1a10','#d8381c','#1c1c1c'),cc0FeatherTex('#141414','#3a3a3e','#c02020')];const nf=4+t,fl=.18+t*.018;
   for(let i=0;i<nf;i++){const f=cc0Feather(fl,.06,tex[i%2]);f.position.y=L*.86;f.rotation.order='YXZ';f.rotation.y=i/nf*TAU;f.rotation.x=PI*.82;g.add(f);}
   if(t>=3)for(let i=0;i<nf;i++){const f=cc0Feather(fl*.7,.05,tex[(i+1)%2]);f.position.y=L*.74;f.rotation.order='YXZ';f.rotation.y=(i+.5)/nf*TAU;f.rotation.x=PI*.86;g.add(f);}
   if(t>=2){const tm=new MSM({color:0xf2ead8,roughness:.5});for(let i=0;i<8;i++){const c=new THREE.Mesh(new THREE.ConeGeometry(.008,.05,5),tm);const a=i/8*TAU;c.position.set(Math.cos(a)*.03,L*.69,Math.sin(a)*.03);c.rotation.set(PI,0,0);g.add(c);}}
@@ -4313,6 +4381,14 @@ function cc0Cetro(S,L,t){t=t==null?3:t;const g=new THREE.Group();const gold=new 
   const gm=new THREE.Mesh(new THREE.OctahedronGeometry(.03+t*.003,0),new MSM({color:S.g,emissive:S.g,emissiveIntensity:.6+t*.06}));gm.material.userData.gem=1;gm.position.y=L*.7;g.add(gm);
   if(t>=5){const r=new THREE.Mesh(new THREE.TorusGeometry(.05,.006,6,24),new MSM({color:S.g,emissive:S.g,emissiveIntensity:.9}));r.material.userData.gem=1;r.position.y=L*.7;r.rotation.x=PI/2;g.add(r);}
   if(t>=4){const sp=glowSprite(S.g,.3+t*.04,.45);sp.position.y=L+.06;sp.userData.gemGlow=1;g.add(sp);}
+  /* remate propio de cada set: hacha de piedra, calavera, pico de cuervo, tridente, medialuna, sol */
+  {const bone=new MSM({color:0xe8e0c8,roughness:.55}),blk=new MSM({color:0x16161a,metalness:.7,roughness:.35}),gmm=new MSM({color:S.g,emissive:S.g,emissiveIntensity:.9});gmm.userData.gem=1;const yT=L+.02,B=(geo,m,x,y,z)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);g.add(o);return o;};
+    if(t===1){const a=B(new THREE.BoxGeometry(.16,.1,.02),new MSM({color:0x5a5a60,roughness:.7}),.06,yT-.06,0);a.rotation.z=.2;}
+    if(t===2){B(new THREE.SphereGeometry(.045,10,8),bone,0,yT-.1,.02);for(const s2 of[-1,1])B(new THREE.SphereGeometry(.012,6,5),blk,s2*.018,yT-.095,.058);}
+    if(t===3){const bk=B(new THREE.ConeGeometry(.03,.2,5),blk,.07,yT-.04,0);bk.rotation.z=-PI/2-.3;const b2=B(new THREE.ConeGeometry(.02,.1,5),blk,-.05,yT-.05,0);b2.rotation.z=PI/2+.5;}
+    if(t===4){for(const s2 of[-1,1]){const p=B(new THREE.ConeGeometry(.014,.2,5),gold,s2*.06,yT+.06,0);p.rotation.z=-s2*.18;}B(new THREE.BoxGeometry(.15,.02,.02),gold,0,yT-.03,0);}
+    if(t===5){const mn=B(new THREE.TorusGeometry(.1,.016,6,22,PI*1.2),blk,0,yT+.12,0);mn.rotation.z=PI*.9;const e=B(new THREE.TorusGeometry(.1,.006,5,22,PI*1.2),gmm,0,yT+.12,.012);e.rotation.z=PI*.9;}
+    if(t===6){B(new THREE.TorusGeometry(.11,.012,6,30),blk,0,yT+.16,0);for(let k=0;k<10;k++){const a=k/10*TAU;const ry=B(new THREE.ConeGeometry(.01,.08,4),k%2?gmm:gold,Math.cos(a)*.15,yT+.16+Math.sin(a)*.15,0);ry.rotation.z=a-PI/2;}B(new THREE.SphereGeometry(.04,10,8),gmm,0,yT+.16,0);}}
   g.traverse(o=>{if(o.isMesh)o.castShadow=true;});return g;}
 function cc0Jeguaka(r){const g=new THREE.Group();const cv=document.createElement('canvas');cv.width=256;cv.height=32;const c=cv.getContext('2d'),w=256,h=32;c.fillStyle='#2a1610';c.fillRect(0,0,w,h);const cols=['#c8321e','#f2e6c8','#141414','#e0a020'];
   for(let x=0;x<w;x+=16){c.fillStyle=cols[(x/16)%4];c.beginPath();c.moveTo(x,h*.15);c.lineTo(x+8,h*.5);c.lineTo(x,h*.85);c.lineTo(x+16,h*.85);c.lineTo(x+8,h*.5);c.lineTo(x+16,h*.15);c.fill();}c.fillStyle='#e8d8b0';c.fillRect(0,0,w,3);c.fillRect(0,h-3,w,3);
@@ -4439,13 +4515,14 @@ function cc0Human(cls,eq,o){o=o||{};const S=CC0_CLS[cls],F=o.face||cc0Face(cls),
   add('c_o_'+S.outfit,n=>{const sl=slot(n);return (!HB||!!sl&&has(sl))&&!hide.some(h=>n.includes(h))&&(!only||only.some(h=>n.includes(h)));},slot);
   if(S.legs&&has('pants'))add('c_o_'+S.legs,n=>/Legs/.test(n),slot);
   if(HB){CC0_SHORT.on=1;try{add(fem?'c_o_female_peasant':'c_o_male_peasant',n=>(/Legs/.test(n)&&!has('pants'))||(fem&&/Body/.test(n)&&!has('armor')),slot);}finally{CC0_SHORT.on=0;}}
+  const bare=HB?cc0Bare(cls,eq):[];if(bare.length)for(const m of sk)if(m.userData.file&&['armor','pants','gloves'].includes(m.userData.slot)&&m.geometry.index)m.geometry=cc0Drop(m,bare,.55);
   for(const [h,c] of F.hair)add('c_h_'+h,null,()=>'hair');
   /* cuerpo base: solo cabeza y cuello (o el torso en el gladiador) */
   for(const m of sk.slice()){if(m.userData.file)continue;const mn=m.material&&m.material.name||'';if(/Superhero/.test(mn)){/* piel a la vista según lo que falta equipar */let kp=S.keep;/* gladiador: la piel de la cintura se queda (si no, entre el torso y el pantalón quedaba un hueco) */if(S.kind==='ranger'&&S.keep===CC0_TORSO&&!kp.includes('pelvis'))kp=kp.concat(['pelvis']);if(!['armor','gloves','pants','boots'].every(has)){kp=kp.slice();const P=(...x)=>x.forEach(v=>{if(!kp.includes(v))kp.push(v);});const LR=n=>[n+'_l',n+'_r'];
       if(!has('armor')){if(!fem)P('spine_01','spine_02','spine_03');P(...LR('clavicle'),...LR('upperarm'));}
       if(!has('gloves')||!has('armor'))P(...CC0_ARMS);
       if(!has('pants'))P(...LR('thigh'),...LR('calf'));if(!has('boots'))P(...LR('calf'),...LR('foot'),...LR('ball'),...LR('ball_leaf'));}
-    m.geometry=cc0Keep(m,kp,S.keepW||.5);}}
+    if(bare.length)kp=kp.concat(bare.filter(b=>!kp.includes(b)));m.geometry=cc0Keep(m,kp,S.keepW||.5);}}
   /* materiales propios de este personaje */
   const mats=[],skin=new THREE.Color(F.skin);
   for(const m of sk){const mm=m.material.clone();m.material=mm;mats.push(mm);m.castShadow=true;m.receiveShadow=true;m.frustumCulled=false;const mn=mm.name||'';
@@ -4467,7 +4544,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   try{if(w){let obj=null,bone='hand_r',dir=[-.15,.62,.77],side=[1,0,0],s=1,sd='r',clip=clipsA.Sword_Idle,tt=.5;
       if(cls==='hechicero'){obj=cc0Staff(S,1.55,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.08];clip=clipsA.Spell_Simple_Idle_Loop;}
       else if(cls==='mburuvicha'){obj=cc0Cetro(S,1.5,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.15];clip=clipsA.Idle_Loop;}
-      else{let n=CC0_W[cls][wt];if(cls==='caballero'){n='nx_sw'+wt;obj=cc0Sword(S,wt);}else obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');if(obj)obj.userData.mdl=n;s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
+      else{let n=CC0_W[cls][wt];if(cls==='caballero'){n='nx_sw'+wt;obj=cc0Sword(S,wt);}else if(cls==='gladiador'){n='nx_gl'+wt;obj=cc0Sword(S,wt,1);}else if(cls==='arquera'){n='nx_bw'+wt;obj=cc0Bow(S,wt);}else obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');if(obj)obj.userData.mdl=n;s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
       if(obj){cc0Grip(body,sd,1);body.updateMatrixWorld(true);const calm=cls==='hechicero'||cls==='mburuvicha'?null:cls==='arquera'?{clip:clipsA.Idle_Loop,t:.5,dir:[0,1,0],side:[1,0,0]}:{clip:clipsA.Idle_Loop,t:.5,dir:[0,-.82,.57],side:[1,0,0]};const h=cc0Grip2(body,clip,tt,bone,obj,dir,side,s,0,calm);if(h&&calm){if(cls==='arquera')h.userData.kOnly='atk1';(r.grips=r.grips||[]).push(h);}if(h){forgeGlow(h,cls,w);h.userData.piece='weapon';r.forge=r.forge||[];r.forge.push(h);}}}
     if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0ShieldTint(cc0Model(n,null,false),Math.min(6,eq.shield.t|0));if(o2){o2.userData.mdl=n;const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){h.userData.gHide=1;forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
     if(false&&cls==='mburuvicha'&&!(eq&&eq.helm)){/* sin corona de plumas en la base (9/11) */const h=cc0Hold(body,'Head',cc0Jeguaka(.124),[0,.175,-.01],[0,0,0],1);}}catch(e){console.error(e);}
@@ -4479,7 +4556,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   oadActs(r,body,map);r.gclips=clips;oadPlay(r,r.acts.calm&&(mode!=='game'||!Z||Z.safe||!P||!P.target)?'calm':'idle',0);r.mixer.update(0);
   if(cls==='mburuvicha'&&mbCapeOn(r,eq,r.anchor)){try{capeFit(r);}catch(e){console.error(e);}}
   /* el carcaj va por encima de la capa (si la hay), nunca atravesándola */
-  if(cls==='arquera')try{const q=cc0Model('c_k_quiver');/* carcaj de cuero (antes salía rosado liso) */if(q){q.userData.gHide=1;q.traverse(x=>{if(x.isMesh&&x.material&&x.material.color){const c=x.material.color;if(c.r>c.g*1.25&&c.r>c.b*1.25){c.setHex(0x6a4424).convertSRGBToLinear();x.material.roughness=.8;}}});}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
+  if(cls==='arquera')try{const q=cc0Model('c_k_quiver');/* carcaj de cuero (antes salía rosado liso) */if(q){q.userData.gHide=1;const QS=forjaOf(cls,eq&&eq.armor?eq.armor.t:0),qc=new THREE.Color(QS.a).lerp(new THREE.Color(QS.m),.35).lerp(new THREE.Color(0xffffff),.25);q.traverse(x=>{if(x.isMesh&&x.material&&x.material.color){/* la textura del carcaj es salmón: se pasa a gris y se tiñe con el color del set */x.material.color.copy(qc);x.material.roughness=.7;const m=x.material;m.onBeforeCompile=sh=>{sh.fragmentShader=sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\n float qg=dot(diffuseColor.rgb,vec3(.5,.4,.1));diffuseColor.rgb=vec3(qg)*vec3('+qc.r.toFixed(3)+','+qc.g.toFixed(3)+','+qc.b.toFixed(3)+')*1.6;');};m.customProgramCacheKey=()=>'quiv'+qc.getHexString();}});}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
   if(eq&&eq.wings&&cls!=='mburuvicha'){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
   if(r.chest){restPose(r.body);wingSocket(r);}
   {const its=ARMK.map(k=>eq&&eq[k]).filter(Boolean);
@@ -4513,16 +4590,16 @@ const CC0_HANDB=['hand_l','hand_r'].concat(['index','middle','pinky','ring','thu
 /* resto de una prenda: todo triángulo que quedó sin placa recibe el material del set (traje parejo, sin tela a la vista). Las manos aparte, con una capa fina (guantelete) o sin tocar */
 function cc0Rest(r,slot,mat,o){o=o||{};const src=m=>m.userData.slot===slot&&!!m.userData.file;let out=cc0Shell(r,[],{src,rest:1,skip:CC0_HANDB,inflate:o.inflate||.011,mat,uvk:o.uvk||4});
   if(o.hands)out=out.concat(cc0Shell(r,CC0_HANDB,{src,rest:1,minW:.5,inflate:.0035,mat:o.hands,uvk:7}));return out;}
-function cc0ArmorMat(S,kind,cls){if(kind==='metal')return fMetal(S.m,S.t);if(kind==='ornate')return fOrnate(S.m,S.t,S.glow);if(kind==='scale'){const m=tm(scalesTex('chScale'+S.m,{base:S.m,dark:S.b,hi:S.t,size:7,rep:2}),{metal:.7,rough:.4});m.userData.forge=1;regMetal(m);return m;}return fLeather(S.a);}
+function cc0ArmorMat(S,kind,cls,body){const xm=body&&S.x&&S.x.mat;if(xm==='cloth')return fCloth(S.a);if(xm==='leather')return fLeather(S.a);if(kind==='metal')return fMetal(S.m,S.t);if(kind==='ornate')return fOrnate(S.m,S.t,S.glow);if(kind==='scale'){const m=tm(scalesTex('chScale'+S.m,{base:S.m,dark:S.b,hi:S.t,size:7,rep:2}),{metal:.7,rough:.4});m.userData.forge=1;regMetal(m);return m;}return fLeather(S.a);}
 function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.slot)||(cls==='gladiador'&&!m.userData.file&&/Superhero/.test(m.material.name||'')&&ss.includes('armor'));
   const grp=(meshes,it)=>{if(!meshes.length)return;const g=new THREE.Group();g.userData.piece='shell';meshes.forEach(m=>{m.userData.lv=it.lv||0;m.userData.ik=it.k;});const holder={traverse:f=>meshes.forEach(f)};forgeGlow(holder,cls,it);r.forge.push(g);};
   if(eq.armor){const S=forjaOf(cls,eq.armor.t);
     if(['plate','cross','scale','ornate','gem'].includes(S.chest)){const kind=S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal';
       /* el gladiador va con el torso desnudo: su peto baja hasta el cinturón para que no quede la panza al aire como un top */
       /* los demás: el peto toma toda la túnica (pecho, panza, cintura y faldón) para que no quede tela entre el pecho y el cinturón */
-      const sh=cc0Shell(r,(cls==='gladiador'?['spine_01','spine_02','spine_03','pelvis']:['spine_01','spine_02','spine_03','pelvis'].concat(CC0_SIDES('thigh'))).concat(CC0_SIDES('clavicle')),{src:slotIs('armor'),minW:cls==='gladiador'?.4:.55,inflate:.013,mat:cc0ArmorMat(S,kind,cls)});grp(sh,eq.armor);
+      const sh=cc0Shell(r,(cls==='gladiador'?((S.x&&S.x.torso)||['spine_01','spine_02','spine_03','pelvis']):['spine_01','spine_02','spine_03','pelvis'].concat(CC0_SIDES('thigh'))).concat(CC0_SIDES('clavicle')),{src:slotIs('armor'),minW:cls==='gladiador'?.4:.55,inflate:.013,mat:cc0ArmorMat(S,kind,cls,1)});grp(sh,eq.armor);
       /* adornos del peto (emblema, gemas, cruz) sobre el frente de la placa */
-      r.restArmor={mat:cc0ArmorMat(S,kind,cls),it:eq.armor};r.restArmorWas=1;
+      r.restArmor={mat:cc0ArmorMat(S,kind,cls,1),it:eq.armor,noSleeve:S.x&&S.x.noSleeve};r.restArmorWas=!(cls==='gladiador'&&S.x&&S.x.torso&&!S.x.torso.includes('pelvis'));
       CC0.noPlate=true;try{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);if(ch&&c.children.length){c.position.set(0,-.02,cc0Front(sh,'spine_03')-.105+.006);ch.add(c);add(c,eq.armor);}}finally{CC0.noPlate=false;}}
     else{const c=forgeChest(S,1,cls);const ch=anchorFn(r.body)(['chest']);let return_=0;if(ch){c.position.set(0,.01,.06);
         /* collar de colmillos: se ciñe al pecho real (antes flotaba un palmo delante del cuerpo) */
@@ -4530,15 +4607,15 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
           const bp=ms[0]&&cc0BindPos(ms[0],'spine_03');if(bp){let z=-1e9;const v=new THREE.Vector3();for(const m of ms){const pa=m.geometry.attributes.position,ix=m.geometry.index.array;for(let i=0;i<ix.length;i++){v.fromBufferAttribute(pa,ix[i]).applyMatrix4(m.bindMatrix);if(Math.abs(v.x)<.07&&v.y>bp.y+.03&&v.y<bp.y+.14)z=Math.max(z,v.z);}}
             if(z>-1e8){const fr=z-bp.z+.004;c.position.z=0;c.position.y=-.06;c.scale.z=Math.max(.3,Math.min(1.1,fr/.1685));}}}
         if(!return_){ch.add(c);add(c,eq.armor);}}}
-    if(['round','square','layer','spike','big'].includes(S.pads)){const kind=S.pads==='big'||S.pads==='layer'?'ornate':'metal';
-      const sh=cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('clavicle')),{src:slotIs('armor','gloves'),minW:.6,inflate:.018,mat:cc0ArmorMat(S,kind,cls),uvk:4});grp(sh,eq.armor);
-      if(S.pads==='spike'||S.pads==='big')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=new THREE.Group();const M=fOrnate(S.m,S.t,S.glow);for(let k=0;k<3;k++){const sp=part(CONE(.016,.06-k*.012,5),M,s*(.02+k*.045),.075-k*.01,0,p);sp.rotation.z=-s*(.15+k*.25);}if(S.pads==='big')gemAt(p,S.t,0,.07,.04,.016);at.add(p);add(p,eq.armor);}}}
-    else if(S.pads!=='none')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar((S.x&&S.x.padK)||1);at.add(p);add(p,eq.armor);}}}
+    if(['round','square','layer','spike','big'].includes(S.pads)&&!(S.x&&S.x.padOnly)){const kind=S.pads==='big'||S.pads==='layer'?'ornate':'metal';
+      const mono=S.x&&S.x.mono,PS=b=>mono?[b+'_l']:CC0_SIDES(b);const sh=cc0Shell(r,PS('upperarm').concat(PS('clavicle')),{src:slotIs('armor','gloves'),minW:.6,inflate:.018,mat:cc0ArmorMat(S,kind,cls),uvk:4});grp(sh,eq.armor);if(cls!=='caballero'&&S.x&&S.x.padK)for(const s of(mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar(S.x.padK);at.add(p);add(p,eq.armor);}}
+      if(S.pads==='spike'||S.pads==='big')for(const s of(mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=new THREE.Group();const M=fOrnate(S.m,S.t,S.glow);for(let k=0;k<3;k++){const sp=part(CONE(.016,.06-k*.012,5),M,s*(.02+k*.045),.075-k*.01,0,p);sp.rotation.z=-s*(.15+k*.25);}if(S.pads==='big')gemAt(p,S.t,0,.07,.04,.016);at.add(p);add(p,eq.armor);}}}
+    else if(S.pads!=='none')for(const s of(S.x&&S.x.mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar((S.x&&S.x.padK)||1);at.add(p);add(p,eq.armor);}}}
   /* el resto del peto (mangas, codos, correas, cuello) va después de hombreras: lo que ellas no tomaron */
   const skinSrc=m=>!m.userData.file&&/Superhero/.test(m.material.name||'');
   if(r.restArmor){grp(cc0Rest(r,'armor',r.restArmor.mat),r.restArmor.it);
     /* gladiador: su peto sale de la piel, así que la manga también (antes quedaba un aro de piel en el codo) */
-    if(cls==='gladiador')grp(cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('lowerarm')),{src:skinSrc,rest:1,minW:.6,inflate:.011,mat:r.restArmor.mat,uvk:4}),r.restArmor.it);delete r.restArmor;}
+    if(cls==='gladiador'&&!r.restArmor.noSleeve)grp(cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('lowerarm')),{src:skinSrc,rest:1,minW:.6,inflate:.011,mat:r.restArmor.mat,uvk:4}),r.restArmor.it);delete r.restArmor;}
   if(eq.gloves){const S=forjaOf(cls,eq.gloves.t);if(S.brace!=='none'){const bk=S.brace==='ornate'?'ornate':S.brace==='metal'?'metal':'leather',bm=cc0ArmorMat(S,bk,cls);const sh=cc0Shell(r,CC0_SIDES('lowerarm'),{src:slotIs('gloves','armor'),minW:.6,inflate:.012,mat:bm,uvk:5});grp(sh,eq.gloves);
       if(S.brace!=='wrap')grp(cc0Rest(r,'gloves',bm,{uvk:5,hands:bk==='leather'?null:bm}),eq.gloves);
       if(cls==='gladiador'&&bk!=='leather')grp(cc0Shell(r,CC0_HANDB,{src:skinSrc,rest:1,minW:.5,inflate:.0035,mat:bm,uvk:7}),eq.gloves);}}
@@ -4547,7 +4624,7 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
     /* gladiador: el cinturón de cuero original (Belt_1) se cubre entero con el material del set y se oculta, así no asoma marrón ni quedan rendijas en la cintura */
     if(cls==='gladiador'&&(S.belt==='metal'||r.restArmorWas)){const bm=[];r.body.traverse(m=>{if(m.isSkinnedMesh&&!m.userData.shell&&/Belt/.test(m.name))bm.push(m);});const gb=cc0Shell(r,['pelvis','spine_01','spine_02'],{src:m=>bm.includes(m),minW:.5,inflate:.016,mat:cc0ArmorMat(S,S.belt==='metal'?'metal':'leather',cls),uvk:5});if(gb.length){bm.forEach(m=>{m.visible=false;});grp(gb,eq.pants);}}
     /* traje completo: los muslos y la cadera llevan el mismo material del set (antes quedaba la tela marrón del pantalón base entre el cinturón y las grebas) */
-    {const tk=['plate','cross','scale','ornate','gem'].includes(S.chest)?(S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal'):'leather';if(eq.pants.t>0||tk!=='leather'){const th=cc0Shell(r,CC0_SIDES('thigh').concat(['pelvis']),{src:slotIs('pants'),minW:.28,inflate:.013,mat:cc0ArmorMat(S,tk,cls),uvk:4});grp(th,eq.pants);r.restPants={mat:cc0ArmorMat(S,tk,cls),it:eq.pants};}}
+    {const tk=['plate','cross','scale','ornate','gem'].includes(S.chest)?(S.chest==='scale'?'scale':S.chest==='ornate'?'ornate':'metal'):'leather';if(eq.pants.t>0||tk!=='leather'){const th=cc0Shell(r,CC0_SIDES('thigh').concat(['pelvis']),{src:slotIs('pants'),minW:.28,inflate:.013,mat:cc0ArmorMat(S,tk,cls,1),uvk:4});grp(th,eq.pants);r.restPants={mat:cc0ArmorMat(S,tk,cls,1),it:eq.pants};}}
     if(bl.length){const hb=anchorFn(r.body)(['hip']);if(hb){const bk=new THREE.Group();gemAt(bk,S.t,0,.06,cc0Front(bl,'pelvis')+.008,.018);hb.add(bk);add(bk,eq.pants);}}
     if(S.greave!=='none'){const sh=cc0Shell(r,CC0_SIDES('calf'),{src:slotIs('pants','boots'),minW:.6,inflate:.012,mat:cc0ArmorMat(S,S.greave==='ornate'?'ornate':'metal',cls),uvk:5});grp(sh,eq.pants);}
     if(r.restPants){grp(cc0Rest(r,'pants',r.restPants.mat),r.restPants.it);delete r.restPants;}}
@@ -4772,7 +4849,7 @@ function cc0VegSwap(G){if(!CC0.on||!G)return;const ims={};G.traverse(o=>{if(o.is
       im.castShadow=!/Flower|Plant/.test(V.m[mi]);im.receiveShadow=true;im.userData.vegCC0=1;G.add(im);});});
     list.forEach(o=>{o.visible=false;o.userData.vegDone=1;});}}
 /* brillo por +nivel sobre la ropa (como MU): cada prenda toma la capa de su pieza; el arma y la forja ya brillan con forgeGlow */
-function cc0Glow(r){const eq=r.eq||{},cls=r.cls;r.glowMats=r.glowMats||[];r.body.traverse(m=>{if(!m.isSkinnedMesh||!m.userData.slot||m.userData.slot==='hair'||/Superhero|Regular/.test(m.material.name||''))return;const it=eq[m.userData.slot];const g=coatSpec(cls,it);if(!g)return;coatInject(m.material,{col:g.col,a:g.op*.32,sh:g.sh});r.glowMats.push(m.material);});}
+function cc0Glow(r){const eq=r.eq||{},cls=r.cls;r.glowMats=r.glowMats||[];r.body.traverse(m=>{if(!m.isSkinnedMesh||!m.userData.slot||m.userData.slot==='hair'||/Superhero|Regular/.test(m.material.name||''))return;const it=eq[m.userData.slot];const g=coatSpec(cls,it);if(!g)return;coatInject(m.material,{col:g.col,a:g.op*.15,sh:g.sh});/* .32 teñía toda la tela del color del set en +13/+15 */r.glowMats.push(m.material);});}
 
 function oadWantHero(cls,eq){OAD.last=[cls,eq];if(!OAD.on||OAD.failed)return;const s=oadHeroSpec(cls,eq);(OAD_CLSP[cls]||[]).forEach(p=>oadGLB('p_'+p));if(oadHave(s.files))return;
   oadNeed(s.files,()=>{if(!OAD.last)return;const [c2,e2]=OAD.last;if(c2===cls&&HERO&&!HERO.oad){rebuildHero(c2,e2);if(mode==='select'){HERO.g.position.set(0,SELY,6.2);HERO.g.rotation.set(0,0,0);}}});}
@@ -5053,35 +5130,63 @@ function irFrame(root,mode,region,cam,aspect){root.updateMatrixWorld(true);
    (a lo largo de +Y, pomo abajo, hoja fina en Z). La misma pieza sirve para el personaje y para el ícono. ===== */
 const NXSW=[{L:3.0,sc:.17,tint:0x9a9288},{L:3.4,sc:.17,tint:0xc08a3a},{L:4.4,sc:.18,tint:0xd8dde6},{L:4.4,sc:.19,tint:0xcfe0d6},{L:4.8,sc:.2,tint:0x2a1a1c},{L:4.8,sc:.2,tint:0xf2e6c0},{L:5.4,sc:.21,tint:0xcfe2ff}];
 NXSW.forEach((d,t)=>{CC0_WS['nx_sw'+t]=d.sc;});
-function cc0Sword(S,t){t=Math.max(0,Math.min(6,t|0));const d=NXSW[t],g=new THREE.Group(),L=d.L,y0=1.9;
-  const wf=[u=>.34*(u<.78?1:.12+.88*(1-u)/.22),u=>(.2+.16*Math.sin(PI*u))*(u>.86?(1-u)/.14:1),u=>.2*(u>.85?(1-u)/.15:1),u=>(.3-.06*u)*(u>.82?(1-u)/.18:1),u=>.22*(u>.85?(1-u)/.15:1),u=>(.27-.2*u)*(u>.93?(1-u)/.07:1),u=>(u<.07?.17:.34-.05*u)*(u>.8?(1-u)/.2:1)][t];
-  const xo=t===4?u=>.09*Math.sin(u*PI*7)*(1-u*.4):()=>0;
-  const geo=gcc('nxsw'+t,()=>{const N=28,sh=new THREE.Shape();for(let i=0;i<=N;i++){const u=i/N,x=xo(u)+Math.max(.012,wf(u)*.62),y=y0+u*L;if(i)sh.lineTo(x,y);else sh.moveTo(x,y);}for(let i=N;i>=0;i--){const u=i/N;sh.lineTo(xo(u)-Math.max(.012,wf(u)*.62),y0+u*L);}
+/* mandobles del Gladiador: hojas anchas y pesadas, una por set */
+const NXGL=[{L:3.4,sc:.2,tint:0x8a8690},{L:4.0,sc:.2,tint:0xa8a4b4},{L:4.4,sc:.21,tint:0xd8d4e4},{L:4.8,sc:.21,tint:0x6a6478},{L:5.2,sc:.22,tint:0xf2f0ff},{L:5.6,sc:.22,tint:0xb898f0},{L:6.2,sc:.23,tint:0xe0d0ff}];
+NXGL.forEach((d,t)=>{CC0_WS['nx_gl'+t]=d.sc;});
+function cc0Sword(S,t,gl){t=Math.max(0,Math.min(6,t|0));const d=(gl?NXGL:NXSW)[t],g=new THREE.Group(),L=d.L,y0=1.9,gt=gl?[2,0,3,4,6,5,1][t]:t,KY=gl?'nxgl':'nxsw';
+  const wf=[u=>.34*(u<.78?1:.12+.88*(1-u)/.22),u=>(.2+.16*Math.sin(PI*u))*(u>.86?(1-u)/.14:1),u=>.2*(u>.85?(1-u)/.15:1),u=>(.3-.06*u)*(u>.82?(1-u)/.18:1),u=>.22*(u>.85?(1-u)/.15:1),u=>(.27-.2*u)*(u>.93?(1-u)/.07:1),u=>(u<.07?.17:.34-.05*u)*(u>.8?(1-u)/.2:1)][t],wg=[u=>.62*(u>.9?.55+.45*(1-u)/.1:1),u=>(.34+.34*u)*(u>.86?(1-u)/.14:1),u=>(.3+.42*Math.sin(PI*Math.pow(u,.8)))*(u>.9?(1-u)/.1:1),u=>(.5+.09*(Math.sin(u*PI*11)>0?1:-1))*(u>.84?(1-u)/.16:1),u=>.5*(u>.86?(1-u)/.14:1),u=>(.16+.62*Math.pow(1-u,.7))*(u>.95?(1-u)/.05:1),u=>(u<.1?.3:u<.16?.46:.74-.2*u)*(u>.78?(1-u)/.22:1)][t];
+  const xo=gl?(t===1?u=>.42*u*u:t===4?u=>.13*Math.sin(u*PI*5):()=>0):t===4?u=>.09*Math.sin(u*PI*7)*(1-u*.4):()=>0;const WF=gl?wg:wf;
+  const geo=gcc(KY+t,()=>{const N=44,sh=new THREE.Shape();for(let i=0;i<=N;i++){const u=i/N,x=xo(u)+Math.max(.012,WF(u)*.62),y=y0+u*L;if(i)sh.lineTo(x,y);else sh.moveTo(x,y);}for(let i=N;i>=0;i--){const u=i/N;sh.lineTo(xo(u)-Math.max(.012,WF(u)*.62),y0+u*L);}
     const q=new THREE.ExtrudeGeometry(sh,{depth:.03,bevelEnabled:true,bevelThickness:.035,bevelSize:.05,bevelSegments:1,curveSegments:2});q.translate(0,0,-.015);q.computeVertexNormals();return q;});
-  const steel=FMAT['nxst'+t]||(FMAT['nxst'+t]=(()=>{const m=new MSM({color:d.tint,metalness:.85,roughness:.26});regMetal(m);m.userData.forge=1;return m;})());
+  const steel=FMAT[KY+'st'+t]||(FMAT[KY+'st'+t]=(()=>{const m=new MSM({color:d.tint,metalness:.85,roughness:.26});regMetal(m);m.userData.forge=1;return m;})());
   const bl=new THREE.Mesh(geo,steel);bl.castShadow=true;g.add(bl);
   const O=fOrnate(S.m,S.t,S.glow),Mt=fMetal(S.m,S.t),Lh=fLeather(S.b);
   if(t>=3){const core=new THREE.Mesh(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),FMAT['nxco'+S.g]||(FMAT['nxco'+S.g]=new MSM({color:S.g,emissive:S.g,emissiveIntensity:t>=4?1.1:.5,roughness:.4})));core.material.userData.gem=1;core.scale.set(t===6?.1:.05,L*.74,.1);core.position.set(0,y0+L*.4,0);if(t===4){core.scale.set(.035,L*.6,.1);}g.add(core);}
   if(t===2){const f=part(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),Mt,0,y0+L*.36,0,g,.045,L*.66,.085);}
   /* empuñadura y pomo */
-  part(gcc('nxgrip',()=>new THREE.CylinderGeometry(1,1,1,8)),Lh,0,.9,0,g,.1,1.3,.1);
-  if(t===1){const r=part(gcc('nxring',()=>new THREE.TorusGeometry(1,.32,6,14)),O,0,.02,0,g,.17,.17,.17);}
-  else if(t===2){const p=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),O,0,.08,0,g,.2,.1,.2);p.rotation.x=PI/2;}
-  else if(t>=5){part(SPH(1,10,8),O,0,.08,0,g,.17,.2,.17);const gm=part(SPH(1,8,6),fGem(S.g),0,-.12,0,g,.09,.09,.09);gm.userData.gem=1;}
+  part(gcc('nxgrip',()=>new THREE.CylinderGeometry(1,1,1,8)),Lh,0,.9,0,g,gl?.12:.1,1.3,gl?.12:.1);
+  if(gt===1){const r=part(gcc('nxring',()=>new THREE.TorusGeometry(1,.32,6,14)),O,0,.02,0,g,.17,.17,.17);}
+  else if(gt===2){const p=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),O,0,.08,0,g,.2,.1,.2);p.rotation.x=PI/2;}
+  else if(gt>=5){part(SPH(1,10,8),O,0,.08,0,g,.17,.2,.17);const gm=part(SPH(1,8,6),fGem(S.g),0,-.12,0,g,.09,.09,.09);gm.userData.gem=1;}
   else part(SPH(1,10,8),O,0,.1,0,g,.16,.16,.16);
   /* guarda */
   const gy=1.72,box=gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1));
-  if(t===0)part(box,Mt,0,gy,0,g,1.0,.16,.2);
-  else if(t===1){const p=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),O,0,gy,0,g,.36,.14,.2);}
-  else if(t===2){part(box,O,0,gy,0,g,1.6,.14,.18);for(const s of[-1,1]){part(box,Mt,s*.8,gy,0,g,.16,.3,.2);}}
-  else if(t===3){const c=part(gcc('nxcres',()=>new THREE.TorusGeometry(1,.14,6,16,PI)),O,0,gy+.5,0,g,.62,.62,.62);c.rotation.z=PI;const gm=part(SPH(1,8,6),fGem(S.g),0,gy-.08,.08,g,.11,.11,.07);gm.userData.gem=1;}
-  else if(t===4){part(box,O,0,gy,0,g,.7,.18,.22);for(const s of[-1,1]){const h=part(CONE(.11,.75,5),Mt,s*.5,gy-.22,0,g);h.rotation.z=s*2.2;const h2=part(CONE(.07,.45,5),Mt,s*.28,gy+.28,0,g);h2.rotation.z=-s*.6;}const gm=part(SPH(1,8,6),fGem(S.g),0,gy,.1,g,.1,.1,.07);gm.userData.gem=1;}
-  else if(t===5){part(box,O,0,gy,0,g,.5,.18,.22);for(const s of[-1,1]){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),Mt,s*.2,gy-.05,0,g,s*1.3,.75,1);w.material.side=THREE.DoubleSide;w.rotation.z=-s*.5;}const gm=part(SPH(1,8,6),fGem(S.g),0,gy,.1,g,.1,.1,.07);gm.userData.gem=1;}
+  if(gt===0)part(box,Mt,0,gy,0,g,1.0,.16,.2);
+  else if(gt===1){const p=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),O,0,gy,0,g,.36,.14,.2);}
+  else if(gt===2){part(box,O,0,gy,0,g,1.6,.14,.18);for(const s of[-1,1]){part(box,Mt,s*.8,gy,0,g,.16,.3,.2);}}
+  else if(gt===3){const c=part(gcc('nxcres',()=>new THREE.TorusGeometry(1,.14,6,16,PI)),O,0,gy+.5,0,g,.62,.62,.62);c.rotation.z=PI;const gm=part(SPH(1,8,6),fGem(S.g),0,gy-.08,.08,g,.11,.11,.07);gm.userData.gem=1;}
+  else if(gt===4){part(box,O,0,gy,0,g,.7,.18,.22);for(const s of[-1,1]){const h=part(CONE(.11,.75,5),Mt,s*.5,gy-.22,0,g);h.rotation.z=s*2.2;const h2=part(CONE(.07,.45,5),Mt,s*.28,gy+.28,0,g);h2.rotation.z=-s*.6;}const gm=part(SPH(1,8,6),fGem(S.g),0,gy,.1,g,.1,.1,.07);gm.userData.gem=1;}
+  else if(gt===5){part(box,O,0,gy,0,g,.5,.18,.22);for(const s of[-1,1]){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),Mt,s*.2,gy-.05,0,g,s*1.3,.75,1);w.material.side=THREE.DoubleSide;w.rotation.z=-s*.5;}const gm=part(SPH(1,8,6),fGem(S.g),0,gy,.1,g,.1,.1,.07);gm.userData.gem=1;}
   else{const r=part(gcc('nxsun',()=>new THREE.TorusGeometry(1,.16,6,18)),O,0,gy+.05,0,g,.34,.34,.34);for(const s of[-1,1]){const h=part(CONE(.09,.7,5),Mt,s*.62,gy+.05,0,g);h.rotation.z=-s*PI/2;const h2=part(CONE(.06,.4,5),Mt,s*.34,gy+.4,0,g);h2.rotation.z=-s*.75;}const gm=part(SPH(1,10,8),fGem(S.g),0,gy+.05,0,g,.2,.2,.13);gm.userData.gem=1;}
-  g.userData.mdl='nx_sw'+t;return g;}
+  if(gl)g.traverse(o=>{if(o.isMesh&&o!==bl&&o.position.y>1.5&&o.position.y<2.4){o.scale.x*=1.25;o.position.x*=1.25;}});
+  g.userData.mdl=(gl?'nx_gl':'nx_sw')+t;return g;}
+
+/* arcos de la Arquera: un diseño por set, en el marco de los modelos CC0 (a lo largo de Y, empuñadura en el origen, cuerda en +X) */
+for(let t=0;t<7;t++)CC0_WS['nx_bw'+t]=.25;
+function cc0Bow(S,t){t=Math.max(0,Math.min(6,t|0));const g=new THREE.Group(),H=2.3+t*.09;
+  const fx=[u=>-.42+1.3*u*u,u=>-.36+1.9*u*u-.75*Math.pow(u,5),u=>-.3+.5*u+1.2*u*u-.9*Math.pow(u,6),u=>-.46+2.2*u*u-1.0*Math.pow(u,4),u=>-.3-.5*u+2.6*u*u-1.1*Math.pow(u,7),u=>-.6+1.5*Math.pow(u,1.6),u=>-.34+.2*Math.sin(u*PI*2)+1.4*u*u-.5*Math.pow(u,8)][t];
+  const wood=[0x6a4a2a,0x4a3020,0x2a5a48,0,0,0,0][t],mt=t>=3?fMetal(S.m,S.t):(FMAT['bww'+t]||(FMAT['bww'+t]=new MSM({color:wood,roughness:.6}))),O=fOrnate(S.m,S.t,S.glow),GM=fGem(S.g);
+  const pts=[];for(let i=0;i<=10;i++){const u=.06+.94*i/10;pts.push([fx(u),u*H,0]);}const xt=fx(1);
+  const lg=gcc('nxbw'+t,()=>taperTube(pts,.105+t*.006,.035,22,7));
+  for(const s of[1,-1]){const l=new THREE.Mesh(lg,mt);l.scale.set(1,s,t===5?.55:.75);l.castShadow=true;if(s<0)l.material=l.material.clone(),l.material.side=THREE.DoubleSide;g.add(l);
+    /* punta */
+    if(t>=1){const tp=part(CONE(.07,.34,5),t>=3?O:mt,xt+.04,s*(H+.1),0,g);tp.rotation.z=s>0?-.5:PI+.5;}
+    if(t===1||t===2)for(let k=0;k<3;k++){const u=.35+k*.2;const f=featherMesh(fFeather([S.t,S.g,S.a]),.5,.2);f.position.set(fx(u)-.04,s*u*H,0);f.rotation.z=s>0?1.9:1.25;g.add(f);}
+    if(t===3)for(let k=0;k<2;k++){const u=.4+k*.3;const b=part(CONE(.06,.36,4),O,fx(u)-.14,s*u*H,0,g);b.rotation.z=s>0?1.2:PI-1.2;b.scale.z=.35;}
+    if(t===4){const u=.55;gemAt(g,S.g,fx(u)-.05,s*u*H,0,.1);const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),O,fx(.3)-.05,s*.3*H,0,g,-.7,s*.9,1);w.material.side=THREE.DoubleSide;}
+    if(t===5){const c=part(gcc('gem8',()=>new THREE.OctahedronGeometry(1,0)),GM,xt,s*(H+.05),0,g,.1,.26,.08);c.userData.gem=1;}
+    if(t===6){for(let k=0;k<3;k++){const u=.3+k*.22;const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),k%2?O:mt,fx(u)-.03,s*u*H,0,g,-(.75-k*.12),s*(.9-k*.12),1);w.material.side=THREE.DoubleSide;w.rotation.z=s*(.2+k*.15);}const c=part(gcc('gem8',()=>new THREE.OctahedronGeometry(1,0)),GM,xt,s*(H+.08),0,g,.09,.22,.08);c.userData.gem=1;}}
+  /* empuñadura */
+  const gp=part(gcc('nxgrip',()=>new THREE.CylinderGeometry(1,1,1,8)),fLeather(S.b),fx(.03),0,0,g,.13,H*.2,.12);
+  if(t>=2){for(const s of[1,-1]){const r=part(gcc('nxring',()=>new THREE.TorusGeometry(1,.32,6,14)),O,fx(.1),s*H*.11,0,g,.13,.13,.13);r.rotation.x=PI/2;}}
+  if(t>=3)gemAt(g,S.g,fx(.03)-.14,0,0,.07+t*.008);
+  /* cuerda */
+  const sm=t>=4?(FMAT['bws'+S.g]||(FMAT['bws'+S.g]=(()=>{const m=new MSM({color:S.g,emissive:S.g,emissiveIntensity:.9});m.userData.gem=1;return m;})())):(FMAT.bwstr||(FMAT.bwstr=new MSM({color:0xe8e0c8,roughness:.8})));
+  part(gcc('nxgrip',()=>new THREE.CylinderGeometry(1,1,1,8)),sm,xt,0,0,g,.012,H*2,.012);
+  g.userData.mdl='nx_bw'+t;return g;}
 /* ícono del arma o escudo CC0: la misma pieza que lleva el personaje */
 function cc0ItemObj(it){const c=it.c,t=Math.min(6,it.t|0),S=forjaOf(c,t);let n=null;if(it.k==='shield')n=CC0_SH[t];else if(c!=='hechicero'&&c!=='mburuvicha')n=CC0_W[c][t];
-  if(c==='caballero'&&it.k==='weapon')return cc0Sword(S,t);
+  if(c==='caballero'&&it.k==='weapon')return cc0Sword(S,t);if(c==='gladiador'&&it.k==='weapon')return cc0Sword(S,t,1);if(c==='arquera'&&it.k==='weapon')return cc0Bow(S,t);
   if(n){if(!oadHave([n])){oadNeed([n],()=>{});return 'WAIT';}const o=cc0Model(n,c==='arquera'||it.k==='shield'?null:S.m,c!=='arquera'&&it.k!=='shield');return it.k==='shield'&&o?cc0ShieldTint(o,t):o;}
   const g=new THREE.Group(),o=c==='hechicero'?cc0Staff(S,1.55,t):cc0Cetro(S,1.5,t);g.add(o);return g;}
 function irRenderIcon(it){const R0=irObject(it);if(R0==='WAIT')return 'WAIT';if(!R0)return null;let wait=false;R0.o.traverse(x=>{const m=x.material;if(m&&m.map&&!(m.map.image&&(m.map.image.complete===undefined||m.map.image.complete)&&(m.map.image.naturalWidth||m.map.image.width)))wait=true;});if(wait&&(IR.tries=(IR.tries||0)+1)<12){irDispose(R0.o);return 'WAIT';}IR.tries=0;

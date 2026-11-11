@@ -448,3 +448,18 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 - Fotos rehechas con `sync.sh alas razas sets iconos` (+ `datos`): razas, 35 sets, 30 alas/capas, íconos de alas de Arquera y capas del Mburuvicha. Los personajes salen volando (como en el juego).
 - `gallery.js`: en `wingsonly` la capa del Mburuvicha es `H.cape.mesh` (antes fallaba con `H.wings.g`); se ocultan `#notices`, `#patchBox`, `#bigNotes`, `.bigNote`, `.gbub` (los avisos de evento salían en las fotos).
 - Mapa de la web: `PINS` son posiciones de dibujo, no reales; las tierras del sur van separadas (Campos [-57,-25], Ybytyruzú [-56.15,-25.85], Monday [-54.72,-25.3], Mbocaruzú [-57.3,-26.15], Salto Cristal [-56.55,-26.5]). Igual en `views.js` y `shell_js.js`. Textos: 12 tierras, 37 criaturas, 9 jefes.
+
+## Sets por raza: cada set con su diseño (11/11, rama arte-cc0, sin publicar)
+
+Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en color. Colores de raza: Hechicero violeta, Arquera verde agua (siempre un poco sexy), Gladiador lila/blanco/gris, Mburuvicha negro/rojo. Caballero queda como estaba.
+
+- `FORJA` (hechicero, arquera, gladiador, mburuvicha): paletas nuevas y un `x:{...}` propio por set. `TIERGLOW` ya no es una tabla aparte: se llena desde `FORJA[..].g`, así el destello del set es siempre el color del set.
+- Piel a la vista: `x.bare:['thigh'|'spine_02'|'spine_01'|'upperarm']`. `cc0Bare(cls,eq)` arma la lista de huesos (torso/brazos salen del set del peto, muslos del set del pantalón), `cc0Drop(m,bones,kw)` quita esos triángulos de la prenda y `cc0Human` suma esos huesos a la piel que se conserva. Las placas (`cc0Shell`) salen de la prenda ya recortada.
+- `cc0ArmorMat(S,kind,cls,body)`: con `body` y `x.mat:'cloth'|'leather'` el peto y los muslos van de tela o cuero en vez de metal (túnicas del Hechicero, cuero del Mburuvicha).
+- Gladiador: `x.torso` (huesos que toma el peto), `x.noSleeve`, `x.mono` (hombrera solo izquierda), `x.padOnly` (hombrera suelta sin placa de brazo). Ojo: los pechos parciales dejan el borde dentado en la espalda; hoy solo Kurusu usa torso desnudo + hombrera suelta.
+- Cascos nuevos en `forgeHelm`: `wizhat`, `mitre`, `circlet`, `laurel`, `mohawk`, `horns2`, `leafcrown`, `butterfly`, `star`, `fan2`, `skull`, `sunfan`.
+- `cc0Extras` nuevos: `skirt:{n,len,st:'strip'|'leaf'|'feather'|'cloth',open,rear}` (faldellín colgado de la pelvis), `cui`: `amulet|rune|pectoral|gems|harness|discs|vee|leaf|star` (sin placa superior; la placa queda para los del Caballero), `back`: `moon|ring|shards|rays|feathers|blades`, `pad2`: `blade|skull|gemstack`, `tab:'plain'|'rune'` (la cruz solo con `tab:1`).
+- Armas: `cc0Sword(S,t,gl)` con `NXGL` (mandobles del Gladiador, `nx_gl0..6`), `cc0Bow(S,t)` (arcos de la Arquera, `nx_bw0..6`, mismo marco que los CC0: largo en Y, cuerda en +X), bastón con rasgos propios por set (voluta, horquilla, cristales) y cetro con remate por set (hacha, calavera, pico, tridente, medialuna, sol) y plumas rojo/negro. `cc0ItemObj` usa las mismas piezas para el ícono.
+- Carcaj: la textura salmón se pasa a gris y se tiñe con el color del set (`onBeforeCompile`).
+- Brillo: en `forgeGlow` la tela/cuero toma 0,4 del brillo del metal; `cc0Glow` bajó de .32 a .15.
+- Pendiente conocido: en +15 algunos sets de tela/cuero siguen muy teñidos (Arandu, Guyra Hũ, Tembetá); ícono del peto del Gladiador chico; escudos del Caballero oscuros; faldellines y tabardos son rígidos (no siguen las piernas al correr); solo se revisó en pose quieta.
