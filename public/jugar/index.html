@@ -3894,12 +3894,12 @@ function mythSparkle(e){if(!e.sparkle||!e.g.visible||e.dead||Math.random()>.22)r
 const FORJA={
  caballero:[
   {n:'Cuero',a:0x6a4a2a,b:0x3a2a18,m:0x8a6a40,t:0xb89860,g:0x8a5226,helm:'cap',pads:'none',chest:'straps',brace:'leather',greave:'leather',belt:'leather'},
-  {n:'Bronce',a:0x7a4a28,b:0x4a2a14,m:0xc08a3a,t:0xe8b860,g:0xd8642a,helm:'round',pads:'round',chest:'plate',brace:'metal',greave:'metal',belt:'metal',x:{tas:{n:1,len:.2,st:'lame'},knee:'round',gor:.045}},
-  {n:'Misión',a:0x2a3a5a,b:0x141c2e,m:0xc8d0dc,t:0xd8b050,g:0xcfe2ff,helm:'crest',pads:'square',chest:'cross',brace:'metal',greave:'metal',belt:'metal',x:{tas:{n:2,len:.26,st:'lame'},knee:'round',gor:.05,tab:1}},
-  {n:'Guardián',a:0x1a4a34,b:0x0c2a1c,m:0x9ab8a8,t:0xffd060,g:0x2aff9a,helm:'full',pads:'layer',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:3,len:.36,st:'lame'},knee:'round',elbow:'round',gor:.08}},
-  {n:'Tau',a:0x3a0a0a,b:0x1a0404,m:0x2a1a1a,t:0xff3a1a,g:0xff1a10,helm:'horn',pads:'spike',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:2,len:.34,st:'point'},knee:'spike',elbow:'spike',gor:.06,back:'spikes'}},
-  {n:'Yvága',a:0x2a1a4a,b:0x140a2a,m:0xd8c8f0,t:0xb070ff,g:0x9a3aff,helm:'wing',pads:'wing',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:3,len:.4,st:'point'},knee:'wing',elbow:'wing',gor:.09,back:'fins'}},
-  {n:"Yvy Marane'ỹ",a:0xf0e0a0,b:0xc0a060,m:0xffd060,t:0xffffff,g:0xfff0a0,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1,x:{tas:{n:3,len:.44,st:'lame'},knee:'round',elbow:'round',gor:.11,back:'sun'}}],
+  {n:'Bronce',a:0x7a4a28,b:0x4a2a14,m:0xc08a3a,t:0xe8b860,g:0xd8642a,helm:'round',pads:'round',chest:'plate',brace:'metal',greave:'metal',belt:'metal',x:{tas:{n:1,len:.2,st:'lame'},knee:'round',gor:.045,cui:'round',padK:1.15}},
+  {n:'Misión',a:0x2a3a5a,b:0x141c2e,m:0xc8d0dc,t:0xd8b050,g:0xcfe2ff,helm:'crest',pads:'square',chest:'cross',brace:'metal',greave:'metal',belt:'metal',x:{tas:{n:2,len:.26,st:'lame'},knee:'round',gor:.05,tab:1,cui:'keel',padK:1.2}},
+  {n:'Guardián',a:0x1a4a34,b:0x0c2a1c,m:0x9ab8a8,t:0xffd060,g:0x2aff9a,helm:'full',pads:'layer',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:3,len:.36,st:'lame'},knee:'round',elbow:'round',gor:.08,cui:'lames',padK:1.35}},
+  {n:'Tau',a:0x3a0a0a,b:0x1a0404,m:0x2a1a1a,t:0xff3a1a,g:0xff1a10,helm:'horn',pads:'spike',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:2,len:.34,st:'point'},knee:'spike',elbow:'spike',gor:.06,back:'spikes',cui:'ribs',pad2:'horn'}},
+  {n:'Yvága',a:0xf0e0a0,b:0xc0a060,m:0xffd060,t:0xffffff,g:0xfff0a0,helm:'wing',pads:'wing',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',x:{tas:{n:3,len:.4,st:'point'},knee:'wing',elbow:'wing',gor:.09,back:'fins',cui:'wings',padK:1.45}},
+  {n:"Yvy Marane'ỹ",a:0x0c1e4a,b:0x061028,m:0x2a5ad8,t:0xbfe0ff,g:0x4aa0ff,helm:'crown',pads:'big',chest:'ornate',brace:'ornate',greave:'ornate',belt:'metal',halo:1,x:{tas:{n:3,len:.44,st:'lame'},knee:'round',elbow:'round',gor:.11,back:'sun',cui:'sun',pad2:'tier'}}],
  hechicero:[
   {n:'Lino',a:0xb09a70,b:0x7a6a48,m:0x8a7a5a,t:0xe8dcc0,g:0xb08a5a,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'none',belt:'rope'},
   {n:'Ñandutí',a:0xf0ecf8,b:0xb0a8c0,m:0xd8d0e8,t:0xffffff,g:0xf6f2ff,helm:'hood',pads:'none',chest:'gem',brace:'wrap',greave:'none',belt:'rope'},
@@ -4101,6 +4101,20 @@ function cc0Extras(r,cls,eq,add){const A=anchorFn(r.body);const DS=m=>{m.side=TH
       if(X.elbow==='wing'){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),M,sg*.03,0,-.05,g,sg*.11,.15,.1);w.rotation.y=sg*2.2;DS(w.material);}
       at.add(g);add(g,eq.gloves);}}
   if(eq.armor){const S=forjaOf(cls,eq.armor.t),X=S.x||{},M=fMetal(S.m,S.t),O=fOrnate(S.m,S.t,S.glow);
+    if(X.cui){const at=A(['spine_03']);if(at){const g=new THREE.Group();const hemi=gcc('xhemi',()=>new THREE.SphereGeometry(1,18,12,0,PI));const pl=(m,x,y,z,sx,sy,sz)=>{const p=part(hemi,m,x,y,z,g,sx,sy,sz);p.castShadow=true;DS(p.material);return p;};const box=gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1));
+        const band=(m,y,r,h)=>{const b=part(gcc('xband',()=>new THREE.CylinderGeometry(1,1.04,1,14,1,true,-PI*.42,PI*.84)),m,0,y,-.02,g,r,h,r*.86);DS(b.material);return b;};
+        const k=X.cui;const top=pl(k==='ribs'||k==='lames'?M:O,0,.045,.0,.178,k==='lames'?.12:.165,.165);
+        if(k==='round'){const d=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),M,0,.06,.165,g,.055,.02,.055);d.rotation.x=PI/2;gemAt(g,S.t,0,.06,.18,.018);}
+        if(k==='keel'){const r=part(box,M,0,.045,.15,g,.03,.3,.03);r.rotation.y=PI/4;}
+        if(k==='lames'){for(let i=0;i<4;i++)band(i%2?M:O,-.085-i*.05,.165-i*.004,.06);gemAt(g,S.g,0,.07,.168,.02);}
+        if(k==='ribs'){for(const s of[-1,1])for(let i=0;i<3;i++){const rb=part(gcc('xrib',()=>new THREE.TorusGeometry(1,.1,5,10,PI*.42)),fMetal(S.t,S.t),s*.01,.1-i*.06,.03,g,.165,.165,.15);rb.rotation.set(PI/2,0,s>0?PI*.5-PI*.42:PI*.5);}gemAt(g,S.g,0,.0,.17,.026);for(let i=0;i<3;i++)band(i%2?O:M,-.1-i*.05,.16,.055);}
+        if(k==='wings'){for(const s of[-1,1]){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),M,s*.012,.02,.158,g,s*.26,.15,1);DS(w.material);w.rotation.y=s*.45;}gemAt(g,S.g,0,.05,.172,.024);for(let i=0;i<2;i++)band(M,-.1-i*.055,.16,.06);}
+        if(k==='sun'){const d=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),M,0,.06,.16,g,.07,.02,.07);d.rotation.x=PI/2;for(let i=0;i<8;i++){const a=i/8*TAU;const ry=part(CONE(.012,.07,4),M,Math.cos(a)*.1,.06+Math.sin(a)*.1,.15-.03*Math.abs(Math.cos(a)),g);ry.rotation.z=a-PI/2;}const gm=part(SPH(1,10,8),fGem(S.g),0,.06,.172,g,.035,.035,.02);gm.userData.gem=1;for(let i=0;i<3;i++)band(i%2?M:O,-.095-i*.05,.162,.058);}
+        at.add(g);add(g,eq.armor);}}
+    if(X.pad2)for(const s of[-1,1]){const at=A([s<0?'arm_L':'arm_R']);if(!at)continue;const g=new THREE.Group();
+        if(X.pad2==='horn'){for(let i=0;i<2;i++){const h=part(CONE(.035-i*.008,.24-i*.07,6),M,s*(.03+i*.07),.11-i*.02,0,g);h.rotation.z=-s*(.35+i*.5);}}
+        if(X.pad2==='tier'){for(let i=0;i<3;i++){const c=cap(i%2?M:O,g,s*(.02+i*.05),.05-i*.012,0,.1-i*.012,.07,.11-i*.012);c.rotation.z=-s*(.2+i*.3);}}
+        at.add(g);add(g,eq.armor);}
     if(X.gor){const at=A(['neck_01']);if(at){const g=new THREE.Group();const c=part(gcc('gorg',()=>{const q=new THREE.CylinderGeometry(1,1.28,1,18,1,true,PI*.22,PI*1.56);q.translate(0,.5,0);return q;}),O,0,-.035,.005,g,.074,X.gor,.082);c.castShadow=true;DS(c.material);
         const rim=part(gcc('gorR',()=>new THREE.TorusGeometry(1,.06,5,20,PI*1.56)),M,0,-.035+X.gor,.005,g,.074,.082,.074);rim.rotation.set(PI/2,0,-PI*.28);at.add(g);add(g,eq.armor);}}
     if(X.back){const at=A(['spine_03']);if(at){const g=new THREE.Group();g.position.set(0,-.04,-.19);
@@ -4212,7 +4226,7 @@ const CC0_W={caballero:['c_k_sword_1handed','c_k_sword_2handed','c_w_dagger_2','
  hechicero:[],mburuvicha:[]};
 const CC0_SH=['c_k_shield_round','c_w_shield_round','c_w_shield_round_2','c_w_shield_heater','c_w_shield_heater_2','c_w_shield_celtic_golden','c_w_shield_celtic_golden'];
 /* cada escudo con su propia forma o color: desde el Guardián se tiñe con el metal y el brillo de su set (Tau rojo oscuro, Yvága violeta, Yvy Marane'ỹ oro blanco) */
-const CC0_SHT=[null,null,null,null,[0x5a1a14,.65],[0xb89aff,.6],[0xfff2c0,.55]];
+const CC0_SHT=[null,[0xc08a3a,.45],[0x8a9ab8,.45],[0x6a9a80,.5],[0x5a1a14,.65],[0xffd060,.6],[0x3a6ae0,.6]];/* el escudo acompaña el color de cada set del Caballero */
 function cc0ShieldTint(o,t){const c=CC0_SHT[t];if(!c||!o)return o;o.traverse(x=>{if(x.isMesh){x.material.color.lerp(new THREE.Color(c[0]),c[1]);x.material.metalness=Math.max(x.material.metalness||0,.55);x.material.roughness=Math.min(x.material.roughness==null?1:x.material.roughness,.38);if(t>=5&&x.material.emissive){x.material.emissive.setHex(c[0]);x.material.emissiveIntensity=t===6?.18:.12;}}});return o;}
 const CC0_WS={c_w_axe_small:.29,c_w_hammer_small:.23,c_w_axe:.23,c_w_hammer_double:.23,c_k_sword_1handed:.62,c_k_sword_2handed:.46,c_w_dagger_2:.26,c_w_claymore:.2,c_w_axe_double:.17,c_w_bow_wooden:.25,c_w_bow_wooden2:.25,c_w_bow_golden:.25,c_w_bow_evil:.25,c_k_shield_round:.75,c_w_shield_round:.28,c_w_shield_round_2:.28,c_w_shield_heater:.28,c_w_shield_heater_2:.28,c_w_shield_celtic_golden:.26};
 /* base sin equipo (9/11): pantalón corto = el pantalón de aldeano cortado al 60 % de su alto */
@@ -4443,7 +4457,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   try{if(w){let obj=null,bone='hand_r',dir=[-.15,.62,.77],side=[1,0,0],s=1,sd='r',clip=clipsA.Sword_Idle,tt=.5;
       if(cls==='hechicero'){obj=cc0Staff(S,1.55,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.08];clip=clipsA.Spell_Simple_Idle_Loop;}
       else if(cls==='mburuvicha'){obj=cc0Cetro(S,1.5,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.15];clip=clipsA.Idle_Loop;}
-      else{const n=CC0_W[cls][wt];obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');if(obj)obj.userData.mdl=n;s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
+      else{let n=CC0_W[cls][wt];if(cls==='caballero'){n='nx_sw'+wt;obj=cc0Sword(S,wt);}else obj=cc0Model(n,cls==='arquera'?null:S.m,cls!=='arquera');if(obj)obj.userData.mdl=n;s=CC0_WS[n]||1;if(cls==='arquera'){bone='hand_l';sd='l';dir=[0,1,.05];side=[1,0,0]/* el lomo del arco hacia el blanco y la cuerda hacia la arquera */;clip=clipsA.Pistol_Aim_Neutral;}}
       if(obj){cc0Grip(body,sd,1);body.updateMatrixWorld(true);const calm=cls==='hechicero'||cls==='mburuvicha'?null:cls==='arquera'?{clip:clipsA.Idle_Loop,t:.5,dir:[0,1,0],side:[1,0,0]}:{clip:clipsA.Idle_Loop,t:.5,dir:[0,-.82,.57],side:[1,0,0]};const h=cc0Grip2(body,clip,tt,bone,obj,dir,side,s,0,calm);if(h&&calm){if(cls==='arquera')h.userData.kOnly='atk1';(r.grips=r.grips||[]).push(h);}if(h){forgeGlow(h,cls,w);h.userData.piece='weapon';r.forge=r.forge||[];r.forge.push(h);}}}
     if(eq&&eq.shield){const n=CC0_SH[Math.min(6,eq.shield.t|0)],o2=cc0ShieldTint(cc0Model(n,null,false),Math.min(6,eq.shield.t|0));if(o2){o2.userData.mdl=n;const in2=new THREE.Group();in2.add(o2);o2.position.x=.0;const h=cc0Grip2(body,clipsA.Sword_Idle,.5,'lowerarm_l',in2,[0,1,0],[.75,0,.65],CC0_WS[n]||.28,.55);if(h){h.userData.gHide=1;forgeGlow(h,cls,eq.shield);r.forge.push(h);}cc0Grip(body,'l',1);}}
     if(false&&cls==='mburuvicha'&&!(eq&&eq.helm)){/* sin corona de plumas en la base (9/11) */const h=cc0Hold(body,'Head',cc0Jeguaka(.124),[0,.175,-.01],[0,0,0],1);}}catch(e){console.error(e);}
@@ -4509,7 +4523,7 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
     if(['round','square','layer','spike','big'].includes(S.pads)){const kind=S.pads==='big'||S.pads==='layer'?'ornate':'metal';
       const sh=cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('clavicle')),{src:slotIs('armor','gloves'),minW:.6,inflate:.018,mat:cc0ArmorMat(S,kind,cls),uvk:4});grp(sh,eq.armor);
       if(S.pads==='spike'||S.pads==='big')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=new THREE.Group();const M=fOrnate(S.m,S.t,S.glow);for(let k=0;k<3;k++){const sp=part(CONE(.016,.06-k*.012,5),M,s*(.02+k*.045),.075-k*.01,0,p);sp.rotation.z=-s*(.15+k*.25);}if(S.pads==='big')gemAt(p,S.t,0,.07,.04,.016);at.add(p);add(p,eq.armor);}}}
-    else if(S.pads!=='none')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;at.add(p);add(p,eq.armor);}}}
+    else if(S.pads!=='none')for(const s of[-1,1]){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar((S.x&&S.x.padK)||1);at.add(p);add(p,eq.armor);}}}
   /* el resto del peto (mangas, codos, correas, cuello) va después de hombreras: lo que ellas no tomaron */
   const skinSrc=m=>!m.userData.file&&/Superhero/.test(m.material.name||'');
   if(r.restArmor){grp(cc0Rest(r,'armor',r.restArmor.mat),r.restArmor.it);
@@ -5025,8 +5039,39 @@ function irFrame(root,mode,region,cam,aspect){root.updateMatrixWorld(true);
   else box=root.userData.box&&!root.userData.box.isEmpty()?root.userData.box.clone():new THREE.Box3().setFromObject(root);
   const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3());const r=Math.max(s.x/aspect,s.y)*.62+s.z*.15;cam.aspect=aspect;cam.updateProjectionMatrix();const d=r/Math.tan(cam.fov*PI/360);
   const dir=region?new THREE.Vector3(.35,.12,1).normalize():new THREE.Vector3(.15,.25,1).normalize();cam.position.copy(c).addScaledVector(dir,d*1.05);cam.lookAt(c);}
+/* ===== espadas del Caballero: un diseño por set (hoja, guarda y pomo propios), en el mismo marco que los modelos CC0
+   (a lo largo de +Y, pomo abajo, hoja fina en Z). La misma pieza sirve para el personaje y para el ícono. ===== */
+const NXSW=[{L:3.0,sc:.17,tint:0x9a9288},{L:3.4,sc:.17,tint:0xc08a3a},{L:4.4,sc:.18,tint:0xd8dde6},{L:4.4,sc:.19,tint:0xcfe0d6},{L:4.8,sc:.2,tint:0x2a1a1c},{L:4.8,sc:.2,tint:0xf2e6c0},{L:5.4,sc:.21,tint:0xcfe2ff}];
+NXSW.forEach((d,t)=>{CC0_WS['nx_sw'+t]=d.sc;});
+function cc0Sword(S,t){t=Math.max(0,Math.min(6,t|0));const d=NXSW[t],g=new THREE.Group(),L=d.L,y0=1.9;
+  const wf=[u=>.34*(u<.78?1:.12+.88*(1-u)/.22),u=>(.2+.16*Math.sin(PI*u))*(u>.86?(1-u)/.14:1),u=>.2*(u>.85?(1-u)/.15:1),u=>(.3-.06*u)*(u>.82?(1-u)/.18:1),u=>.22*(u>.85?(1-u)/.15:1),u=>(.27-.2*u)*(u>.93?(1-u)/.07:1),u=>(u<.07?.17:.34-.05*u)*(u>.8?(1-u)/.2:1)][t];
+  const xo=t===4?u=>.09*Math.sin(u*PI*7)*(1-u*.4):()=>0;
+  const geo=gcc('nxsw'+t,()=>{const N=28,sh=new THREE.Shape();for(let i=0;i<=N;i++){const u=i/N,x=xo(u)+Math.max(.012,wf(u)*.62),y=y0+u*L;if(i)sh.lineTo(x,y);else sh.moveTo(x,y);}for(let i=N;i>=0;i--){const u=i/N;sh.lineTo(xo(u)-Math.max(.012,wf(u)*.62),y0+u*L);}
+    const q=new THREE.ExtrudeGeometry(sh,{depth:.03,bevelEnabled:true,bevelThickness:.035,bevelSize:.05,bevelSegments:1,curveSegments:2});q.translate(0,0,-.015);q.computeVertexNormals();return q;});
+  const steel=FMAT['nxst'+t]||(FMAT['nxst'+t]=(()=>{const m=new MSM({color:d.tint,metalness:.85,roughness:.26});regMetal(m);m.userData.forge=1;return m;})());
+  const bl=new THREE.Mesh(geo,steel);bl.castShadow=true;g.add(bl);
+  const O=fOrnate(S.m,S.t,S.glow),Mt=fMetal(S.m,S.t),Lh=fLeather(S.b);
+  if(t>=3){const core=new THREE.Mesh(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),FMAT['nxco'+S.g]||(FMAT['nxco'+S.g]=new MSM({color:S.g,emissive:S.g,emissiveIntensity:t>=4?1.1:.5,roughness:.4})));core.material.userData.gem=1;core.scale.set(t===6?.1:.05,L*.74,.1);core.position.set(0,y0+L*.4,0);if(t===4){core.scale.set(.035,L*.6,.1);}g.add(core);}
+  if(t===2){const f=part(gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1)),Mt,0,y0+L*.36,0,g,.045,L*.66,.085);}
+  /* empuñadura y pomo */
+  part(gcc('nxgrip',()=>new THREE.CylinderGeometry(1,1,1,8)),Lh,0,.9,0,g,.1,1.3,.1);
+  if(t===1){const r=part(gcc('nxring',()=>new THREE.TorusGeometry(1,.32,6,14)),O,0,.02,0,g,.17,.17,.17);}
+  else if(t===2){const p=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),O,0,.08,0,g,.2,.1,.2);p.rotation.x=PI/2;}
+  else if(t>=5){part(SPH(1,10,8),O,0,.08,0,g,.17,.2,.17);const gm=part(SPH(1,8,6),fGem(S.g),0,-.12,0,g,.09,.09,.09);gm.userData.gem=1;}
+  else part(SPH(1,10,8),O,0,.1,0,g,.16,.16,.16);
+  /* guarda */
+  const gy=1.72,box=gcc('nxcore',()=>new THREE.BoxGeometry(1,1,1));
+  if(t===0)part(box,Mt,0,gy,0,g,1.0,.16,.2);
+  else if(t===1){const p=part(gcc('nxdisc',()=>new THREE.CylinderGeometry(1,1,1,14)),O,0,gy,0,g,.36,.14,.2);}
+  else if(t===2){part(box,O,0,gy,0,g,1.6,.14,.18);for(const s of[-1,1]){part(box,Mt,s*.8,gy,0,g,.16,.3,.2);}}
+  else if(t===3){const c=part(gcc('nxcres',()=>new THREE.TorusGeometry(1,.14,6,16,PI)),O,0,gy+.5,0,g,.62,.62,.62);c.rotation.z=PI;const gm=part(SPH(1,8,6),fGem(S.g),0,gy-.08,.08,g,.11,.11,.07);gm.userData.gem=1;}
+  else if(t===4){part(box,O,0,gy,0,g,.7,.18,.22);for(const s of[-1,1]){const h=part(CONE(.11,.75,5),Mt,s*.5,gy-.22,0,g);h.rotation.z=s*2.2;const h2=part(CONE(.07,.45,5),Mt,s*.28,gy+.28,0,g);h2.rotation.z=-s*.6;}const gm=part(SPH(1,8,6),fGem(S.g),0,gy,.1,g,.1,.1,.07);gm.userData.gem=1;}
+  else if(t===5){part(box,O,0,gy,0,g,.5,.18,.22);for(const s of[-1,1]){const w=part(gcc('kwing',()=>{const sh=new THREE.Shape();sh.moveTo(0,-.4);sh.lineTo(.5,.2);sh.lineTo(.35,1);sh.lineTo(0,.5);return new THREE.ShapeGeometry(sh);}),Mt,s*.2,gy-.05,0,g,s*1.3,.75,1);w.material.side=THREE.DoubleSide;w.rotation.z=-s*.5;}const gm=part(SPH(1,8,6),fGem(S.g),0,gy,.1,g,.1,.1,.07);gm.userData.gem=1;}
+  else{const r=part(gcc('nxsun',()=>new THREE.TorusGeometry(1,.16,6,18)),O,0,gy+.05,0,g,.34,.34,.34);for(const s of[-1,1]){const h=part(CONE(.09,.7,5),Mt,s*.62,gy+.05,0,g);h.rotation.z=-s*PI/2;const h2=part(CONE(.06,.4,5),Mt,s*.34,gy+.4,0,g);h2.rotation.z=-s*.75;}const gm=part(SPH(1,10,8),fGem(S.g),0,gy+.05,0,g,.2,.2,.13);gm.userData.gem=1;}
+  g.userData.mdl='nx_sw'+t;return g;}
 /* ícono del arma o escudo CC0: la misma pieza que lleva el personaje */
 function cc0ItemObj(it){const c=it.c,t=Math.min(6,it.t|0),S=forjaOf(c,t);let n=null;if(it.k==='shield')n=CC0_SH[t];else if(c!=='hechicero'&&c!=='mburuvicha')n=CC0_W[c][t];
+  if(c==='caballero'&&it.k==='weapon')return cc0Sword(S,t);
   if(n){if(!oadHave([n])){oadNeed([n],()=>{});return 'WAIT';}const o=cc0Model(n,c==='arquera'||it.k==='shield'?null:S.m,c!=='arquera'&&it.k!=='shield');return it.k==='shield'&&o?cc0ShieldTint(o,t):o;}
   const g=new THREE.Group(),o=c==='hechicero'?cc0Staff(S,1.55,t):cc0Cetro(S,1.5,t);g.add(o);return g;}
 function irRenderIcon(it){const R0=irObject(it);if(R0==='WAIT')return 'WAIT';if(!R0)return null;let wait=false;R0.o.traverse(x=>{const m=x.material;if(m&&m.map&&!(m.map.image&&(m.map.image.complete===undefined||m.map.image.complete)&&(m.map.image.naturalWidth||m.map.image.width)))wait=true;});if(wait&&(IR.tries=(IR.tries||0)+1)<12){irDispose(R0.o);return 'WAIT';}IR.tries=0;
