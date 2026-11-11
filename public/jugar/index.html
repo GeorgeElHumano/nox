@@ -2465,7 +2465,7 @@ function fairyWings(lv,gen,ico){lv=lv||0;gen=Math.max(1,Math.min(3,gen||1));cons
     if(gen===3)sh.fragmentShader=sh.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float f=dot(normalize(vViewPosition),normal);vec3 ir=0.5+0.5*cos(6.2832*(f*1.3+vec3(0.0,0.33,0.67)));totalEmissiveRadiance+=ir*0.18*diffuseColor.a;}');};
   m.customProgramCacheKey=()=>'fairy'+gen;
   const S=[.9,1.025,1.425][gen-1]*(1+Math.min(15,lv)*.006);
-  for(const s of[-1,1]){const W=new THREE.Group();W.position.x=.04*s;g.add(W);sides.push(W);W.rotation.y=s*(ico?.14:.42);
+  for(const s of[-1,1]){const W=new THREE.Group();W.userData.ws=s;W.position.x=.04*s;g.add(W);sides.push(W);W.rotation.y=s*(ico?.14:.42);
     const me=new THREE.Mesh(FAIRY_GEO,m);me.scale.set(S*s,S,S);me.renderOrder=2;W.add(me);if(ico)continue;
     /* chispas: +10 polen o estrellas en el borde; +13 el doble */
     const ns=lv>=13?9:lv>=10?5:0;for(let k=0;k<ns;k++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sfxTex('star'),color:em,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.9,fog:false}));const t=k/Math.max(1,ns-1);sp.scale.setScalar(.06+(k%3)*.035);sp.position.set(s*S*(.35+.6*Math.sin(.3+t*2.6)),S*(.95-t*1.6),.04);W.add(sp);}
@@ -2557,8 +2557,8 @@ const WART=(()=>{const D=Math.PI/180,lp=(a,b,t)=>a+(b-a)*t;
     m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,wu);sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nuniform float uWP;uniform float uWA;uniform float uWT;uniform float uWR;').replace('#include <begin_vertex>','#include <begin_vertex>\n{float sx=abs(transformed.x);float w=smoothstep(0.08,1.0,sx);transformed.z+=sin(uWP-sx*1.7)*uWA*w*0.6+0.02*sin(uWT*7.0+sx*8.0+transformed.y*5.0)*w*uWR;}');};
     m.customProgramCacheKey=()=>'plume';
     const S=[1.3,1.45,1.62][gen-1]*(1+Math.min(15,lv)*.006);
-    const add=(s,px,py,pz,ry,sc,rz)=>{const W=new THREE.Group();W.position.set(px*s,py,pz);W.rotation.y=s*ry;g.add(W);sides.push(W);const me=new THREE.Mesh(GEO,m);me.scale.set(S*sc*s,S*sc,S*sc);me.rotation.z=s*rz;me.castShadow=true;W.add(me);return W;};
-    for(const s of[-1,1]){if(gen>=2)add(s,.05,-.2,.02,.5,.62,-38*D);if(gen>=3)add(s,.04,.12,.04,.3,.5,34*D);const W=add(s,.05,0,0,.42,1,6*D);
+    const add=(s,px,py,pz,ry,sc,rz,wk)=>{const W=new THREE.Group();W.userData.ws=s;W.userData.wk=wk||0;W.position.set(px*s,py,pz);W.rotation.y=s*ry;g.add(W);sides.push(W);const me=new THREE.Mesh(GEO,m);me.scale.set(S*sc*s,S*sc,S*sc);me.rotation.z=s*rz;me.castShadow=true;W.add(me);return W;};
+    for(const s of[-1,1]){if(gen>=2)add(s,.05,-.2,.02,.5,.62,-38*D,1);if(gen>=3)add(s,.04,.12,.04,.3,.5,34*D,2);const W=add(s,.05,0,0,.42,1,6*D);
       const ns=lv>=13?6:lv>=10?3:0;for(let k=0;k<ns;k++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sfxTex('star'),color:em,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.85,fog:false}));const t=k/Math.max(1,ns-1);sp.scale.setScalar(.06+(k%3)*.03);sp.position.set(s*S*(.3+.55*t),S*(.36+.2*Math.sin(t*2.4)),.05);W.add(sp);}
       if(lv>=13){const au=glowSprite(em,1.1*S,.12);au.position.set(s*.5*S,.25*S,-.06);W.add(au);}}
     if(gen===3){const sp=glowSprite(em,S*2,.12);sp.position.set(0,.2,-.14);g.add(sp);}
@@ -6416,7 +6416,13 @@ function animHero(dt){if(!HERO)return;const r=HERO,cls=r.cls;const y=H(P.x,P.z);
   if(r.staff&&r.staff.userData.orb)r.staff.userData.orb.rotation.y+=dt*2;
   if(r.wings&&r.wings.sides){const fk=r.flyK||0,ke=fk*fk*(3-2*fk),gl=Math.sin(T*1.3)*.06;const beat=r.beat||0;
     /* reposo: alas abiertas en V hacia atrás e inclinadas, para que se lean desde la cámara de arriba; en vuelo: aleteo con ola */
-    r.wings.sides.forEach((W,i)=>{const s=i?1:-1;W.rotation.y=s*(WG.ry*(1-ke)+ke*(WG.fy-beat*.06)+gl*(1-ke));W.rotation.z=s*(WG.rz*(1-ke)+ke*(.1+beat*.5));W.rotation.x=0;});r.wings.g.rotation.x=WG.rx*(1-ke)+WG.fx*ke;
+    /* cada ala sabe de qué lado es (userData.ws): antes el lado salía del orden en la lista y los pares de las fases 2 y 3 batían cruzados.
+       Aves: además de subir y bajar, el ala barre adelante en la bajada, gira sobre su eje y se pliega un poco al subir.
+       Hada: aleteo de mariposa: las alas se juntan detrás de la espalda y se abren de golpe, sin batir arriba y abajo. */
+    const wph=r.flyPh||0,wsw=Math.cos(wph+.45*Math.cos(wph)),fairy=r.wings.P&&/^fy/.test(r.wings.P.key||'');
+    r.wings.sides.forEach((W,i)=>{const s=W.userData.ws||(i?1:-1),a=W.userData.wk===1?.8:W.userData.wk===2?.7:1;
+      if(fairy){const c=.5+.5*Math.sin(wph*1.5),cl=c*c*(3-2*c);W.rotation.y=s*((WG.ry+gl)*(1-ke)+ke*(.1+1.0*cl));W.rotation.z=s*(WG.rz*(1-ke)+ke*(.04+.1*Math.sin(wph*1.5-1.2)));W.rotation.x=ke*.08*Math.sin(wph*1.5-.8);W.scale.x=1;}
+      else{W.rotation.y=s*(WG.ry*(1-ke)+ke*(WG.fy-beat*.06-wsw*.16*a)+gl*(1-ke));W.rotation.z=s*(WG.rz*(1-ke)+ke*(.1+beat*.5*a));W.rotation.x=ke*wsw*.2*a;W.scale.x=1-ke*Math.max(0,wsw)*.2-(1-ke)*.02*(1+Math.sin(T*1.3));}});r.wings.g.rotation.x=WG.rx*(1-ke)+WG.fx*ke;
     const u=r.wings.u;if(u){const Tz=STUDIO.frozen?3:T;u.uWT.value=Tz;u.uWP.value=ke>.02?(r.flyPh||0)+.35:Tz*1.4;u.uWA.value=.05*(1-ke)+.36*ke;u.uWR.value=.35+.65*ke;}}
   if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);
   if(r.glowCol&&(r.glowLv||0)>=11&&mode==='game'&&r.g.parent===scene){r.spk=(r.spk||0)-dt;if(r.spk<=0){r.spk=.12;parts(r.g.position.x+(Math.random()-.5)*.8,r.g.position.y+.4+Math.random()*1.4,r.g.position.z+(Math.random()-.5)*.8,{n:2,col:r.glowCol,spd:.4,up:.8,grav:-.6,life:.8,size:.22});}}
