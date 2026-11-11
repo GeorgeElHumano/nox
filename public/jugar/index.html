@@ -2894,7 +2894,7 @@ function updSnake(e,t,sp,lk){const {geo,N,SEG,LEN}=e,a=geo.attributes.position.a
   for(let i=0;i<N;i++){const p=pts[i],q=pts[Math.min(N-1,i+1)],o=pts[Math.max(0,i-1)];let tx=o[0]-q[0],ty=o[1]-q[1],tz=o[2]-q[2];const tl=Math.hypot(tx,ty,tz)||1;tx/=tl;ty/=tl;tz/=tl;
     let nx,nz;if(R&&i<=R){nx=sx0;nz=sz0;}else{const l=Math.hypot(tx,tz)||1;nx=tz/l;nz=-tx/l;}
     let ux=ty*nz,uy=tz*nx-tx*nz,uz=-ty*nx;const ul=Math.hypot(ux,uy,uz)||1;ux/=ul;uy/=ul;uz/=ul;if(i===0){T0x=tx;T0y=ty;T0z=tz;U0x=ux;U0y=uy;U0z=uz;}
-    const u=i/(N-1),rr=(.33*Math.pow(1-u,.75)+.03)*(i<2?.85:1)*TH*(R&&i<R?.7+.3*Math.min(1,i/(R*.6)):1);
+    const u=i/(N-1),rr=(.33*Math.pow(1-u,.75)+.03)*/* el cuello se afina y entra en la cabeza: antes el tubo quedaba abierto y más ancho que ella */(i===0?.45:i===1?.74:i===2?.93:1)*TH*(R&&i<R?.7+.3*Math.min(1,i/(R*.6)):1);
     for(let j=0;j<SEG;j++){const an=j/SEG*TAU,cx=Math.cos(an),cy=Math.sin(an),k=(i*SEG+j)*3,f=cy<0?.8:.95,ky=cy*rr*f;a[k]=p[0]+nx*cx*rr+ux*ky;a[k+1]=p[1]+uy*ky;a[k+2]=p[2]+nz*cx*rr+uz*ky;
       /* normal exacta de la elipse (antes computeVertexNormals: más de la mitad del tiempo de las serpientes) */const cyf=cy/f;let mx=nx*cx+ux*cyf,my=uy*cyf,mz=nz*cx+uz*cyf;const ml=Math.hypot(mx,my,mz)||1;nr[k]=mx/ml;nr[k+1]=my/ml;nr[k+2]=mz/ml;}
     if(e.ridge){const r=e.ridge[i-2];if(r&&i>=2){r.position.set(p[0]+ux*rr*.95,p[1]+uy*rr*.95,p[2]+uz*rr*.95);
@@ -3577,12 +3577,20 @@ const MYTH={
  jaguarete:{ficha:'Jaguareté: el jaguar, dorado con rosetas negras, cabeza ancha y cola larga.',beast:'b_jaguarete',len:2.35,ts:{walk:1.9,run:3.2}},
  luison:{ficha:'Luisón, séptimo hijo de Tau y Kerana: hombre-perro de los cementerios, flaco, negro y de ojos rojos; señor de la muerte.',
   beast:'b_luison',len:2.6,ts:{walk:1.4,run:1.15},eye:0xff2a12,tex:()=>peloTex('luison',{base:0x1e181a,dark:0x060405,hi:0x6a5a60,len:18,n:5000,amt:.8,S:512}),aura:0x3a6a2a,auraS:2.8,sparkle:0x6aff6a,
+  /* armadura de huesos medida sobre la malla real (cabeza baja: el hocico cae unos 40°): cada pieza cuelga del hueso que mueve esa parte del cuerpo, así no flota al sentarse ni al morir */
   extra(r,o,U,A){const T=tm(peloTex('luisonB',{base:0x0a0808,dark:0x020202,hi:0x3a3036,len:14}));const sp=[['Neck1',0],['Neck2',0],['Neck3',0]];for(const [bn] of sp){const b=A([bn]);if(!b)continue;for(let i=0;i<3;i++){const c=part(CONE(.025*U,.14*U,5),T,(i-1)*.03*U,.1*U,0,b);c.rotation.x=-.6;}}
-    const hd=A(['Head']);if(hd){for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.015*U,.07*U,4),mat(0xe8e0c8),(.045+k*.025)*s*U,-.115*U,(.12+k*.04)*U,hd);t.rotation.x=PI;}
-      const bm=mat(0xd8d0b8,{roughness:.6});part(SPH(1,10,8),bm,0,-.055*U,.1*U,hd,.062*U,.04*U,.11*U);/* hocico descarnado */
-      for(const s of[-1,1]){const r=part(SPH(1,8,6),mat(0x050303),.045*s*U,-.03*U,.03*U,hd,.03*U,.03*U,.02*U);}}
-    /* sin costillas ni collar de huesos: colgaban del cuello y quedaban flotando sobre el lomo al sentarse o morir */
-    const hd2=A(['Head']);if(hd2){const dm=new MSM({color:0x9aff8a,transparent:true,opacity:.7,emissive:0x3aff3a,emissiveIntensity:.5});for(let k=0;k<3;k++){part(SPH(1,6,5),dm,(k-1)*.03*U,-.17*U-k*.02*U,(.17-k*.02)*U,hd2,.012*U,.03*U,.012*U);}}}},
+    const bm=mat(0xd8d0b8,{roughness:.6}),bm2=mat(0xc8c0a8,{roughness:.7});
+    const hd=A(['Head']);if(hd){/* colmillos: nacen del labio de arriba, dentro de la boca */
+      for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.011*U,.055*U,4),mat(0xe8e0c8),(.024-k*.007)*s*U,(-.2-k*.012)*U,(.148+k*.03)*U,hd);t.rotation.x=PI+.45;}
+      /* hocico descarnado: placa de hueso sobre el lomo del hocico */
+      const sk=part(SPH(1,10,8),bm,0,-.075*U,.125*U,hd,.04*U,.024*U,.098*U);sk.rotation.x=.78;
+}
+    /* collar de vértebras alrededor del cuello */
+    const nk=A(['Neck1']);if(nk){for(let i=0;i<7;i++){const a=(i/6-.5)*3.5;const bn=part(limbGeo(.06*U,.009*U,.007*U,.3),bm,Math.sin(a)*.118*U,(-.11+Math.cos(a)*.168)*U,.09*U,nk);bn.rotation.z=-a;}}
+    /* costillas: arcos que abrazan el lomo y los flancos, colgados del hueso del pecho */
+    const ch=A(['Bone_001']);if(ch){for(let i=0;i<4;i++){const rb=part(gcc('rib2',()=>new THREE.TorusGeometry(1,.075,6,16,PI*1.16)),bm2,0,(-.17-i*.004)*U,(.2-i*.075)*U,ch,(.152-i*.002)*U,(.232-i*.004)*U,.1*U);rb.rotation.z=-PI*.08;}
+}
+    const hd2=A(['Head']);if(hd2){const dm=new MSM({color:0x9aff8a,transparent:true,opacity:.7,emissive:0x3aff3a,emissiveIntensity:.5});for(let k=0;k<3;k++){part(SPH(1,6,5),dm,(k-1)*.014*U,(-.245-k*.02)*U,(.165-k*.012)*U,hd2,.009*U,.024*U,.009*U);}}}},
  teju:{ficha:'Teju Jagua, primogénito: lagarto enorme con siete cabezas de perro y ojos de fuego; señor de las cuevas y los frutos. Manso a pesar de su aspecto.',custom:(def,gold)=>tejuModel(def,gold)},
  escorpion:null,
  aoao:{ficha:'Ao Ao: bestia lanuda parecida a una oveja grande, con colmillos y garras; caza en manada por los cerros. Solo se salva quien trepa a una palmera pindó.',
@@ -3590,15 +3598,15 @@ const MYTH={
   extra(r,o,U,A){const wm=tm(woolTex('aoaoW',{base:0xe8dcc0,dark:0xa89878,hi:0xfffaf0,S:512,n:9000}),{rough:1});
     for(const [bn,n,rr] of [['Ursidae_Spine_1',6,.12],['Ursidae_Spine_2',6,.13],['Ursidae_Spine_3',6,.13],['Ursidae_Neck',5,.11]]){const b=A([bn]);if(!b)continue;for(let i=0;i<n;i++){const a=(i/(n-1)-.5)*2.4;part(SPH(1,10,8),wm,Math.sin(a)*.2*U+(Math.random()-.5)*.04*U,.06*U+Math.cos(a)*.1*U,(Math.random()-.5)*.1*U,b,rr*U*(.8+Math.random()*.3),rr*U*.7,rr*U*(.9+Math.random()*.3));}}
     const hd=A(['Ursidae_Head']);if(hd){part(SPH(1,10,8),wm,0,.12*U,-.02*U,hd,.17*U,.14*U,.16*U);for(const s of[-1,1]){const e=part(SPH(1,8,6),wm,.16*s*U,.1*U,-.04*U,hd,.05*U,.08*U,.03*U);e.rotation.z=-.6*s;}}
-    const hd2=A(['Ursidae_Head']);if(hd2)for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.018*U,(.1-k*.03)*U,5),mat(0xf0e8d0),(.06+k*.04)*s*U,-.06*U,(.24+k*.03)*U,hd2);t.rotation.x=PI;}
-    /* garras sólo en huesos que deforman la malla: 'Foot_L/R' son controles de IK y dejaban garras sueltas en el piso */for(const f of['Ursidae_Foot_L','Ursidae_Foot_R']){const b=A([f]);if(!b)continue;for(let k=0;k<3;k++){const c=part(CONE(.02*U,.09*U,4),mat(0x2a2018),(k-1)*.05*U,.0,.1*U,b);c.rotation.x=-PI/2;}}}},
+    const hd2=A(['Ursidae_Head']);if(hd2)for(const s of[-1,1])for(let k=0;k<2;k++){const t=part(CONE(.018*U,(.1-k*.03)*U,5),mat(0xf0e8d0),/* colmillos dentro del ancho del hocico (antes quedaban al aire a los costados) */(.036+k*.006)*s*U,(-.082+k*.012)*U,(.272-k*.04)*U,hd2);t.scale.setScalar(.8);t.rotation.x=PI;}
+    /* garras sólo en huesos que deforman la malla: 'Foot_L/R' son controles de IK y dejaban garras sueltas en el piso */for(const f of['Ursidae_Foot_L','Ursidae_Foot_R']){const b=A([f]);if(!b)continue;for(let k=0;k<3;k++){const c=part(CONE(.016*U,.07*U,4),mat(0x2a2018),(k-1)*.04*U,-.022*U,.085*U,b);c.rotation.x=PI/2;}}}},
  mboitui:{ficha:"Mbói Tu'i, segundo hijo: serpiente gigante con cabeza de loro, plumas verdes, pico enorme y lengua roja como la sangre; señor de las aguas.",snake:{head:'parrot',skin:()=>scalesTex('mboituiS',{base:0x2a7a2a,dark:0x0a2a10,hi:0x9ae860,size:11,belly:0xe0d890,stripes:6,stripeC:0x0a3a14}),eye:0xffe25a,beak:0x6a6a70}},
  pombero:{ficha:'Pombero: hombrecito del monte, bajo y fornido, oscurísimo y muy peludo, con sombrero de paja grande y manos y pies enormes. Camina sin hacer ruido, imita a los pájaros y le gustan el tabaco y la miel.',
   human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','pomberoFur',furRecolor(0x060403,0x1a1410,0x4a3a2a)),props:['hd_m_wide'],team:0x1a1410,scale:.78,bulk:[1.35,1,1.35],anim:'n',
    extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(hp){const h=strawHat(.42*U,{col:0xd8b870,band:0x3a1a0c});h.position.set(0,A.top-.125*U,.03*U);hp.add(h);}
     const T=peloTex('pomberoB',{base:0x120e0a,dark:0x030202,hi:0x3a2e22,len:14});bigFeet(A,U,T,false);
     for(const s of['L','R']){const b=A(['hand_'+s]);if(b){const m=part(SPH(1,8,6),tm(T),0,-.02*U,0,b,.07*U,.05*U,.09*U);}}
-    const hd=A(['head']);if(hd){const bd=part(SPH(1,10,8),tm(T),0,.02*U,.07*U,hd,.11*U,.1*U,.06*U);const cg=part(limbGeo(.1*U,.012*U,.01*U,0),mat(0x8a6a40),.05*U,.08*U,.14*U,hd);cg.rotation.x=-PI/2-.3;cg.rotation.z=-.4;const gl=glowSprite(0xff8a3a,.06*U,.9);gl.position.set(.08*U,.1*U,.23*U);hd.add(gl);}},
+    /* cara oscura como el resto del cuerpo */r.g.traverse(x=>{if(x.isMesh&&/^head_/.test(x.name)){x.material=x.material.clone();x.material.color.setHex(0x241a12);}});const hd=A(['head']);if(hd){const bd=part(SPH(1,10,8),tm(T),0,.02*U,.07*U,hd,.11*U,.1*U,.06*U);const cg=part(limbGeo(.1*U,.012*U,.01*U,0),mat(0x8a6a40),.05*U,.08*U,.14*U,hd);cg.rotation.x=-PI/2-.3;cg.rotation.z=-.4;const gl=glowSprite(0xff8a3a,.06*U,.9);gl.position.set(.08*U,.1*U,.23*U);hd.add(gl);}},
    aura:0x6a8a3a,auraS:1.6}},
  kurupi:{ficha:'Kurupí, quinto hijo: enano feo y peludo de piel curtida, pies al revés y una soga gruesa enrollada en la cintura; señor de la fertilidad. Acecha a las mujeres en el monte.',
   human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','kurupiFur',furRecolor(0x1a0e06,0x5a3a1a,0x9a7040)),props:['hd_x_woad'],team:0x5a3a1a,scale:.72,bulk:[1.45,1,1.45],anim:'k',headK:1.25,
