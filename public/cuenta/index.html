@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>NOX · Tienda y cuenta</title>
+<title>NOX · Tienda Noxis y cuenta</title>
 <meta name="theme-color" content="#0d0a09">
 <link rel="icon" type="image/png" href="../img/icon-256.png">
 <link rel="apple-touch-icon" href="../img/icon-512.png">
@@ -180,39 +180,25 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
     </div>
   </section>
 
-  <!-- tienda -->
+  <!-- tienda Noxis -->
   <section id="v-tienda" hidden>
-    <div class="view-head"><span class="eyebrow">Tienda del reino</span><h1>Tienda de NOX</h1><p class="muted" style="max-width:68ch">Todo se paga por transferencia bancaria. Cuando el administrador confirma tu pago, los ítems llegan al baúl de Ña Chela, en Asunción, y los ven todos tus personajes.</p></div>
-    <div class="shop">
-      <div>
-        <div class="filters">
-          <div class="chips" id="fCls" aria-label="Clase"></div>
-          <div class="chips" id="fCat" aria-label="Categoría"></div>
-        </div>
-        <div id="shopList"><div class="empty">Cargando la tienda…</div></div>
-      </div>
-      <aside class="panel cart" id="cart" aria-label="Carrito">
-        <h2>Tu pedido</h2>
-        <ul id="cartList"></ul>
-        <div class="tot"><span class="muted">Total</span><span class="price" id="cartTot">₲ 0</span></div>
-        <p class="err" id="cartErr" role="alert"></p>
-        <button class="btn btn-gold" id="checkout" type="button">Confirmar pedido</button>
-        <p class="muted" style="font-size:.85rem">Al confirmar te damos un código de pedido y el mensaje para mandar por WhatsApp con tu comprobante.</p>
-      </aside>
-    </div>
-    <div class="cartbar" id="cartbar"><span><b id="cbN">0</b> ítems · <span class="price" id="cbTot">₲ 0</span></span><a class="btn btn-gold btn-sm" href="#cart" id="cbGo">Ver pedido</a></div>
+    <div class="view-head"><span class="eyebrow">Tienda Noxis</span><h1>Cosméticos y servicios</h1><p class="muted" style="max-width:68ch">Los Noxis son la moneda de la tienda: se recargan por transferencia y compran gestos, títulos, marcos, estelas, aspectos de mascota y servicios. Nada de lo que hay acá da poder en el juego.</p>
+      <div class="actions" id="nxHead"></div></div>
+    <div id="nxShop"><div class="empty">Cargando la tienda…</div></div>
+    <p class="muted" style="font-size:.86rem;max-width:72ch;margin-top:22px">Los Noxis y los artículos de la tienda son bienes virtuales sin valor monetario real: se otorgan como licencia de uso dentro del juego y no son canjeables por dinero. Las compras son finales y no reembolsables, salvo lo que exija la ley. NOX está en beta: puede haber cambios, reinicios o interrupciones. Los intercambios entre jugadores corren por cuenta de ellos, y la venta por dinero real fuera del juego está prohibida y puede terminar en suspensión. Los menores de 18 años necesitan autorización de un adulto responsable.</p>
   </section>
 
   <!-- pedido confirmado -->
   <section id="v-pedido" hidden>
     <div class="auth" style="max-width:640px">
-      <div class="view-head"><span class="eyebrow">Pedido creado</span><h1>Pedido <span class="code" id="poCode"></span></h1><p class="muted">Total a transferir: <span class="price" id="poTot"></span></p></div>
+      <div class="view-head"><span class="eyebrow">Pedido creado</span><h1>Pedido <span class="code" id="poCode"></span></h1><p class="muted"><span id="poWhat"></span> · Total a transferir: <span class="price" id="poTot"></span></p></div>
       <div class="panel form">
         <h2>Cómo pagar</h2>
         <ol class="steps">
           <li><span id="poBank"></span></li>
+          <li><span>En la <b>descripción de la transferencia</b> poné este código: <b class="code" id="poCode2" style="font-size:1.3em"></b> <button class="btn btn-line btn-sm" type="button" id="poCodeCopy">Copiar código</button></span></li>
           <li><span>Mandá el comprobante por WhatsApp al <b>+595 981 187 259</b>. El botón de abajo abre el chat con el mensaje listo.</span></li>
-          <li><span>Cuando confirmemos el pago, los ítems aparecen en el <b>baúl de Ña Chela</b>, en Asunción. Si estás jugando, llegan en menos de un minuto.</span></li>
+          <li><span>Cuando confirmemos el pago, los Noxis aparecen en tu cuenta. Si estás jugando, llegan en menos de un minuto.</span></li>
         </ol>
         <div class="field"><label>Mensaje</label><div class="msgbox" id="poMsg"></div></div>
         <div class="actions"><a class="btn btn-gold" id="poWa" target="_blank" rel="noopener">Enviar por WhatsApp</a><button class="btn btn-line" type="button" id="poCopy">Copiar mensaje</button><a class="btn btn-line" href="#pedidos">Ver mis pedidos</a></div>
@@ -278,21 +264,17 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
 <div class="toast" id="toast" hidden role="status"></div>
 
 <script>
-const CONFIG={
-  whatsapp:'595981187259',
-  // Datos para la transferencia. Si queda vacío, se piden por WhatsApp.
-  bank:'Banco Itaú Paraguay\nCuenta N.º 212128\nTitular: Jorge Duarte\nCI 4804865 · RUC 4804865-8 (alias)'
-};
+// WhatsApp y datos de la transferencia: llegan del servidor con el catálogo (lib/noxis.js, NX_PAY).
+const CONFIG={whatsapp:'595981187259',bank:''};
 const CLASSN={caballero:'Caballero',hechicero:'Hechicero',arquera:'Arquera',gladiador:'Gladiador',mburuvicha:'Mburuvicha'};
-const CATN={set:'Sets',arma:'Armas y escudos',alas:'Alas',mascota:'Mascotas',gema:'Gemas',consumible:'Consumibles',oro:'Oro del reino'};
+const KINDN={gest:'Gestos y bailes',title:'Títulos',frame:'Marcos del nombre',trail:'Estelas',pet:'Aspectos de mascota',svc:'Servicios'};
 const STN={pendiente:'Esperando pago',pagado:'Pagado',rechazado:'No pagado',cancelado:'Cancelado'};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const gs=n=>'₲ '+Math.round(n).toLocaleString('es-PY');
 const when=t=>t?new Date(t).toLocaleString('es-PY',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-const S={tok:'',me:null,cat:[],cart:[],fCls:'caballero',fCat:'todo',authMode:'in',admTab:'stats',ordSt:'pendiente',admLast:0,admCount:0,lastOrder:null};
-try{S.tok=localStorage.getItem('nox-token')||'';S.cart=JSON.parse(localStorage.getItem('nox-cart')||'[]');}catch(e){}
-const saveCart=()=>{try{localStorage.setItem('nox-cart',JSON.stringify(S.cart));}catch(e){}};
+const S={tok:'',me:null,cat:null,nx:null,cfm:'',authMode:'in',admTab:'stats',ordSt:'pendiente',admLast:0,admCount:0,lastOrder:null};
+try{S.tok=localStorage.getItem('nox-token')||'';localStorage.removeItem('nox-cart');}catch(e){}
 function setTok(t){S.tok=t||'';try{t?localStorage.setItem('nox-token',t):localStorage.removeItem('nox-token');}catch(e){}}
 async function api(m,p,b){const r=await fetch('/api/'+p,{method:m,headers:{'content-type':'application/json',...(S.tok?{authorization:'Bearer '+S.tok}:{})},body:b!==undefined?JSON.stringify(b):undefined});
   let j={};try{j=await r.json();}catch(e){}if(r.status===401&&S.tok&&!/^(login|register)$/.test(p)){setTok('');S.me=null;renderWho();}
@@ -310,8 +292,7 @@ function renderWho(){const w=$('#who');
 /* ---------- vistas ---------- */
 const NEEDS={pedidos:1,cuenta:1,admin:1,pedido:1};
 let afterLogin='tienda';
-async function route(){let v=(location.hash||'#tienda').slice(1);if(!['entrar','tienda','pedidos','cuenta','admin','pedido','cart'].includes(v))v='tienda';
-  if(v==='cart'){v='tienda';setTimeout(()=>$('#cart').scrollIntoView({behavior:'smooth'}),50);}
+async function route(){let v=(location.hash||'#tienda').slice(1);if(!['entrar','tienda','pedidos','cuenta','admin','pedido'].includes(v))v='tienda';
   if(NEEDS[v]&&!S.me){afterLogin=v;v='entrar';}
   if(v==='admin'&&S.me.user.role!=='admin')v='cuenta';
   if(v==='pedido'&&!S.lastOrder)v='pedidos';
@@ -335,53 +316,50 @@ $('#authForm').addEventListener('submit',async e=>{e.preventDefault();const btn=
       if(r.user.mustchange){toast('Entraste con una contraseña temporal. Elegí una nueva.');location.hash='#cuenta';}else location.hash='#'+(afterLogin||'tienda');route();}}
   catch(err){$('#authErr').textContent=err.message;}btn.disabled=false;});
 
-/* ---------- tienda ---------- */
-async function loadCatalog(){if(S.cat.length)return;const r=await api('GET','catalog');S.cat=r.items;S.byId=new Map(S.cat.map(i=>[i.id,i]));S.cart=S.cart.filter(x=>S.byId.has(x.id));}
+/* ---------- tienda Noxis ---------- */
+const nf=n=>Math.round(n).toLocaleString('es-PY');
+async function loadCatalog(){if(S.cat)return;const r=await api('GET','nox/catalog');S.cat=r;S.byId=new Map(r.items.map(i=>[i.id,i]));if(r.pay){CONFIG.bank=r.pay.bank||'';CONFIG.whatsapp=r.pay.whatsapp||CONFIG.whatsapp;}}
 function chip(id,label,on,attr){return `<button type="button" class="chip ${on?'on':''}" ${attr}="${id}">${label}</button>`;}
-async function renderShop(){try{await loadCatalog();}catch(e){$('#shopList').innerHTML='<div class="empty">No se pudo cargar la tienda. Revisá tu conexión y recargá.</div>';return;}
-  const general=S.fCls==='general';
-  $('#fCls').innerHTML=Object.keys(CLASSN).map(k=>chip(k,CLASSN[k],S.fCls===k,'data-c')).join('')+chip('general','Para todos',general,'data-c');
-  const cats=general?['mascota','gema','consumible','oro']:['set','arma','alas'];if(S.fCat!=='todo'&&!cats.includes(S.fCat))S.fCat='todo';
-  $('#fCat').innerHTML=chip('todo','Todo',S.fCat==='todo','data-k')+cats.map(k=>chip(k,CATN[k],S.fCat===k,'data-k')).join('');
-  const list=S.cat.filter(i=>(general?!i.cls:i.cls===S.fCls)&&(S.fCat==='todo'||i.cat===S.fCat));
-  let groups=[];
-  if(general)groups=cats.filter(c=>S.fCat==='todo'||c===S.fCat).map(c=>({t:CATN[c],items:list.filter(i=>i.cat===c)}));
-  else{for(let t=0;t<7;t++){const it=list.filter(i=>i.cat!=='alas'&&i.tier===t);if(it.length){const full=it.find(i=>i.id.startsWith('full:'));groups.push({t:'Set '+(t+1)+(full?' · '+full.name.replace('Set completo ',''):''),c:it[0].col,items:it.sort((a,b)=>(b.id.startsWith('full:'))-(a.id.startsWith('full:')))});}}
-    const al=list.filter(i=>i.cat==='alas');if(al.length)groups.push({t:'Alas',items:al});}
-  $('#shopList').innerHTML=groups.filter(g=>g.items.length).map(g=>`<div class="group"><h3>${g.c?`<span class="gem" style="--c:${g.c}"></span>`:''}${esc(g.t)}</h3><div class="items">${g.items.map(i=>`<div class="item ${i.id.startsWith('full:')?'full':''}"><div class="nm"><span class="gem" style="--c:${i.col||'#e6b04b'}"></span><span>${esc(i.name)}</span></div>${i.desc?`<div class="ds">${esc(i.desc)}</div>`:''}<div class="row"><span class="price">${gs(i.price)}</span><button class="btn btn-line btn-sm" type="button" data-add="${i.id}">Agregar</button></div></div>`).join('')}</div></div>`).join('')||'<div class="empty">No hay ítems en esta categoría.</div>';
-  renderCart();}
-$('#fCls').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b){S.fCls=b.dataset.c;renderShop();}});
-$('#fCat').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b){S.fCat=b.dataset.k;renderShop();}});
-$('#shopList').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;const x=S.cart.find(c=>c.id===b.dataset.add);if(x)x.q=Math.min(20,x.q+1);else S.cart.push({id:b.dataset.add,q:1});saveCart();renderCart();toast('Agregado: '+S.byId.get(b.dataset.add).name);});
-function renderCart(){const L=S.cart.map(x=>({...x,it:S.byId&&S.byId.get(x.id)})).filter(x=>x.it);const tot=L.reduce((s,x)=>s+x.it.price*x.q,0),n=L.reduce((s,x)=>s+x.q,0);
-  $('#cartList').innerHTML=L.length?L.map(x=>`<li><span>${esc(x.it.name)}<br><span class="muted" style="font-size:.85rem">${gs(x.it.price)}${x.q>1?' × '+x.q:''}</span></span><span class="q"><button type="button" data-dq="${x.id}" data-d="-1" aria-label="Quitar uno">−</button><b style="min-width:18px;text-align:center">${x.q}</b><button type="button" data-dq="${x.id}" data-d="1" aria-label="Agregar uno">+</button></span></li>`).join(''):'<li class="muted" style="display:block;border:0">Todavía no agregaste nada.</li>';
-  $('#cartTot').textContent=gs(tot);$('#cbN').textContent=n;$('#cbTot').textContent=gs(tot);$('#checkout').disabled=!L.length;$('#cartbar').hidden=!L.length;}
-$('#cartList').addEventListener('click',e=>{const b=e.target.closest('[data-dq]');if(!b)return;const x=S.cart.find(c=>c.id===b.dataset.dq);if(!x)return;x.q+=+b.dataset.d;if(x.q<=0)S.cart=S.cart.filter(c=>c!==x);if(x.q>20)x.q=20;saveCart();renderCart();});
-function orderMsg(o){return `Hola, soy ${S.me.user.name}, jugador de NOX. Acabo de comprar: ${o.items.map(i=>i.name+(i.q>1?' ×'+i.q:'')).join(', ')}.\nPedido ${o.code} · Total ${gs(o.total)}.\nAdjunto el comprobante de la transferencia.`;}
-$('#checkout').onclick=async()=>{$('#cartErr').textContent='';if(!S.me){afterLogin='tienda';location.hash='#entrar';toast('Entrá con tu cuenta para confirmar el pedido');return;}
-  const b=$('#checkout');b.disabled=true;
-  try{const r=await api('POST','orders',{items:S.cart});S.lastOrder=r.order;S.cart=[];saveCart();location.hash='#pedido';}
-  catch(e){$('#cartErr').textContent=e.message;}b.disabled=false;};
-function renderOrderDone(){const o=S.lastOrder;$('#poCode').textContent=o.code;$('#poTot').textContent=gs(o.total);
+const FUND={fund1:['Título Fundador','Marco de bronce','Baile exclusivo: Polca del Fundador'],fund2:['Título Fundador de Plata','Marco de plata','Baile exclusivo: Polca del Fundador','Aspecto de mascota: Imp del Fundador','1 cambio de nombre'],fund3:['Título Fundador de Oro','Marco de oro','2 bailes exclusivos','Aspecto de mascota: Imp del Fundador','Estela del Fundador','1 cambio de nombre y 1 reorganizar puntos','Tu nombre en el Muro de Fundadores']};
+async function renderShop(){const box=$('#nxShop');try{await loadCatalog();}catch(e){box.innerHTML='<div class="empty">No se pudo cargar la tienda. Revisá tu conexión y recargá.</div>';return;}
+  if(S.me){try{S.nx=await api('GET','nox');}catch(e){S.nx=null;}}else S.nx=null;
+  let muro=[];try{muro=(await api('GET','nox/muro')).names||[];}catch(e){}
+  const nx=S.nx,own=nx?nx.own:{},lv=nx?nx.founder:0,prev=S.cat.packs.find(p=>p.f===lv),end=S.cat.founderEnd&&Date.now()>S.cat.founderEnd;
+  $('#nxHead').innerHTML=nx?`<span class="pill pagado" style="font-size:1rem">Tu saldo: <b>${nf(nx.bal)} Noxis</b></span><a class="btn btn-line btn-sm" href="#recargar-noxis" data-go="nxRec">Recargar</a>`:'<a class="btn btn-gold btn-sm" href="#entrar">Entrá para comprar</a>';
+  const item=(i)=>{const has=own[i.id]|0,perm=i.kind!=='svc';return `<div class="item"><div class="nm"><span class="gem" style="--c:#e6b04b"></span><span>${esc(i.name)}</span></div><div class="ds">${esc(i.desc||'')}</div><div class="row"><span class="price">${nf(i.price)} Noxis</span>${has&&perm?'<span class="pill pagado">Tuyo</span>':`<button class="btn btn-line btn-sm" type="button" data-buy="${i.id}">${S.cfm===i.id?'¿Confirmar?':'Comprar'}</button>`}</div>${has&&!perm?`<div class="ds">Tenés ${has} sin usar: se usan dentro del juego.</div>`:''}</div>`;};
+  box.innerHTML=`<p class="err" id="nxErr" role="alert"></p>
+    <div class="group" id="nxRec"><h3>Recargar Noxis</h3><p class="muted" style="font-size:.92rem;margin:0 0 10px">1 Noxis = 10 Gs. Los paquetes grandes traen Noxis de regalo.</p><div class="items">${S.cat.packs.filter(p=>!p.f).map(p=>`<div class="item"><div class="nm"><span class="gem" style="--c:#e6b04b"></span><span>${nf(p.nx)} Noxis</span></div><div class="ds">${p.bonus?'+'+p.bonus+' % de regalo':'Sin bono'}</div><div class="row"><span class="price">${gs(p.gs)}</span><button class="btn btn-gold btn-sm" type="button" data-pack="${p.id}">Recargar</button></div></div>`).join('')}</div></div>
+    <div class="group"><h3>Packs Fundador</h3><p class="muted" style="font-size:.92rem;margin:0 0 10px">Solo durante el lanzamiento, uno por cuenta. Lo exclusivo no se vuelve a vender ni se puede comerciar.</p><div class="items">${S.cat.packs.filter(p=>p.f).map(p=>{const price=p.gs-(prev&&p.f>lv?prev.gs:0);return `<div class="item full"><div class="nm"><span class="gem" style="--c:${p.f===1?'#d39a66':p.f===2?'#e6ebf5':'#ffe08a'}"></span><span>${esc(p.name)}</span></div><div class="ds">${nf(p.nx)} Noxis<br>${FUND[p.id].map(esc).join('<br>')}</div><div class="row"><span class="price">${p.f<=lv?'Ya es tuyo':gs(price)}</span>${p.f<=lv?'':end?'<span class="muted">Ya no se vende</span>':`<button class="btn btn-gold btn-sm" type="button" data-pack="${p.id}">Pedir</button>`}</div>${prev&&p.f>lv?'<div class="ds">Pagás la diferencia con tu pack.</div>':''}</div>`;}).join('')}</div></div>
+    ${Object.keys(KINDN).map(k=>`<div class="group"><h3>${KINDN[k]}</h3><div class="items">${S.cat.items.filter(i=>i.kind===k&&i.price).map(item).join('')}</div></div>`).join('')}
+    <div class="group"><h3>Muro de Fundadores</h3><p class="muted" style="font-size:.95rem">${muro.length?muro.map(esc).join(' · '):'Todavía no hay Fundadores de Oro. El primer nombre puede ser el tuyo.'}</p></div>`;}
+$('#nxShop').addEventListener('click',async e=>{const b=e.target.closest('[data-buy]'),p=e.target.closest('[data-pack]');if(!b&&!p)return;
+  if(!S.me){afterLogin='tienda';location.hash='#entrar';toast('Entrá con tu cuenta para comprar');return;}
+  if(p){p.disabled=true;try{const r=await api('POST','orders',{items:[{id:p.dataset.pack}]});S.lastOrder=r.order;location.hash='#pedido';}catch(err){$('#nxErr').textContent=err.message;$('#nxErr').scrollIntoView({block:'center'});p.disabled=false;}return;}
+  const id=b.dataset.buy;if(S.cfm!==id){S.cfm=id;renderShop();return;}S.cfm='';b.disabled=true;
+  try{await api('POST','nox/buy',{id});toast('Compra hecha: '+S.byId.get(id).name);renderShop();}catch(err){await renderShop();$('#nxErr').textContent=err.message;$('#nxErr').scrollIntoView({block:'center'});}});
+document.addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();const t=$('#'+a.dataset.go);if(t)t.scrollIntoView({behavior:'smooth'});});
+function orderMsg(o){return `Hola, soy ${S.me.user.name}, jugador de NOX. Pedido ${o.code} · ${o.items.map(i=>i.name).join(', ')} · Total ${gs(o.total)}.\nAdjunto el comprobante de la transferencia.`;}
+function renderOrderDone(){const o=S.lastOrder;$('#poCode').textContent=o.code;$('#poCode2').textContent=o.code;$('#poWhat').textContent=o.items.map(i=>i.name).join(', ');$('#poTot').textContent=gs(o.total);
+  $('#poCodeCopy').onclick=()=>{try{navigator.clipboard.writeText(o.code).then(()=>toast('Código copiado'),()=>toast('Seleccioná el código y copialo'));}catch(e){toast('Seleccioná el código y copialo');}};
   $('#poBank').innerHTML=CONFIG.bank?`Transferí <b>${gs(o.total)}</b> a esta cuenta:<br>${esc(CONFIG.bank).replace(/\n/g,'<br>')}`:`Escribinos por WhatsApp con tu código <b class="code">${esc(o.code)}</b> y te pasamos los datos de la cuenta para transferir <b>${gs(o.total)}</b>.`;
   const m=orderMsg(o);$('#poMsg').textContent=m;$('#poWa').href=waLink(m);
   $('#poCopy').onclick=()=>{try{navigator.clipboard.writeText(m).then(()=>toast('Mensaje copiado'),()=>toast('Seleccioná el mensaje y copialo'));}catch(e){toast('Seleccioná el mensaje y copialo');}};}
 
 /* ---------- mis pedidos ---------- */
 async function renderMyOrders(){const box=$('#myOrders');box.innerHTML='<div class="empty">Cargando…</div>';
-  try{const r=await api('GET','orders');if(!r.orders.length){box.innerHTML='<div class="empty">Todavía no hiciste pedidos. <a href="#tienda">Ir a la tienda</a></div>';return;}
-    box.innerHTML=r.orders.map(o=>`<div class="panel order"><div class="hd"><span><span class="code">${esc(o.code)}</span> <span class="muted">· ${when(o.created)}</span></span><span class="pill ${o.status}">${STN[o.status]||o.status}</span></div>
+  try{await loadCatalog();const r=await api('GET','orders');if(!r.orders.length){box.innerHTML='<div class="empty">Todavía no hiciste pedidos. <a href="#tienda">Ir a la tienda</a></div>';return;}
+    S.myOrders=r.orders;box.innerHTML=r.orders.map(o=>`<div class="panel order"><div class="hd"><span><span class="code">${esc(o.code)}</span> <span class="muted">· ${when(o.created)}</span></span><span class="pill ${o.status}">${STN[o.status]||o.status}</span></div>
       <ul>${o.items.map(i=>`<li>${esc(i.name)}${i.q>1?' ×'+i.q:''}</li>`).join('')}</ul>
-      <div class="hd"><span class="price">${gs(o.total)}</span><span class="actions">${o.status==='pendiente'?`<a class="btn btn-gold btn-sm" target="_blank" rel="noopener" href="${waLink(orderMsg(o))}">Enviar comprobante</a><button class="btn btn-line btn-sm" type="button" data-cancel="${o.id}">Cancelar</button>`:o.status==='pagado'?'<span class="muted" style="font-size:.9rem">Los ítems están en el baúl de Ña Chela</span>':''}</span></div>${o.note?`<p class="muted" style="font-size:.9rem">Nota: ${esc(o.note)}</p>`:''}</div>`).join('');}
+      <div class="hd"><span class="price">${gs(o.total)}</span><span class="actions">${o.status==='pendiente'?`<button class="btn btn-line btn-sm" type="button" data-see="${o.id}">Cómo pagar</button><a class="btn btn-gold btn-sm" target="_blank" rel="noopener" href="${waLink(orderMsg(o))}">Enviar comprobante</a><button class="btn btn-line btn-sm" type="button" data-cancel="${o.id}">Cancelar</button>`:o.status==='pagado'?'<span class="muted" style="font-size:.9rem">Acreditado en tu cuenta</span>':''}</span></div>${o.note?`<p class="muted" style="font-size:.9rem">Nota: ${esc(o.note)}</p>`:''}</div>`).join('');}
   catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
-$('#myOrders').addEventListener('click',async e=>{const b=e.target.closest('[data-cancel]');if(!b)return;if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='¿Cancelar el pedido?';return;}
+$('#myOrders').addEventListener('click',async e=>{const sv=e.target.closest('[data-see]');if(sv){const o=(S.myOrders||[]).find(x=>x.id===+sv.dataset.see);if(o){S.lastOrder=o;location.hash='#pedido';}return;}const b=e.target.closest('[data-cancel]');if(!b)return;if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='¿Cancelar el pedido?';return;}
   try{await api('POST','orders/'+b.dataset.cancel+'/cancel');toast('Pedido cancelado');renderMyOrders();}catch(err){toast(err.message);}});
 
 /* ---------- mi cuenta ---------- */
 async function renderAccount(){await loadMe();if(!S.me){route();return;}const u=S.me.user;
   $('#accTitle').textContent=u.name;$('#accSub').textContent=u.role==='admin'?'Administrador de NOX':'Jugador de NOX';
   $('#accChars').innerHTML=S.me.chars.length?S.me.chars.map(c=>`<li><b>${esc(c.name)}</b><span class="muted">${CLASSN[c.cls]||c.cls} · Nivel ${c.L}${c.resets?' · R'+c.resets:''}</span></li>`).join(''):'<li class="muted">Todavía no creaste personajes. Entrá al juego con esta cuenta para crear el primero.</li>';
-  $('#accPend').textContent=S.me.pendingItems?`Tenés ${S.me.pendingItems} ítem${S.me.pendingItems>1?'s':''} esperando en el baúl de Ña Chela. Entrá al juego para recibirlos.`:'';
+  $('#accPend').textContent=S.me.pendingItems?`Tenés ${S.me.pendingItems} entrega${S.me.pendingItems>1?'s':''} esperando. Entrá al juego para recibirlas.`:'';
   $('#fOld').hidden=u.mustchange;$('#waIn').value=u.wa||'';if(u.mustchange){$('#pwErr').textContent='Estás usando una contraseña temporal. Elegí una nueva.';}}
 $('#pwForm').addEventListener('submit',async e=>{e.preventDefault();$('#pwErr').textContent='';$('#pwOk').textContent='';
   try{await api('POST','password',{old:$('#pwOld').value,password:$('#pwNew').value});$('#pwOk').textContent='Contraseña guardada.';$('#pwOld').value=$('#pwNew').value='';await loadMe();$('#fOld').hidden=false;}catch(err){$('#pwErr').textContent=err.message;}});
@@ -417,7 +395,7 @@ async function admOrders(){$('#ordSt').innerHTML=['pendiente','pagado','rechazad
 $('#ordSt').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(b){S.ordSt=b.dataset.st;admOrders();}});
 $('#admOrders').addEventListener('click',async e=>{const b=e.target.closest('[data-ord]');if(!b)return;
   if(b.dataset.sure!=='1'){$$('#admOrders [data-sure="1"]').forEach(x=>{x.dataset.sure='';x.textContent=x.dataset.act==='pagado'?'Pagado':'No pagado';});b.dataset.sure='1';b.textContent=b.dataset.act==='pagado'?'¿Confirmar pago?':'¿Marcar no pagado?';return;}
-  b.disabled=true;try{const r=await api('POST','admin/orders/'+b.dataset.ord,{action:b.dataset.act,note:($('#note-'+b.dataset.ord)||{}).value||''});toast(b.dataset.act==='pagado'?`Pago confirmado. ${r.delivered} ítem${r.delivered===1?'':'s'} enviados al baúl del jugador.`:'Pedido marcado como no pagado');admOrders();admPoll();}catch(err){toast(err.message);b.disabled=false;}});
+  b.disabled=true;try{const r=await api('POST','admin/orders/'+b.dataset.ord,{action:b.dataset.act,note:($('#note-'+b.dataset.ord)||{}).value||''});toast(b.dataset.act==='pagado'?'Pago confirmado: los Noxis ya están en la cuenta del jugador.':'Pedido marcado como no pagado');admOrders();admPoll();}catch(err){toast(err.message);b.disabled=false;}});
 async function admResets(){const box=$('#admResets');box.innerHTML='<div class="empty">Cargando…</div>';
   try{const r=await api('GET','admin/resets');if(!r.resets.length){box.innerHTML='<div class="empty">No hay pedidos de contraseña.</div>';return;}
     box.innerHTML=r.resets.map(x=>`<div class="panel order" id="rs-${x.id}"><div class="hd"><span><b>${esc(x.uname||x.name)}</b> <span class="muted">· ${when(x.created)} · WhatsApp ${esc(x.wa)}</span></span>${x.uname?'':'<span class="pill rechazado">Usuario inexistente</span>'}</div>
@@ -434,18 +412,21 @@ async function admUsers(){const box=$('#admUsers');box.innerHTML='<div class="em
     box.innerHTML=r.users.map(u=>`<div class="panel order" id="us-${u.id}"><div class="hd"><span><b>${esc(u.name)}</b>${u.role==='admin'?' <span class="pill pagado">Admin</span>':''} <span class="muted">· ${u.wa?'WhatsApp '+esc(u.wa)+' · ':''}última vez ${when(u.lastlogin)}</span></span></div>
       <p class="muted" style="font-size:.92rem">${u.chars.length?u.chars.map(c=>esc(c.name)+' ('+(CLASSN[c.cls]||c.cls)+' '+c.L+')').join(' · '):'Sin personajes'}</p>
       <div class="actions"><button class="btn btn-line btn-sm" type="button" data-pw="${u.id}">Nueva contraseña</button>
-      <select aria-label="Ítem para regalar a ${esc(u.name)}" id="give-${u.id}" style="background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 10px;max-width:100%">${S.cat.map(i=>`<option value="${i.id}">${esc(i.name)}${i.cls?' · '+CLASSN[i.cls]:''}</option>`).join('')}</select><button class="btn btn-ok btn-sm" type="button" data-give="${u.id}">Regalar ítem</button></div><div class="slot"></div></div>`).join('');}
+      <input aria-label="Noxis para regalar a ${esc(u.name)}" id="gnx-${u.id}" inputmode="numeric" placeholder="Noxis" style="background:var(--ink);color:inherit;border:1px solid var(--line);border-radius:10px;padding:7px 10px;width:90px">
+      <select aria-label="Artículo para regalar a ${esc(u.name)}" id="give-${u.id}" style="background:var(--ink);color:inherit;border:1px solid var(--line);border-radius:10px;padding:7px 10px;max-width:100%"><option value="">Sin artículo</option>${S.cat.items.map(i=>`<option value="${i.id}">${esc(i.name)} · ${KINDN[i.kind]}</option>`).join('')}</select><button class="btn btn-ok btn-sm" type="button" data-give="${u.id}">Regalar</button><button class="btn btn-line btn-sm" type="button" data-nxsee="${u.id}">Ver Noxis</button></div><div class="slot"></div></div>`).join('');}
   catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
 $('#uSearch').addEventListener('submit',e=>{e.preventDefault();admUsers();});
 $('#admUsers').addEventListener('click',async e=>{const p=e.target.closest('[data-pw]'),g=e.target.closest('[data-give]');
   if(p){if(p.dataset.sure!=='1'){p.dataset.sure='1';p.textContent='¿Generar contraseña?';return;}p.disabled=true;try{const r=await api('POST','admin/users/'+p.dataset.pw+'/password');$('#us-'+p.dataset.pw+' .slot').innerHTML=tempCard(r.name,r.temp,r.wa);}catch(err){toast(err.message);}p.disabled=false;p.dataset.sure='';p.textContent='Nueva contraseña';}
-  if(g){const id=$('#give-'+g.dataset.give).value;if(g.dataset.sure!==id){g.dataset.sure=id;g.textContent='¿Regalar '+S.byId.get(id).name+'?';return;}g.disabled=true;try{await api('POST','admin/give',{uid:g.dataset.give,items:[{id,q:1}]});toast('Regalo enviado al baúl del jugador');}catch(err){toast(err.message);}g.disabled=false;g.dataset.sure='';g.textContent='Regalar ítem';}});
+  const sx=e.target.closest('[data-nxsee]');if(sx){try{const r=await api('GET','admin/nox/'+sx.dataset.nxsee);const WHY={recarga:'Recarga',regalo:'Regalo',compra:'Compra',uso:'Uso',intercambio:'Intercambio'};$('#us-'+sx.dataset.nxsee+' .slot').innerHTML=`<div class="temp"><b>Saldo: ${nf(r.bal)} Noxis</b><span class="muted" style="font-size:.9rem">Tiene: ${Object.keys(r.own).filter(k=>r.own[k]).map(k=>esc((S.byId.get(k)||{name:k}).name)+(r.own[k]>1?' ×'+r.own[k]:'')).join(', ')||'nada todavía'}</span><span class="muted" style="font-size:.88rem">${r.log.slice(0,12).map(l=>`${when(l.t)} · ${esc(String(l.why).split(' ')[0] in WHY?WHY[String(l.why).split(' ')[0]]:l.why)} ${l.d>0?'+':''}${nf(l.d)} → ${nf(l.bal)}${l.ref?' ('+esc(l.ref)+')':''}`).join('<br>')||'Sin movimientos'}</span></div>`;}catch(err){toast(err.message);}return;}
+  if(g){const id=$('#give-'+g.dataset.give).value,nx=Math.max(0,Math.floor(+$('#gnx-'+g.dataset.give).value||0)),key=id+'|'+nx;if(!id&&!nx){toast('Poné una cantidad de Noxis o elegí un artículo');return;}
+    if(g.dataset.sure!==key){g.dataset.sure=key;g.textContent='¿Regalar '+[nx?nf(nx)+' Noxis':'',id?S.byId.get(id).name:''].filter(Boolean).join(' y ')+'?';return;}g.disabled=true;try{await api('POST','admin/give',{uid:g.dataset.give,nx,items:id?[id]:[]});toast('Regalo acreditado en la cuenta del jugador');}catch(err){toast(err.message);}g.disabled=false;g.dataset.sure='';g.textContent='Regalar';}});
 async function admPoll(){if(!S.me||S.me.user.role!=='admin')return;try{const r=await api('GET','admin/pending');const n=r.orders+r.resets;const bd=$('#admBadge');bd.hidden=!n;bd.textContent=n;
     $('#admUpd').textContent='Actualizado '+new Date().toLocaleTimeString('es-PY',{hour:'2-digit',minute:'2-digit'});
     if(S.admLast&&r.latest>S.admLast&&n){const m=`${r.orders} pedido${r.orders===1?'':'s'} y ${r.resets} contraseña${r.resets===1?'':'s'} por revisar`;toast('Administración: '+m);
       try{if('Notification' in window&&Notification.permission==='granted')new Notification('NOX · administración',{body:m,icon:'../img/icon-192.png'});}catch(e){}
       if(!$('#v-admin').hidden)renderAdmin();}
-    S.admLast=Math.max(S.admLast,r.latest||0);document.title=(n?'('+n+') ':'')+'NOX · Tienda y cuenta';}catch(e){}}
+    S.admLast=Math.max(S.admLast,r.latest||0);document.title=(n?'('+n+') ':'')+'NOX · Tienda Noxis y cuenta';}catch(e){}}
 let pollT=0;function startAdminPoll(){clearInterval(pollT);if(S.me&&S.me.user.role==='admin'){admPoll();pollT=setInterval(admPoll,30000);}}
 
 (async()=>{await loadMe();renderWho();startAdminPoll();route();})();

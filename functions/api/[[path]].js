@@ -485,6 +485,7 @@ route('POST', 'admin/orders/:id', async ({ db, req, p }) => {
   if (o.status !== 'pendiente') return fail('Ese pedido ya fue resuelto: ' + o.status + '.');
   const note = String(b.note || '').slice(0, 300);
   if (b.action === 'pagado') {
+    if (!JSON.parse(o.items).some(i => NX_PACK.has(i.id))) return fail('Ese pedido es de la tienda anterior, que ya no existe. Marcalo como no pagado y arreglá con el jugador.');
     const r = await db.prepare("UPDATE orders SET status='pagado',decided=?,note=? WHERE id=? AND status='pendiente'").bind(now(), note, o.id).run();
     if (!r.meta.changes) return fail('Ese pedido ya fue resuelto.');
     const n = await deliver(db, o.uid, o.id, JSON.parse(o.items), 'recarga ' + o.code);
