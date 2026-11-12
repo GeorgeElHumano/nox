@@ -30,3 +30,4 @@ assert notes,'el parche necesita al menos una novedad (se muestran en la actuali
 print('parche',b,'mínimo',mn)
 PY
 python3 scripts/swfiles.py
+echo "Recordatorio: actualizar también la web en el mismo push (ver CLAUDE.md: sync.sh datos + fotos de lo que cambió)."
