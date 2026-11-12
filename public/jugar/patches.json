@@ -1,5 +1,12 @@
 [
  {
+  "build": "202611120155",
+  "title": "Cambiar de personaje, ahora en la ficha",
+  "notes": [
+   "El botón «Cambiar de personaje» pasó de Ajustes a la ficha del Personaje (al final)."
+  ]
+ },
+ {
   "build": "202611120138",
   "title": "Sets nuevos por raza, alas, vuelo y colosos",
   "notes": [

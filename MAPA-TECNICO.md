@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611120138 publicado: sets, alas, vuelo, colosos y jefes).
+Última actualización: 12 de noviembre de 2026 (parche 202611120155 publicado: botón Cambiar de personaje en la ficha).
 
 ## Repositorio y publicación
 
@@ -493,4 +493,4 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 ## Parche 202611120138 publicado (12/11, madrugada)
 - Sale a main todo lo hecho desde el parche 202611102346: auditoría de sets y mobs, alas rediseñadas y aleteo, sets por raza con armas propias, íconos reales, agarres, pose de vuelo y paños que siguen las piernas, escudos, colosos de piedra (`q_golem`), Kurupí, Yaguareté-Abá y Teju Hũ.
 - Sin revisar antes de publicar: pelea con los jefes agrandados, sonidos de la Ita Jára, la web (las fotos de sets, alas y mobs de noxparaguay.com quedaron viejas: correr `scripts/web/sync.sh`). El servidor en vivo no cambió.
-- «Cambiar de personaje» (12/11, SIN publicar): el botón (`data-act="toMenu"`) pasó de Ajustes (`renderCfg`) al final de la ficha del personaje (`renderChar`).
+- «Cambiar de personaje» (12/11, publicado en el parche 202611120155): el botón (`data-act="toMenu"`) pasó de Ajustes (`renderCfg`) al final de la ficha del personaje (`renderChar`).
