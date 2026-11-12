@@ -4,6 +4,7 @@
 
 import { Sim, RAID_KEY } from './sim.js';
 import { ZONES } from './data.js';
+import { NX_ITEMS, NX_BY } from './noxis.js'; // copia de lib/noxis.js (scripts/noxis-sync.sh)
 
 const enc = new TextEncoder();
 const hex = u => [...u].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -19,6 +20,9 @@ async function minBuild() {
 }
 
 const GESTOS = ['saludo', 'baile', 'risa', 'llanto', 'burla', 'celebracion', 'descanso'];
+// gestos de la tienda Noxis: solo los puede mostrar quien los compró (a.gx = máscara de bits según este orden)
+const GESTOS_NX = NX_ITEMS.filter(i => i.kind === 'gest').map(i => i.id);
+const CZ_SLOTS = ['title', 'frame', 'trail', 'pet_imp', 'pet_hada', 'pet_rudolf'];
 
 export default {
   async fetch(req, env) {
@@ -241,6 +245,27 @@ export class World {
     if (gold > 0) st.push(this.env.DB.prepare('INSERT INTO deliveries(uid,oid,item,label,created) VALUES(?,?,?,?,?)').bind(uid, null, JSON.stringify({ k: 'gold', n: Math.round(gold), inv: 1 }), label, now));
     if (st.length) await this.env.DB.batch(st);
   }
+  // lee de la base lo que la cuenta compró y tiene puesto: a.cz = [título, marco, estela, imp, hada, rudolf] y a.gx = gestos comprados
+  async loadCz(a) {
+    a.cz = []; a.gx = 0;
+    try {
+      const r = await this.env.DB.prepare('SELECT own,eq FROM noxis WHERE uid=?').bind(a.uid).first(); if (!r) return;
+      const own = JSON.parse(r.own || '{}'), eq = JSON.parse(r.eq || '{}');
+      GESTOS_NX.forEach((g, i) => { if (own[g]) a.gx |= 1 << i; });
+      const cz = CZ_SLOTS.map(k => { const it = NX_BY.get(eq[k]); return it && own[it.id] ? it.id : 0; });
+      while (cz.length && !cz[cz.length - 1]) cz.pop(); a.cz = cz;
+    } catch {}
+  }
+  // pasa Noxis de una cuenta a otra; devuelve false si no le alcanzan
+  async nxMove(from, to, n, ref) {
+    const db = this.env.DB, now = Date.now();
+    const d = await db.prepare('UPDATE noxis SET bal=bal-?1, upd=?2 WHERE uid=?3 AND bal>=?1 RETURNING bal').bind(n, now, from).first();
+    if (!d) return false;
+    await db.prepare("INSERT OR IGNORE INTO noxis(uid,bal,own,eq,upd) VALUES(?,0,'{}','{}',?)").bind(to, now).run();
+    const c = await db.prepare('UPDATE noxis SET bal=bal+?, upd=? WHERE uid=? RETURNING bal').bind(n, now, to).first();
+    await db.batch([db.prepare('INSERT INTO noxlog(uid,d,bal,why,ref,t) VALUES(?,?,?,?,?,?)').bind(from, -n, d.bal, 'intercambio', ref, now), db.prepare('INSERT INTO noxlog(uid,d,bal,why,ref,t) VALUES(?,?,?,?,?,?)').bind(to, n, c ? c.bal : null, 'intercambio', ref, now)]);
+    return true;
+  }
   cleanItems(l, max) { const out = []; for (const it of (Array.isArray(l) ? l : []).slice(0, max)) { if (!it || typeof it !== 'object' || it.k === 'gold' || it.raw) continue; const s = JSON.stringify(it); if (s.length > 1500) continue; out.push(JSON.parse(s)); } return out; }
   tradeOf(uid) { if (!this.trades) return [null, null]; for (const [k, tr] of this.trades) if (tr.a === uid || tr.b === uid) return [k, tr]; return [null, null]; }
   tradeState(tr) { return { t: 'tst', off: { [tr.a]: tr.off[tr.a], [tr.b]: tr.off[tr.b] }, rdy: tr.rdy, cnf: tr.cnf, stage: tr.stage }; }
@@ -266,14 +291,14 @@ export class World {
       if (t === 'trej') { this.send(x.ws, { t: 'sys', m: (a.s ? a.s.n : 'El jugador') + ' no quiso comerciar.' }); return; }
       if (this.tradeOf(a.uid)[1] || this.tradeOf(x.a.uid)[1]) return;
       const k = 'tr' + Date.now().toString(36) + Math.floor(Math.random() * 1e4);
-      const tr = { a: x.a.uid, b: a.uid, na: x.a.s.n, nb: a.s.n, off: { [x.a.uid]: { items: [], gold: 0 }, [a.uid]: { items: [], gold: 0 } }, rdy: {}, cnf: {}, got: {}, stage: 'open' };
+      const tr = { a: x.a.uid, b: a.uid, na: x.a.s.n, nb: a.s.n, off: { [x.a.uid]: { items: [], gold: 0, nx: 0 }, [a.uid]: { items: [], gold: 0, nx: 0 } }, rdy: {}, cnf: {}, got: {}, stage: 'open' };
       this.trades.set(k, tr);
       this.send(x.ws, { t: 'topen', with: a.uid, n: a.s.n }); this.send(ws, { t: 'topen', with: x.a.uid, n: x.a.s.n }); return;
     }
     const [k, tr] = this.tradeOf(a.uid); if (!tr) return;
     if (t === 'tx') { await this.tradeEnd(k, tr, (a.s ? a.s.n : 'El otro jugador') + ' canceló el intercambio.'); return; }
     if (tr.stage === 'open') {
-      if (t === 'toff') { tr.off[a.uid] = { items: this.cleanItems(m.items, 8), gold: Math.max(0, Math.min(2e9, Math.round(+m.gold || 0))) }; tr.rdy = {}; tr.cnf = {}; this.tradeSend(tr, this.tradeState(tr)); return; }
+      if (t === 'toff') { tr.off[a.uid] = { items: this.cleanItems(m.items, 8), gold: Math.max(0, Math.min(2e9, Math.round(+m.gold || 0))), nx: Math.max(0, Math.min(1e7, Math.floor(+m.nx || 0))) }; tr.rdy = {}; tr.cnf = {}; this.tradeSend(tr, this.tradeState(tr)); return; }
       if (t === 'trdy') { tr.rdy[a.uid] = !!m.on; if (!m.on) tr.cnf = {}; this.tradeSend(tr, this.tradeState(tr)); return; }
       if (t === 'tcnf') { if (!tr.rdy[tr.a] || !tr.rdy[tr.b]) return; tr.cnf[a.uid] = true; this.tradeSend(tr, this.tradeState(tr));
         if (tr.cnf[tr.a] && tr.cnf[tr.b]) { tr.stage = 'commit'; tr.nonce = Math.random().toString(36).slice(2, 10);
@@ -285,9 +310,15 @@ export class World {
     if (tr.stage === 'commit' && t === 'tok' && m.nonce === tr.nonce && !tr.got[a.uid]) {
       tr.got[a.uid] = { items: this.cleanItems(m.items, 8), gold: Math.max(0, Math.min(2e9, Math.round(+m.gold || 0))) };
       if (tr.got[tr.a] && tr.got[tr.b]) { this.trades.delete(k); if (tr.timer) clearTimeout(tr.timer);
+        // Noxis: es lo último que se mueve y lo decide la base. Si a alguno no le alcanzan, se devuelve todo.
+        const na = tr.off[tr.a].nx | 0, nb = tr.off[tr.b].nx | 0; let nxFail = null;
+        if (na > 0 && !(await this.nxMove(tr.a, tr.b, na, k))) nxFail = tr.na;
+        if (!nxFail && nb > 0 && !(await this.nxMove(tr.b, tr.a, nb, k))) { nxFail = tr.nb; if (na > 0) await this.nxMove(tr.b, tr.a, na, k + ':dev'); }
+        if (nxFail) { for (const u of [tr.a, tr.b]) { const g = tr.got[u]; await this.deliver(u, g.items, g.gold, 'Intercambio devuelto'); }
+          this.tradeSend(tr, { t: 'tend', ok: false, refund: 1, m: nxFail + ' no tiene los Noxis que ofreció: lo que entregaste vuelve a tu bolsa.' }); return; }
         await this.deliver(tr.a, tr.got[tr.b].items, tr.got[tr.b].gold, 'Intercambio con ' + tr.nb);
         await this.deliver(tr.b, tr.got[tr.a].items, tr.got[tr.a].gold, 'Intercambio con ' + tr.na);
-        this.tradeSend(tr, { t: 'tend', ok: true }); }
+        this.tradeSend(tr, { t: 'tend', ok: true, nx: na + nb > 0 ? 1 : 0 }); }
       return;
     }
     if (tr.stage === 'commit' && t === 'tno') { await this.tradeEnd(k, tr, 'Un ítem ya no estaba en la bolsa: se canceló el intercambio.'); }
@@ -363,6 +394,7 @@ export class World {
     if (t === 'p') { // posición: x,z,ry,mv,ac (contador de ataques),d (muerto),f (vuela)
       a.p = { x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, mv: +m.mv || 0, ac: m.ac | 0, d: m.d ? 1 : 0 };
       if (GESTOS.includes(m.g)) a.p.g = m.g; // gesto en curso (saludo, baile…), para que lo vean los demás
+      else { const gi = GESTOS_NX.indexOf(m.g); if (gi >= 0 && ((a.gx | 0) >> gi & 1)) a.p.g = m.g; }
       this.save(ws, a);
       if (!a.zone) return;
       const out = JSON.stringify({ t: 'p', id: a.uid, ...a.p });
@@ -375,7 +407,9 @@ export class World {
     }
     if (t === 'hi' || t === 'z' || t === 'eq') { // presentarse, cambiar de mapa o de equipo
       const s = m.s || {};
+      if (t === 'hi' || m.cz || a.cz === undefined) await this.loadCz(a); // cosméticos de la tienda Noxis: salen de la base, no de lo que diga el juego
       a.s = { n: clip(s.n, 24), c: clip(s.c, 12), L: s.L | 0, evo: !!s.evo, eq: s.eq && typeof s.eq === 'object' ? s.eq : {}, pet: clip(s.pet, 10) || null, face: s.face | 0 };
+      if (a.cz && a.cz.length) a.s.cz = a.cz;
       if (JSON.stringify(a.s).length > 2500) a.s.eq = {};
       const old = a.zone, zone = m.zone ? clip(m.zone, 24) : a.zone;
       if (m.p) a.p = { x: +m.p.x || 0, z: +m.p.z || 0, ry: +m.p.ry || 0, mv: 0, ac: 0, d: 0 };
