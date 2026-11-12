@@ -4315,8 +4315,8 @@ const CC0_W={caballero:['c_k_sword_1handed','c_k_sword_2handed','c_w_dagger_2','
  hechicero:[],mburuvicha:[]};
 const CC0_SH=['c_k_shield_round','c_w_shield_round','c_w_shield_round_2','c_w_shield_heater','c_w_shield_heater_2','c_w_shield_celtic_golden','c_w_shield_celtic_golden'];
 /* cada escudo con su propia forma o color: desde el Guardián se tiñe con el metal y el brillo de su set (Tau rojo oscuro, Yvága violeta, Yvy Marane'ỹ oro blanco) */
-const CC0_SHT=[null,[0xc08a3a,.45],[0x8a9ab8,.45],[0x6a9a80,.5],[0x5a1a14,.65],[0xffd060,.6],[0x3a6ae0,.6]];/* el escudo acompaña el color de cada set del Caballero */
-function cc0ShieldTint(o,t){const c=CC0_SHT[t];if(!c||!o)return o;o.traverse(x=>{if(x.isMesh){x.material.color.lerp(new THREE.Color(c[0]),c[1]);x.material.metalness=Math.max(x.material.metalness||0,.55);x.material.roughness=Math.min(x.material.roughness==null?1:x.material.roughness,.38);if(t>=5&&x.material.emissive){x.material.emissive.setHex(c[0]);x.material.emissiveIntensity=t===6?.18:.12;}}});return o;}
+const CC0_SHT=[null,[0xc08a3a,.45],[0x8a9ab8,.45],[0x6a9a80,.5],[0x8a2a1e,.6],[0xffd060,.6],[0x3a6ae0,.6]];/* el escudo acompaña el color de cada set del Caballero */
+function cc0ShieldTint(o,t){const c=CC0_SHT[t];if(!c||!o)return o;o.traverse(x=>{if(x.isMesh){x.material.color.lerp(new THREE.Color(c[0]),c[1]);/* poco metal: con .55 el escudo reflejaba el cielo oscuro y se veía casi negro */x.material.metalness=.22;x.material.roughness=.5;if(x.material.emissive){x.material.emissive.setHex(c[0]);x.material.emissiveIntensity=t===6?.2:t===5?.16:.1;}}});return o;}
 const CC0_WS={c_w_axe_small:.29,c_w_hammer_small:.23,c_w_axe:.23,c_w_hammer_double:.23,c_k_sword_1handed:.62,c_k_sword_2handed:.46,c_w_dagger_2:.26,c_w_claymore:.2,c_w_axe_double:.17,c_w_bow_wooden:.25,c_w_bow_wooden2:.25,c_w_bow_golden:.25,c_w_bow_evil:.25,c_k_shield_round:.75,c_w_shield_round:.28,c_w_shield_round_2:.28,c_w_shield_heater:.28,c_w_shield_heater_2:.28,c_w_shield_celtic_golden:.26};
 /* base sin equipo (9/11): pantalón corto = el pantalón de aldeano cortado al 60 % de su alto */
 const CC0_SHORT={on:0,cut:.6,c:new Map()};
