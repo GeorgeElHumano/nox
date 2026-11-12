@@ -1,5 +1,17 @@
 [
  {
+  "build": "202611121633",
+  "title": "Arandu, el guía del reino",
+  "notes": [
+   "Nuevo en la plaza de Asunción: Arandu, el guía del reino, frente a la fuente. Preguntale cómo subir de nivel, seguir tu misión, mejorar tu set, conseguir alas y más: ya sabe quién es tu personaje",
+   "Diez temas que Arandu responde al instante, sin límite, y hasta 10 preguntas escritas por día (100 letras) para lo más complejo. Solo responde sobre NOX",
+   "Arandu lleva un set y unas alas que nadie más tiene",
+   "Al hablar con cualquier personaje de la plaza, la cámara ahora lo muestra a él",
+   "El cronista del reino ahora se llama Mombe'u",
+   "Guardado en el dispositivo: el juego guarda modelos, sonidos y texturas en tu equipo, carga más rápido y cada parche baja solo lo que cambió (Ajustes → Guardado en el dispositivo)"
+  ]
+ },
+ {
   "build": "202611121351",
   "title": "Gráficos según tu equipo",
   "notes": [

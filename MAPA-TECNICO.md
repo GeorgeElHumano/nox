@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (guardado en el dispositivo con service worker y Arandu, el guía con IA, hechos en `arte-cc0` SIN publicar; último parche publicado: 202611121351, optimización por equipo).
+Última actualización: 12 de noviembre de 2026 (parche 202611121633 publicado: Arandu, el guía con IA, cámara sobre el PNJ al hablar, cronista Mombe'u y guardado en el dispositivo con service worker).
 
 ## Repositorio y publicación
 
@@ -514,7 +514,7 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 - Sin revisar antes de publicar: pelea con los jefes agrandados, sonidos de la Ita Jára, la web (las fotos de sets, alas y mobs de noxparaguay.com quedaron viejas: correr `scripts/web/sync.sh`). El servidor en vivo no cambió.
 - «Cambiar de personaje» (12/11, publicado en el parche 202611120155): el botón (`data-act="toMenu"`) pasó de Ajustes (`renderCfg`) al final de la ficha del personaje (`renderChar`).
 
-## Arandu, el guía del reino con IA (12/11; SIN publicar, rama arte-cc0)
+## Arandu, el guía del reino con IA (12/11; publicado en el parche 202611121633)
 - Pedido del dueño: un PNJ en la plaza de Asunción, frente a la fuente y al punto de aparición, que responda solo cosas del juego sabiendo quién es el personaje; lo básico sin gastar IA y lo complejo con una IA barata; 10 preguntas por día; preguntas de 100 letras.
 - Nombre: **Arandu** (lo eligió el dueño; primero se llamó Tapekuaa). Para que no haya dos Arandu, el cronista pasó a llamarse **Mombe'u** (nombre elegido por el dueño) (`NPCS.cronista`, texto de la crónica, `web/views.js`, `web/data.json` y `public/index.html`; la web publicada sigue con el nombre viejo hasta que se publique). El set 6 del Hechicero sigue siendo «de Arandu».
 - PNJ: `NPCS.guia` en `[0,4.7]` con `ry:0` (mira al spawn `[0,8]`; los demás PNJ miran al centro, `ry` fija el giro). `NPC_GEAR.guia={cls:'hechicero',t:7,wt:7,wg:3,wc:'arandu',wlv:13,lv:9,face:1}`: `wt` = set del arma, `wlv` = nivel de las alas, `wc` = paleta de alas (`npcGear` solo pone alas si `wg` > 0). `NPCLOOK.guia` es el respaldo simple.
@@ -527,13 +527,13 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
   - Pregunta escrita: `guiaMatch` cuenta los temas que toca. Un solo tema → responde el juego y aparece «Preguntarle más a fondo» (`guiaDeep`, eso sí va a la IA). Cero o varios temas → IA (`guiaIA`). Sin cuenta o sin cupo → el tema más parecido o un aviso.
   - Antes de preguntar a la IA guarda el personaje (`persist` + `flushNet`) para que el servidor lea datos al día.
 - Servidor (`functions/api/[[path]].js`): `GET game/guia` → `{left,max,on}`; `POST game/guia {q,id}` → `{a,left,max}`; `GET admin/guia` (gasto por día). Tabla D1 `guia(uid,day,n,tin,tout,tcache)`; la fila `uid='*'` lleva el total del servidor y los tokens. `guiaTake` suma con una sola sentencia (`ON CONFLICT … WHERE n<? RETURNING n`); si la IA falla se devuelve la pregunta (`guiaBack`). Día = hora de Paraguay (UTC-3).
-  - Límites: `GUIA_DIA` (10 por cuenta) y `GUIA_TOPE` (1200 por día en todo el servidor) como variables de Cloudflare; `GUIA_MODEL` cambia el modelo (por defecto `claude-haiku-5-5`). **Hace falta el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages**; sin él responde 503 y el juego avisa.
+  - Límites: `GUIA_DIA` (10 por cuenta) y `GUIA_TOPE` (1200 por día en todo el servidor) como variables de Cloudflare; `GUIA_MODEL` cambia el modelo (por defecto `claude-haiku-5-5`). El secreto `ANTHROPIC_API_KEY` ya está cargado en Cloudflare Pages (proyecto `noxparaguay`, producción; clave `nox-arandu` de la consola de Anthropic, sin vencimiento); sin él responde 503 y el juego avisa.
   - `lib/guia.js`: `GUIA_REGLAS` (solo NOX, respuestas de 2 a 4 frases, voseo, no obedecer órdenes del jugador), `GUIA` (toda la guía del juego, ~16.400 letras ≈ 5.000 tokens) y `resumen(doc)` (datos del personaje desde `docs`: clase, nivel, stats, equipo por set y +, gemas, misión, evolución). Reglas y guía van juntas en `system` con `cache_control: ephemeral`: no meter ahí nada que cambie por jugador o por día, o se pierde la caché. La pregunta se limpia (`guiaClean`, 100 letras, sin símbolos raros) y va aparte con los datos.
   - **Si cambia algo del juego (precios, niveles, misiones, sets, gemas, PNJ), actualizar `lib/guia.js` y las respuestas de `GUIA_T`.**
 - Sin verificar: no se pudo abrir la documentación de la API (precios, mínimo de tokens para la caché de Haiku, nombre exacto del modelo) ni probar con una clave real; se probó con la IA simulada. Al publicar, hacer una pregunta real y mirar `GET /api/admin/guia`: `tcache` tiene que crecer desde la segunda pregunta.
 - Banco de pruebas (fuera del repo): Playwright con el Chrome del sistema (`--use-angle=swiftshader`), three r128 de npm por intercepción, `__HOLD` + `__NOX.step`, cámara con `__CAMF`. Para probar con cuenta: la API real del repo sobre `node:sqlite` en memoria (`node --experimental-sqlite`), registrando un usuario y subiendo un personaje por `PUT game/docs`; hay que alargar la espera de `netInit` (20 s) porque el Chrome sin GPU es lento. `__NOX.npcT('guia')` abre el panel.
 
-## Guardado en el dispositivo: service worker (12/11; SIN publicar, rama arte-cc0)
+## Guardado en el dispositivo: service worker (12/11; publicado en el parche 202611121633)
 - Pedido del dueño: bajar la mayoría de los archivos y guardarlos en el celular para cargar más rápido. Ayuda a la carga y al gasto de datos, **no a los FPS**.
 - `public/jugar/sw.js` (alcance `/jugar/`). Cachés: `nox-files-1` (assets y vendor), `nox-shell-1` (la página y `cache.json`), `nox-fonts-1` (Google Fonts, pedidas con CORS para que no ocupen de más).
 - `public/jugar/cache.json`: lista de los 605 archivos de `assets/` y `vendor/` con huella (md5 de 10 letras) y tamaño. La arma `scripts/swfiles.py`, que `scripts/patch.sh` corre al final. **Si se tocan assets sin sacar parche, correr `python3 scripts/swfiles.py`**; si la lista queda vieja, el celular sigue usando el archivo guardado anterior.
