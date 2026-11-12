@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (optimización por equipo, SIN publicar en rama arte-cc0; antes parche 202611120155: botón Cambiar de personaje en la ficha).
+Última actualización: 12 de noviembre de 2026 (parche 202611121351 publicado: optimización por equipo).
 
 ## Repositorio y publicación
 
@@ -186,7 +186,7 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
 
-## Calidad por equipo (12/11, rama arte-cc0; SIN publicar)
+## Calidad por equipo (12/11, publicada)
 
 - Problema: el nivel inicial salía de `hardwareConcurrency` y `deviceMemory`. Safari (iPhone, iPad, Mac) informa 2-4 núcleos y nunca la memoria, así que **todos los iPhone arrancaban en bajo** (sin sombras, sin brillo, resolución 1 en pantalla ×3). Además el celular en alto seguía recortado (resolución tope 1,5, sombra 1024 y al 65 % del área, distancias de sombra cortas, alas a 768 px).
 - `DEV` (después de crear el renderer): lee la placa de video (`WEBGL_debug_renderer_info`) y elige `DEV.tier`. Celular: Apple → iOS 17+ alto, 16 medio, ≤15 bajo; Adreno 640-699 y 730+ alto, 616-639/540-599/700-729 medio, el resto (610-613…) bajo; Mali G710+/G77/G78 e Immortalis/Xclipse alto, G6xx/G57/G68/G72/G76 medio, G52/G51/G31/T bajo; PowerVR bajo. PC: NVIDIA/AMD/Apple M/Iris Xe/Arc alto, otra Intel medio. Software (SwiftShader) bajo. Con `deviceMemory` ≤2 bajo, ≤3 como máximo medio. Prueba sin navegador: `devunit.js` del banco (17 casos).
