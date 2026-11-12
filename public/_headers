@@ -3,3 +3,11 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /img/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+# three.js propio (antes venía de un CDN): no cambia nunca
+/jugar/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+# Guardado en el dispositivo: el service worker y su lista de archivos se revisan siempre
+/jugar/sw.js
+  Cache-Control: no-cache
+/jugar/cache.json
+  Cache-Control: no-store

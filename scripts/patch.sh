@@ -3,6 +3,7 @@
 # Uso: scripts/patch.sh "Título" "novedad 1" "novedad 2" ...   (OPCIONAL=1 para que no sea obligatorio)
 # - Pone la versión (AAAAMMDDHHMM, hora de Paraguay) en public/jugar/index.html (NOX_BUILD)
 # - Escribe public/jugar/build.json: build, min (igual a build: obligatorio para jugar en línea), título y notas
+# - Rehace public/jugar/cache.json (scripts/swfiles.py): la lista de archivos con huella que el juego guarda en el dispositivo
 set -e
 cd "$(dirname "$0")/.."
 B=$(TZ=America/Asuncion date +%Y%m%d%H%M)
@@ -28,3 +29,4 @@ json.dump(hist[:80],open('public/jugar/patches.json','w',encoding='utf-8'),ensur
 assert notes,'el parche necesita al menos una novedad (se muestran en la actualización obligatoria)'
 print('parche',b,'mínimo',mn)
 PY
+python3 scripts/swfiles.py

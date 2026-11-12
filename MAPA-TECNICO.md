@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (Arandu, el guía con IA, hecho en `arte-cc0` SIN publicar; último parche publicado: 202611121351, optimización por equipo).
+Última actualización: 12 de noviembre de 2026 (guardado en el dispositivo con service worker y Arandu, el guía con IA, hechos en `arte-cc0` SIN publicar; último parche publicado: 202611121351, optimización por equipo).
 
 ## Repositorio y publicación
 
@@ -27,7 +27,7 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
 
 ## Juego: `public/jugar/index.html`
 
-Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Partes clave:
+Un solo archivo HTML de unos 1,4 MB con three.js r128, servido desde `public/jugar/vendor/` (copia de `desktop/vendor`; antes venía de cdnjs/jsdelivr). Partes clave:
 
 ### Datos
 
@@ -532,4 +532,22 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
   - **Si cambia algo del juego (precios, niveles, misiones, sets, gemas, PNJ), actualizar `lib/guia.js` y las respuestas de `GUIA_T`.**
 - Sin verificar: no se pudo abrir la documentación de la API (precios, mínimo de tokens para la caché de Haiku, nombre exacto del modelo) ni probar con una clave real; se probó con la IA simulada. Al publicar, hacer una pregunta real y mirar `GET /api/admin/guia`: `tcache` tiene que crecer desde la segunda pregunta.
 - Banco de pruebas (fuera del repo): Playwright con el Chrome del sistema (`--use-angle=swiftshader`), three r128 de npm por intercepción, `__HOLD` + `__NOX.step`, cámara con `__CAMF`. Para probar con cuenta: la API real del repo sobre `node:sqlite` en memoria (`node --experimental-sqlite`), registrando un usuario y subiendo un personaje por `PUT game/docs`; hay que alargar la espera de `netInit` (20 s) porque el Chrome sin GPU es lento. `__NOX.npcT('guia')` abre el panel.
+
+## Guardado en el dispositivo: service worker (12/11; SIN publicar, rama arte-cc0)
+- Pedido del dueño: bajar la mayoría de los archivos y guardarlos en el celular para cargar más rápido. Ayuda a la carga y al gasto de datos, **no a los FPS**.
+- `public/jugar/sw.js` (alcance `/jugar/`). Cachés: `nox-files-1` (assets y vendor), `nox-shell-1` (la página y `cache.json`), `nox-fonts-1` (Google Fonts, pedidas con CORS para que no ocupen de más).
+- `public/jugar/cache.json`: lista de los 605 archivos de `assets/` y `vendor/` con huella (md5 de 10 letras) y tamaño. La arma `scripts/swfiles.py`, que `scripts/patch.sh` corre al final. **Si se tocan assets sin sacar parche, correr `python3 scripts/swfiles.py`**; si la lista queda vieja, el celular sigue usando el archivo guardado anterior.
+- Cada archivo se guarda como `ruta?h=huella` (esa misma dirección es la que se pide a la red, así tampoco sale viejo de la caché HTTP de 1 día de `_headers`). Al abrir el juego (navegación) el SW baja `cache.json` sin caché (5 s de espera, si no usa la guardada) y `purge` borra lo que cambió o ya no está: **un parche solo vuelve a bajar los archivos que cambiaron**.
+- Página del juego: red primero; la copia guardada solo si no hay conexión, si el servidor da 5xx o si la red tarda más de 7 s. `build.json`, `patches.json`, `/api` y `/live` no pasan por el SW, así que el aviso de parche funciona igual.
+- Música y video (pedidos con `Range`): el SW baja el archivo entero una vez, lo guarda y contesta el pedazo con 206 (`ranged`). Safari exige el 206.
+- Registro: script inline antes del de `#boot` (`window.__SWREG`), lo antes posible para que ya guarde lo de la primera carga. **En localhost queda apagado** (las pruebas leerían archivos viejos); se prende con `?sw=1`. `?nosw=1` quita el SW y borra lo guardado (sirve de botón de emergencia en producción). No corre en `nox://` (app de escritorio sin conexión) ni sin `caches`.
+- Adelanto de fondo (`KEEPF`, `keepWarm`, después de `updCheck`): a los 9 s (celular) o 5 s (PC) pide al SW lo que falta (`stat`) y se lo manda guardar en tandas de hasta 8 archivos o 1,5 MB (`put`), en orden: vendor, interfaz, sonidos, texturas, modelos y música al final. Espera mientras carga un mapa (`OAD.pend`), con la pestaña oculta o en la pantalla de carga.
+  - `keepPlan()`: con ahorro de datos o red 2G no adelanta nada; la música solo en PC o con wifi confirmado (`navigator.connection.type`; el iPhone no lo informa, así que ahí la música se guarda recién cuando suena cada tema). Preferencia en `localStorage noxSave` (`todo`/`no`; sin clave = auto).
+  - Ajustes → «Guardado en el dispositivo» (solo aparece con el SW activo): Auto / Todo / Apagado y «Guardado: X de Y MB» (`#keepTxt`, `ACT.keepSet`).
+  - `navigator.storage.persist()` para que el sistema no borre lo guardado. En iPhone, Safari igual puede borrarlo tras ~7 días sin abrir el juego, salvo que esté en la pantalla de inicio.
+- `_headers`: `/jugar/vendor/*` un año inmutable, `/jugar/sw.js` `no-cache`, `/jugar/cache.json` `no-store`.
+- Ganchos: `__NOX.KEEPF`, `__NOX.keepStat()`, `__NOX.keepWarm()`.
+- Medido en el banco (Chrome, servidor a 1,5 MB/s con las cabeceras de Cloudflare): primera carga 8,6 MB y 129 archivos; al terminar el adelanto quedan los 605 archivos (78 MB en disco, 65 MB de bajada con gzip). Segunda carga: 0 archivos del juego pedidos, 10 KB en total (página 304, `cache.json`, `build.json`). Parche que cambia 1 archivo: se baja solo ese y la copia vieja se borra. Con el servidor apagado el juego abre, crea personaje y entra a Asunción sin cuenta.
+- Sin probar: Safari/iPhone real y la app de Android (WebView); el tiempo de carga no se pudo comparar en el banco porque sin placa de video manda el procesador (~60 s con o sin guardado).
+- Banco (fuera del repo, `/home/claude/h`): `srv.mjs` (cabeceras de Cloudflare, registro de pedidos en `/__log`, `KBPS`/`LAT`, `INJ=1` inyecta `__E`, `/__die` lo apaga), `t1.mjs` (Playwright con perfil persistente, `SW=0` para comparar) y pruebas `a` (primera carga y adelanto), `c` (segunda carga, Range, parche), `e` (sin conexión y foto de Ajustes), `f` (música sin guardar y `?nosw=1`).
 
