@@ -1996,9 +1996,9 @@ const NPCS={
  chamana:{name:'Jarýi Kuña',role:'Caldero de Kerana',pos:[13,6.5],greet:'El caldero de Kerana da poder… o se traga todo. Vos elegís.'},
  baqueano:{name:'Baqueano Tito',role:'Viajes',pos:[-5,30],greet:'Conozco cada camino del reino. Decime adónde y te llevo, por unos guaraníes.'},
  baul:{name:'Ña Chela',role:'Baúl de la cuenta',pos:[-13.4,7.6],greet:'Lo que guardes acá lo ven todos tus personajes. Y nadie más, si le ponés candado.'},
- cronista:{name:'Karaí Arandu',role:'Cronista del reino',pos:[-10.2,-16.6],greet:'Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?'},
+ cronista:{name:"Karaí Mombe'u",role:'Cronista del reino',pos:[-10.2,-16.6],greet:'Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?'},
  /* guía del reino: frente a la fuente, mirando a donde aparecen los jugadores (ry fija el giro; los demás miran al centro) */
- guia:{name:'Tapekuaa',role:'Guía del reino',pos:[0,4.7],ry:0,greet:"Mba'éichapa. Soy Tapekuaa, el que conoce el camino. Preguntame lo que quieras de NOX."}
+ guia:{name:'Arandu',role:'Guía del reino',pos:[0,4.7],ry:0,greet:"Mba'éichapa. Soy Arandu, la sabiduría del reino. Preguntame lo que quieras de NOX."}
 };
 
 /* ================= estado ================= */
@@ -2614,7 +2614,10 @@ const WART=(()=>{const D=Math.PI/180,lp=(a,b,t)=>a+(b-a)*t;
    /* gladiador: metal y magia: hojas de acero alternadas con plumas de energía, vetas y filos encendidos */
    gladiador:[{em:0x4a9aff,style:'blade',base:'#12161f',mid:'#414a5c',tip:'#98a3b8',edge:'#e8eef8',shaft:'#b8dcff',vein:'#b8dcff',rim:'#3a8aff66',cbase:'#161b26',cmid:'#4a5468',ctip:'#8a96ac',arm0:'#2a303c',arm1:'#c8d0de',gem:'#3a8aff',nP:8,nS:8,wP:.095,wS:.105,mg:{style:'blade',glowFill:1,base:'#0c2a6a',mid:'#3a8aff',tip:'#3a8aff',edge:'#b8dcff',shaft:'#b8dcff',vein:'#ffffff',rim:'#b8dcff',cbase:'#0c2a6a',cmid:'#0c2a6a',ctip:'#3a8aff'}},
     {em:0x2ad0ff,style:'blade',base:'#12161f',mid:'#414a5c',tip:'#98a3b8',edge:'#e8eef8',shaft:'#c8f8ff',vein:'#c8f8ff',rim:'#22c8f066',cbase:'#161b26',cmid:'#4a5468',ctip:'#8a96ac',arm0:'#2a303c',arm1:'#c8d0de',gem:'#22c8f0',nP:8,nS:8,wP:.095,wS:.105,mg:{style:'blade',glowFill:1,base:'#06405a',mid:'#22c8f0',tip:'#22c8f0',edge:'#c8f8ff',shaft:'#c8f8ff',vein:'#ffffff',rim:'#c8f8ff',cbase:'#06405a',cmid:'#06405a',ctip:'#22c8f0'}},
-    {em:0xb04aff,style:'blade',base:'#12161f',mid:'#414a5c',tip:'#98a3b8',edge:'#e8eef8',shaft:'#f0c0ff',vein:'#f0c0ff',rim:'#9a4aff66',cbase:'#161b26',cmid:'#4a5468',ctip:'#8a96ac',arm0:'#2a303c',arm1:'#c8d0de',gem:'#9a4aff',nP:8,nS:8,wP:.095,wS:.105,mg:{style:'blade',glowFill:1,base:'#2a0a5a',mid:'#9a4aff',tip:'#9a4aff',edge:'#f0c0ff',shaft:'#f0c0ff',vein:'#ffffff',rim:'#f0c0ff',cbase:'#2a0a5a',cmid:'#2a0a5a',ctip:'#9a4aff'}}]};
+    {em:0xb04aff,style:'blade',base:'#12161f',mid:'#414a5c',tip:'#98a3b8',edge:'#e8eef8',shaft:'#f0c0ff',vein:'#f0c0ff',rim:'#9a4aff66',cbase:'#161b26',cmid:'#4a5468',ctip:'#8a96ac',arm0:'#2a303c',arm1:'#c8d0de',gem:'#9a4aff',nP:8,nS:8,wP:.095,wS:.105,mg:{style:'blade',glowFill:1,base:'#2a0a5a',mid:'#9a4aff',tip:'#9a4aff',edge:'#f0c0ff',shaft:'#f0c0ff',vein:'#ffffff',rim:'#f0c0ff',cbase:'#2a0a5a',cmid:'#2a0a5a',ctip:'#9a4aff'}}],
+   /* arandu: las alas del guía de la plaza, solo suyas. Plumas blancas de punta dorada alternadas con plumas de luz ámbar; gema celeste */
+   arandu:(A=>[A,A,A])({em:0xffd88a,style:'soft',base:'#b8923e',mid:'#fff4d6',tip:'#ffffff',edge:'#ffe9a8',shaft:'#fff0c0',barb:'rgba(150,110,30,.2)',cbase:'#c8a24a',cmid:'#fff0c8',ctip:'#ffffff',arm0:'#9a7424',arm1:'#fff3c8',gem:'#6fe0ff',nP:10,nS:10,wP:.1,wS:.11,rim:'rgba(255,236,170,.55)',tipAt:.86,
+     mg:{style:'soft',glowFill:1,base:'#8a5208',mid:'#ffb92e',tip:'#ffe39a',edge:'#ffffff',shaft:'#ffffff',rim:'#ffe9a0',cbase:'#8a5208',cmid:'#e09a20',ctip:'#ffd060'}})};
   const TX={},mk=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);return t;};
   const cvs=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
   function plumeTex(cls,gen,lv){const st=lv>=13?3:lv>=10?2:lv>=7?1:0,pi=PAL[cls].length>3?(gen>=3?3:Math.min(3,Math.floor(lv/4)+(gen>=2?1:0))):gen-1,key=cls+gen+'_'+st+'_'+pi;if(TX[key])return TX[key];const N=(typeof LITE!=='undefined'&&LITE())?768:1024,k=N/1024,P=PAL[cls][pi];
@@ -3521,9 +3524,9 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
 /* los NPC de Asunción son guerreros de cada clase, con los sets y alas más lindos del reino, sin repetir ninguno */
 const NPC_GEAR={herrero:{cls:'caballero',t:6,wg:2,lv:11,face:3},boticaria:{cls:'arquera',t:6,wg:2,lv:13,face:1},pai:{cls:'hechicero',t:6,wg:2,lv:11,face:9},capitan:{cls:'gladiador',t:6,wg:2,lv:13,face:11},
   chamana:{cls:'arquera',t:5,wg:1,lv:9,face:5},baqueano:{cls:'mburuvicha',t:6,wg:2,lv:11,face:7},baul:{cls:'arquera',t:4,wg:1,lv:4,face:2},cronista:{cls:'hechicero',t:5,wg:1,lv:9,face:14},
-  /* Tapekuaa: set único (FORJA.hechicero[7], «Tapekuaa»: blanco y oro), con su bastón, y sin alas: es el único PNJ con los pies en la tierra */
-  guia:{cls:'hechicero',t:7,wt:7,wg:0,lv:9,face:1}};
-function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',G.wt!=null?G.wt:Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});if(G.wg)eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.lv,g:G.wg};return eq;}
+  /* Arandu: set único (FORJA.hechicero[7], «Arandu Guasu»: blanco y oro), con su bastón, y alas propias (wc:'arandu' = paleta WART.PAL.arandu, tres pares, wlv = nivel de las alas) */
+  guia:{cls:'hechicero',t:7,wt:7,wg:3,wc:'arandu',wlv:13,lv:9,face:1}};
+function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',G.wt!=null?G.wt:Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});if(G.wg){eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.wlv!=null?G.wlv:G.lv,g:G.wg};if(G.wc)eq.wings.wc=G.wc;}return eq;}
 function oadNpc(id){const G=NPC_GEAR[id];if(G&&OAD.on&&!OAD.failed){const eq=npcGear(G);const hf=HERO_FACE;HERO_FACE=G.face;let r=null;try{if(CC0.on){if(cc0Want(G.cls,eq,oadUpgradeNpcs))r=cc0Hero(G.cls,eq);}else{const sp=oadHeroSpec(G.cls,eq);if(!oadHave(sp.files)){oadNeed(sp.files,oadUpgradeNpcs);}else r=oadHero(G.cls,eq);}}catch(e){console.error(e);}finally{HERO_FACE=hf;}
     if(r){(r.faceMats||[]).forEach(m=>m.userData.npc=1);r.npcP={mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false,flyK:0};return r;}return null;}
   if(CC0.on&&!OAD.failed&&CC0_NPC[id])return cc0Npc(id);
@@ -4080,8 +4083,8 @@ const FORJA={
   {n:'Tupã',a:0x4a1a7a,b:0x240c3c,m:0x7a30d0,t:0xffd040,g:0xb050ff,helm:'mitre',pads:'spike',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',x:{cui:'pectoral',back:'rays',skirt:{n:8,len:.42,st:'cloth'},elbow:'round'}},
   {n:'Arandu',a:0x3a0a4a,b:0x1c0424,m:0x581470,t:0xff5ad8,g:0xe040ff,helm:'antler',pads:'none',chest:'gem',brace:'ornate',greave:'none',belt:'metal',x:{mat:'cloth',cui:'gems',back:'shards',pad2:'gemstack',skirt:{n:6,len:.46,st:'leaf'},gor:.07}},
   {n:'Ñamandu',a:0x5a20c0,b:0x2a0c60,m:0x8a48ff,t:0xf4e8ff,g:0xb070ff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',halo:1,x:{cui:'star',back:'ring',skirt:{n:10,len:.48,st:'cloth'},gor:.09,pad2:'tier',elbow:'wing'}},
-  /* 7: set de Tapekuaa, el guía de la plaza. Solo lo lleva él: no se vende ni cae (los ítems llegan hasta el set 6) */
-  {n:'Tapekuaa',a:0xf4eedc,b:0xb8a67c,m:0xe8c25a,t:0xfff4c8,g:0xffd070,helm:'sunfan',pads:'big',chest:'ornate',brace:'wrap',greave:'none',belt:'metal',halo:1,x:{mat:'cloth',cui:'amulet',back:'sun',tab:'rune',skirt:{n:10,len:.5,st:'cloth'},gor:.08,pad2:'gemstack',elbow:'wing'}}],
+  /* 7: set de Arandu, el guía de la plaza. Solo lo lleva él: no se vende ni cae (los ítems llegan hasta el set 6) */
+  {n:'Arandu Guasu',a:0xf4eedc,b:0xb8a67c,m:0xe8c25a,t:0xfff4c8,g:0xffd070,helm:'sunfan',pads:'big',chest:'ornate',brace:'wrap',greave:'none',belt:'metal',halo:1,x:{mat:'cloth',cui:'amulet',back:'sun',tab:'rune',skirt:{n:10,len:.5,st:'cloth'},gor:.08,pad2:'gemstack',elbow:'wing'}}],
  arquera:[
   {n:"Ao Po'i",a:0xbfe0d8,b:0x6a9a90,m:0x8a8a70,t:0xe8fff8,g:0x7ad8c8,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'leather',belt:'leather',x:{bare:['thigh'],skirt:{n:10,len:.15,st:'cloth'}}},
   {n:'Plumas',a:0x2a9a8a,b:0x145048,m:0x8a7a50,t:0xffe0a0,g:0x30e0c0,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather',x:{bare:['spine_02','thigh'],skirt:{n:12,len:.2,st:'feather'}}},
@@ -4722,7 +4725,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   try{r=cc0Human(cls,eq,o);}catch(e){console.error(e);return null;}
   try{bodyShape(r.body,cls);}catch(e){console.error(e);}
   try{cc0APose(r.body,true);forgeApply(r,cls,eq);}catch(e){console.error(e);}finally{cc0APose(r.body,false);}
-  const body=r.body,w=eq&&eq.weapon,wt=w?Math.min(6,w.t|0):-1,S=w?forjaOf(cls,w.t|0):null;/* la forma del arma llega hasta el set 6; el color sale del set real (forjaOf ya lo acota: Tapekuaa lleva el suyo) */
+  const body=r.body,w=eq&&eq.weapon,wt=w?Math.min(6,w.t|0):-1,S=w?forjaOf(cls,w.t|0):null;/* la forma del arma llega hasta el set 6; el color sale del set real (forjaOf ya lo acota: Arandu lleva el suyo) */
   const clipsA={};['c_anim1','c_anim2'].forEach(f=>((OAD.ok[f]&&OAD.ok[f].animations)||[]).forEach(c=>clipsA[c.name]=c));
   try{if(w){let obj=null,bone='hand_r',dir=[-.15,.62,.77],side=[1,0,0],s=1,sd='r',clip=clipsA.Sword_Idle,tt=.5;
       if(cls==='hechicero'){obj=cc0Staff(S,1.55,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.08];clip=clipsA.Spell_Simple_Idle_Loop;}
@@ -4740,7 +4743,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   if(cls==='mburuvicha'&&mbCapeOn(r,eq,r.anchor)){try{capeFit(r);}catch(e){console.error(e);}}
   /* el carcaj va por encima de la capa (si la hay), nunca atravesándola */
   if(cls==='arquera')try{const q=cc0Model('c_k_quiver');/* carcaj de cuero (antes salía rosado liso) */if(q){q.userData.gHide=1;const QS=forjaOf(cls,eq&&eq.armor?eq.armor.t:0),qc=new THREE.Color(QS.a).lerp(new THREE.Color(QS.m),.35).lerp(new THREE.Color(0xffffff),.25);q.traverse(x=>{if(x.isMesh&&x.material&&x.material.color){/* la textura del carcaj es salmón: se pasa a gris y se tiñe con el color del set */x.material.color.copy(qc);x.material.roughness=.7;const m=x.material;m.onBeforeCompile=sh=>{sh.fragmentShader=sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\n float qg=dot(diffuseColor.rgb,vec3(.5,.4,.1));diffuseColor.rgb=vec3(qg)*vec3('+qc.r.toFixed(3)+','+qc.g.toFixed(3)+','+qc.b.toFixed(3)+')*1.6;');};m.customProgramCacheKey=()=>'quiv'+qc.getHexString();}});}if(q)cc0Hold(body,'spine_03',q,[.06,.02,r.cape?Math.min(-.17,r.cape.mesh.position.z-.075):-.17],[0,0,-.45],.55);}catch(e){console.error(e);}
-  if(eq&&eq.wings&&cls!=='mburuvicha'){const W=wingsMesh(cls,eq.wings.lv,eq.wings.g);r.anchor.add(W.g);r.wings=W;}
+  if(eq&&eq.wings&&cls!=='mburuvicha'){const W=wingsMesh(eq.wings.wc||cls,eq.wings.lv,eq.wings.g);/* wc: alas de otra paleta (las de Arandu) */r.anchor.add(W.g);r.wings=W;}
   if(r.chest){restPose(r.body);wingSocket(r);}
   {const its=ARMK.map(k=>eq&&eq[k]).filter(Boolean);
     if(its.length===ARMK.length&&its.every(it=>it.epic&&it.t===its[0].t)){const c=tierGlow(cls,its[0].t);r.epicAura=makeAura(c==='dark'?0x9a4aff:c);r.g.add(r.epicAura);}
@@ -6816,7 +6819,7 @@ function auraFit(a){const ud=a.userData;ud.ang=(ud.ang||0)+.0035;const g=a.geome
   for(let i=0;i<P.count;i++){const bx=B[i*3],bz=B[i*3+2],x=bx*c-bz*sn,z=bx*sn+bz*c;_av.set(x,oy,z).applyMatrix4(M);let y=(H(_av.x,_av.z)+.05-_ap.y)/k-oy;y=Math.max(-1.2,Math.min(1.2,y));P.setXYZ(i,x,y,z);}
   P.needsUpdate=true;}
 
-function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);/* en la portada no se ve a ningún PNJ parado entre la cámara y el personaje (Tapekuaa está justo detrás) */{const sv=!(mode==='select'&&Math.abs(n.x)<8&&n.z>1.5&&n.z<19);if(n.m.g.visible!==sv)n.m.g.visible=sv;}charShadow(n,n.m&&n.m.g,d);const want=d<7?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
+function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);/* en la portada no se ve a ningún PNJ parado entre la cámara y el personaje (Arandu está justo detrás) */{const sv=!(mode==='select'&&Math.abs(n.x)<8&&n.z>1.5&&n.z<19);if(n.m.g.visible!==sv)n.m.g.visible=sv;}charShadow(n,n.m&&n.m.g,d);const want=d<7&&HC.npc!==n?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
 
 /* ================= entrada ================= */
 const joyEl=$('#joy'),knob=$('#knob'),joy={id:null,ox:0,oy:0,x:0,y:0};
@@ -7270,7 +7273,7 @@ function cauldGo(r){const it=C.inv[CALD.sel];if(!it)return;let ok=false,msg;
     if(ok){const w=newEquip(C.cls,'wings',0,{luck:Math.random()<.3});addItem(w);msg=`¡Éxito! Creaste ${itemName(w)}`;}else msg='El caldero se tragó el ítem.';}
   CALD.res={ok,msg};toast(`<em style="color:${ok?'var(--good)':'var(--bad)'}">${esc(msg)}</em>`);persist();renderCaldero();}
 
-/* ===== Tapekuaa, el guía del reino (PNJ frente a la fuente de Asunción) =====
+/* ===== Arandu, el guía del reino (PNJ frente a la fuente de Asunción) =====
    Las preguntas comunes las contesta el juego con los datos del personaje (gratis, sin límite): GUIA_T.
    Las demás van a la IA por la API (`POST game/guia`, 10 por día por cuenta); el servidor lee el personaje de la base.
    Si una pregunta escrita cae en un solo tema, responde el juego y ofrece «Preguntarle más a fondo» (eso sí gasta una). */
@@ -7358,7 +7361,7 @@ function guiaLeftTxt(){if(!guiaOnline())return 'Las preguntas escritas a fondo n
   if(GUIA.left==null)return `Los temas de arriba son gratis. Las preguntas escritas que necesiten al sabio: ${GUIA.max} por día.`;
   return GUIA.left>0?`Te queda${GUIA.left>1?'n':''} ${tkB(GUIA.left)} pregunta${GUIA.left>1?'s':''} al sabio hoy. Los temas de arriba no gastan.`:'Ya usaste tus preguntas al sabio de hoy. Los temas de arriba los respondo siempre.';}
 function renderGuia(){const b=$('#npcBody');if(!b)return;const keep=$('#gqIn')?$('#gqIn').value:'';
-  const log=GUIA.log.map(m=>`<div class="gq-m ${m.who}${m.wait?' wait':''}">${m.who==='he'?'<i>Tapekuaa</i>':''}<span>${m.html}</span>${m.deep&&guiaOnline()&&GUIA.left!==0&&!GUIA.busy?`<button class="btn sm ghost" data-act="guiaDeep">Preguntarle más a fondo</button>`:''}</div>`).join('');
+  const log=GUIA.log.map(m=>`<div class="gq-m ${m.who}${m.wait?' wait':''}">${m.who==='he'?'<i>Arandu</i>':''}<span>${m.html}</span>${m.deep&&guiaOnline()&&GUIA.left!==0&&!GUIA.busy?`<button class="btn sm ghost" data-act="guiaDeep">Preguntarle más a fondo</button>`:''}</div>`).join('');
   b.innerHTML=`<div class="gq"><div class="gq-log" id="gqLog">${log||'<p class="hint" style="margin:0">Elegí un tema o escribí tu pregunta. Ya sé quién sos y por dónde vas.</p>'}</div>
     <div class="gq-chips">${GUIA_T.map(t=>`<button class="btn sm ghost" data-act="guiaTopic" data-k="${t.k}">${esc(typeof t.q==='function'?t.q(C):t.q)}</button>`).join('')}</div>
     <div class="namebox"><input id="gqIn" maxlength="100" placeholder="Escribí tu pregunta sobre NOX" autocomplete="off" enterkeyhint="send" ${GUIA.busy?'disabled':''}><button class="btn sm" data-act="guiaAsk" ${GUIA.busy?'disabled':''}>Preguntar</button></div>
@@ -7644,7 +7647,7 @@ const LORE=[
 let LOREP=0;
 function loreOpen(i){const L=LORE[i];if(!L||!L.req)return true;try{return C?!!L.req(achData()):false;}catch(e){return false;}}
 function loreHTML(){const pg=LORE[LOREP],n=LORE.length,open=loreOpen(LOREP);
-  return `<div class="lore"><div class="lore-k">Crónica ${LOREP+1} de ${n}</div><h3>${open?pg.t:'Capítulo sin escribir'}</h3>${open?pg.p.map(x=>`<p>${x}</p>`).join(''):`<p class="it-d">Karaí Arandu todavía no sabe cómo sigue esta historia. <b>${esc(pg.lock||'')}</b> y volvé a contarle.</p>`}
+  return `<div class="lore"><div class="lore-k">Crónica ${LOREP+1} de ${n}</div><h3>${open?pg.t:'Capítulo sin escribir'}</h3>${open?pg.p.map(x=>`<p>${x}</p>`).join(''):`<p class="it-d">Karaí Mombe'u todavía no sabe cómo sigue esta historia. <b>${esc(pg.lock||'')}</b> y volvé a contarle.</p>`}
   <div class="lore-dots">${LORE.map((_,i)=>`<i class="${i===LOREP?'on':''} ${loreOpen(i)?'':'lk'}"></i>`).join('')}</div>
   <div class="lore-nav"><button class="btn sm ghost" data-act="lorePg" data-d="-1" ${LOREP?'':'disabled'}>Anterior</button><button class="btn sm" data-act="lorePg" data-d="1" ${LOREP<n-1?'':'disabled'}>Seguir leyendo</button></div></div>`;}
 ACT.lorePg=d=>{LOREP=clamp(LOREP+(+d.d),0,LORE.length-1);$('#npcBody').innerHTML=loreHTML();sfx('item');};
@@ -8371,7 +8374,7 @@ function updCamera(dt){
     if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));look.set(P.x,py+1,P.z);HOLE.uHole.value=1;if(shake>0){camera.position.x+=R(-1,1)*shake*.35;camera.position.y+=R(-1,1)*shake*.35;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
   camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();HOLE.uPV.value.set(P.x,H(P.x,P.z)+1.1,P.z).applyMatrix4(camera.matrixWorldInverse);if(mode!=='game')HOLE.uHole.value=0;
   sky.position.copy(camera.position);const cx=mode==='game'?P.x:0,cz=mode==='game'?P.z:6;sun.position.set(cx+sunDir.x*90,sunDir.y*90,cz+sunDir.z*90);sun.target.position.set(cx,0,cz);
-  if(HERO)HERO.g.visible=!HERO.hideWait;
+  if(HERO)HERO.g.visible=!HERO.hideWait&&!HC.npc;/* HC.npc: en la charla con Arandu la cámara lo muestra a él */
   {const wl=mode==='select'&&HERO&&HERO.hideWait;let el=document.getElementById('heroLoad');if(wl&&!el){el=document.createElement('div');el.id='heroLoad';el.innerHTML='<i></i>Cargando tu personaje…';document.body.appendChild(el);}if(el)el.hidden=!wl;}
   {const fp=mode==='game'&&CAMM==='primera'&&!HC.on,fv=HC.on?40:fp?Math.round(Math.min(80,Math.max(62,2*Math.atan(Math.tan(PI/3)/camera.aspect)*180/PI))):mode==='game'&&CAMM!=='iso'?62:45,nr=fp?.18:.25;if(camera.fov!==fv||camera.near!==nr){camera.fov=fv;camera.near=nr;camera.updateProjectionMatrix();}}
   /* lo que está más allá de la niebla total no se ve: la cámara corta ahí (con la cámara de 3ra y 1ra persona se ve hasta el horizonte) y el cielo se achica para quedar adentro */{const ff=scene.fog&&scene.fog.far<590?Math.round(scene.fog.far+6):600;if(camera.far!==ff){camera.far=ff;camera.updateProjectionMatrix();sky.scale.setScalar(Math.min(1,ff*.9/450));}}
@@ -8480,11 +8483,13 @@ function tabsFor(id){let t=$('#pTabs');if(id==='pNpc'&&NPCV!=='quests'){if(t)t.r
   const box=id==='partyBox'?$('#partyBox'):$('#'+id+' .card');const h=box.querySelector('.card-h,.lp-h');if(h)h.after(t);else box.prepend(t);}
 function tabCycle(d){const cur=PTABS.findIndex(p=>{const e=$('#'+p[2]);return e&&!e.hidden&&(p[2]!=='pNpc'||NPCV==='quests');});if(cur<0)return;const f=ACT[PTABS[(cur+d+PTABS.length)%PTABS.length][1]];if(f)f();}
 /* cámara con un menú abierto: de frente al personaje y centrada en la mitad que queda libre */
-const HC={on:false,snap:false};
+const HC={on:false,snap:false,npc:null};
 function hcTick(){const on=mode==='game'&&!!C&&!STUDIO.on&&(paused||['partyBox','chatBox'].some(id=>{const e=$('#'+id);return e&&!e.hidden;}));
-  if(on!==HC.on){HC.on=on;document.body.classList.toggle('half',on);if(on){HC.snap=true;try{document.exitPointerLock&&document.exitPointerLock();}catch(e){}}else{snapCam=true;camOY=1;}}}
-function hcCamera(dt){const port=innerHeight>innerWidth,py=H(P.x,P.z),fx=Math.sin(P.ry),fz=Math.cos(P.ry),d=port?9:IS_MOB?4.8:3.6;
-  camT.set(P.x+fx*d+fz*.35,py+1.5,P.z+fz*d-fx*.35);const gy=H(camT.x,camT.z)+.4;if(camT.y<gy)camT.y=gy;look.set(P.x,py+1.02,P.z);
+  if(on!==HC.on){HC.on=on;document.body.classList.toggle('half',on);if(on){HC.snap=true;try{document.exitPointerLock&&document.exitPointerLock();}catch(e){}}else{snapCam=true;camOY=1;}}
+  /* en el panel de Arandu la cámara lo muestra a él: el personaje se oculta mientras dura la charla */
+  const foc=on&&NPCV==='guia'&&!$('#pNpc').hidden?npcs.find(n=>n.id==='guia')||null:null;if(foc!==HC.npc){HC.npc=foc;HC.snap=true;}}
+function hcCamera(dt){const N=HC.npc,X=N?N.x:P.x,Z0=N?N.z:P.z,RY=N?N.ry0:P.ry,up=N&&N.m&&N.m.model?Math.max(0,N.m.model.position.y):0;const port=innerHeight>innerWidth,py=H(X,Z0)+up,fx=Math.sin(RY),fz=Math.cos(RY),d=port?9:IS_MOB?4.8:3.6;
+  camT.set(X+fx*d+fz*.35,py+1.5,Z0+fz*d-fx*.35);const gy=H(camT.x,camT.z)+.4;if(camT.y<gy)camT.y=gy;look.set(X,py+1.02,Z0);
   if(HC.snap){camera.position.copy(camT);HC.snap=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));
   const key=port?'hp':'hl';if(camOY!==key){camOY=key;if(port)camera.setViewOffset(innerWidth,innerHeight,0,Math.round(innerHeight*.22),innerWidth,innerHeight);else camera.setViewOffset(innerWidth,innerHeight,Math.round(innerWidth*.25),-Math.round(innerHeight*(IS_MOB?.1:.04)),innerWidth,innerHeight);}
   HOLE.uHole.value=0;camera.lookAt(look);}

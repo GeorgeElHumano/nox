@@ -298,7 +298,7 @@ route('GET', 'game/count', async ({ db }) => {
   return json({ n: r ? r.n : 0 });
 });
 
-/* ---------- Tapekuaa, el guía con IA ----------
+/* ---------- Arandu, el guía con IA ----------
    El juego contesta solo las preguntas comunes; acá llegan las demás. Cada cuenta tiene GUIA_DIA preguntas por día (10) y hay
    un tope para todo el servidor (GUIA_TOPE, 1200 por día) que cuida el crédito. La guía del juego va siempre igual y primero,
    con cache_control, así la IA la cobra como lectura de caché. Los datos del personaje salen de la base (docs), no del jugador.
@@ -323,10 +323,10 @@ route('GET', 'game/guia', async ({ db, env, me }) => {
 route('POST', 'game/guia', async ({ db, req, env, me }) => {
   const b = await body(req), q = guiaClean(b.q), { dia, tope } = guiaLim(env), day = guiaDay();
   if (q.length < 3) return fail('Escribí tu pregunta.');
-  if (!env.ANTHROPIC_API_KEY) return json({ error: 'Tapekuaa todavía no está conectado. Probá más tarde.', off: true }, 503);
+  if (!env.ANTHROPIC_API_KEY) return json({ error: 'Arandu todavía no está conectado. Probá más tarde.', off: true }, 503);
   const n = await guiaTake(db, me.id, day, dia);
   if (!n) return json({ error: 'Ya hiciste tus ' + dia + ' preguntas de hoy. Volvé mañana.', left: 0, max: dia, limit: true }, 429);
-  if (!await guiaTake(db, '*', day, tope)) { await guiaBack(db, me.id, day); return json({ error: 'Tapekuaa atendió a demasiada gente hoy. Volvé mañana.', left: dia - n + 1, max: dia, busy: true }, 429); }
+  if (!await guiaTake(db, '*', day, tope)) { await guiaBack(db, me.id, day); return json({ error: 'Arandu atendió a demasiada gente hoy. Volvé mañana.', left: dia - n + 1, max: dia, busy: true }, 429); }
   const undo = async () => { await guiaBack(db, me.id, day); await guiaBack(db, '*', day); };
   let ctx = 'Sin datos del personaje.';
   if (DOC_RE.test(String(b.id || '')) && b.id !== 'vault') {
@@ -345,9 +345,9 @@ route('POST', 'game/guia', async ({ db, req, env, me }) => {
       }),
     });
     j = await r.json();
-  } catch (e) { await undo(); return json({ error: 'Tapekuaa no pudo responder. Probá de nuevo.' }, 502); }
+  } catch (e) { await undo(); return json({ error: 'Arandu no pudo responder. Probá de nuevo.' }, 502); }
   const a = r.ok && j && Array.isArray(j.content) ? j.content.filter(x => x && x.type === 'text').map(x => x.text).join(' ').replace(/[*#_`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 700) : '';
-  if (!a) { await undo(); console.log('guia', r.status, JSON.stringify(j).slice(0, 300)); return json({ error: 'Tapekuaa no pudo responder. Probá de nuevo.' }, 502); }
+  if (!a) { await undo(); console.log('guia', r.status, JSON.stringify(j).slice(0, 300)); return json({ error: 'Arandu no pudo responder. Probá de nuevo.' }, 502); }
   const u = j.usage || {};
   await db.prepare('UPDATE guia SET tin=tin+?, tout=tout+?, tcache=tcache+? WHERE uid=? AND day=?').bind((+u.input_tokens || 0) + (+u.cache_creation_input_tokens || 0), +u.output_tokens || 0, +u.cache_read_input_tokens || 0, '*', day).run();
   return json({ a, left: Math.max(0, dia - n), max: dia });

@@ -8,7 +8,7 @@ $('#sons').innerHTML=SONS.map(k=>{const m=W.mobs[k];return `<li><button data-go=
 let curCh=0;
 function setChapter(i){curCh=Math.max(0,Math.min(W.lore.length-1,i|0));const c=W.lore[curCh];
   $('#bookNav').innerHTML=W.lore.map((x,k)=>`<button type="button" data-ch="${k}" aria-current="${k===curCh}"><span class="no">${ROM[k]}</span><span>${x.t}</span></button>`).join('');
-  $('#bookPage').innerHTML=`<span class="kicker">Capítulo ${ROM[curCh]} · Karaí Arandu, cronista del reino</span><h3>${c.t}</h3><span class="lk">${c.lock?'En el juego se abre al '+c.lock.charAt(0).toLowerCase()+c.lock.slice(1)+'.':'Disponible desde el inicio.'}</span>${c.p.map(x=>'<p>'+x+'</p>').join('')}<div class="pn">${curCh>0?'<button class="btn btn-line" data-ch="'+(curCh-1)+'">Anterior</button>':''}${curCh<W.lore.length-1?'<button class="btn btn-gold" data-ch="'+(curCh+1)+'">Siguiente capítulo</button>':'<button class="btn btn-gold" data-dl>Empezar a jugar</button>'}</div>`;}
+  $('#bookPage').innerHTML=`<span class="kicker">Capítulo ${ROM[curCh]} · Karaí Mombe'u, cronista del reino</span><h3>${c.t}</h3><span class="lk">${c.lock?'En el juego se abre al '+c.lock.charAt(0).toLowerCase()+c.lock.slice(1)+'.':'Disponible desde el inicio.'}</span>${c.p.map(x=>'<p>'+x+'</p>').join('')}<div class="pn">${curCh>0?'<button class="btn btn-line" data-ch="'+(curCh-1)+'">Anterior</button>':''}${curCh<W.lore.length-1?'<button class="btn btn-gold" data-ch="'+(curCh+1)+'">Siguiente capítulo</button>':'<button class="btn btn-gold" data-dl>Empezar a jugar</button>'}</div>`;}
 $('#book').addEventListener('click',e=>{const b=e.target.closest('[data-ch]');if(b)setChapter(+b.dataset.ch);});setChapter(0);
 
 /* razas: selector, barras y técnicas */
