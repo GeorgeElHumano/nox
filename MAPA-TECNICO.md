@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (Tapekuaa, el guía con IA, hecho en `arte-cc0` SIN publicar; último parche publicado: 202611121351, optimización por equipo).
+Última actualización: 12 de noviembre de 2026 (Arandu, el guía con IA, hecho en `arte-cc0` SIN publicar; último parche publicado: 202611121351, optimización por equipo).
 
 ## Repositorio y publicación
 
@@ -514,12 +514,14 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 - Sin revisar antes de publicar: pelea con los jefes agrandados, sonidos de la Ita Jára, la web (las fotos de sets, alas y mobs de noxparaguay.com quedaron viejas: correr `scripts/web/sync.sh`). El servidor en vivo no cambió.
 - «Cambiar de personaje» (12/11, publicado en el parche 202611120155): el botón (`data-act="toMenu"`) pasó de Ajustes (`renderCfg`) al final de la ficha del personaje (`renderChar`).
 
-## Tapekuaa, el guía del reino con IA (12/11; SIN publicar, rama arte-cc0)
+## Arandu, el guía del reino con IA (12/11; SIN publicar, rama arte-cc0)
 - Pedido del dueño: un PNJ en la plaza de Asunción, frente a la fuente y al punto de aparición, que responda solo cosas del juego sabiendo quién es el personaje; lo básico sin gastar IA y lo complejo con una IA barata; 10 preguntas por día; preguntas de 100 letras.
-- Nombre: **Tapekuaa** («el que conoce el camino»). No se usó Arandu porque ya existen el cronista Karaí Arandu y el set de Arandu del Hechicero.
-- PNJ: `NPCS.guia` en `[0,4.7]` con `ry:0` (mira al spawn `[0,8]`; los demás PNJ miran al centro, `ry` fija el giro). `NPC_GEAR.guia={cls:'hechicero',t:7,wt:7,wg:0,lv:9,face:1}`: `wt` = set del arma, `wg:0` = sin alas (`npcGear` ya no las pone siempre). `NPCLOOK.guia` es el respaldo simple.
-- Set único: `FORJA.hechicero[7]` «Tapekuaa» (blanco y oro, corona `sunfan`, sol en la espalda, túnica de tela). Solo lo lleva él: los ítems del juego llegan al set 6 (índice 6) y `forjaOf` acota por el largo de cada lista. En `cc0Hero` el color del arma sale de `forjaOf(cls,w.t)` (la forma sigue acotada a 6), por eso su bastón es dorado.
-- Portada: `updNpcs` oculta a los PNJ parados entre la cámara y el personaje (|x|<8, z de 1,5 a 19), la misma caja que `updLife`; Tapekuaa quedaba justo detrás del héroe.
+- Nombre: **Arandu** (lo eligió el dueño; primero se llamó Tapekuaa). Para que no haya dos Arandu, el cronista pasó a llamarse **Karaí Mombe'u** (`NPCS.cronista`, texto de la crónica, `web/views.js`, `web/data.json` y `public/index.html`; la web publicada sigue con el nombre viejo hasta que se publique). El set 6 del Hechicero sigue siendo «de Arandu».
+- PNJ: `NPCS.guia` en `[0,4.7]` con `ry:0` (mira al spawn `[0,8]`; los demás PNJ miran al centro, `ry` fija el giro). `NPC_GEAR.guia={cls:'hechicero',t:7,wt:7,wg:3,wc:'arandu',wlv:13,lv:9,face:1}`: `wt` = set del arma, `wlv` = nivel de las alas, `wc` = paleta de alas (`npcGear` solo pone alas si `wg` > 0). `NPCLOOK.guia` es el respaldo simple.
+- Alas propias: `WART.PAL.arandu` (plumas blancas de punta dorada alternadas con plumas de luz ámbar, gema celeste; la misma paleta en las tres fases). `cc0Hero` llama `wingsMesh(eq.wings.wc||cls,…)`: `wc` en el ítem de alas elige otra paleta. Tres pares (`wg:3`), chispas y halo (`wlv:13`). Con alas, flota como los demás PNJ.
+- Cámara del panel: en `hcTick`, `HC.npc` = el PNJ `guia` mientras su panel está abierto; `hcCamera` encuadra a `HC.npc` (posición, giro de base `ry0` y altura de vuelo) en vez de al héroe, el héroe se oculta (`HERO.g.visible=!HERO.hideWait&&!HC.npc`) y `updNpcs` lo deja mirando a la cámara. Al cerrar vuelve todo.
+- Set único: `FORJA.hechicero[7]` «Arandu Guasu» (blanco y oro, corona `sunfan`, sol en la espalda, túnica de tela). Solo lo lleva él: los ítems del juego llegan al set 6 (índice 6) y `forjaOf` acota por el largo de cada lista. En `cc0Hero` el color del arma sale de `forjaOf(cls,w.t)` (la forma sigue acotada a 6), por eso su bastón es dorado.
+- Portada: `updNpcs` oculta a los PNJ parados entre la cámara y el personaje (|x|<8, z de 1,5 a 19), la misma caja que `updLife`; Arandu quedaba justo detrás del héroe.
 - Panel (`renderGuia`, rama `NPCV==='guia'` de `renderNpc`): charla `#gqLog`, temas `.gq-chips`, campo `#gqIn` (100 letras) y cupo `#gqLeft`. Estado en `GUIA` (se limpia en `enterGame`). Acciones `guiaTopic`, `guiaAsk`, `guiaDeep`.
   - `GUIA_T`: 10 temas (nivel, misión, set, alas, gemas, puntos, evolución, técnicas, oro, eventos), cada uno con `re` (palabras clave sobre el texto sin acentos, `tkNorm`) y `f()` que arma la respuesta con los datos de `C` (mejor caza `tkHunt`, misión y diarias, piezas que faltan, gemas en la bolsa, etc.). **No gastan IA ni cupo.**
   - Pregunta escrita: `guiaMatch` cuenta los temas que toca. Un solo tema → responde el juego y aparece «Preguntarle más a fondo» (`guiaDeep`, eso sí va a la IA). Cero o varios temas → IA (`guiaIA`). Sin cuenta o sin cupo → el tema más parecido o un aviso.
