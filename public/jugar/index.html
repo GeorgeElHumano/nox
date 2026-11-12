@@ -1996,7 +1996,7 @@ const NPCS={
  chamana:{name:'Jarýi Kuña',role:'Caldero de Kerana',pos:[13,6.5],greet:'El caldero de Kerana da poder… o se traga todo. Vos elegís.'},
  baqueano:{name:'Baqueano Tito',role:'Viajes',pos:[-5,30],greet:'Conozco cada camino del reino. Decime adónde y te llevo, por unos guaraníes.'},
  baul:{name:'Ña Chela',role:'Baúl de la cuenta',pos:[-13.4,7.6],greet:'Lo que guardes acá lo ven todos tus personajes. Y nadie más, si le ponés candado.'},
- cronista:{name:"Karaí Mombe'u",role:'Cronista del reino',pos:[-10.2,-16.6],greet:'Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?'},
+ cronista:{name:"Mombe'u",role:'Cronista del reino',pos:[-10.2,-16.6],greet:'Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?'},
  /* guía del reino: frente a la fuente, mirando a donde aparecen los jugadores (ry fija el giro; los demás miran al centro) */
  guia:{name:'Arandu',role:'Guía del reino',pos:[0,4.7],ry:0,greet:"Mba'éichapa. Soy Arandu, la sabiduría del reino. Preguntame lo que quieras de NOX."}
 };
@@ -7203,7 +7203,7 @@ function renderShop(){$('#tabBuy').classList.toggle('on',SHOP.tab==='buy');$('#t
   $('#shopGold').textContent=fmt(C.gold);$('#shopFree').textContent=freeSlots()+' lugares libres';}
 
 /* NPC paneles */
-function openNpc(n){P.interact=null;P.moveTo=null;faceTalk(n.m&&n.m.faceMats,3.5);if(n.id==='herrero'||n.id==='boticaria')return openShop(n);if(n.id==='baul')return openVault(n);if(n.id==='cronista')LOREP=0;$('#npcName').textContent=n.def.name;$('#npcRole').textContent=n.def.role;$('#npcGreet').textContent=n.def.greet;$('#npcGreet').hidden=false;NPCV=n.id;renderNpc();showPanel('pNpc');}
+function openNpc(n){HC.talk=n;P.interact=null;P.moveTo=null;faceTalk(n.m&&n.m.faceMats,3.5);if(n.id==='herrero'||n.id==='boticaria')return openShop(n);if(n.id==='baul')return openVault(n);if(n.id==='cronista')LOREP=0;$('#npcName').textContent=n.def.name;$('#npcRole').textContent=n.def.role;$('#npcGreet').textContent=n.def.greet;$('#npcGreet').hidden=false;NPCV=n.id;renderNpc();showPanel('pNpc');}
 let NPCV=null;const CALD={sel:null,res:null};
 function renderNpc(){const b=$('#npcBody');
   if(NPCV==='cronista'){b.innerHTML=loreHTML();return;}
@@ -7647,7 +7647,7 @@ const LORE=[
 let LOREP=0;
 function loreOpen(i){const L=LORE[i];if(!L||!L.req)return true;try{return C?!!L.req(achData()):false;}catch(e){return false;}}
 function loreHTML(){const pg=LORE[LOREP],n=LORE.length,open=loreOpen(LOREP);
-  return `<div class="lore"><div class="lore-k">Crónica ${LOREP+1} de ${n}</div><h3>${open?pg.t:'Capítulo sin escribir'}</h3>${open?pg.p.map(x=>`<p>${x}</p>`).join(''):`<p class="it-d">Karaí Mombe'u todavía no sabe cómo sigue esta historia. <b>${esc(pg.lock||'')}</b> y volvé a contarle.</p>`}
+  return `<div class="lore"><div class="lore-k">Crónica ${LOREP+1} de ${n}</div><h3>${open?pg.t:'Capítulo sin escribir'}</h3>${open?pg.p.map(x=>`<p>${x}</p>`).join(''):`<p class="it-d">Mombe'u todavía no sabe cómo sigue esta historia. <b>${esc(pg.lock||'')}</b> y volvé a contarle.</p>`}
   <div class="lore-dots">${LORE.map((_,i)=>`<i class="${i===LOREP?'on':''} ${loreOpen(i)?'':'lk'}"></i>`).join('')}</div>
   <div class="lore-nav"><button class="btn sm ghost" data-act="lorePg" data-d="-1" ${LOREP?'':'disabled'}>Anterior</button><button class="btn sm" data-act="lorePg" data-d="1" ${LOREP<n-1?'':'disabled'}>Seguir leyendo</button></div></div>`;}
 ACT.lorePg=d=>{LOREP=clamp(LOREP+(+d.d),0,LORE.length-1);$('#npcBody').innerHTML=loreHTML();sfx('item');};
@@ -8374,7 +8374,7 @@ function updCamera(dt){
     if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));look.set(P.x,py+1,P.z);HOLE.uHole.value=1;if(shake>0){camera.position.x+=R(-1,1)*shake*.35;camera.position.y+=R(-1,1)*shake*.35;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
   camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();HOLE.uPV.value.set(P.x,H(P.x,P.z)+1.1,P.z).applyMatrix4(camera.matrixWorldInverse);if(mode!=='game')HOLE.uHole.value=0;
   sky.position.copy(camera.position);const cx=mode==='game'?P.x:0,cz=mode==='game'?P.z:6;sun.position.set(cx+sunDir.x*90,sunDir.y*90,cz+sunDir.z*90);sun.target.position.set(cx,0,cz);
-  if(HERO)HERO.g.visible=!HERO.hideWait&&!HC.npc;/* HC.npc: en la charla con Arandu la cámara lo muestra a él */
+  if(HERO)HERO.g.visible=!HERO.hideWait&&!HC.npc;/* HC.npc: al hablar con un PNJ la cámara lo muestra a él */
   {const wl=mode==='select'&&HERO&&HERO.hideWait;let el=document.getElementById('heroLoad');if(wl&&!el){el=document.createElement('div');el.id='heroLoad';el.innerHTML='<i></i>Cargando tu personaje…';document.body.appendChild(el);}if(el)el.hidden=!wl;}
   {const fp=mode==='game'&&CAMM==='primera'&&!HC.on,fv=HC.on?40:fp?Math.round(Math.min(80,Math.max(62,2*Math.atan(Math.tan(PI/3)/camera.aspect)*180/PI))):mode==='game'&&CAMM!=='iso'?62:45,nr=fp?.18:.25;if(camera.fov!==fv||camera.near!==nr){camera.fov=fv;camera.near=nr;camera.updateProjectionMatrix();}}
   /* lo que está más allá de la niebla total no se ve: la cámara corta ahí (con la cámara de 3ra y 1ra persona se ve hasta el horizonte) y el cielo se achica para quedar adentro */{const ff=scene.fog&&scene.fog.far<590?Math.round(scene.fog.far+6):600;if(camera.far!==ff){camera.far=ff;camera.updateProjectionMatrix();sky.scale.setScalar(Math.min(1,ff*.9/450));}}
@@ -8483,11 +8483,11 @@ function tabsFor(id){let t=$('#pTabs');if(id==='pNpc'&&NPCV!=='quests'){if(t)t.r
   const box=id==='partyBox'?$('#partyBox'):$('#'+id+' .card');const h=box.querySelector('.card-h,.lp-h');if(h)h.after(t);else box.prepend(t);}
 function tabCycle(d){const cur=PTABS.findIndex(p=>{const e=$('#'+p[2]);return e&&!e.hidden&&(p[2]!=='pNpc'||NPCV==='quests');});if(cur<0)return;const f=ACT[PTABS[(cur+d+PTABS.length)%PTABS.length][1]];if(f)f();}
 /* cámara con un menú abierto: de frente al personaje y centrada en la mitad que queda libre */
-const HC={on:false,snap:false,npc:null};
+const HC={on:false,snap:false,npc:null,talk:null};
 function hcTick(){const on=mode==='game'&&!!C&&!STUDIO.on&&(paused||['partyBox','chatBox'].some(id=>{const e=$('#'+id);return e&&!e.hidden;}));
   if(on!==HC.on){HC.on=on;document.body.classList.toggle('half',on);if(on){HC.snap=true;try{document.exitPointerLock&&document.exitPointerLock();}catch(e){}}else{snapCam=true;camOY=1;}}
-  /* en el panel de Arandu la cámara lo muestra a él: el personaje se oculta mientras dura la charla */
-  const foc=on&&NPCV==='guia'&&!$('#pNpc').hidden?npcs.find(n=>n.id==='guia')||null:null;if(foc!==HC.npc){HC.npc=foc;HC.snap=true;}}
+  /* al hablar con un PNJ (su panel o su tienda) la cámara lo muestra a él y el personaje se oculta; HC.talk lo anota openNpc. Viajes y Misiones abiertos desde el menú no tienen PNJ; el baúl va a pantalla completa */
+  const tk=HC.talk,foc=on&&tk&&npcs.includes(tk)&&((!$('#pNpc').hidden&&NPCV===tk.id)||(!$('#pShop').hidden&&typeof SHOP!=='undefined'&&SHOP&&SHOP.id===tk.id))?tk:null;if(foc!==HC.npc){HC.npc=foc;HC.snap=true;}}
 function hcCamera(dt){const N=HC.npc,X=N?N.x:P.x,Z0=N?N.z:P.z,RY=N?N.ry0:P.ry,up=N&&N.m&&N.m.model?Math.max(0,N.m.model.position.y):0;const port=innerHeight>innerWidth,py=H(X,Z0)+up,fx=Math.sin(RY),fz=Math.cos(RY),d=port?9:IS_MOB?4.8:3.6;
   camT.set(X+fx*d+fz*.35,py+1.5,Z0+fz*d-fx*.35);const gy=H(camT.x,camT.z)+.4;if(camT.y<gy)camT.y=gy;look.set(X,py+1.02,Z0);
   if(HC.snap){camera.position.copy(camT);HC.snap=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));
