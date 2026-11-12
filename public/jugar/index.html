@@ -7173,9 +7173,10 @@ function renderChar(){const cl=CLASSES[C.cls];
   ${petHTML()}
   ${titlesHTML()}
   <p class="hint">${cl.hint} Con el set de armadura completo (5 piezas del mismo tipo) ganás +10% de defensa, y +5% más si todas son +10.</p>
+  <button class="btn full ghost" data-act="toMenu" style="margin-top:10px">Cambiar de personaje</button>
 `;if(!$('#pCfg').hidden)renderCfg();}
 /* ajustes (separados de la ficha del personaje) */
-function renderCfg(){$('#cfgBody').innerHTML=`<div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p><button class="btn full ghost" data-act="toMenu">Cambiar de personaje</button></div>
+function renderCfg(){$('#cfgBody').innerHTML=`<div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p></div>
   <div class="sect"><h3>Gráficos</h3><div class="tabs">${['bajo','medio','alto'].map(l=>`<button data-act="quality" data-q="${l}" class="${Q.level===l?'on':''}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div><p class="hint" style="margin:0">Alto: más nitidez, sombras finas y brillos. Bajo: sin brillos ni sombras, para celulares más simples.</p></div>
   <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Acercá o alejá con dos dedos o la rueda del mouse. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
   <div class="sect"><h3>Cuadros por segundo</h3><div class="tabs">${[30,60].map(f=>`<button data-act="fpsCap" data-f="${f}" class="${FCAP.fps===f?'on':''}">${f}</button>`).join('')}<button data-act="fpsShow" class="${FPSM.on?'on':''}">Ver FPS</button></div><p class="hint" style="margin:0">30 gasta menos batería y calienta menos el celular. 60 se ve más suave si tu equipo lo aguanta.</p></div>
