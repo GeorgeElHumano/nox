@@ -3504,8 +3504,8 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
   if(r.skF||r.tbF)skirtFollow(r);
   if(r.poleH&&r.cc0&&r.gripOk){/* bastón, cetro y arco en movimiento: el braceo los cruzaba por delante del cuerpo o entre las piernas. Mientras se mueve en tierra el arma se mantiene derecha (apenas inclinada adelante) pasando por el puño; el arco sólo al correr, caminando va atravesado en la mano */
     const h=r.poleH,bow=r.cls==='arquera',base=bow?h.userData.qC:r.poleQ0;if(!bow&&!r.poleQ1){r.poleQ1=1;r.poleQ0.copy(h.quaternion);}
-    const want=!act&&!(P.deadK>0)&&!(P.gest&&r.gOn)&&(!bow||r.curK==='run')?Math.min(1,(P.mv||0)*3)*(1-Math.min(1,(r.flyK||0)*1.5)):0;r.poleK=(r.poleK||0)+(want-(r.poleK||0))*Math.min(1,dt*8);
-    if(!bow)h.quaternion.copy(base);if(r.poleK>.01&&base){h.parent.updateWorldMatrix(true,false);h.parent.getWorldQuaternion(_fq2);_fq3.copy(_fq2).multiply(base);_sk1.set(0,1,0).applyQuaternion(_fq3).normalize();r.g.getWorldQuaternion(_fq);_sk2.set(bow?.12:0,1,bow?.3:.1).normalize().applyQuaternion(_fq);
+    /* los PNJ de la plaza están siempre quietos: su bastón o cetro va siempre derecho y apenas abierto hacia afuera, para que no cruce la túnica ni las piernas (Arandu) */const want=P.npc&&!bow?1:!act&&!(P.deadK>0)&&!(P.gest&&r.gOn)&&(!bow||r.curK==='run')?Math.min(1,(P.mv||0)*3)*(1-Math.min(1,(r.flyK||0)*1.5)):0;r.poleK=(r.poleK||0)+(want-(r.poleK||0))*Math.min(1,dt*8);
+    if(!bow)h.quaternion.copy(base);if(r.poleK>.01&&base){h.parent.updateWorldMatrix(true,false);h.parent.getWorldQuaternion(_fq2);_fq3.copy(_fq2).multiply(base);_sk1.set(0,1,0).applyQuaternion(_fq3).normalize();r.g.getWorldQuaternion(_fq);_sk2.set(bow?.12:P.npc?.1:0,1,bow?.3:P.npc?.06:.1).normalize().applyQuaternion(_fq);
       _fq.setFromUnitVectors(_sk1,_sk2).multiply(_fq3);_fq2.invert().multiply(_fq);h.quaternion.slerp(_fq2,r.poleK);}}
   {/* postura erguida en reposo y al caminar: columna derecha, pecho arriba, mirada al frente (no en ataques ni en vuelo) */
     const want=act||P.deadK>0?0:1;r.standK=(r.standK==null?1:r.standK)+(want-(r.standK==null?1:r.standK))*Math.min(1,dt*6);const w=r.standK*(1-Math.min(1,(r.flyK||0)*1.5));
@@ -3537,7 +3537,7 @@ const NPC_GEAR={herrero:{cls:'caballero',t:6,wg:2,lv:11,face:3},boticaria:{cls:'
   guia:{cls:'hechicero',t:7,wt:7,wg:3,wc:'arandu',wlv:13,lv:9,face:1}};
 function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',G.wt!=null?G.wt:Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});if(G.wg){eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.wlv!=null?G.wlv:G.lv,g:G.wg};if(G.wc)eq.wings.wc=G.wc;}return eq;}
 function oadNpc(id){const G=NPC_GEAR[id];if(G&&OAD.on&&!OAD.failed){const eq=npcGear(G);const hf=HERO_FACE;HERO_FACE=G.face;let r=null;try{if(CC0.on){if(cc0Want(G.cls,eq,oadUpgradeNpcs))r=cc0Hero(G.cls,eq);}else{const sp=oadHeroSpec(G.cls,eq);if(!oadHave(sp.files)){oadNeed(sp.files,oadUpgradeNpcs);}else r=oadHero(G.cls,eq);}}catch(e){console.error(e);}finally{HERO_FACE=hf;}
-    if(r){(r.faceMats||[]).forEach(m=>m.userData.npc=1);r.npcP={mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false,flyK:0};return r;}return null;}
+    if(r){(r.faceMats||[]).forEach(m=>m.userData.npc=1);r.npcP={npc:1,mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false,flyK:0};return r;}return null;}
   if(CC0.on&&!OAD.failed&&CC0_NPC[id])return cc0Npc(id);
   const d=OAD_NPC[id];if(!d||!OAD.on||OAD.failed)return null;const s={body:d.body,tex:OAD_PLAN.tex.npc[id],props:d.props};
   const files=['anims','body_'+d.body].concat(d.props.map(p=>'p_'+p));if(!oadHave(files)){oadNeed(files,oadUpgradeNpcs);return null;}
@@ -4093,7 +4093,7 @@ const FORJA={
   {n:'Arandu',a:0x3a0a4a,b:0x1c0424,m:0x581470,t:0xff5ad8,g:0xe040ff,helm:'antler',pads:'none',chest:'gem',brace:'ornate',greave:'none',belt:'metal',x:{mat:'cloth',cui:'gems',back:'shards',pad2:'gemstack',skirt:{n:6,len:.46,st:'leaf'},gor:.07}},
   {n:'Ñamandu',a:0x5a20c0,b:0x2a0c60,m:0x8a48ff,t:0xf4e8ff,g:0xb070ff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',halo:1,x:{cui:'star',back:'ring',skirt:{n:10,len:.48,st:'cloth'},gor:.09,pad2:'tier',elbow:'wing'}},
   /* 7: set de Arandu, el guía de la plaza. Solo lo lleva él: no se vende ni cae (los ítems llegan hasta el set 6) */
-  {n:'Arandu Guasu',a:0xf4eedc,b:0xb8a67c,m:0xe8c25a,t:0xfff4c8,g:0xffd070,helm:'sunfan',pads:'big',chest:'ornate',brace:'wrap',greave:'none',belt:'metal',halo:1,x:{mat:'cloth',cui:'amulet',back:'sun',tab:'rune',skirt:{n:10,len:.5,st:'cloth'},gor:.08,pad2:'gemstack',elbow:'wing'}}],
+  {n:'Arandu Guasu',a:0xf4eedc,b:0xe9dcb4,m:0xf7e2a0,t:0xfff4c8,g:0xffd070,helm:'sunfan',pads:'big',chest:'ornate',brace:'wrap',greave:'none',belt:'metal',halo:1,x:{mat:'cloth',cui:'amulet',back:'sun',tab:'rune',skirt:{n:10,len:.5,st:'cloth'},gor:.08,pad2:'gemstack',elbow:'wing'}}],
  arquera:[
   {n:"Ao Po'i",a:0xbfe0d8,b:0x6a9a90,m:0x8a8a70,t:0xe8fff8,g:0x7ad8c8,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'leather',belt:'leather',x:{bare:['thigh'],skirt:{n:10,len:.15,st:'cloth'}}},
   {n:'Plumas',a:0x2a9a8a,b:0x145048,m:0x8a7a50,t:0xffe0a0,g:0x30e0c0,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather',x:{bare:['spine_02','thigh'],skirt:{n:12,len:.2,st:'feather'}}},
@@ -8186,7 +8186,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611121633';const UPD={shown:'',req:false};
+const NOX_BUILD='202611121914';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}

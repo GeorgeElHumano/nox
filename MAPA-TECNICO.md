@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611121633 publicado: Arandu, el guía con IA, cámara sobre el PNJ al hablar, cronista Mombe'u y guardado en el dispositivo con service worker).
+Última actualización: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA).
 
 ## Repositorio y publicación
 
@@ -519,6 +519,7 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 - Nombre: **Arandu** (lo eligió el dueño; primero se llamó Tapekuaa). Para que no haya dos Arandu, el cronista pasó a llamarse **Mombe'u** (nombre elegido por el dueño) (`NPCS.cronista`, texto de la crónica, `web/views.js`, `web/data.json` y `public/index.html`; la web publicada sigue con el nombre viejo hasta que se publique). El set 6 del Hechicero sigue siendo «de Arandu».
 - PNJ: `NPCS.guia` en `[0,4.7]` con `ry:0` (mira al spawn `[0,8]`; los demás PNJ miran al centro, `ry` fija el giro). `NPC_GEAR.guia={cls:'hechicero',t:7,wt:7,wg:3,wc:'arandu',wlv:13,lv:9,face:1}`: `wt` = set del arma, `wlv` = nivel de las alas, `wc` = paleta de alas (`npcGear` solo pone alas si `wg` > 0). `NPCLOOK.guia` es el respaldo simple.
 - Alas propias: `WART.PAL.arandu` (plumas blancas de punta dorada alternadas con plumas de luz ámbar, gema celeste; la misma paleta en las tres fases). `cc0Hero` llama `wingsMesh(eq.wings.wc||cls,…)`: `wc` en el ítem de alas elige otra paleta. Tres pares (`wg:3`), chispas y halo (`wlv:13`). Con alas, flota como los demás PNJ.
+- Bastón de los PNJ (pedido del dueño, parche 202611121914): la pose de reposo del Hechicero lleva el bastón en diagonal y a Arandu le cruzaba la túnica y las piernas. `npcP` lleva `npc:1` y, en el bloque `r.poleH` de `oadHeroAnim`, los PNJ tienen `want=1` siempre (bastón o cetro derecho pasando por el puño) con el eje `(.1,1,.06)`: la punta apenas hacia la cabeza para que el pie del bastón quede por fuera del cuerpo. Inclinarlo al revés (x negativo) mete el pie entre las piernas. El set «Arandu Guasu» pasó a `b:0xe9dcb4, m:0xf7e2a0` porque con `m:0xe8c25a` hombreras, corona y botas se veían cobrizas.
 - Cámara al hablar con cualquier PNJ (pedido del dueño): `openNpc` anota `HC.talk`; en `hcTick`, `HC.npc` = ese PNJ mientras está abierto su panel (`#pNpc` con su `NPCV`) o su tienda (`#pShop` con su `SHOP.id`). Viajes y Misiones abiertos desde el menú no tienen PNJ y el baúl va a pantalla completa, así que ahí no cambia nada; `hcCamera` encuadra a `HC.npc` (posición, giro de base `ry0` y altura de vuelo) en vez de al héroe, el héroe se oculta (`HERO.g.visible=!HERO.hideWait&&!HC.npc`) y `updNpcs` lo deja mirando a la cámara. Al cerrar vuelve todo.
 - Set único: `FORJA.hechicero[7]` «Arandu Guasu» (blanco y oro, corona `sunfan`, sol en la espalda, túnica de tela). Solo lo lleva él: los ítems del juego llegan al set 6 (índice 6) y `forjaOf` acota por el largo de cada lista. En `cc0Hero` el color del arma sale de `forjaOf(cls,w.t)` (la forma sigue acotada a 6), por eso su bastón es dorado.
 - Portada: `updNpcs` oculta a los PNJ parados entre la cámara y el personaje (|x|<8, z de 1,5 a 19), la misma caja que `updLife`; Arandu quedaba justo detrás del héroe.

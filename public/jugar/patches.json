@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611121914",
+  "title": "Arandu: bastón y set corregidos",
+  "notes": [
+   "El bastón de Arandu ya no atraviesa su túnica ni sus piernas: lo lleva derecho, al costado",
+   "Los personajes de la plaza que llevan bastón o cetro ahora lo sostienen derecho",
+   "Las hombreras, la corona y las botas de Arandu ahora son doradas, a juego con su bastón",
+   "Arandu ya responde las preguntas escritas (se corrigió el error 502)"
+  ]
+ },
+ {
   "build": "202611121633",
   "title": "Arandu, el guía del reino",
   "notes": [
