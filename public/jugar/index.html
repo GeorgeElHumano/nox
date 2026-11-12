@@ -1478,7 +1478,38 @@ const trampleTex=canvasTex(256,(x,s)=>{const n=noiseArr(s,6,4),img=x.createImage
 const petalTex=canvasTex(32,(x,s)=>{x.fillStyle='#fff';x.beginPath();x.ellipse(s/2,s/2,s*.42,s*.22,.6,0,TAU);x.fill();});
 
 /* calidad gráfica y posprocesado */
-const IS_MOB=matchMedia('(pointer:coarse)').matches;const Q={level:'medio'};try{const q=localStorage.getItem('tsm-calidad');const mob=matchMedia('(pointer:coarse)').matches,mem=navigator.deviceMemory||4,cpu=navigator.hardwareConcurrency||4;Q.auto=!q;Q.level=q||localStorage.getItem('tsm-calidad-auto')||(mob?(mem<=3||cpu<=4?'bajo':'medio'):(mem<=4||cpu<=2?'medio':'alto'));}catch(e){Q.level='medio';}
+const IS_MOB=matchMedia('(pointer:coarse)').matches;
+/* NIVEL DEL EQUIPO (12/11/2026). Antes se elegía por núcleos y memoria, pero Safari (iPhone, iPad y Mac) siempre dice
+   2-4 núcleos y nunca dice la memoria: TODOS los iPhone arrancaban en "bajo" (sin sombras, sin brillo, resolución 1).
+   Ahora se mira la placa de video (y en Apple la versión de iOS) para arrancar en un nivel razonable, y después
+   el juego sube o baja solo según los cuadros por segundo reales (dynRes). */
+const DEV=(()=>{const n=navigator,ua=n.userAgent||'';let gpu='';try{const gl=renderer.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info');gpu=String((x&&gl.getParameter(x.UNMASKED_RENDERER_WEBGL))||gl.getParameter(gl.RENDERER)||'');}catch(e){}
+  const g=gpu.toLowerCase(),mem=n.deviceMemory||0,ios=/iP(hone|ad|od)/.test(ua)||(/Macintosh/.test(ua)&&n.maxTouchPoints>1),iosV=+((ua.match(/OS (\d+)_\d/)||[])[1]||(ua.match(/Version\/(\d+)/)||[])[1]||0),num=re=>+((g.match(re)||[])[1]||0);
+  let t='medio',why='';
+  if(/swiftshader|llvmpipe|softpipe|basic render|software/.test(g)){t='bajo';why='sin placa de video';}
+  else if(IS_MOB){
+    if(ios||/apple/.test(g)){t=iosV>=17?'alto':iosV>=16?'medio':'bajo';why='iOS '+iosV;}/* iOS 17+ = iPhone XS/XR (A12) o más nuevo; iOS 16 = iPhone 8/X (A11) */
+    else if(/adreno/.test(g)){const v=num(/adreno[^0-9]*(\d{3})/);t=v>=730||(v>=640&&v<700)?'alto':v>=616||v>=540&&v<600||v>=700?'medio':'bajo';why='Adreno '+v;}
+    else if(/immortalis|xclipse/.test(g)){t='alto';why=g;}
+    else if(/mali/.test(g)){const v=num(/mali-?g(\d+)/);t=v>=710||v===77||v===78?'alto':v>=600||v===57||v===68||v===76||v===72?'medio':'bajo';why='Mali '+(v||'T/4xx');}
+    else if(/powervr|vivante|videocore/.test(g)){t='bajo';why=g;}
+    else{t=mem&&mem>=6?'medio':'bajo';why='desconocida';}}
+  else{
+    if(/nvidia|geforce|quadro|rtx|gtx|radeon|amd|arc\b|apple m|apple gpu|iris xe|iris\(r\) xe/.test(g)){t='alto';why=g;}
+    else if(/intel/.test(g)){t='medio';why=g;}
+    else{t=mem&&mem<=4?'medio':'alto';why='desconocida';}}
+  if(mem&&mem<=2)t='bajo';else if(mem&&mem<=3&&t==='alto')t='medio';
+  return {gpu,tier:t,why,ios,iosV,mem};})();
+const QLV=['bajo','medio','alto'];
+/* nivel elegido a mano (tsm-calidad), o el automático guardado (nox-q2: el que quedó después de subir o bajar solo),
+   o el del equipo. Las claves viejas de automático no se usan: venían del cálculo que dejaba los iPhone en bajo. */
+const Q={level:'medio',auto:true,top:'alto'};try{const q=localStorage.getItem('tsm-calidad');Q.auto=!q;let a=null;try{a=JSON.parse(localStorage.getItem('nox-q2')||'null');}catch(e){}
+  /* "top" = el nivel más alto al que puede subir solo: si un nivel ya anduvo lento en este equipo, no se vuelve a probar por 10 días */
+  if(a&&a.fail&&Date.now()-a.ft<864e6)Q.top=QLV[Math.max(0,QLV.indexOf(a.fail)-1)];
+  Q.level=q||(a&&a.lv)||DEV.tier;if(QLV.indexOf(Q.level)<0)Q.level='medio';}catch(e){Q.level=DEV.tier||'medio';}
+function qSave(o){try{const a=JSON.parse(localStorage.getItem('nox-q2')||'null')||{};Object.assign(a,o);localStorage.setItem('nox-q2',JSON.stringify(a));}catch(e){}}
+/* recortes de celular: solo por debajo de alto. En alto un teléfono potente se ve como la PC (sombras, brillo, distancias). */
+const LITE=()=>IS_MOB&&Q.level!=='alto';
 let SHMOD=1;let composer=null,bloom=null,FINAL=null,windT=0,shake=0;
 const HAS_PP=!!(THREE.EffectComposer&&THREE.RenderPass&&THREE.UnrealBloomPass&&THREE.ShaderPass);
 const FinalShader={uniforms:{tDiffuse:{value:null},uVig:{value:1.15},uTime:{value:0},uRes:{value:new THREE.Vector2(1,1)},uSplit:{value:.3},uCurve:{value:.1},uSat:{value:.93}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
@@ -1492,7 +1523,7 @@ const FinalShader={uniforms:{tDiffuse:{value:null},uVig:{value:1.15},uTime:{valu
    'c*=1.0-dot(d,d)*uVig*1.1;',
    'c+=(hs(vUv*uRes+fract(uTime*7.0)*91.0)-0.5)*0.012;',
    'gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);}'].join('\n')};
-const DYN={base:1,cur:1,acc:0,n:0,t:0};
+const DYN={base:1,cur:1,acc:0,n:0,t:0,good:0,upAt:0,slowUp:0};const RAWF={l:0,acc:0,n:0};
 /* cuadros por segundo: en el celular 30 por defecto (menos calor y batería, imagen más pareja); se puede pasar a 60 */
 renderer.info.autoReset=false;
 const FCAP={fps:60};try{const f=+localStorage.getItem('tsm-fps');FCAP.fps=f===30||f===60?f:(matchMedia('(pointer:coarse)').matches?30:60);}catch(e){}
@@ -1518,18 +1549,32 @@ async function benchRun(){if(BENCH.on)return;BENCH.on=true;const z0=Z.id,p0=[P.x
       res.push({zona:ZONES[z].name,fps:Math.round(avg),bajo:Math.round(low),dib:Math.round(calls/nc)});}}
   catch(e){console.error(e);}
   loadZone(z0,p0);BENCH.on=false;FPSM.on=fv;fpsBox();
-  const I=benchInfo(),txt='NOX · prueba de rendimiento\n'+new Date().toLocaleString()+'\nGráficos: '+Q.level+' · tope '+FCAP.fps+' FPS\nNúcleos: '+I.nucleos+' · memoria: '+I.memoria+' · WebGL '+I.webgl+'\nGPU: '+I.gpu+'\nPantalla: '+I.pantalla+'\n'+I.nav+'\n\n'+res.map(r=>r.zona+': '+r.fps+' FPS (bajones '+r.bajo+') · '+r.dib+' dibujos').join('\n');
+  const I=benchInfo(),txt='NOX · prueba de rendimiento\n'+new Date().toLocaleString()+'\nGráficos: '+Q.level+(Q.auto?' (auto, equipo: '+DEV.tier+' por '+DEV.why+')':' (a mano)')+' · tope '+FCAP.fps+' FPS\nNúcleos: '+I.nucleos+' · memoria: '+I.memoria+' · WebGL '+I.webgl+'\nGPU: '+I.gpu+'\nPantalla: '+I.pantalla+'\n'+I.nav+'\n\n'+res.map(r=>r.zona+': '+r.fps+' FPS (bajones '+r.bajo+') · '+r.dib+' dibujos').join('\n');
   const verdict=r=>r.fps>=FCAP.fps*.9?'#7fd38a':r.fps>=FCAP.fps*.65?'#f2d98a':'#ef7a6a';
   benchMsg('<div style="font:600 12px Cinzel,serif;letter-spacing:.12em;color:#c9a24a">PRUEBA DE RENDIMIENTO</div><table style="width:100%;margin:10px 0;border-collapse:collapse">'+res.map(r=>'<tr><td style="padding:3px 0">'+r.zona+'</td><td style="text-align:right;color:'+verdict(r)+'"><b>'+r.fps+'</b> FPS</td><td style="text-align:right;opacity:.75;font-size:12px">bajones '+r.bajo+'</td></tr>').join('')+'</table><div style="font-size:12px;opacity:.8">Gráficos '+Q.level+' · tope '+FCAP.fps+' · '+I.gpu+'</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn sm" id="benchCopy">Copiar resultado</button><button class="btn sm ghost" id="benchClose">Cerrar</button></div>');
   document.getElementById('benchCopy').onclick=async()=>{try{if(navigator.share)await navigator.share({text:txt});else{await navigator.clipboard.writeText(txt);toast('Copiado: pegalo en WhatsApp');}}catch(e){try{await navigator.clipboard.writeText(txt);toast('Copiado');}catch(e2){}}};
   document.getElementById('benchClose').onclick=()=>{const m=document.getElementById('benchBox');if(m)m.remove();};window.__BENCH=res;}
 function setPR(pr){DYN.cur=pr;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);if(composer){composer.setPixelRatio(pr);composer.setSize(innerWidth,innerHeight);}}
-function dynRes(dt){if(mode!=='game'||paused)return;DYN.t+=dt;DYN.acc+=dt;DYN.n++;if(DYN.t<1.5)return;const a=DYN.acc/DYN.n;DYN.t=DYN.acc=DYN.n=0;const mn=innerWidth*innerHeight>1.2e6?.5:.75;const c30=FCAP.fps<=30,tLo=c30?1/26:1/33,tQ=c30?1/21:1/26,tHi=c30?1/29:1/54;/* si va muy lento baja de a 0,25 para recuperarse rápido */if(a>tLo&&DYN.cur>mn)setPR(Math.max(mn,+(DYN.cur-(a>1/18?.25:.15)).toFixed(2)));else if(a>tQ&&DYN.cur<=mn&&Q.auto&&Q.level!=='bajo'){DYN.slow=(DYN.slow||0)+1;if(DYN.slow>=2){DYN.slow=0;Q.level=Q.level==='alto'?'medio':'bajo';/* se recuerda aparte, para que siga en automático */try{localStorage.setItem('tsm-calidad-auto',Q.level);}catch(e){}applyQuality();toast('Ajustamos los gráficos a <em>'+Q.level+'</em> para que el juego corra más fluido');}}else if(a<tHi&&DYN.cur<DYN.base)setPR(Math.min(DYN.base,+(DYN.cur+.1).toFixed(2)));}
+function dynRes(dt){if(mode!=='game'||paused){RAWF.acc=RAWF.n=0;return;}DYN.t+=dt;DYN.acc+=dt;DYN.n++;if(DYN.t<1.5)return;const a=DYN.acc/DYN.n,raw=RAWF.n?RAWF.acc/RAWF.n:99;DYN.t=DYN.acc=DYN.n=0;RAWF.acc=RAWF.n=0;const mn=innerWidth*innerHeight>1.2e6?.5:.75;const c30=FCAP.fps<=30,tLo=c30?1/26:1/33,tQ=c30?1/21:1/26,tHi=c30?1/29:1/54;
+  const now=performance.now(),fresh=DYN.upAt&&now-DYN.upAt<60000;
+  /* recién subido y anda lento: se vuelve al nivel anterior enseguida y ese nivel no se prueba más por 10 días */
+  if(fresh&&Q.auto&&a>tQ){if(++DYN.slowUp>=2){const was=Q.level;DYN.upAt=0;DYN.slowUp=0;Q.top=QLV[Math.max(0,QLV.indexOf(was)-1)];qLevel(Q.top,{fail:was,ft:Date.now()});return;}}else DYN.slowUp=0;
+  /* si va muy lento baja de a 0,25 para recuperarse rápido */if(a>tLo&&DYN.cur>mn){DYN.good=0;setPR(Math.max(mn,+(DYN.cur-(a>1/18?.25:.15)).toFixed(2)));}
+  else if(a>tQ&&DYN.cur<=mn&&Q.auto&&Q.level!=='bajo'){DYN.good=0;DYN.slow=(DYN.slow||0)+1;if(DYN.slow>=2){DYN.slow=0;const was=Q.level;qLevel(QLV[QLV.indexOf(was)-1],fresh?{fail:was,ft:Date.now()}:null);}}
+  else if(a<tHi&&DYN.cur<DYN.base){DYN.good=0;setPR(Math.min(DYN.base,+(DYN.cur+.1).toFixed(2)));}
+  /* sobra potencia: con tope 30 los rAF llegan cada ~16 ms aunque se dibuje cada 33; con tope 60 tiene que ir clavado en 60.
+     15 segundos seguidos así y se sube un nivel (hasta Q.top) */
+  else if(Q.auto&&QLV.indexOf(Q.level)<QLV.indexOf(Q.top)&&DYN.cur>=DYN.base&&(c30?(a<1/27&&raw<21):(a<1/58.5))){if(++DYN.good>=10){DYN.good=0;DYN.upAt=now;qLevel(QLV[QLV.indexOf(Q.level)+1]);}}
+  else DYN.good=0;}
+/* cambia el nivel automático, lo recuerda (nox-q2) y avisa */
+function qLevel(lv,extra){if(!lv||lv===Q.level)return;const up=QLV.indexOf(lv)>QLV.indexOf(Q.level);Q.level=lv;qSave(Object.assign({lv},extra||{}));applyQuality();
+  try{toast(up?'Tu equipo da para más: subimos los gráficos a <em>'+lv+'</em>':'Ajustamos los gráficos a <em>'+lv+'</em> para que el juego corra más fluido');}catch(e){}}
 function applyQuality(){
   /* presupuesto de píxeles: en monitores grandes (PC) la resolución interna se limita para mantener los FPS */
-  const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS */let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,mob?1.3:1.5):Math.min(dpr,mob?1.5:2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
+  const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS *//* (12/11) en alto el celular ya no se queda en 1,5: un teléfono que da para alto se ve nítido como la PC; si no aguanta, dynRes baja la resolución sola */let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,mob?1.3:1.5):Math.min(dpr,2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
   renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);DYN.base=pr;DYN.cur=pr;
-  sun.castShadow=Q.level!=='bajo';SHMOD=mob&&Q.level!=='alto'?2:1;const ms=Q.level==='alto'&&!big&&!mob?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
+  sun.castShadow=Q.level!=='bajo';SHMOD=mob&&Q.level!=='alto'?2:1;const ms=Q.level==='alto'&&!big?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
+  if(typeof liteAll==='function'&&typeof HERO!=='undefined')liteAll();
   if(composer){try{composer.renderTarget1.dispose();composer.renderTarget2.dispose();}catch(e){}composer=null;bloom=null;}
   if(HAS_PP&&Q.level!=='bajo'){try{const w=innerWidth,h=innerHeight;let rt=null;
       if(renderer.capabilities&&renderer.capabilities.isWebGL2&&THREE.WebGLMultisampleRenderTarget){rt=new THREE.WebGLMultisampleRenderTarget(Math.round(w*pr),Math.round(h*pr),{format:THREE.RGBAFormat,stencilBuffer:true});rt.samples=big?(Q.level==='alto'?2:0):(Q.level==='alto'?(mob?2:4):(mob?0:2));}
@@ -2091,7 +2136,7 @@ function bakeGroups(root){const groups=[];root.traverse(o=>{if(!o.isMesh&&o.chil
    bakeRig(r): en un personaje (héroe, NPC, otro jugador) une las mallas rígidas colgadas del mismo hueso
    que tienen material equivalente, y las mallas animadas (piel) que comparten esqueleto y material.
    No toca lo que el código anima por su cuenta (todo lo que el objeto r referencia, y sus hijos). */
-const BAKEFN=new WeakMap();let BAKEFNN=0;function bakeFnId(f){if(!f||f===THREE.Material.prototype.onBeforeCompile)return '0';if(!BAKEFN.has(f))BAKEFN.set(f,++BAKEFNN);return 'f'+BAKEFN.get(f);}
+const BAKEFN=new WeakMap();let BAKEFNN=0;function bakeFnId(f){if(!f||f===THREE.Material.prototype.onBeforeCompile)return '0';if(f.__bk)return f.__bk;if(!BAKEFN.has(f))BAKEFN.set(f,++BAKEFNN);return 'f'+BAKEFN.get(f);}
 function bakeUD(x,d){if(x==null||d>3)return String(x);if(typeof x!=='object')return String(x);if(x.isColor)return '#'+x.getHexString();if(x.isVector2||x.isVector3||x.isVector4)return x.toArray().join(',');if(x.isTexture||x.isMaterial||x.isObject3D)return '@'+x.uuid;if(Array.isArray(x))return '['+x.map(y=>bakeUD(y,d+1)).join(';')+']';return '{'+Object.keys(x).sort().map(k=>k==='t'?'t':k+':'+bakeUD(x[k],d+1)).join(';')+'}';}
 function bakeSig(m){if(!m||Array.isArray(m))return null;const v=[m.type,m.transparent,m.opacity,m.side,m.alphaTest,m.depthWrite,m.depthTest,m.blending,m.metalness,m.roughness,m.emissiveIntensity,m.envMapIntensity,m.vertexColors,m.skinning,m.clearcoat,m.clearcoatRoughness,m.sheen,m.transmission,m.flatShading,m.wireframe,m.fog,m.toneMapped,m.visible,m.polygonOffset,m.polygonOffsetFactor,m.colorWrite,m.premultipliedAlpha];
   for(const k of['color','emissive','sheenColor','sheenTint','specular'])v.push(m[k]&&m[k].getHexString?m[k].getHexString():'');
@@ -2144,7 +2189,7 @@ function bakeRig(r,opt){opt=opt||{};const root=r&&(r.g||r);if(!root||root.userDa
   root.traverse(o=>{if(!o.isSkinnedMesh||o.children.length||keep.has(o)||!o.visible||!o.material||Array.isArray(o.material)||o.userData.nobake)return;if(o.geometry.morphAttributes&&Object.keys(o.geometry.morphAttributes).length)return;
     for(let q=o.parent;q&&q!==root;q=q.parent)if(!q.visible)return;
     const sig=bakeSig(o.material);if(sig==null)return;o.updateMatrix();
-    const k=o.parent.uuid+'#'+o.skeleton.bones.map(b=>b.uuid).join(',')+'#'+o.bindMatrix.elements.map(v=>v.toFixed(5)).join(',')+'#'+o.matrix.elements.map(v=>v.toFixed(5)).join(',')+'#'+o.skeleton.boneInverses.map(m=>m.elements.map(v=>v.toFixed(4)).join(',')).join(';')+'#'+sig+'#'+bakeAttrKey(o.geometry)+'#'+o.castShadow+o.receiveShadow+o.renderOrder+o.layers.mask+o.bindMode;
+    /* (12/11) con piel en modo 'attached' la posición del objeto se cancela (bindMatrixInverse = su inversa): alcanza con mismo esqueleto, bindMatrix e inversas; ya no se exige el mismo padre (cada prenda CC0 viene en su propia escena y no se unían: PNJ con 7 piezas de la misma tela) */const k=(o.bindMode==='attached'?'A':o.parent.uuid+'#'+o.matrix.elements.map(v=>v.toFixed(5)).join(','))+'#'+o.skeleton.bones.map(b=>b.uuid).join(',')+'#'+o.bindMatrix.elements.map(v=>v.toFixed(5)).join(',')+'#'+o.skeleton.boneInverses.map(m=>m.elements.map(v=>v.toFixed(4)).join(',')).join(';')+'#'+sig+'#'+bakeAttrKey(o.geometry)+'#'+o.castShadow+o.receiveShadow+o.renderOrder+o.layers.mask+o.bindMode;
     if(!bySk.has(k))bySk.set(k,[]);bySk.get(k).push(o);});
   for(const list of bySk.values()){if(list.length<2)continue;const mg=bakeMerge(list.map(o=>o.geometry));const o0=list[0];
     const sm=new THREE.SkinnedMesh(mg,o0.material);sm.name='bakedSkin';sm.userData=Object.assign({},o0.userData,{bakedN:list.length});sm.castShadow=o0.castShadow;sm.receiveShadow=o0.receiveShadow;sm.renderOrder=o0.renderOrder;sm.frustumCulled=o0.frustumCulled;
@@ -2183,9 +2228,9 @@ function mergeStatic(G,dyn,moved){if(!G||(Z&&Z.event)||window.__NOBAKE)return 0;
 /* personaje terminado (héroe, PNJ, otro jugador): se une lo rígido y las piezas chicas dejan de proyectar sombra */
 /* sombra por distancia: los mobs a más de 24 m no la proyectan (en gráficos alto, todos) */
 /* personajes del pueblo (PNJ, vecinos): proyectan sombra solo cerca del jugador (en el celular, 16 m) */
-function charShadow(o,g,d){if(!g)return;const on=d<(IS_MOB?16:Q.level==='alto'?36:24),eye=d<(IS_MOB?12:18);if(o.shOn===on&&o.eyOn===eye&&o.shG===g)return;if(o.shG!==g){o.shG=g;o.shL=[];o.eyL=[];g.traverse(x=>{if(x.isMesh&&x.castShadow)o.shL.push(x);if(x.isMesh&&/^(Eyes|Eyebrows|Eyelashes)$/.test(x.name))o.eyL.push(x);});o.shOn=o.eyOn=null;}
+function charShadow(o,g,d){if(!g)return;const lt=LITE(),on=d<(lt?16:Q.level==='alto'?(IS_MOB?20:36):24),eye=d<(lt?12:18);if(o.shOn===on&&o.eyOn===eye&&o.shG===g)return;if(o.shG!==g){o.shG=g;o.shL=[];o.eyL=[];g.traverse(x=>{if(x.isMesh&&x.castShadow)o.shL.push(x);if(x.isMesh&&/^(Eyes|Eyebrows|Eyelashes)$/.test(x.name))o.eyL.push(x);});o.shOn=o.eyOn=null;}
   if(o.shOn!==on){o.shOn=on;for(const x of o.shL)x.castShadow=on;}/* de lejos los ojos y las cejas no se distinguen: se ocultan (2 llamadas menos por persona) */if(o.eyOn!==eye){o.eyOn=eye;for(const x of o.eyL)x.visible=eye;}}
-function mobShadow(e,d){const on=d<(IS_MOB?20:Q.level==='alto'?36:24)||e.def.boss;if(e.shOn===on)return;if(!e.shL){e.shL=[];e.g.traverse(o=>{if(o.isMesh&&o.castShadow)e.shL.push(o);});}e.shOn=on;for(const o of e.shL)o.castShadow=on;}
+function mobShadow(e,d){const on=d<(LITE()?20:Q.level==='alto'?(IS_MOB?28:36):24)||e.def.boss;if(e.shOn===on)return;if(!e.shL){e.shL=[];e.g.traverse(o=>{if(o.isMesh&&o.castShadow)e.shL.push(o);});}e.shOn=on;for(const o of e.shL)o.castShadow=on;}
 /* mobs hechos con piezas (serpientes, bichos de 4 patas, alacranes): une las piezas quietas de cada grupo animado
    (cabeza, mandíbula, pata, pájaros) que comparten material, en el espacio del grupo. Lo que el código mueve por su cuenta
    (referenciado directo, alas, llamas, ojos) queda aparte. Los mobs con animación de modelo (mixer) no se tocan. */
@@ -2195,7 +2240,47 @@ function mobBake(r){if(!r||!r.g||r.mixer||window.__NOBAKE)return 0;const direct=
       const k=c.material.uuid+'#'+bakeAttrKey(c.geometry)+c.castShadow+c.receiveShadow+c.renderOrder+c.frustumCulled;if(!by.has(k))by.set(k,[]);by.get(k).push(c);}
     for(const list of by.values()){if(list.length<2)continue;const geos=list.map(c=>{c.updateMatrix();return bakeXform(c.geometry,c.matrix);});const mg=bakeMerge(geos);geos.forEach(x=>x.dispose());const o0=list[0];const mm=new THREE.Mesh(mg,o0.material);mm.castShadow=o0.castShadow;mm.receiveShadow=o0.receiveShadow;mm.renderOrder=o0.renderOrder;mm.frustumCulled=o0.frustumCulled;mm.name='baked';g.add(mm);for(const c of list){g.remove(c);if(!c.geometry.userData.keep)c.geometry.dispose();n++;}}}
   return n;}
-function charBake(r){if(!r||window.__NOBAKE)return r;try{bakeRig(r);shadowTrim(r.g||r);}catch(e){console.error(e);}return r;}
+/* (12/11) piezas dentro de grupos que se mueven solos (bastón, armas, faldón, adornos del set, alas): bakeRig no las toca
+   porque el grupo está referenciado, pero lo que cuelga quieto dentro de cada grupo se puede unir en el espacio del grupo.
+   Solo se deja aparte lo referenciado directo por r (un nivel de objetos/listas), lo animado por sombreador y los sprites.
+   Con set máximo y alas: Hechicero 118 → ~60 piezas, Mburuvicha 165 → ~80 (medido en el banco). */
+function bakeInner(r){const root=r&&r.g;if(!root||root.userData.bakedIn)return 0;root.userData.bakedIn=1;
+  const direct=new Set(),seen=new Set();const skip={g:1,model:1,body:1,mats:1,faceMats:1,pm:1,forge:1,glowMats:1,eq:1,spec:1,acts:1,mixer:1,gclips:1};
+  const vis=(v,d)=>{if(!v||typeof v!=='object'||seen.has(v)||d>3)return;seen.add(v);if(v.isObject3D){direct.add(v);return;}if(v.isMaterial||v.isTexture||v.isBufferGeometry)return;
+    if(Array.isArray(v)){for(const x of v)vis(x,d+1);return;}if(v instanceof Map){v.forEach(x=>vis(x,d+1));return;}if(Object.getPrototypeOf(v)===Object.prototype)for(const k in v)vis(v[k],d+1);};
+  for(const k in r){if(!skip[k])vis(r[k],0);}
+  const nob=THREE.Object3D.prototype.onBeforeRender,nodes=[];root.traverse(o=>{if(!o.isMesh&&!o.isSprite&&o.children.length>1)nodes.push(o);});let n=0;
+  for(const g of nodes){if(!g.visible)continue;const by=new Map();
+    for(const c of g.children){if(!c.isMesh||c.isSkinnedMesh||c.isInstancedMesh||c.children.length||!c.visible||direct.has(c)||!c.geometry||!c.geometry.attributes.position||!c.material||Array.isArray(c.material)||c.onBeforeRender!==nob)continue;
+      const u=c.userData;if(u.solo||u.nobake||u.wing||u.flame||u.slot)continue;if(c.geometry.morphAttributes&&Object.keys(c.geometry.morphAttributes).length)continue;if(bakeVS(c.material))continue;
+      const sig=bakeSig(c.material);if(sig==null)continue;const k=sig+'#'+bakeAttrKey(c.geometry)+'#'+c.castShadow+c.receiveShadow+c.renderOrder+c.frustumCulled+c.layers.mask;if(!by.has(k))by.set(k,[]);by.get(k).push(c);}
+    for(const list of by.values()){if(list.length<2)continue;const geos=list.map(c=>{c.updateMatrix();return bakeXform(c.geometry,c.matrix);});const mg=bakeMerge(geos);geos.forEach(x=>x.dispose());const o0=list[0];
+      const mm=new THREE.Mesh(mg,o0.material);mm.castShadow=o0.castShadow;mm.receiveShadow=o0.receiveShadow;mm.renderOrder=o0.renderOrder;mm.frustumCulled=o0.frustumCulled;mm.layers.mask=o0.layers.mask;mm.name='bakedIn';mm.userData.bakedN=list.length;if(o0.userData.ik)mm.userData.ik=o0.userData.ik;g.add(mm);
+      for(const c of list){g.remove(c);if(!c.geometry.userData.keep)c.geometry.dispose();n++;}}}
+  return n;}
+/* (12/11) paños del faldellín y tabardos: cada paño se mueve solo (skirtFollow), así que eran 2-4 llamadas por paño
+   (10 paños = 20-40 llamadas por personaje, y otro tanto en la sombra). Ahora los paños de un mismo faldellín son
+   una sola malla con piel: cada paño es un "hueso" (el mismo grupo que gira skirtFollow), sin cambiar nada de cómo se mueve. */
+function skinFlaps(r){let n=0;const sets=[];if(r.skF)for(const S of r.skF)if(S&&S.ps)sets.push(S.ps.map(p=>p[0]));if(r.tbF&&r.tbF.length)sets.push(r.tbF.map(x=>x[0]));
+  const nob=THREE.Object3D.prototype.onBeforeRender;
+  for(const H of sets){if(H.length<2)continue;const P=H[0].parent;if(!P||H.some(h=>!h||h.parent!==P))continue;P.updateWorldMatrix(true,true);const by=new Map();
+    H.forEach((h,bi)=>h.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||o.isInstancedMesh||o.children.length||!o.geometry||!o.geometry.attributes.position||!o.material||Array.isArray(o.material)||o.onBeforeRender!==nob)return;
+      for(let q=o;q&&q!==h;q=q.parent)if(!q.visible)return;const u=o.userData;if(u.solo||u.nobake||u.flame)return;if(o.geometry.morphAttributes&&Object.keys(o.geometry.morphAttributes).length)return;if(bakeVS(o.material))return;
+      const sig=bakeSig(o.material);if(sig==null)return;const k=sig+'#'+bakeAttrKey(o.geometry)+'#'+o.castShadow+o.receiveShadow+o.renderOrder;if(!by.has(k))by.set(k,[]);by.get(k).push({o,bi,h});}));
+    let used=false;
+    for(const list of by.values()){if(list.length<2)continue;
+      const geos=list.map(({o,bi})=>{const M=new THREE.Matrix4();const ch=[];for(let q=o;q&&q!==P;q=q.parent)ch.push(q);for(let i=ch.length-1;i>=0;i--){ch[i].updateMatrix();M.multiply(ch[i].matrix);}
+        const g=bakeXform(o.geometry,M);const c=g.attributes.position.count,si=new Uint16Array(c*4),sw=new Float32Array(c*4);for(let i=0;i<c;i++){si[i*4]=bi;sw[i*4]=1;}g.setAttribute('skinIndex',new THREE.BufferAttribute(si,4));g.setAttribute('skinWeight',new THREE.BufferAttribute(sw,4));return g;});
+      const mg=bakeMerge(geos);geos.forEach(x=>x.dispose());const o0=list[0].o,m0=o0.material,m=m0.clone();m.skinning=true;m.userData=Object.assign({},m0.userData);m.onBeforeCompile=m0.onBeforeCompile;if(m0.customProgramCacheKey!==THREE.Material.prototype.customProgramCacheKey)m.customProgramCacheKey=m0.customProgramCacheKey;if(METALS.has(m0))regMetal(m);
+      const sm=new THREE.SkinnedMesh(mg,m);sm.name='flapsSkin';sm.castShadow=o0.castShadow;sm.receiveShadow=o0.receiveShadow;sm.renderOrder=o0.renderOrder;sm.frustumCulled=false;P.add(sm);sm.updateMatrixWorld(true);
+      if(!used){used=new THREE.Skeleton(H);}sm.bind(used,sm.matrixWorld);
+      for(const {o} of list){o.parent.remove(o);if(!o.geometry.userData.keep)o.geometry.dispose();n++;}}}
+  return n;}
+/* (12/11) en medio y bajo del celular: sin halos de gemas y con un tercio de las chispas de las alas (cada sprite es una llamada de dibujo; con set +15 y alas 3 eran ~25 por personaje). En alto se ven todas. */
+function liteSprites(r){if(!r||!r.g)return;if(!r.liteSp){r.liteSp=[];let i=0;r.g.traverse(o=>{if(!o.isSprite)return;if(o.userData.gemGlow){r.liteSp.push(o);return;}for(let w=o.parent;w&&w!==r.g;w=w.parent)if(w.name==='wingSock'){if(i++%3)r.liteSp.push(o);break;}});}
+  const on=!LITE();for(const o of r.liteSp)o.visible=on;}
+function liteAll(){try{if(HERO)liteSprites(HERO);LIVE.others.forEach(o=>{if(o.m&&o.m.cc0)liteSprites(o.m);});}catch(e){}}
+function charBake(r){if(!r||window.__NOBAKE)return r;try{bakeRig(r);if(r.cc0){bakeInner(r);skinFlaps(r);liteSprites(r);}shadowTrim(r.g||r);}catch(e){console.error(e);}return r;}
 function part(geo,m,x,y,z,parent,sx,sy,sz){const o=mk(geo,m,x,y,z,parent);if(sx!=null)o.scale.set(sx,sy==null?sx:sy,sz==null?sx:sz);return o;}
 
 /* ---------- cuerpo humano ---------- */
@@ -2516,7 +2601,7 @@ const WART=(()=>{const D=Math.PI/180,lp=(a,b,t)=>a+(b-a)*t;
     {em:0xb04aff,style:'blade',base:'#12161f',mid:'#414a5c',tip:'#98a3b8',edge:'#e8eef8',shaft:'#f0c0ff',vein:'#f0c0ff',rim:'#9a4aff66',cbase:'#161b26',cmid:'#4a5468',ctip:'#8a96ac',arm0:'#2a303c',arm1:'#c8d0de',gem:'#9a4aff',nP:8,nS:8,wP:.095,wS:.105,mg:{style:'blade',glowFill:1,base:'#2a0a5a',mid:'#9a4aff',tip:'#9a4aff',edge:'#f0c0ff',shaft:'#f0c0ff',vein:'#ffffff',rim:'#f0c0ff',cbase:'#2a0a5a',cmid:'#2a0a5a',ctip:'#9a4aff'}}]};
   const TX={},mk=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);return t;};
   const cvs=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
-  function plumeTex(cls,gen,lv){const st=lv>=13?3:lv>=10?2:lv>=7?1:0,pi=PAL[cls].length>3?(gen>=3?3:Math.min(3,Math.floor(lv/4)+(gen>=2?1:0))):gen-1,key=cls+gen+'_'+st+'_'+pi;if(TX[key])return TX[key];const N=(typeof IS_MOB!=='undefined'&&IS_MOB)?768:1024,k=N/1024,P=PAL[cls][pi];
+  function plumeTex(cls,gen,lv){const st=lv>=13?3:lv>=10?2:lv>=7?1:0,pi=PAL[cls].length>3?(gen>=3?3:Math.min(3,Math.floor(lv/4)+(gen>=2?1:0))):gen-1,key=cls+gen+'_'+st+'_'+pi;if(TX[key])return TX[key];const N=(typeof LITE!=='undefined'&&LITE())?768:1024,k=N/1024,P=PAL[cls][pi];
     const cv=cvs(N,N),x=cv.getContext('2d');x.translate(16*k,680*k);wing(x,505*k,P);
     const ec=cvs(N,N),e=ec.getContext('2d');e.fillStyle='#000';e.fillRect(0,0,N,N);e.globalAlpha=.1+.05*(gen-1);e.drawImage(cv,0,0);e.globalAlpha=st?.6:gen>1?.25:0;if(e.globalAlpha>0){e.translate(16*k,680*k);wing(e,505*k,P,true);}
     return TX[key]={map:mk(cv),em:mk(ec),P};}
@@ -2545,7 +2630,7 @@ const WART=(()=>{const D=Math.PI/180,lp=(a,b,t)=>a+(b-a)*t;
     else{const o={cols:['#ffe9b0','#ffb0e0','#a8b8ff','#9af0d8'],alpha:.5,vein:'#f6d27a',rim:'#fff6dc',irid:1,cells:1,nv:9};
       lobe(c,-98*D,S*.62,S*.2,Object.assign({},o,{tip:.5}),hl,ico);lobe(c,58*D,S*.9,S*.34,Object.assign({},o,{tip:.3,skew:-.3}),hl,ico);tail(c,74*D,S*1.3,o);tail(c,60*D,S*1.14,o);
       lobe(c,-38*D,S*1.3,S*.42,Object.assign({},o,{tip:.5,skew:.3}),hl,ico);for(let i=0;i<7;i++)star(c,S*(.4+i*.13)*Math.cos((-50+i*5)*D),S*(.4+i*.13)*Math.sin((-52+i*4)*D),S*(.03+.015*(i%2)),'#fff6d0');}}
-  function fairyArt(gen,lv,ico){const st=lv>=13?3:lv>=10?2:lv>=7?1:0,key='fa'+gen+'_'+st+(ico?'i':'');if(TX[key])return TX[key];const mob=(typeof IS_MOB!=='undefined'&&IS_MOB),Wc=mob?512:640,Hc=Wc*2,k=Wc/640;
+  function fairyArt(gen,lv,ico){const st=lv>=13?3:lv>=10?2:lv>=7?1:0,key='fa'+gen+'_'+st+(ico?'i':'');if(TX[key])return TX[key];const mob=(typeof LITE!=='undefined'&&LITE()),Wc=mob?512:640,Hc=Wc*2,k=Wc/640;
     const cv=cvs(Wc,Hc),x=cv.getContext('2d');x.translate(12*k,582*k);fairyDraw(x,522*k,gen,false,ico);
     const ec=cvs(Wc,Hc),e=ec.getContext('2d');e.fillStyle='#000';e.fillRect(0,0,Wc,Hc);e.globalAlpha=.12;e.drawImage(cv,0,0);e.globalAlpha=1;if(st){e.translate(12*k,582*k);e.globalAlpha=.6;fairyDraw(e,522*k,gen,true,ico);}
     if(ico&&st){x.setTransform(1,0,0,1,0,0);x.globalAlpha=.5;x.globalCompositeOperation='lighter';const tc=cvs(Wc,Hc),t2=tc.getContext('2d');t2.drawImage(ec,0,0);t2.globalCompositeOperation='destination-in';t2.drawImage(cv,0,0);x.drawImage(tc,0,0);}
@@ -3200,6 +3285,7 @@ function coatInject(m,o){if(m.userData.coatU){const u=m.userData.coatU;Object.as
       .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,0.2,cA);')
       .replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nmetalnessFactor=mix(metalnessFactor,0.4,cA);')
       .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=cC*cA*(0.05+uCS*cgb*1.3);');};
+  /* (12/11) para unir mallas: dos capas con la misma función de antes y los mismos valores (bakeUD de userData.coatU) son equivalentes */m.onBeforeCompile.__bk='coat|'+bakeFnId(prev)+'|'+(useMap?1:0);
   m.customProgramCacheKey=()=>(key?key.call(m):'')+'coat'+(useMap?1:0);m.needsUpdate=true;regMetal(m);return u;}
 const GGT={};
 function gearGlow(r){if(!r||!r.body)return;const eq=r.eq||{},cls=r.cls;const S={armor:coatSpec(cls,eq.armor),pants:coatSpec(cls,eq.pants),boots:coatSpec(cls,eq.boots),gloves:coatSpec(cls,eq.gloves),helm:coatSpec(cls,eq.helm),shield:coatSpec(cls,eq.shield),weapon:coatSpec(cls,eq.weapon)};
@@ -4955,7 +5041,7 @@ function lifeCritter(kind){const K=AMBK[kind],g0=OAD.ok[K.f];if(!g0)return null;
 function lifePoint(cx,cz,rad,clr){for(let t=0;t<30;t++){const a=Math.random()*TAU,d=Math.sqrt(Math.random())*rad,x=cx+Math.cos(a)*d,z=cz+Math.sin(a)*d;if(Math.abs(x)>114||Math.abs(z)>114)continue;if(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]+2)continue;if(!blocked(x,z,clr||.6))return [x,z];}return null;}
 function lifePut(c,x,z,o){Object.assign(c,{x,z,hx:x,hz:z,ry:Math.random()*TAU,st:'idle',t:R(.5,5),tx:x,tz:z},o||{});c.g.position.set(x,H(x,z),z);c.g.rotation.y=c.ry;c.g.traverse(m=>{if(m.isMesh)m.castShadow=!c.fly&&(c.hum||c.K&&c.K.len>1);});zoneG.add(c.g);LIFE.push(c);}
 function lifeZone(id){lifeClear();if(!OAD.on||OAD.failed||!LIFE_POP[id])return;const files=lifeFiles(id);if(!oadHave(files)){oadLater(files,()=>{if(Z&&Z.id===id&&!LIFE.length)lifeZone(id);});return;}
-  const P0=LIFE_POP[id],low=Q.level==='bajo'?.5:1;
+  const P0=LIFE_POP[id],low=Q.level==='bajo'?.5:LITE()?.75:1;/* (12/11) celular en medio: 3/4 de la gente y animales del ambiente */
   for(let i=0;i<Math.round((P0.vill||0)*low);i++){const v=VILL[i%VILL.length];const r=oadHuman({body:v.body,tex:OAD_PLAN.tex.npc[v.tex],props:v.props},{team:v.team});if(!r)continue;if(v.col)r.body.userData.mats.forEach(m=>m.color.setHex(v.col));
     oadActs(r,r.body,{idle:v.m?'n_idle_m':'n_idle_f',walk:v.m?'n_walk_m':'n_walk_f'});oadPlay(r,'idle',0);r.mixer.update(Math.random()*3);const p=lifePoint(0,10,17,.8);if(!p)continue;addBlob(r.g,1);lifePut(r,p[0],p[1],{hum:true,sp:1.15,home:16,cx:0,cz:10});}
   (P0.guards||[]).forEach(pt=>{const r=oadHuman({body:'m_tunic',tex:OAD_PLAN.tex.caballero[2],props:['head_m','kh2','ks1','kd2']},{team:0x7a1a1a});if(!r)return;oadActs(r,r.body,{idle:'k_idle',walk:'k_walk'});oadPlay(r,'idle',0);addBlob(r.g,1);lifePut(r,pt[0][0],pt[0][1],{hum:true,sp:1,patrol:pt,pi:1});});
@@ -7177,7 +7263,7 @@ function renderChar(){const cl=CLASSES[C.cls];
 `;if(!$('#pCfg').hidden)renderCfg();}
 /* ajustes (separados de la ficha del personaje) */
 function renderCfg(){$('#cfgBody').innerHTML=`<div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p></div>
-  <div class="sect"><h3>Gráficos</h3><div class="tabs">${['bajo','medio','alto'].map(l=>`<button data-act="quality" data-q="${l}" class="${Q.level===l?'on':''}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div><p class="hint" style="margin:0">Alto: más nitidez, sombras finas y brillos. Bajo: sin brillos ni sombras, para celulares más simples.</p></div>
+  <div class="sect"><h3>Gráficos</h3><div class="tabs"><button data-act="quality" data-q="auto" class="${Q.auto?'on':''}">Auto</button>${['bajo','medio','alto'].map(l=>`<button data-act="quality" data-q="${l}" class="${!Q.auto&&Q.level===l?'on':''}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div><p class="hint" style="margin:0">${Q.auto?'Automático: ahora en <b>'+Q.level+'</b>. El juego sube o baja solo según lo que da tu equipo. ':''}Alto: más nitidez, sombras finas y brillos. Bajo: sin brillos ni sombras, para celulares más simples.</p></div>
   <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Acercá o alejá con dos dedos o la rueda del mouse. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
   <div class="sect"><h3>Cuadros por segundo</h3><div class="tabs">${[30,60].map(f=>`<button data-act="fpsCap" data-f="${f}" class="${FCAP.fps===f?'on':''}">${f}</button>`).join('')}<button data-act="fpsShow" class="${FPSM.on?'on':''}">Ver FPS</button></div><p class="hint" style="margin:0">30 gasta menos batería y calienta menos el celular. 60 se ve más suave si tu equipo lo aguanta.</p></div>
   <div class="sect"><h3>Sonido</h3><label class="vol"><span>Música</span><input type="range" id="volMus" min="0" max="1" step="0.05" value="${SND.vol.mus}"></label><label class="vol"><span>Efectos y ambiente</span><input type="range" id="volSfx" min="0" max="1" step="0.05" value="${SND.vol.sfx}"></label></div>`;}
@@ -7284,7 +7370,7 @@ const ACT={
     else travel(d.z,pos);},
   fpsCap(d){FCAP.fps=+d.f===30?30:60;try{localStorage.setItem('tsm-fps',FCAP.fps);}catch(e){}DYN.t=DYN.acc=DYN.n=0;toast('Cuadros por segundo: '+FCAP.fps);renderChar();},
   fpsShow(){FPSM.on=!FPSM.on;fpsBox();try{localStorage.setItem('tsm-fpsv',FPSM.on?'1':'0');}catch(e){}renderChar();},
-  camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},quality(d){Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}applyQuality();renderChar();toast('Gráficos: '+d.q);},
+  camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},quality(d){if(d.q==='auto'){Q.auto=true;try{localStorage.removeItem('tsm-calidad');const a=JSON.parse(localStorage.getItem('nox-q2')||'null');Q.level=(a&&a.lv)||DEV.tier;}catch(e){Q.level=DEV.tier;}DYN.good=0;DYN.upAt=0;}else{Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}}applyQuality();renderChar();try{renderCfg();}catch(e){}toast('Gráficos: '+(Q.auto?'automático ('+Q.level+')':d.q));},
   cauldSel(d){CALD.sel=+d.i;CALD.res=null;renderCaldero();const pb=$('#npcBody');const sc=pb&&(pb.closest('.card')||pb);try{sc.scrollTo({top:0,behavior:'smooth'});pb.scrollTo&&pb.scrollTo({top:0,behavior:'smooth'});}catch(e){}},
   cauldGo(d){cauldGo(d.r);},
   selPlay(d){enterGame(+d.i);},
@@ -8158,12 +8244,13 @@ function updCamera(dt){
   {const wl=mode==='select'&&HERO&&HERO.hideWait;let el=document.getElementById('heroLoad');if(wl&&!el){el=document.createElement('div');el.id='heroLoad';el.innerHTML='<i></i>Cargando tu personaje…';document.body.appendChild(el);}if(el)el.hidden=!wl;}
   {const fp=mode==='game'&&CAMM==='primera'&&!HC.on,fv=HC.on?40:fp?Math.round(Math.min(80,Math.max(62,2*Math.atan(Math.tan(PI/3)/camera.aspect)*180/PI))):mode==='game'&&CAMM!=='iso'?62:45,nr=fp?.18:.25;if(camera.fov!==fv||camera.near!==nr){camera.fov=fv;camera.near=nr;camera.updateProjectionMatrix();}}
   /* lo que está más allá de la niebla total no se ve: la cámara corta ahí (con la cámara de 3ra y 1ra persona se ve hasta el horizonte) y el cielo se achica para quedar adentro */{const ff=scene.fog&&scene.fog.far<590?Math.round(scene.fog.far+6):600;if(camera.far!==ff){camera.far=ff;camera.updateProjectionMatrix();sky.scale.setScalar(Math.min(1,ff*.9/450));}}
-  /* área de la sombra alrededor del jugador: en el celular más chica (menos objetos en la pasada de sombra) */const s=(innerHeight>innerWidth?40:30)*(IS_MOB?.65:1);if(sc.right!==s){sc.left=-s;sc.right=s;sc.top=s;sc.bottom=-s;sc.updateProjectionMatrix();}
+  /* área de la sombra alrededor del jugador: en el celular más chica (menos objetos en la pasada de sombra) */const s=(innerHeight>innerWidth?40:30)*(LITE()?.65:IS_MOB?.8:1);/* celular en alto: 80 % del área con mapa de 2048 (más nítida que la PC y con menos objetos en la pasada) */if(sc.right!==s){sc.left=-s;sc.right=s;sc.top=s;sc.bottom=-s;sc.updateProjectionMatrix();}
 }
 let last=performance.now(),HITSTOP=0;
 /* las pruebas automáticas pueden detener el reloj (__HOLD) y avanzar cuadro a cuadro con __NOX.step(dt), con o sin dibujar */
 function frame(now){if(window.__KICKED)return;
   requestAnimationFrame(frame);
+  /* intervalo crudo entre rAF (también los cuadros que se saltean por el tope): si con tope 30 el navegador igual llega a ~60, sobra potencia (dynRes sube la calidad) */if(RAWF.l){const d=now-RAWF.l;if(d<250){RAWF.acc+=d;RAWF.n++;}}RAWF.l=now;
   /* límite de cuadros: si toca saltear este, no se dibuja (el tiempo se acumula para el próximo) */
   if(FCAP.fps<60&&now-last<1000/FCAP.fps-4)return;
   const rdt0=(now-last)/1000;last=now;if(window.__HOLD)return;if(rdt0<1){dynRes(rdt0);fpsMeter(rdt0);}tickOnce(Math.min(.05,rdt0),rdt0,!window.__NORENDER);}

@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611120155 publicado: botón Cambiar de personaje en la ficha).
+Última actualización: 12 de noviembre de 2026 (optimización por equipo, SIN publicar en rama arte-cc0; antes parche 202611120155: botón Cambiar de personaje en la ficha).
 
 ## Repositorio y publicación
 
@@ -185,6 +185,25 @@ Un solo archivo HTML de unos 880 KB con three.js r128, que se carga del CDN. Par
 ### Ganchos de prueba
 
 `window.__NOX` expone `STUDIO`, `MOBS`, `MYTH`, `GAMEDATA`, `HERO`, `DS`, `C`, `fixChar`, `recalc`, `renderChar`, `SND`, `setEq`, entre otros.
+
+## Calidad por equipo (12/11, rama arte-cc0; SIN publicar)
+
+- Problema: el nivel inicial salía de `hardwareConcurrency` y `deviceMemory`. Safari (iPhone, iPad, Mac) informa 2-4 núcleos y nunca la memoria, así que **todos los iPhone arrancaban en bajo** (sin sombras, sin brillo, resolución 1 en pantalla ×3). Además el celular en alto seguía recortado (resolución tope 1,5, sombra 1024 y al 65 % del área, distancias de sombra cortas, alas a 768 px).
+- `DEV` (después de crear el renderer): lee la placa de video (`WEBGL_debug_renderer_info`) y elige `DEV.tier`. Celular: Apple → iOS 17+ alto, 16 medio, ≤15 bajo; Adreno 640-699 y 730+ alto, 616-639/540-599/700-729 medio, el resto (610-613…) bajo; Mali G710+/G77/G78 e Immortalis/Xclipse alto, G6xx/G57/G68/G72/G76 medio, G52/G51/G31/T bajo; PowerVR bajo. PC: NVIDIA/AMD/Apple M/Iris Xe/Arc alto, otra Intel medio. Software (SwiftShader) bajo. Con `deviceMemory` ≤2 bajo, ≤3 como máximo medio. Prueba sin navegador: `devunit.js` del banco (17 casos).
+- `Q.level` = elegido a mano (`tsm-calidad`) o el automático guardado en `nox-q2` (`{lv, fail, ft}`) o `DEV.tier`. Las claves viejas (`tsm-calidad-auto`) ya no se leen. Ajustes → Gráficos tiene **Auto** (borra `tsm-calidad`) además de Bajo/Medio/Alto.
+- `LITE()` = celular y nivel menor que alto. Los recortes de celular (área de sombra 65 %, sombra de PNJ 16 m y mobs 20 m, ojos a 12 m, texturas de alas 768/512) ahora dependen de `LITE()`, no de `IS_MOB`: **en alto el celular se ve como la PC** (sombra 2048, resolución hasta 2 con presupuesto 1,5 M píxeles, brillo a media resolución, MSAA 2). El tope de 30 FPS en el celular se mantiene.
+- Subida y bajada solas (`dynRes`, ventanas de 1,5 s): `RAWF` mide el intervalo crudo entre `requestAnimationFrame` (también los que se saltean por el tope). Con tope 30, si se dibuja a 27+ y los rAF llegan cada <21 ms (sobra la mitad del tiempo) durante 10 ventanas seguidas (15 s), sube un nivel (`qLevel`) hasta `Q.top`. Si en los 60 s siguientes anda lento 2 ventanas, vuelve al anterior y guarda `fail` (ese nivel no se prueba por 10 días). La bajada de siempre (resolución hasta .75 y después nivel) sigue igual. Aviso con `toast`.
+- Simulación en el banco (`dyn.js`): bajo → 16 s holgado → medio → 16 s → alto (res 1,95) → 18 FPS → vuelve a medio y no sube más.
+- `?prueba=1`: el resultado copiado dice el nivel del equipo y por qué (`DEV.why`).
+
+### Menos llamadas por personaje (12/11)
+- Con set +15 y alas de 3ª, cada personaje (el héroe y cada jugador en línea) costaba 95-165 llamadas de dibujo. `bakeRig` no unía lo que cuelga de grupos referenciados por `r` (bastón `poleH`, armas, paños `skF`, adornos del set).
+- `bakeInner(r)` (en `charBake`, solo `r.cc0`): dentro de cada grupo une los hijos quietos con material equivalente (`bakeSig`) en el espacio del grupo. Deja aparte lo referenciado directo por `r` (hasta 3 niveles de listas/objetos), `bakeVS`, sprites, `userData.solo/nobake/wing/flame/slot`.
+- `skinFlaps(r)`: los paños de cada faldellín (`r.skF[i].ps`) y los tabardos (`r.tbF`) pasan a una sola `SkinnedMesh` por material, con un `Skeleton` cuyos "huesos" son los mismos grupos que gira `skirtFollow` (nada cambia en el movimiento). Material clonado con `skinning:true`, `onBeforeCompile` y `customProgramCacheKey` copiados, `regMetal` si era metal.
+- `liteSprites(r)`: con `LITE()` se ocultan los halos de gemas (`gemGlow`) y 2 de cada 3 chispas de las alas; `applyQuality` llama a `liteAll()` para el héroe y los jugadores en línea.
+- Medido (piezas visibles, set 6 +15, alas 3ª): Hechicero 118 → 74, Arquera 132 → 78, Mburuvicha 165 → 71, Gladiador 97 → 75, Caballero ~72 (ya estaba unido). Fotos antes/después idénticas.
+- Vida de ambiente (`LIFE_POP`): 75 % en celular medio (antes 100 %), 50 % en bajo.
+- Banco nuevo (fuera del repo, `/home/claude/h`): `perf.js` (llamadas, sombra, triángulos y lógica por zona; `PROF=movil|pc Q= ZONES= ROOT=`; hora fija `__HOUR=15` y `Math.random` con semilla), `cat.js` (llamadas por categoría: héroe, mobs, PNJ, mapa), `mobs.js`, `hero.js` (piezas del héroe por clase), `shot.js` (fotos del héroe), `zshot.js` (fotos de zona), `devunit.js`, `dyn.js`. El HTML servido inyecta `window.__E=s=>eval(s)` dentro del IIFE para llegar a las variables internas.
 
 ## Rendimiento (optimización del 7/11)
 
