@@ -3870,7 +3870,7 @@ const MYTH={
   extra(r,o,U,A){for(const m2 of r.mats){m2.color.setHex(0x232326);crackGlow(m2,0xff4a1a,.22,2.2);}}},
  mboihovy:{ficha:'Mbói Hovy: serpiente azul de las cascadas, larga como el arroyo; se enrosca bajo la espuma y muerde a quien cruza las piedras.',
   snake:{head:'dragon',thick:1.05,skin:()=>scalesTex('mboihovyS',{base:0x1a5a9a,dark:0x061a3a,hi:0x6ad0ff,size:10,belly:0xd8e8f0,stripes:5,stripeC:0x0a2a5a}),belly:0xd8e8f0,eye:0x7affff,horn:[0xa8d8f0,0x1a3a5a],crest:0x3ad8ff,headTex:()=>scalesTex('mboihovyH',{base:0x1a5a9a,dark:0x061a3a,hi:0x6ad0ff,size:7,spots:.06,nrm:2.4}),mouth:0x0a1a3a}},
- tejuhu:{ficha:'Teju Hũ: lagarto negro gigante que toma sol en las lajas calientes del arroyo Corriente; la lengua le quema como brasa.',beast:'b_teju',len:4.4,ts:{walk:1.3,run:1.5},eye:0xff6a1a,tex:()=>scalesTex('tejuhuS',{base:0x1a1a1c,dark:0x050506,hi:0x5a4a3a,size:8,belly:0x6a5a40,stripes:6,stripeC:0x020202}),aura:0xff6a1a,auraS:2.2,
+ tejuhu:{ficha:'Teju Hũ: lagarto negro gigante que toma sol en las lajas calientes del arroyo Corriente; la lengua le quema como brasa.',beast:'b_teju',len:4.4,fat:[1.35,1.9],ts:{walk:1.3,run:1.5},eye:0xff6a1a,tex:()=>scalesTex('tejuhuS2',{base:0x16161a,dark:0x040405,hi:0x34343c,size:8,belly:0x3a2c24,stripes:6,stripeC:0x020202}),aura:0xff6a1a,auraS:2.2,
   extra(r,o,U,A){for(const m2 of r.mats)m2.color.lerp(new THREE.Color(0x202024),.6);const m=tm(scalesTex('tejuhuSp',{base:0x2a1a12,dark:0x0a0504,hi:0xff6a2a,size:6}));for(const bn of['Spine1','Spine2','Neck','Tail1','Tail2']){const b=A([bn]);if(!b)continue;for(let i=0;i<3;i++){const c=part(CONE(.035*U,.22*U,4),m,0,.11*U,(i-1)*.09*U,b);c.rotation.x=-.5;}}}},
  ypovera:{ficha:'Ypo Vera: el Ypo de las aguas cristalinas, brillante como el reflejo del sol en la pileta; parece vidrio que camina.',
   human:{body:'m_tunic',tex:()=>recolorTex('skeletal_gaul_tunic_noble_01_01','ypoveraT',tintRecolor(0x8af8ee,.9,{gain:2})),props:['hd_x_lime'],team:0x3ad8c8,scale:1.05,anim:'w',ghost:0x9affee,op:.8,fly:.3,aura:0x6affe8,auraS:2.2,sparkle:0xffffff,eyeGlow:0xffffff,
@@ -3905,13 +3905,13 @@ const ATK_FROM={b_luison:'b_aguara'};
 function atkFix(file,m2){const f=ATK_FROM[file];if(f&&OAD.ok[f]){const a=OAD.ok[f].animations.find(c=>c.name==='attack');if(a)m2.attack=a;}}
 function mythBeast(def,gold,M){const need=[M.beast].concat(ATK_FROM[M.beast]?[ATK_FROM[M.beast]]:[]);if(!need.every(f=>OAD.ok[f])){oadNeed(need,oadUpgradeMobs);return null;}
   const ds=def.scale||1;const o=oadInst(M.beast,{rimK:1.15});const Ms=oadMeasure(M.beast);const k=M.len/ds/Math.max(Ms.size.z,Ms.size.x),U=1/k;
-  const g=new THREE.Group(),rig=new THREE.Group(),model=new THREE.Group();g.add(rig);rig.add(model);model.add(o);model.scale.setScalar(k);
-  model.position.set(-(Ms.min.x+Ms.size.x/2)*k,-Ms.min.y*k,-(Ms.min.z+Ms.size.z/2)*k);
+  const g=new THREE.Group(),rig=new THREE.Group(),model=new THREE.Group();g.add(rig);rig.add(model);model.add(o);model.scale.setScalar(k);const FT2=M.fat||[1,1];/* fat:[ancho,alto]: engorda el modelo sin alargarlo (el lagarto de 0 A.D. es muy chato) */model.scale.x*=FT2[0];model.scale.y*=FT2[1];
+  model.position.set(-(Ms.min.x+Ms.size.x/2)*k*FT2[0],-Ms.min.y*k*FT2[1],-(Ms.min.z+Ms.size.z/2)*k);
   const mats=o.userData.mats;
   if(!gold){if(M.tex){const T=M.tex();mats.forEach(m=>{matTexture(m,T,{nk:.6,rough:.85});});}
     if(M.tint){mats.forEach(m=>m.color.lerp(C3(M.tint[0]),M.tint[1]));}
     if(M.legs)tintBelow(o,M.legs[0],M.legs[1]);}
-  const r={g,rig,mats,kind:'glb',B:{ts:M.ts,len:M.len},rad:Math.max(Ms.size.x*k*.55,M.len/ds*.28),hgt:Ms.size.y*k};
+  const r={g,rig,mats,kind:'glb',B:{ts:M.ts,len:M.len},rad:Math.max(Ms.size.x*k*.55*FT2[0],M.len/ds*.28),hgt:Ms.size.y*k*FT2[1]};
   if(M.eye){const head=o.getObjectByName('Head')||o.getObjectByName('head')||o.getObjectByName('Neck3')||o.getObjectByName('Ursidae_Head');if(head){r.eyeBone=head;r.eye=glowSprite(M.eye,.32,.95);rig.add(r.eye);}}
   if(M.horns&&!gold){const hd=anchorFn(o)(['Ursidae_Head']);if(hd){const hm=new MSM({color:0x3a2c20,roughness:.5,metalness:.1});for(const sd of[-1,1]){const h=new THREE.Mesh(taperTube([[0,0,0],[sd*.18,.12,-.05],[sd*.32,.05,.08],[sd*.3,-.12,.2],[sd*.2,-.16,.28]],.075,.012,16,8),hm);h.position.set(sd*.1*U,.2*U,-.02*U);h.scale.set(.6*U,.7*U,.6*U);hd.add(h);}}}
   if(M.extra&&!gold)try{M.extra(r,o,U,anchorFn(o));}catch(e){console.error(e);}
