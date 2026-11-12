@@ -75,7 +75,7 @@ export const NX_PACKS = [
 export const NX_FOUNDER_END = 0;
 
 // Datos para pagar por transferencia (antes estaban en la página de la cuenta).
-export const NX_PAY = { whatsapp: '595981187259', bank: 'Banco Itaú Paraguay\nCuenta N.º 212128\nTitular: Jorge Duarte\nCI 4804865 · RUC 4804865-8 (alias)' };
+export const NX_PAY = { whatsapp: '595981187259', bank: 'Banco Familiar\nAlias: CI 4804865\nTitular: Jorge Duarte', iva: 10, hours: 48 };
 
 export const NX_BY = new Map(NX_ITEMS.map(i => [i.id, i]));
 export const NX_PACK = new Map(NX_PACKS.map(p => [p.id, p]));

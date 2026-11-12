@@ -128,7 +128,7 @@ main{padding-block:32px 80px}
 .pill{font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
 .pill.pendiente{color:var(--warn);border-color:#6a5524}
 .pill.pagado{color:var(--good);border-color:#2f6a35}
-.pill.rechazado,.pill.cancelado{color:var(--bad);border-color:#6a352f}
+.pill.rechazado,.pill.vencido,.pill.cancelado{color:var(--bad);border-color:#6a352f}
 .order ul{margin:0;padding-left:18px;color:var(--muted)}
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -196,9 +196,9 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
         <h2>Cómo pagar</h2>
         <ol class="steps">
           <li><span id="poBank"></span></li>
-          <li><span>En la <b>descripción de la transferencia</b> poné este código: <b class="code" id="poCode2" style="font-size:1.3em"></b> <button class="btn btn-line btn-sm" type="button" id="poCodeCopy">Copiar código</button></span></li>
-          <li><span>Mandá el comprobante por WhatsApp al <b>+595 981 187 259</b>. El botón de abajo abre el chat con el mensaje listo.</span></li>
-          <li><span>Cuando confirmemos el pago, los Noxis aparecen en tu cuenta. Si estás jugando, llegan en menos de un minuto.</span></li>
+          <li><span><b>Transferí exactamente <span class="code" id="poCode2" style="font-size:1.3em"></span>, sin redondear.</b> Los últimos guaraníes identifican tu pedido: con el monto exacto tus Noxis se acreditan solos. <button class="btn btn-line btn-sm" type="button" id="poCodeCopy">Copiar monto</button><span id="poFac"></span></span></li>
+          <li><span>Solo si transferiste otro monto o los Noxis no llegan: mandá el comprobante por WhatsApp al <b>+595 981 187 259</b>.</span></li>
+          <li><span>Con el monto exacto, los Noxis aparecen solos en tu cuenta en cuanto el banco confirma. El pedido vence en 48 horas.</span></li>
         </ol>
         <div class="field"><label>Mensaje</label><div class="msgbox" id="poMsg"></div></div>
         <div class="actions"><a class="btn btn-gold" id="poWa" target="_blank" rel="noopener">Enviar por WhatsApp</a><button class="btn btn-line" type="button" id="poCopy">Copiar mensaje</button><a class="btn btn-line" href="#pedidos">Ver mis pedidos</a></div>
@@ -244,7 +244,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
   <!-- administración -->
   <section id="v-admin" hidden>
     <div class="view-head"><span class="eyebrow">Solo administrador</span><h1>Administración</h1>
-      <div class="actions"><div class="seg" id="admSeg"><button type="button" data-a="stats" class="on">Resumen</button><button type="button" data-a="orders">Pedidos</button><button type="button" data-a="resets">Contraseñas</button><button type="button" data-a="users">Jugadores</button></div><button class="btn btn-line btn-sm" type="button" id="notifBtn">Activar avisos</button><span class="muted" id="admUpd" style="font-size:.85rem"></span></div>
+      <div class="actions"><div class="seg" id="admSeg"><button type="button" data-a="stats" class="on">Resumen</button><button type="button" data-a="orders">Pedidos</button><button type="button" data-a="bank">Banco</button><button type="button" data-a="resets">Contraseñas</button><button type="button" data-a="users">Jugadores</button></div><button class="btn btn-line btn-sm" type="button" id="notifBtn">Activar avisos</button><span class="muted" id="admUpd" style="font-size:.85rem"></span></div>
     </div>
     <div id="a-stats">
       <div class="stats" id="admStats"><div class="empty">Cargando…</div></div>
@@ -253,6 +253,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
       <div class="chips" id="ordSt" style="margin-bottom:14px"></div>
       <div class="list" id="admOrders"></div>
     </div>
+    <div id="a-bank" hidden><p class="muted" id="bankInfo" style="font-size:.92rem"></p><div class="list" id="admBank"></div></div>
     <div id="a-resets" hidden><div class="list" id="admResets"></div></div>
     <div id="a-users" hidden>
       <form class="panel form" id="uSearch" style="margin-bottom:14px"><div class="field"><label for="uQ">Buscar jugador</label><input id="uQ" placeholder="Nombre de usuario"></div></form>
@@ -268,12 +269,12 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
 const CONFIG={whatsapp:'595981187259',bank:''};
 const CLASSN={caballero:'Caballero',hechicero:'Hechicero',arquera:'Arquera',gladiador:'Gladiador',mburuvicha:'Mburuvicha'};
 const KINDN={gest:'Gestos y bailes',title:'Títulos',frame:'Marcos del nombre',trail:'Estelas',pet:'Aspectos de mascota',svc:'Servicios'};
-const STN={pendiente:'Esperando pago',pagado:'Pagado',rechazado:'No pagado',cancelado:'Cancelado'};
+const STN={pendiente:'Esperando pago',pagado:'Pagado',rechazado:'No pagado',cancelado:'Cancelado',vencido:'Vencido'};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const gs=n=>'₲ '+Math.round(n).toLocaleString('es-PY');
 const when=t=>t?new Date(t).toLocaleString('es-PY',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-const S={tok:'',me:null,cat:null,nx:null,cfm:'',authMode:'in',admTab:'stats',ordSt:'pendiente',admLast:0,admCount:0,lastOrder:null};
+const S={tok:'',me:null,cat:null,nx:null,cfm:'',fac:{on:false,ruc:'',rs:''},authMode:'in',admTab:'stats',ordSt:'pendiente',admLast:0,admCount:0,lastOrder:null};
 try{S.tok=localStorage.getItem('nox-token')||'';localStorage.removeItem('nox-cart');}catch(e){}
 function setTok(t){S.tok=t||'';try{t?localStorage.setItem('nox-token',t):localStorage.removeItem('nox-token');}catch(e){}}
 async function api(m,p,b){const r=await fetch('/api/'+p,{method:m,headers:{'content-type':'application/json',...(S.tok?{authorization:'Bearer '+S.tok}:{})},body:b!==undefined?JSON.stringify(b):undefined});
@@ -321,27 +322,29 @@ const nf=n=>Math.round(n).toLocaleString('es-PY');
 async function loadCatalog(){if(S.cat)return;const r=await api('GET','nox/catalog');S.cat=r;S.byId=new Map(r.items.map(i=>[i.id,i]));if(r.pay){CONFIG.bank=r.pay.bank||'';CONFIG.whatsapp=r.pay.whatsapp||CONFIG.whatsapp;}}
 function chip(id,label,on,attr){return `<button type="button" class="chip ${on?'on':''}" ${attr}="${id}">${label}</button>`;}
 const FUND={fund1:['Título Fundador','Marco de bronce','Baile exclusivo: Polca del Fundador'],fund2:['Título Fundador de Plata','Marco de plata','Baile exclusivo: Polca del Fundador','Aspecto de mascota: Imp del Fundador','1 cambio de nombre'],fund3:['Título Fundador de Oro','Marco de oro','2 bailes exclusivos','Aspecto de mascota: Imp del Fundador','Estela del Fundador','1 cambio de nombre y 1 reorganizar puntos','Tu nombre en el Muro de Fundadores']};
+function facRead(){const r=$('#facRuc'),n=$('#facRs');if(r)S.fac.ruc=r.value.trim();if(n)S.fac.rs=n.value.trim();}
 async function renderShop(){const box=$('#nxShop');try{await loadCatalog();}catch(e){box.innerHTML='<div class="empty">No se pudo cargar la tienda. Revisá tu conexión y recargá.</div>';return;}
   if(S.me){try{S.nx=await api('GET','nox');}catch(e){S.nx=null;}}else S.nx=null;
   let muro=[];try{muro=(await api('GET','nox/muro')).names||[];}catch(e){}
-  const nx=S.nx,own=nx?nx.own:{},lv=nx?nx.founder:0,prev=S.cat.packs.find(p=>p.f===lv),end=S.cat.founderEnd&&Date.now()>S.cat.founderEnd;
+  facRead();const iva=(S.cat.pay||{}).iva||10,pr=g=>S.fac.on?g+Math.round(g*iva/100):g;const nx=S.nx,own=nx?nx.own:{},lv=nx?nx.founder:0,prev=S.cat.packs.find(p=>p.f===lv),end=S.cat.founderEnd&&Date.now()>S.cat.founderEnd;
   $('#nxHead').innerHTML=nx?`<span class="pill pagado" style="font-size:1rem">Tu saldo: <b>${nf(nx.bal)} Noxis</b></span><a class="btn btn-line btn-sm" href="#recargar-noxis" data-go="nxRec">Recargar</a>`:'<a class="btn btn-gold btn-sm" href="#entrar">Entrá para comprar</a>';
   const item=(i)=>{const has=own[i.id]|0,perm=i.kind!=='svc';return `<div class="item"><div class="nm"><span class="gem" style="--c:#e6b04b"></span><span>${esc(i.name)}</span></div><div class="ds">${esc(i.desc||'')}</div><div class="row"><span class="price">${nf(i.price)} Noxis</span>${has&&perm?'<span class="pill pagado">Tuyo</span>':`<button class="btn btn-line btn-sm" type="button" data-buy="${i.id}">${S.cfm===i.id?'¿Confirmar?':'Comprar'}</button>`}</div>${has&&!perm?`<div class="ds">Tenés ${has} sin usar: se usan dentro del juego.</div>`:''}</div>`;};
   box.innerHTML=`<p class="err" id="nxErr" role="alert"></p>
-    <div class="group" id="nxRec"><h3>Recargar Noxis</h3><p class="muted" style="font-size:.92rem;margin:0 0 10px">1 Noxis = 10 Gs. Los paquetes grandes traen Noxis de regalo.</p><div class="items">${S.cat.packs.filter(p=>!p.f).map(p=>`<div class="item"><div class="nm"><span class="gem" style="--c:#e6b04b"></span><span>${nf(p.nx)} Noxis</span></div><div class="ds">${p.bonus?'+'+p.bonus+' % de regalo':'Sin bono'}</div><div class="row"><span class="price">${gs(p.gs)}</span><button class="btn btn-gold btn-sm" type="button" data-pack="${p.id}">Recargar</button></div></div>`).join('')}</div></div>
-    <div class="group"><h3>Packs Fundador</h3><p class="muted" style="font-size:.92rem;margin:0 0 10px">Solo durante el lanzamiento, uno por cuenta. Lo exclusivo no se vuelve a vender ni se puede comerciar.</p><div class="items">${S.cat.packs.filter(p=>p.f).map(p=>{const price=p.gs-(prev&&p.f>lv?prev.gs:0);return `<div class="item full"><div class="nm"><span class="gem" style="--c:${p.f===1?'#d39a66':p.f===2?'#e6ebf5':'#ffe08a'}"></span><span>${esc(p.name)}</span></div><div class="ds">${nf(p.nx)} Noxis<br>${FUND[p.id].map(esc).join('<br>')}</div><div class="row"><span class="price">${p.f<=lv?'Ya es tuyo':gs(price)}</span>${p.f<=lv?'':end?'<span class="muted">Ya no se vende</span>':`<button class="btn btn-gold btn-sm" type="button" data-pack="${p.id}">Pedir</button>`}</div>${prev&&p.f>lv?'<div class="ds">Pagás la diferencia con tu pack.</div>':''}</div>`;}).join('')}</div></div>
+    <div class="group" id="nxRec"><h3>Recargar Noxis</h3><p class="muted" style="font-size:.92rem;margin:0 0 10px">1 Noxis = 10 Gs. Los paquetes grandes traen Noxis de regalo.</p><div class="panel form" style="margin-bottom:14px"><label style="display:flex;gap:10px;align-items:center;cursor:pointer"><input type="checkbox" id="facOn" ${S.fac.on?'checked':''} style="width:22px;height:22px"><b>Quiero factura legal</b></label>${S.fac.on?`<p class="muted" style="font-size:.92rem;margin:0">Con factura se suma el ${iva} % de IVA al precio (₲ 5.000 pasan a ₲ 5.500). Los Noxis que recibís son los mismos.</p><div class="field"><label for="facRuc">RUC con dígito verificador</label><input id="facRuc" maxlength="12" placeholder="4804865-8" value="${esc(S.fac.ruc)}"></div><div class="field"><label for="facRs">Nombre o razón social</label><input id="facRs" maxlength="80" value="${esc(S.fac.rs)}"></div>`:''}</div><div class="items">${S.cat.packs.filter(p=>!p.f).map(p=>`<div class="item"><div class="nm"><span class="gem" style="--c:#e6b04b"></span><span>${nf(p.nx)} Noxis</span></div><div class="ds">${p.bonus?'+'+p.bonus+' % de regalo':'Sin bono'}</div><div class="row"><span class="price">${gs(pr(p.gs))}</span><button class="btn btn-gold btn-sm" type="button" data-pack="${p.id}">Recargar</button></div></div>`).join('')}</div></div>
+    <div class="group"><h3>Packs Fundador</h3><p class="muted" style="font-size:.92rem;margin:0 0 10px">Solo durante el lanzamiento, uno por cuenta. Lo exclusivo no se vuelve a vender ni se puede comerciar.</p><div class="items">${S.cat.packs.filter(p=>p.f).map(p=>{const price=p.gs-(prev&&p.f>lv?prev.gs:0);return `<div class="item full"><div class="nm"><span class="gem" style="--c:${p.f===1?'#d39a66':p.f===2?'#e6ebf5':'#ffe08a'}"></span><span>${esc(p.name)}</span></div><div class="ds">${nf(p.nx)} Noxis<br>${FUND[p.id].map(esc).join('<br>')}</div><div class="row"><span class="price">${p.f<=lv?'Ya es tuyo':gs(pr(price))}</span>${p.f<=lv?'':end?'<span class="muted">Ya no se vende</span>':`<button class="btn btn-gold btn-sm" type="button" data-pack="${p.id}">Pedir</button>`}</div>${prev&&p.f>lv?'<div class="ds">Pagás la diferencia con tu pack.</div>':''}</div>`;}).join('')}</div></div>
     ${Object.keys(KINDN).map(k=>`<div class="group"><h3>${KINDN[k]}</h3><div class="items">${S.cat.items.filter(i=>i.kind===k&&i.price).map(item).join('')}</div></div>`).join('')}
     <div class="group"><h3>Muro de Fundadores</h3><p class="muted" style="font-size:.95rem">${muro.length?muro.map(esc).join(' · '):'Todavía no hay Fundadores de Oro. El primer nombre puede ser el tuyo.'}</p></div>`;}
+$('#nxShop').addEventListener('change',e=>{if(e.target.id==='facOn'){facRead();S.fac.on=e.target.checked;renderShop();}});
 $('#nxShop').addEventListener('click',async e=>{const b=e.target.closest('[data-buy]'),p=e.target.closest('[data-pack]');if(!b&&!p)return;
   if(!S.me){afterLogin='tienda';location.hash='#entrar';toast('Entrá con tu cuenta para comprar');return;}
-  if(p){p.disabled=true;try{const r=await api('POST','orders',{items:[{id:p.dataset.pack}]});S.lastOrder=r.order;location.hash='#pedido';}catch(err){$('#nxErr').textContent=err.message;$('#nxErr').scrollIntoView({block:'center'});p.disabled=false;}return;}
+  if(p){p.disabled=true;try{facRead();const r=await api('POST','orders',{items:[{id:p.dataset.pack}],...(S.fac.on?{fac:{ruc:S.fac.ruc,rs:S.fac.rs}}:{})});S.lastOrder=r.order;location.hash='#pedido';}catch(err){$('#nxErr').textContent=err.message;$('#nxErr').scrollIntoView({block:'center'});p.disabled=false;}return;}
   const id=b.dataset.buy;if(S.cfm!==id){S.cfm=id;renderShop();return;}S.cfm='';b.disabled=true;
   try{await api('POST','nox/buy',{id});toast('Compra hecha: '+S.byId.get(id).name);renderShop();}catch(err){await renderShop();$('#nxErr').textContent=err.message;$('#nxErr').scrollIntoView({block:'center'});}});
 document.addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();const t=$('#'+a.dataset.go);if(t)t.scrollIntoView({behavior:'smooth'});});
 function orderMsg(o){return `Hola, soy ${S.me.user.name}, jugador de NOX. Pedido ${o.code} · ${o.items.map(i=>i.name).join(', ')} · Total ${gs(o.total)}.\nAdjunto el comprobante de la transferencia.`;}
-function renderOrderDone(){const o=S.lastOrder;$('#poCode').textContent=o.code;$('#poCode2').textContent=o.code;$('#poWhat').textContent=o.items.map(i=>i.name).join(', ');$('#poTot').textContent=gs(o.total);
-  $('#poCodeCopy').onclick=()=>{try{navigator.clipboard.writeText(o.code).then(()=>toast('Código copiado'),()=>toast('Seleccioná el código y copialo'));}catch(e){toast('Seleccioná el código y copialo');}};
-  $('#poBank').innerHTML=CONFIG.bank?`Transferí <b>${gs(o.total)}</b> a esta cuenta:<br>${esc(CONFIG.bank).replace(/\n/g,'<br>')}`:`Escribinos por WhatsApp con tu código <b class="code">${esc(o.code)}</b> y te pasamos los datos de la cuenta para transferir <b>${gs(o.total)}</b>.`;
+function renderOrderDone(){const o=S.lastOrder;$('#poCode').textContent=o.code;$('#poCode2').textContent=gs(o.total);$('#poFac').innerHTML=o.items[0].iva?`<br><span class="muted">Incluye ${gs(o.items[0].iva)} de IVA. Factura a nombre de ${esc(o.fac?o.fac.rs:'')} · RUC ${esc(o.fac?o.fac.ruc:'')}.</span>`:'';$('#poWhat').textContent=o.items.map(i=>i.name).join(', ');$('#poTot').textContent=gs(o.total);
+  $('#poCodeCopy').onclick=()=>{try{navigator.clipboard.writeText(String(o.total)).then(()=>toast('Monto copiado'),()=>toast('Seleccioná el monto y copialo'));}catch(e){toast('Seleccioná el monto y copialo');}};
+  $('#poBank').innerHTML=CONFIG.bank?`Datos de la cuenta:<br>${esc(CONFIG.bank).replace(/\n/g,'<br>')}`:`Escribinos por WhatsApp con tu código <b class="code">${esc(o.code)}</b> y te pasamos los datos de la cuenta para transferir <b>${gs(o.total)}</b>.`;
   const m=orderMsg(o);$('#poMsg').textContent=m;$('#poWa').href=waLink(m);
   $('#poCopy').onclick=()=>{try{navigator.clipboard.writeText(m).then(()=>toast('Mensaje copiado'),()=>toast('Seleccioná el mensaje y copialo'));}catch(e){toast('Seleccioná el mensaje y copialo');}};}
 
@@ -368,9 +371,9 @@ $('#logout').onclick=async()=>{try{await api('POST','logout');}catch(e){}setTok(
 
 /* ---------- administración ---------- */
 $('#admSeg').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;S.admTab=b.dataset.a;renderAdmin();});
-function renderAdmin(){$$('#admSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===S.admTab));['stats','orders','resets','users'].forEach(k=>$('#a-'+k).hidden=k!==S.admTab);
+function renderAdmin(){$$('#admSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===S.admTab));['stats','orders','bank','resets','users'].forEach(k=>$('#a-'+k).hidden=k!==S.admTab);
   $('#notifBtn').hidden=!('Notification' in window)||Notification.permission==='granted';
-  if(S.admTab==='stats')admStats();if(S.admTab==='orders')admOrders();if(S.admTab==='resets')admResets();if(S.admTab==='users')admUsers();}
+  if(S.admTab==='stats')admStats();if(S.admTab==='orders')admOrders();if(S.admTab==='bank')admBank();if(S.admTab==='resets')admResets();if(S.admTab==='users')admUsers();}
 $('#notifBtn').onclick=async()=>{try{const p=await Notification.requestPermission();if(p==='granted'){toast('Avisos activados en este dispositivo');$('#notifBtn').hidden=true;}else toast('El navegador no permitió los avisos');}catch(e){toast('Este navegador no permite avisos');}};
 async function admStats(){const box=$('#admStats');box.innerHTML='<div class="empty">Cargando…</div>';
   try{const r=await api('GET','admin/stats');const U=r.users,D=r.downloads,G=r.github||{};const n=x=>Number(x||0).toLocaleString('es-PY');
@@ -385,17 +388,28 @@ async function admStats(){const box=$('#admStats');box.innerHTML='<div class="em
       <div class="stat wide"><div class="k">Cuentas nuevas por día (30 días)</div>${bars(D.udays||[])}</div>
       ${Object.keys(G.by||{}).length?`<div class="stat wide"><div class="k">Instaladores en GitHub (todas las versiones)</div><div class="plats">${Object.entries(G.by).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div><b>${n(v)}</b><span>${esc(k)}</span></div>`).join('')}</div></div>`:''}`;
   }catch(e){box.innerHTML='<div class="empty">'+esc(e.message||'No se pudo cargar el resumen.')+'</div>';}}
-async function admOrders(){$('#ordSt').innerHTML=['pendiente','pagado','rechazado','cancelado','todos'].map(k=>chip(k,k==='todos'?'Todos':STN[k],S.ordSt===k,'data-st')).join('');
+async function admOrders(){$('#ordSt').innerHTML=['pendiente','pagado','vencido','rechazado','cancelado','todos'].map(k=>chip(k,k==='todos'?'Todos':STN[k],S.ordSt===k,'data-st')).join('');
   const box=$('#admOrders');box.innerHTML='<div class="empty">Cargando…</div>';
   try{const r=await api('GET','admin/orders?status='+S.ordSt);if(!r.orders.length){box.innerHTML='<div class="empty">No hay pedidos en esta lista.</div>';return;}
     box.innerHTML=r.orders.map(o=>`<div class="panel order"><div class="hd"><span><span class="code">${esc(o.code)}</span> · <b>${esc(o.uname)}</b> <span class="muted">· ${when(o.created)}${o.uwa?' · WhatsApp '+esc(o.uwa):''}</span></span><span class="pill ${o.status}">${STN[o.status]||o.status}</span></div>
       <ul>${o.items.map(i=>`<li>${esc(i.name)}${i.q>1?' ×'+i.q:''} <span class="muted">· ${gs(i.price*i.q)}</span></li>`).join('')}</ul>
-      <div class="hd"><span class="price">${gs(o.total)}</span>${o.status==='pendiente'?`<span class="actions"><input class="field" style="all:unset;border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0;width:200px;max-width:100%" placeholder="Nota (opcional)" id="note-${o.id}" aria-label="Nota para ${esc(o.code)}"><button class="btn btn-ok btn-sm" type="button" data-ord="${o.id}" data-act="pagado">Pagado</button><button class="btn btn-no btn-sm" type="button" data-ord="${o.id}" data-act="rechazado">No pagado</button></span>`:`<span class="muted" style="font-size:.88rem">${when(o.decided)}${o.note?' · '+esc(o.note):''}</span>`}</div></div>`).join('');}
+      ${o.fac?`<p class="muted" style="font-size:.92rem"><b>Factura legal:</b> ${esc(o.fac.rs)} · RUC ${esc(o.fac.ruc)} · IVA ${gs(o.items[0].iva||0)}</p>`:''}<div class="hd"><span class="price">${gs(o.total)}</span>${o.status==='pendiente'?`<span class="actions"><input class="field" style="all:unset;border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0;width:200px;max-width:100%" placeholder="Nota (opcional)" id="note-${o.id}" aria-label="Nota para ${esc(o.code)}"><button class="btn btn-ok btn-sm" type="button" data-ord="${o.id}" data-act="pagado">Pagado</button><button class="btn btn-no btn-sm" type="button" data-ord="${o.id}" data-act="rechazado">No pagado</button></span>`:`<span class="muted" style="font-size:.88rem">${when(o.decided)}${o.note?' · '+esc(o.note):''}</span>`}</div></div>`).join('');}
   catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
 $('#ordSt').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(b){S.ordSt=b.dataset.st;admOrders();}});
 $('#admOrders').addEventListener('click',async e=>{const b=e.target.closest('[data-ord]');if(!b)return;
   if(b.dataset.sure!=='1'){$$('#admOrders [data-sure="1"]').forEach(x=>{x.dataset.sure='';x.textContent=x.dataset.act==='pagado'?'Pagado':'No pagado';});b.dataset.sure='1';b.textContent=b.dataset.act==='pagado'?'¿Confirmar pago?':'¿Marcar no pagado?';return;}
   b.disabled=true;try{const r=await api('POST','admin/orders/'+b.dataset.ord,{action:b.dataset.act,note:($('#note-'+b.dataset.ord)||{}).value||''});toast(b.dataset.act==='pagado'?'Pago confirmado: los Noxis ya están en la cuenta del jugador.':'Pedido marcado como no pagado');admOrders();admPoll();}catch(err){toast(err.message);b.disabled=false;}});
+async function admBank(){const box=$('#admBank');box.innerHTML='<div class="empty">Cargando…</div>';
+  try{const r=await api('GET','admin/bank');const BST={auto:'Acreditado solo',manual:'Asignado a mano',suelto:'Sin pedido',descartado:'Descartado'};
+    $('#bankInfo').innerHTML=(r.on?'Los avisos del banco se reciben y se acreditan solos cuando el monto coincide con un pedido.':'<b>Todavía no está conectado:</b> faltan los secretos BANK_SECRET y BANK_FWD en el servidor.')+(r.mails.length?'<br>Último correo de Gmail para confirmar el reenvío: <b>'+esc(r.mails[0].subject)+'</b>':'');
+    if(!r.rows.length){box.innerHTML='<div class="empty">Todavía no llegó ningún aviso del banco.</div>';return;}
+    box.innerHTML=r.rows.map(k=>`<div class="panel order"><div class="hd"><span><span class="price">${gs(k.amt)}</span> · <b>${esc(k.payer||'')}</b> <span class="muted">· ${esc(k.bank||'')} · ${esc(k.at||'')}</span></span><span class="pill ${k.st==='suelto'?'pendiente':k.st==='descartado'?'cancelado':'pagado'}">${BST[k.st]||k.st}</span></div>
+      <p class="muted" style="font-size:.88rem">Ref. ${esc(k.ref)}${k.code?' · pedido '+esc(k.code)+' de '+esc(k.uname||''):''}</p>
+      ${k.st==='suelto'?`<div class="actions"><input id="bk-${esc(k.ref)}" placeholder="Código del pedido, ej. NOX-AB12C" aria-label="Código del pedido para ${esc(k.ref)}" style="background:var(--ink);color:inherit;border:1px solid var(--line);border-radius:10px;padding:7px 10px;width:220px;max-width:100%"><button class="btn btn-ok btn-sm" type="button" data-bk="${esc(k.ref)}" data-act="asignar">Acreditar a ese pedido</button><button class="btn btn-line btn-sm" type="button" data-bk="${esc(k.ref)}" data-act="descartar">No es de NOX</button></div>`:''}</div>`).join('');}
+  catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}}
+$('#admBank').addEventListener('click',async e=>{const b=e.target.closest('[data-bk]');if(!b)return;const ref=b.dataset.bk,act=b.dataset.act;
+  if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent=act==='asignar'?'¿Acreditar?':'¿Descartar?';return;}b.disabled=true;
+  try{const r=await api('POST','admin/bank/'+encodeURIComponent(ref),act==='asignar'?{code:document.getElementById('bk-'+ref).value}:{action:'descartar'});toast(act==='asignar'?'Acreditado al pedido '+r.code:'Aviso descartado');admBank();admPoll();}catch(err){toast(err.message);b.disabled=false;b.dataset.sure='';b.textContent=act==='asignar'?'Acreditar a ese pedido':'No es de NOX';}});
 async function admResets(){const box=$('#admResets');box.innerHTML='<div class="empty">Cargando…</div>';
   try{const r=await api('GET','admin/resets');if(!r.resets.length){box.innerHTML='<div class="empty">No hay pedidos de contraseña.</div>';return;}
     box.innerHTML=r.resets.map(x=>`<div class="panel order" id="rs-${x.id}"><div class="hd"><span><b>${esc(x.uname||x.name)}</b> <span class="muted">· ${when(x.created)} · WhatsApp ${esc(x.wa)}</span></span>${x.uname?'':'<span class="pill rechazado">Usuario inexistente</span>'}</div>
@@ -421,7 +435,7 @@ $('#admUsers').addEventListener('click',async e=>{const p=e.target.closest('[dat
   const sx=e.target.closest('[data-nxsee]');if(sx){try{const r=await api('GET','admin/nox/'+sx.dataset.nxsee);const WHY={recarga:'Recarga',regalo:'Regalo',compra:'Compra',uso:'Uso',intercambio:'Intercambio'};$('#us-'+sx.dataset.nxsee+' .slot').innerHTML=`<div class="temp"><b>Saldo: ${nf(r.bal)} Noxis</b><span class="muted" style="font-size:.9rem">Tiene: ${Object.keys(r.own).filter(k=>r.own[k]).map(k=>esc((S.byId.get(k)||{name:k}).name)+(r.own[k]>1?' ×'+r.own[k]:'')).join(', ')||'nada todavía'}</span><span class="muted" style="font-size:.88rem">${r.log.slice(0,12).map(l=>`${when(l.t)} · ${esc(String(l.why).split(' ')[0] in WHY?WHY[String(l.why).split(' ')[0]]:l.why)} ${l.d>0?'+':''}${nf(l.d)} → ${nf(l.bal)}${l.ref?' ('+esc(l.ref)+')':''}`).join('<br>')||'Sin movimientos'}</span></div>`;}catch(err){toast(err.message);}return;}
   if(g){const id=$('#give-'+g.dataset.give).value,nx=Math.max(0,Math.floor(+$('#gnx-'+g.dataset.give).value||0)),key=id+'|'+nx;if(!id&&!nx){toast('Poné una cantidad de Noxis o elegí un artículo');return;}
     if(g.dataset.sure!==key){g.dataset.sure=key;g.textContent='¿Regalar '+[nx?nf(nx)+' Noxis':'',id?S.byId.get(id).name:''].filter(Boolean).join(' y ')+'?';return;}g.disabled=true;try{await api('POST','admin/give',{uid:g.dataset.give,nx,items:id?[id]:[]});toast('Regalo acreditado en la cuenta del jugador');}catch(err){toast(err.message);}g.disabled=false;g.dataset.sure='';g.textContent='Regalar';}});
-async function admPoll(){if(!S.me||S.me.user.role!=='admin')return;try{const r=await api('GET','admin/pending');const n=r.orders+r.resets;const bd=$('#admBadge');bd.hidden=!n;bd.textContent=n;
+async function admPoll(){if(!S.me||S.me.user.role!=='admin')return;try{const r=await api('GET','admin/pending');const n=r.orders+r.resets+(r.bank||0);const bd=$('#admBadge');bd.hidden=!n;bd.textContent=n;
     $('#admUpd').textContent='Actualizado '+new Date().toLocaleTimeString('es-PY',{hour:'2-digit',minute:'2-digit'});
     if(S.admLast&&r.latest>S.admLast&&n){const m=`${r.orders} pedido${r.orders===1?'':'s'} y ${r.resets} contraseña${r.resets===1?'':'s'} por revisar`;toast('Administración: '+m);
       try{if('Notification' in window&&Notification.permission==='granted')new Notification('NOX · administración',{body:m,icon:'../img/icon-192.png'});}catch(e){}

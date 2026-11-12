@@ -2,6 +2,7 @@
 // Cuentas, guardado del juego en la nube, tienda Noxis (recargas por transferencia) y panel de administración.
 import { NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, nxFounderLevel, nxPackGrant } from '../../lib/noxis.js';
 import { IMPORTS } from '../../lib/imports.js';
+import { parseBankMail, BANK_FROM } from '../../lib/bankmail.js';
 import { GUIA, GUIA_REGLAS, resumen } from '../../lib/guia.js';
 
 const ADMIN_NAME = 'GEORGEELHUMANO';
@@ -25,6 +26,8 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS noxis(uid TEXT PRIMARY KEY, bal INTEGER NOT NULL DEFAULT 0, own TEXT NOT NULL DEFAULT '{}', eq TEXT NOT NULL DEFAULT '{}', upd INTEGER)`,
   `CREATE TABLE IF NOT EXISTS noxlog(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, d INTEGER NOT NULL, bal INTEGER, why TEXT, ref TEXT, t INTEGER)`,
   `CREATE INDEX IF NOT EXISTS noxlog_uid ON noxlog(uid)`,
+  `CREATE TABLE IF NOT EXISTS bankin(ref TEXT PRIMARY KEY, amt INTEGER NOT NULL, payer TEXT, bank TEXT, at TEXT, t INTEGER, oid INTEGER, st TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS mailin(id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER, frm TEXT, subject TEXT, body TEXT)`,
   `CREATE INDEX IF NOT EXISTS dl_created ON downloads(created)`,
   `CREATE INDEX IF NOT EXISTS orders_status ON orders(status)`,
   `CREATE INDEX IF NOT EXISTS orders_uid ON orders(uid)`,
@@ -35,6 +38,7 @@ let ready = false;
 async function init(db) {
   if (ready) return;
   await db.batch(SCHEMA.map(q => db.prepare(q)));
+  try { await db.prepare('ALTER TABLE orders ADD COLUMN fac TEXT').run(); } catch {} // datos de factura legal (ya existe después de la primera vez)
   ready = true;
 }
 
@@ -65,6 +69,7 @@ async function checkPass(pw, stored) {
 const CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const code = (pre, n) => pre + '-' + [...rand(n)].map(b => CODE_ABC[b % CODE_ABC.length]).join('');
 function tempPassword() { return [...rand(8)].map(b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); }
+const gsTxt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' Gs';
 const cleanWa = s => String(s || '').replace(/[^\d+]/g, '').slice(0, 20);
 async function body(req) { try { return await req.json(); } catch { return {}; } }
 
@@ -119,6 +124,26 @@ async function deliver(db, uid, oid, items, why) {
   }
   return n;
 }
+/* ---------- pago: monto único por pedido, vencimiento y aviso del banco ----------
+   El banco no reenvía el comentario del que paga, así que cada pedido pendiente tiene un monto distinto (el precio más
+   1 a 99 Gs) y el aviso de transferencia se empareja por ese monto exacto. Un pedido sin pagar vence a las 48 horas. */
+const ORDER_HOURS = 48, IVA = 10;
+const RUC_RE = /^\d{5,9}-\d$/;
+const expireOrders = db => db.prepare("UPDATE orders SET status='vencido',decided=? WHERE status='pendiente' AND created<? AND code LIKE 'NOX-%'").bind(now(), now() - ORDER_HOURS * 3600e3).run();
+async function uniqueTotal(db, base) {
+  const used = new Set(((await db.prepare("SELECT total FROM orders WHERE status='pendiente' AND total BETWEEN ? AND ?").bind(base + 1, base + 499).all()).results || []).map(r => r.total));
+  for (let k = 0; k < 200; k++) { const x = 1 + rand(1)[0] % 99; if (!used.has(base + x)) return x; }
+  for (let x = 1; x < 500; x++) if (!used.has(base + x)) return x;
+  return 0;
+}
+// marca un pedido como pagado y acredita; devuelve false si ya estaba resuelto
+async function settle(db, o, note, st) {
+  const r = await db.prepare(`UPDATE orders SET status='pagado',decided=?,note=? WHERE id=? AND status IN (${st || "'pendiente'"})`).bind(now(), note, o.id).run();
+  if (!r.meta.changes) return false;
+  await deliver(db, o.uid, o.id, JSON.parse(o.items), 'recarga ' + o.code);
+  return true;
+}
+
 async function pendingDeliveries(db, uid) {
   const v = await db.prepare("SELECT data FROM docs WHERE uid=? AND id='vault'").bind(uid).first();
   let upto = 0;
@@ -205,22 +230,34 @@ route('POST', 'reset-request', async ({ db, req }) => {
 /* tienda */
 route('POST', 'orders', async ({ db, req, me }) => {
   const b = await body(req);
+  await expireOrders(db);
   const nx = await noxRow(db, me.id);
   const items = orderItems(b.items, nx.own);
   if (typeof items === 'string') return fail(items);
   if (!items) return fail('Ese paquete no está en la tienda. Recargá la página.');
-  const total = items.reduce((s, x) => s + x.price * x.q, 0);
+  let fac = null;
+  if (b.fac) {
+    const ruc = String(b.fac.ruc || '').trim(), rs = String(b.fac.rs || '').trim().slice(0, 80);
+    if (!RUC_RE.test(ruc)) return fail('El RUC tiene que ir con su dígito verificador, por ejemplo 4804865-8.');
+    if (rs.length < 3) return fail('Escribí el nombre o la razón social para la factura.');
+    fac = { ruc, rs };
+  }
   const pend = (await db.prepare("SELECT items FROM orders WHERE uid=? AND status='pendiente'").bind(me.id).all()).results || [];
   if (pend.length >= 5) return fail('Ya tenés 5 pedidos esperando el pago. Esperá a que se aprueben o cancelá alguno.');
   if (NX_PACK.get(items[0].id).f && pend.some(o => { try { return JSON.parse(o.items).some(i => (NX_PACK.get(i.id) || {}).f); } catch { return false; } })) return fail('Ya tenés un pack Fundador esperando el pago.');
+  const price = items[0].price, iva = fac ? Math.round(price * IVA / 100) : 0;
+  const extra = await uniqueTotal(db, price + iva);
+  if (!extra) return fail('Hay demasiados pedidos de ese paquete esperando el pago. Probá en unos minutos.');
+  const total = price + iva + extra; items[0].iva = iva; items[0].extra = extra;
   let c; for (let k = 0; k < 5; k++) { c = code('NOX', 5); if (!(await db.prepare('SELECT 1 FROM orders WHERE code=?').bind(c).first())) break; }
-  const r = await db.prepare("INSERT INTO orders(code,uid,items,total,status,created) VALUES(?,?,?,?, 'pendiente', ?)").bind(c, me.id, JSON.stringify(items), total, now()).run();
-  return json({ order: { id: r.meta.last_row_id, code: c, items, total, status: 'pendiente', created: now() } });
+  const r = await db.prepare("INSERT INTO orders(code,uid,items,total,status,created,fac) VALUES(?,?,?,?, 'pendiente', ?, ?)").bind(c, me.id, JSON.stringify(items), total, now(), fac ? JSON.stringify(fac) : null).run();
+  return json({ order: { id: r.meta.last_row_id, code: c, items, total, status: 'pendiente', created: now(), fac, expires: now() + ORDER_HOURS * 3600e3 } });
 }, { auth: true });
 
 route('GET', 'orders', async ({ db, me }) => {
-  const rows = (await db.prepare('SELECT id,code,items,total,status,created,decided,note FROM orders WHERE uid=? ORDER BY id DESC LIMIT 50').bind(me.id).all()).results || [];
-  return json({ orders: rows.map(o => ({ ...o, items: JSON.parse(o.items) })) });
+  await expireOrders(db);
+  const rows = (await db.prepare('SELECT id,code,items,total,status,created,decided,note,fac FROM orders WHERE uid=? ORDER BY id DESC LIMIT 50').bind(me.id).all()).results || [];
+  return json({ orders: rows.map(o => ({ ...o, items: JSON.parse(o.items), fac: o.fac ? JSON.parse(o.fac) : null, expires: o.created + ORDER_HOURS * 3600e3 })) });
 }, { auth: true });
 
 route('POST', 'orders/:id/cancel', async ({ db, me, p }) => {
@@ -467,15 +504,17 @@ route('GET', 'admin/stats', async ({ db }) => {
     downloads: { total: dl.total || 0, d7: dl.d7 || 0, d30: dl.d30 || 0, byPlat, days, udays }, github: await githubCounts(), t: now() });
 }, { admin: true });
 route('GET', 'admin/pending', async ({ db }) => {
+  await expireOrders(db);
   const o = await db.prepare("SELECT COUNT(*) n, MAX(created) t FROM orders WHERE status='pendiente'").first();
   const r = await db.prepare("SELECT COUNT(*) n, MAX(created) t FROM resets WHERE status='pendiente'").first();
-  return json({ orders: o.n || 0, resets: r.n || 0, latest: Math.max(o.t || 0, r.t || 0) });
+  const k = await db.prepare("SELECT COUNT(*) n, MAX(t) t FROM bankin WHERE st='suelto'").first();
+  return json({ orders: o.n || 0, resets: r.n || 0, bank: k.n || 0, latest: Math.max(o.t || 0, r.t || 0, k.t || 0) });
 }, { admin: true });
 
 route('GET', 'admin/orders', async ({ db, url }) => {
   const st = url.searchParams.get('status') || 'pendiente';
   const rows = (await db.prepare('SELECT o.*, u.name uname, u.wa uwa FROM orders o JOIN users u ON u.id=o.uid WHERE (?=\'todos\' OR o.status=?) ORDER BY o.id DESC LIMIT 100').bind(st, st).all()).results || [];
-  return json({ orders: rows.map(o => ({ ...o, items: JSON.parse(o.items) })) });
+  return json({ orders: rows.map(o => ({ ...o, items: JSON.parse(o.items), fac: o.fac ? JSON.parse(o.fac) : null })) });
 }, { admin: true });
 
 route('POST', 'admin/orders/:id', async ({ db, req, p }) => {
@@ -486,16 +525,63 @@ route('POST', 'admin/orders/:id', async ({ db, req, p }) => {
   const note = String(b.note || '').slice(0, 300);
   if (b.action === 'pagado') {
     if (!JSON.parse(o.items).some(i => NX_PACK.has(i.id))) return fail('Ese pedido es de la tienda anterior, que ya no existe. Marcalo como no pagado y arreglá con el jugador.');
-    const r = await db.prepare("UPDATE orders SET status='pagado',decided=?,note=? WHERE id=? AND status='pendiente'").bind(now(), note, o.id).run();
-    if (!r.meta.changes) return fail('Ese pedido ya fue resuelto.');
-    const n = await deliver(db, o.uid, o.id, JSON.parse(o.items), 'recarga ' + o.code);
-    return json({ ok: true, delivered: n });
+    if (!(await settle(db, o, note))) return fail('Ese pedido ya fue resuelto.');
+    return json({ ok: true, delivered: 1 });
   }
   if (b.action === 'rechazado') {
     await db.prepare("UPDATE orders SET status='rechazado',decided=?,note=? WHERE id=? AND status='pendiente'").bind(now(), note, o.id).run();
     return json({ ok: true });
   }
   return fail('Acción no válida.');
+}, { admin: true });
+
+/* ---------- avisos del banco ----------
+   Un Email Worker (mail/) recibe los avisos que Gmail reenvía y los manda acá crudos. Se confía en un aviso solo si:
+   trae el secreto BANK_SECRET, el sobre viene de la casilla del dueño (BANK_FWD) y el remitente es el banco.
+   Cada referencia del banco entra una sola vez. Si hay exactamente un pedido pendiente por ese monto, se paga solo;
+   si no, el aviso queda "suelto" para que el administrador lo asigne o lo descarte. */
+route('POST', 'bank/mail', async ({ db, req, env }) => {
+  const sec = env.BANK_SECRET || '';
+  if (sec.length < 16 || req.headers.get('x-nox-bank') !== sec) return fail('No autorizado.', 403);
+  const u8 = new Uint8Array(await req.arrayBuffer()); if (u8.length > 300000) return fail('Demasiado grande.', 413);
+  let raw = ''; for (let i = 0; i < u8.length; i += 8192) raw += String.fromCharCode.apply(null, u8.subarray(i, i + 8192));
+  const envFrom = String(req.headers.get('x-nox-envfrom') || '').toLowerCase(), info = parseBankMail(raw);
+  if (info.from === 'forwarding-noreply@google.com') { // el correo con el que Gmail pide confirmar el reenvío: se guarda para que el administrador vea el código
+    await db.prepare('INSERT INTO mailin(t,frm,subject,body) VALUES(?,?,?,?)').bind(now(), info.from, info.subject.slice(0, 200), raw.replace(/=\r?\n/g, '').slice(-2500)).run();
+    return json({ ok: true, kind: 'gmail' });
+  }
+  const fwd = String(env.BANK_FWD || '').toLowerCase();
+  if (!fwd || !envFrom.includes(fwd) || info.from !== BANK_FROM) return json({ ok: true, kind: 'ignorado' });
+  if (!info.pay) return json({ ok: true, kind: 'sin-datos' });
+  const p = info.pay;
+  const ins = await db.prepare("INSERT OR IGNORE INTO bankin(ref,amt,payer,bank,at,t,oid,st) VALUES(?,?,?,?,?,?,NULL,'suelto')").bind(p.ref, p.amt, p.payer, p.bank, p.when, now()).run();
+  if (!ins.meta.changes) return json({ ok: true, kind: 'repetido' });
+  await expireOrders(db);
+  const cand = (await db.prepare("SELECT * FROM orders WHERE status='pendiente' AND total=? AND code LIKE 'NOX-%'").bind(p.amt).all()).results || [];
+  if (cand.length !== 1) return json({ ok: true, kind: 'suelto' });
+  const o = cand[0];
+  if (!(await settle(db, o, ('Automático · ' + p.payer + ' · ' + p.bank + ' · ref ' + p.ref).slice(0, 300)))) return json({ ok: true, kind: 'suelto' });
+  await db.prepare("UPDATE bankin SET oid=?, st='auto' WHERE ref=?").bind(o.id, p.ref).run();
+  return json({ ok: true, kind: 'pagado', code: o.code });
+});
+
+route('GET', 'admin/bank', async ({ db, env }) => {
+  const rows = (await db.prepare('SELECT b.*, o.code, u.name uname FROM bankin b LEFT JOIN orders o ON o.id=b.oid LEFT JOIN users u ON u.id=o.uid ORDER BY b.t DESC LIMIT 80').all()).results || [];
+  const mails = (await db.prepare('SELECT t,subject,body FROM mailin ORDER BY id DESC LIMIT 3').all()).results || [];
+  return json({ rows, mails, on: (env.BANK_SECRET || '').length >= 16 && !!env.BANK_FWD });
+}, { admin: true });
+
+route('POST', 'admin/bank/:ref', async ({ db, req, p }) => {
+  const b = await body(req), k = await db.prepare('SELECT * FROM bankin WHERE ref=?').bind(p.ref).first();
+  if (!k) return fail('No existe ese aviso.', 404);
+  if (k.st !== 'suelto') return fail('Ese aviso ya fue resuelto.');
+  if (b.action === 'descartar') { await db.prepare("UPDATE bankin SET st='descartado' WHERE ref=? AND st='suelto'").bind(k.ref).run(); return json({ ok: true }); }
+  const o = await db.prepare('SELECT * FROM orders WHERE code=?').bind(String(b.code || '').trim().toUpperCase()).first();
+  if (!o || !/^NOX-/.test(o.code)) return fail('No existe un pedido con ese código.', 404);
+  const take = await db.prepare("UPDATE bankin SET oid=?, st='manual' WHERE ref=? AND st='suelto'").bind(o.id, k.ref).run();
+  if (!take.meta.changes) return fail('Ese aviso ya fue resuelto.');
+  if (!(await settle(db, o, ('Asignado a mano · ' + k.payer + ' · ' + gsTxt(k.amt) + ' · ref ' + k.ref).slice(0, 300), "'pendiente','vencido'"))) { await db.prepare("UPDATE bankin SET oid=NULL, st='suelto' WHERE ref=?").bind(k.ref).run(); return fail('Ese pedido ya estaba resuelto: ' + o.status + '.'); }
+  return json({ ok: true, code: o.code });
 }, { admin: true });
 
 route('GET', 'admin/resets', async ({ db }) => {

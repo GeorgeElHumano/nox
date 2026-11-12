@@ -8971,7 +8971,7 @@ function gLp(a,b,k){return a+(b-a)*k;}
    estelas, aspectos de mascota y tres servicios. El saldo, lo comprado y lo puesto viven en el servidor (tabla noxis):
    el juego solo muestra. Catálogo y precios: lib/noxis.js (GET /api/nox/catalog). Hace falta cuenta y estar en línea. */
 const NXCOIN=s=>`<svg class="nxc" width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#e8b44a"/><circle cx="32" cy="32" r="25" fill="#101a4a"/><path d="M22 44V20l20 24V20" fill="none" stroke="#e8b44a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const NX={cat:null,by:{},bal:0,own:{},eq:{},founder:0,ready:false,tab:'gest',view:'shop',cfm:null,busy:false,order:null,orders:null,pollT:0,err:'',prev:null,svc:null,face0:null,acc:null};
+const NX={cat:null,by:{},bal:0,own:{},eq:{},founder:0,ready:false,tab:'gest',view:'shop',cfm:null,busy:false,order:null,orders:null,pollT:0,err:'',prev:null,svc:null,face0:null,acc:null,fac:{on:false,ruc:'',rs:''}};
 const NXTABS=[['gest','Gestos'],['title','Títulos'],['frame','Marcos'],['trail','Estelas'],['pet','Mascotas'],['svc','Servicios'],['fund','Fundador']];
 const nxOn=()=>!!SRV.on&&NET.mode==='online'&&!!NET.account;
 const gsFmt=n=>fmt(n)+' Gs';
@@ -9028,21 +9028,26 @@ function renderNox(){const b=$('#noxBody');if(!b)return;nxHud();const tabs=$('#n
   tabs.innerHTML=NXTABS.map(([k,n])=>`<button data-act="nxTab" data-t="${k}" class="${NX.tab===k?'on':''}">${n}</button>`).join('');
   if(NX.tab==='fund'){const lv=NX.founder,prev=NX.cat.packs.find(p=>p.f===lv),end=NX.cat.founderEnd&&Date.now()>NX.cat.founderEnd;
     b.innerHTML=err+'<div class="nx-fund">'+NX.cat.packs.filter(p=>p.f).map(p=>{const gs=p.gs-(prev&&p.f>lv?prev.gs:0);
-      return `<div class="fc f${p.f}"><h3>${esc(p.name)}</h3><div class="sub">${p.f<=lv?'Ya es tuyo':gsFmt(gs)+(prev&&p.f>lv?' (pagás la diferencia con tu pack)':'')}</div><ul>${NXFUND[p.id].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${p.f<=lv?'':end?'<div class="sub">Ya no está a la venta.</div>':`<button class="btn sm" data-act="nxOrder" data-id="${p.id}" ${NX.busy?'disabled':''}>Pedir este pack</button>`}</div>`;}).join('')+'</div><p class="hint">Un pack por cuenta. Lo exclusivo del Fundador no se vuelve a vender ni se puede comerciar.</p>';return;}
+      return `<div class="fc f${p.f}"><h3>${esc(p.name)}</h3><div class="sub">${p.f<=lv?'Ya es tuyo':gsFmt(nxPrice(gs))+(NX.fac.on?' con IVA':'')+(prev&&p.f>lv?' (pagás la diferencia con tu pack)':'')}</div><ul>${NXFUND[p.id].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${p.f<=lv?'':end?'<div class="sub">Ya no está a la venta.</div>':`<button class="btn sm" data-act="nxOrder" data-id="${p.id}" ${NX.busy?'disabled':''}>Pedir este pack</button>`}</div>`;}).join('')+'</div><p class="hint">Un pack por cuenta. Lo exclusivo del Fundador no se vuelve a vender ni se puede comerciar. Si querés factura legal, marcala antes en Recargar Noxis.</p>';return;}
   const items=NX.cat.items.filter(i=>i.kind===NX.tab&&(i.price||NX.own[i.id]));
   b.innerHTML=err+'<div class="list">'+items.map(nxRow).join('')+'</div>'+`<p class="hint">${NX.tab==='gest'?'Probar te lo muestra solo a vos. Los gestos comprados aparecen en la rueda de gestos, en Más.':NX.tab==='svc'?'Los servicios se usan dentro del juego, con el personaje al que se lo querés aplicar.':NX.tab==='pet'?'El aspecto se ve cuando llevás esa mascota.':'Lo que comprás vale para todos los personajes de tu cuenta.'}</p>`;}
-function renderNoxPay(b,err){const pend=(NX.orders||[]).filter(o=>o.status==='pendiente');
-  b.innerHTML=err+(pend.length?`<div class="nx-box"><div class="sub">Pedidos esperando el pago</div>${pend.map(o=>`<div class="nx-pend"><div><b>${esc(o.code)}</b> · ${esc(o.items[0].name)} · ${gsFmt(o.total)}</div><div class="acts"><button class="btn sm" data-act="nxOrderSee" data-id="${o.id}">Ver datos</button><button class="btn sm ghost" data-act="nxOrderCancel" data-id="${o.id}">Cancelar</button></div></div>`).join('')}</div>`:'')
-    +'<div class="list" style="margin-top:10px">'+NX.cat.packs.filter(p=>!p.f).map(p=>`<div class="row"><span class="ico">${NXCOIN(26)}</span><div><div class="nm">${fmt(p.nx)} Noxis</div><div class="sub">${p.bonus?'+'+p.bonus+' % de regalo':'Sin bono'}</div></div><div style="text-align:right"><div class="pr">${gsFmt(p.gs)}</div><button class="btn sm" data-act="nxOrder" data-id="${p.id}" ${NX.busy?'disabled':''}>Elegir</button></div></div>`).join('')+'</div>'
-    +'<p class="hint">Se paga por transferencia. Al elegir te damos un código para poner en la descripción.</p>';}
+function nxFacRead(){const r=$('#nxRuc'),n=$('#nxRs');if(r)NX.fac.ruc=r.value.trim();if(n)NX.fac.rs=n.value.trim();}
+function nxPrice(gs){return NX.fac.on?gs+Math.round(gs*((NX.cat.pay||{}).iva||10)/100):gs;}
+function renderNoxPay(b,err){nxFacRead();const pend=(NX.orders||[]).filter(o=>o.status==='pendiente'),iva=(NX.cat.pay||{}).iva||10;
+  b.innerHTML=err+(pend.length?`<div class="nx-box"><div class="sub">Pedidos esperando el pago</div>${pend.map(o=>`<div class="nx-pend"><div><b>${gsFmt(o.total)}</b> · ${esc(o.items[0].name)} · ${esc(o.code)}</div><div class="acts"><button class="btn sm" data-act="nxOrderSee" data-id="${o.id}">Ver datos</button><button class="btn sm ghost" data-act="nxOrderCancel" data-id="${o.id}">Cancelar</button></div></div>`).join('')}</div>`:'')
+    +`<div class="nx-box" style="margin-top:10px"><label style="display:flex;gap:10px;align-items:center;cursor:pointer"><input type="checkbox" id="nxFacOn" data-act="nxFac" ${NX.fac.on?'checked':''} style="width:22px;height:22px"><b>Quiero factura legal</b></label>${NX.fac.on?`<div class="sub" style="margin-top:8px">Con factura se suma el ${iva} % de IVA al precio (5.000 Gs pasan a 5.500 Gs). Los Noxis que recibís son los mismos.</div><input class="nx-in" id="nxRuc" maxlength="12" placeholder="RUC con dígito verificador, ej. 4804865-8" value="${esc(NX.fac.ruc)}"><input class="nx-in" id="nxRs" maxlength="80" placeholder="Nombre o razón social" value="${esc(NX.fac.rs)}">`:''}</div>`
+    +'<div class="list" style="margin-top:10px">'+NX.cat.packs.filter(p=>!p.f).map(p=>`<div class="row"><span class="ico">${NXCOIN(26)}</span><div><div class="nm">${fmt(p.nx)} Noxis</div><div class="sub">${p.bonus?'+'+p.bonus+' % de regalo':'Sin bono'}</div></div><div style="text-align:right"><div class="pr">${gsFmt(nxPrice(p.gs))}</div><button class="btn sm" data-act="nxOrder" data-id="${p.id}" ${NX.busy?'disabled':''}>Elegir</button></div></div>`).join('')+'</div>'
+    +'<p class="hint">Se paga por transferencia. Al elegir te damos el monto exacto a transferir: se acredita solo cuando llega.</p>';}
 function nxWaMsg(o){return `Hola, soy ${NET.account}, jugador de NOX. Pedido ${o.code} · ${o.items[0].name} · Total ${gsFmt(o.total)}. Adjunto el comprobante de la transferencia.`;}
-function renderNoxOrder(b,err){const o=NX.order,pay=NX.cat.pay||{};if(!o){NX.view='pay';renderNox();return;}
-  b.innerHTML=err+`<div class="nx-box"><div class="sub">${esc(o.items[0].name)} · transferí</div><b class="big">${gsFmt(o.total)}</b>
-    <div class="sub">En la descripción de la transferencia poné este código:</div><b class="big code">${esc(o.code)}</b>
-    <div class="acts"><button class="btn sm" data-act="nxCopy" data-v="${esc(o.code)}">Copiar código</button></div>
-    ${pay.bank?`<p style="margin:12px 0 0;white-space:pre-line">${esc(pay.bank)}</p><div class="acts"><button class="btn sm" data-act="nxCopy" data-v="${esc(pay.bank)}">Copiar datos de la cuenta</button></div>`:'<p style="margin:12px 0 0">Escribinos por WhatsApp con tu código y te pasamos los datos de la cuenta.</p>'}
-    ${pay.whatsapp?`<div class="acts"><a class="btn sm ok" target="_blank" rel="noopener" href="https://wa.me/${esc(pay.whatsapp)}?text=${encodeURIComponent(nxWaMsg(o))}">Enviar comprobante por WhatsApp</a></div>`:''}
-    <p class="hint" style="margin:10px 0 0">Tus Noxis llegan cuando el administrador confirma el pago; mandar el comprobante por WhatsApp lo acelera. Los Noxis son bienes virtuales sin valor monetario real, no son canjeables por dinero y las compras son finales, salvo lo que exija la ley. Menores de 18 años: con autorización de un adulto.</p></div>
+function renderNoxOrder(b,err){const o=NX.order,pay=NX.cat.pay||{};if(!o){NX.view='pay';renderNox();return;}const it=o.items[0];
+  b.innerHTML=err+`<div class="nx-box"><div class="sub">${esc(it.name)} · transferí exactamente</div><b class="big code">${gsFmt(o.total)}</b>
+    <div class="sub"><b>No redondees.</b> Los últimos guaraníes identifican tu pedido: con el monto exacto tus Noxis se acreditan solos.</div>
+    <div class="acts"><button class="btn sm" data-act="nxCopy" data-v="${o.total}">Copiar monto</button></div>
+    ${it.iva?`<div class="sub" style="margin-top:8px">Incluye ${gsFmt(it.iva)} de IVA. Factura a nombre de ${esc(o.fac?o.fac.rs:'')} · RUC ${esc(o.fac?o.fac.ruc:'')}.</div>`:''}
+    ${pay.bank?`<p style="margin:12px 0 0;white-space:pre-line">${esc(pay.bank)}</p><div class="acts"><button class="btn sm" data-act="nxCopy" data-v="${esc(pay.bank)}">Copiar datos de la cuenta</button></div>`:'<p style="margin:12px 0 0">Escribinos por WhatsApp y te pasamos los datos de la cuenta.</p>'}
+    <p class="hint" style="margin:10px 0 0">Pedido ${esc(o.code)} · vence en ${pay.hours||48} horas. Si transferiste otro monto o pasó un rato y no llegan, mandanos el comprobante.</p>
+    ${pay.whatsapp?`<div class="acts"><a class="btn sm ghost" target="_blank" rel="noopener" href="https://wa.me/${esc(pay.whatsapp)}?text=${encodeURIComponent(nxWaMsg(o))}">Enviar comprobante por WhatsApp</a></div>`:''}
+    <p class="hint" style="margin:10px 0 0">Los Noxis son bienes virtuales sin valor monetario real, no son canjeables por dinero y las compras son finales, salvo lo que exija la ley. Menores de 18 años: con autorización de un adulto.</p></div>
     <div class="acts" style="margin-top:10px;display:flex;gap:8px"><button class="btn sm ghost" data-act="nxPay">Mis pedidos y otros paquetes</button></div>`;}
 async function nxOrders(){try{const r=await srvApi('GET','orders');NX.orders=r.orders||[];const p=$('#pNox');if(p&&!p.hidden&&NX.view==='pay')renderNox();}catch(e){}}
 /* --- servicios: se gastan en el servidor y recién entonces el juego hace el cambio --- */
@@ -9071,7 +9076,8 @@ Object.assign(ACT,{
   nxSvcOk(){nxDo(nxSvcOk);},
   nxFace(d){if(NX.svc!=='s_apariencia'||!C)return;const n=HEADS[C.cls==='arquera'?'f':'m'].length;C.face=(((C.face|0)+(+d.d))%n+n)%n;HERO_FACE=C.face;rebuildHero(C.cls,C.eq);renderNox();},
   nxFaceNo(){nxFaceBack();NX.view='shop';NX.svc=null;renderNox();},
-  nxOrder(d){nxDo(async()=>{const r=await srvApi('POST','orders',{items:[{id:d.id}]});NX.order=r.order;NX.view='order';nxOrders();});},
+  nxFac(){nxFacRead();NX.fac.on=!NX.fac.on;renderNox();},
+  nxOrder(d){nxFacRead();nxDo(async()=>{const r=await srvApi('POST','orders',{items:[{id:d.id}],...(NX.fac.on?{fac:{ruc:NX.fac.ruc,rs:NX.fac.rs}}:{})});NX.order=r.order;NX.view='order';nxOrders();});},
   nxOrderSee(d){const o=(NX.orders||[]).find(x=>x.id===+d.id);if(o){NX.order=o;NX.view='order';renderNox();}},
   nxOrderCancel(d){nxDo(async()=>{await srvApi('POST','orders/'+(+d.id)+'/cancel');await nxOrders();});},
   nxCopy(d){const v=d.v||'';try{navigator.clipboard.writeText(v).then(()=>toast('Copiado'),()=>toast('No se pudo copiar: mantené apretado el texto para copiarlo'));}catch(e){toast('No se pudo copiar: mantené apretado el texto para copiarlo');}},

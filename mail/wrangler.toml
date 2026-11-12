@@ -1,0 +1,8 @@
+# Recibe los avisos del banco que Gmail reenvía (Cloudflare Email Routing → este Worker) y los pasa crudos a la API.
+# Secretos (wrangler secret put): BANK_SECRET (el mismo que en Pages). Variable BANK_TO = dirección que recibe los avisos.
+name = "nox-mail"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+API = "https://noxparaguay.com/api/bank/mail"
