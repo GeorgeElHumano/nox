@@ -386,6 +386,20 @@ input{user-select:text;-webkit-user-select:text}
 .cald .recipe{padding:8px 10px;margin-top:6px}.cald .recipe h4{margin:0 0 4px;font-size:14px}.cald .recipe ul{margin:0 0 6px;font-size:12.5px;line-height:1.4}.cald .recipe .it-d{margin:0 0 6px;font-size:12.5px;line-height:1.35}.cald .recipe .btn.full{padding:8px 10px;font-size:13px}.cald .recipe .hint{margin:4px 0 6px;font-size:12px}
 .cald .recipe.inv .ivh{display:flex;align-items:center;justify-content:space-between;gap:8px}.cald .recipe.inv .ivh h4{margin:0}.cald .recipe.inv .btn.sm{padding:5px 14px;font-size:12.5px}
 .cald .chips{display:flex;flex-wrap:wrap;gap:5px}.cald .chips span{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.5}.cald .chips .ok{color:var(--good)}.cald .chips .no{color:var(--bad)}
+.gq{display:flex;flex-direction:column;gap:8px}
+.gq-log{max-height:38vh;min-height:84px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:8px;background:rgba(0,0,0,.28);overscroll-behavior:contain}
+.gq-m{max-width:94%;font-size:13.5px;line-height:1.45}
+.gq-m span{display:block;padding:7px 10px;border-radius:10px}
+.gq-m.me{align-self:flex-end}
+.gq-m.me span{background:rgba(226,168,63,.18);box-shadow:inset 0 0 0 1px rgba(226,168,63,.45)}
+.gq-m.he span{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.gq-m.he i{display:block;font-style:normal;font-size:11px;color:var(--gold);margin:0 0 2px 4px;letter-spacing:.04em}
+.gq-m.he b{color:var(--gold2)}
+.gq-m.wait span{opacity:.6;font-style:italic}
+.gq-m .btn{margin-top:4px}
+.gq-chips{display:flex;flex-wrap:wrap;gap:5px}
+.gq-chips .btn{font-size:12px;padding:5px 9px}
+@media (max-width:560px),(max-height:480px){.gq-log{max-height:22vh;min-height:64px}.gq-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}.gq-chips .btn{flex:none;white-space:nowrap}}
 .cald-sel{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(240,204,132,.5);border-radius:10px;background:rgba(240,204,132,.08)}.cald-sel .cell{width:52px;height:52px;flex:none}.cald-sel small{display:block;color:var(--dim);font-size:11px;letter-spacing:.06em;text-transform:uppercase}.cald-sel b{font-size:15px}
 .cald .result{margin:0 0 8px}
 .recipe{padding:10px;border:1px solid var(--edge2);border-radius:8px;background:rgba(0,0,0,.25);margin-top:8px}
@@ -1982,7 +1996,9 @@ const NPCS={
  chamana:{name:'Jarýi Kuña',role:'Caldero de Kerana',pos:[13,6.5],greet:'El caldero de Kerana da poder… o se traga todo. Vos elegís.'},
  baqueano:{name:'Baqueano Tito',role:'Viajes',pos:[-5,30],greet:'Conozco cada camino del reino. Decime adónde y te llevo, por unos guaraníes.'},
  baul:{name:'Ña Chela',role:'Baúl de la cuenta',pos:[-13.4,7.6],greet:'Lo que guardes acá lo ven todos tus personajes. Y nadie más, si le ponés candado.'},
- cronista:{name:'Karaí Arandu',role:'Cronista del reino',pos:[-10.2,-16.6],greet:'Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?'}
+ cronista:{name:'Karaí Arandu',role:'Cronista del reino',pos:[-10.2,-16.6],greet:'Cada leyenda empieza cuando cae la noche. ¿Querés saber cómo empezó la nuestra?'},
+ /* guía del reino: frente a la fuente, mirando a donde aparecen los jugadores (ry fija el giro; los demás miran al centro) */
+ guia:{name:'Tapekuaa',role:'Guía del reino',pos:[0,4.7],ry:0,greet:"Mba'éichapa. Soy Tapekuaa, el que conoce el camino. Preguntame lo que quieras de NOX."}
 };
 
 /* ================= estado ================= */
@@ -3504,8 +3520,10 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
 /* --- PNJ --- */
 /* los NPC de Asunción son guerreros de cada clase, con los sets y alas más lindos del reino, sin repetir ninguno */
 const NPC_GEAR={herrero:{cls:'caballero',t:6,wg:2,lv:11,face:3},boticaria:{cls:'arquera',t:6,wg:2,lv:13,face:1},pai:{cls:'hechicero',t:6,wg:2,lv:11,face:9},capitan:{cls:'gladiador',t:6,wg:2,lv:13,face:11},
-  chamana:{cls:'arquera',t:5,wg:1,lv:9,face:5},baqueano:{cls:'mburuvicha',t:6,wg:2,lv:11,face:7},baul:{cls:'arquera',t:4,wg:1,lv:4,face:2},cronista:{cls:'hechicero',t:5,wg:1,lv:9,face:14}};
-function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.lv,g:G.wg};return eq;}
+  chamana:{cls:'arquera',t:5,wg:1,lv:9,face:5},baqueano:{cls:'mburuvicha',t:6,wg:2,lv:11,face:7},baul:{cls:'arquera',t:4,wg:1,lv:4,face:2},cronista:{cls:'hechicero',t:5,wg:1,lv:9,face:14},
+  /* Tapekuaa: set único (FORJA.hechicero[7], «Tapekuaa»: blanco y oro), con su bastón, y sin alas: es el único PNJ con los pies en la tierra */
+  guia:{cls:'hechicero',t:7,wt:7,wg:0,lv:9,face:1}};
+function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',G.wt!=null?G.wt:Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});if(G.wg)eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.lv,g:G.wg};return eq;}
 function oadNpc(id){const G=NPC_GEAR[id];if(G&&OAD.on&&!OAD.failed){const eq=npcGear(G);const hf=HERO_FACE;HERO_FACE=G.face;let r=null;try{if(CC0.on){if(cc0Want(G.cls,eq,oadUpgradeNpcs))r=cc0Hero(G.cls,eq);}else{const sp=oadHeroSpec(G.cls,eq);if(!oadHave(sp.files)){oadNeed(sp.files,oadUpgradeNpcs);}else r=oadHero(G.cls,eq);}}catch(e){console.error(e);}finally{HERO_FACE=hf;}
     if(r){(r.faceMats||[]).forEach(m=>m.userData.npc=1);r.npcP={mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false,flyK:0};return r;}return null;}
   if(CC0.on&&!OAD.failed&&CC0_NPC[id])return cc0Npc(id);
@@ -4061,7 +4079,9 @@ const FORJA={
   {n:'Jasy',a:0x2a1a6a,b:0x140c36,m:0x5a48c8,t:0xd0d8ff,g:0x7a6aff,helm:'moon',pads:'orb',chest:'gem',brace:'ornate',greave:'none',belt:'metal',x:{mat:'cloth',cui:'rune',back:'moon',tab:'rune',gor:.05}},
   {n:'Tupã',a:0x4a1a7a,b:0x240c3c,m:0x7a30d0,t:0xffd040,g:0xb050ff,helm:'mitre',pads:'spike',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',x:{cui:'pectoral',back:'rays',skirt:{n:8,len:.42,st:'cloth'},elbow:'round'}},
   {n:'Arandu',a:0x3a0a4a,b:0x1c0424,m:0x581470,t:0xff5ad8,g:0xe040ff,helm:'antler',pads:'none',chest:'gem',brace:'ornate',greave:'none',belt:'metal',x:{mat:'cloth',cui:'gems',back:'shards',pad2:'gemstack',skirt:{n:6,len:.46,st:'leaf'},gor:.07}},
-  {n:'Ñamandu',a:0x5a20c0,b:0x2a0c60,m:0x8a48ff,t:0xf4e8ff,g:0xb070ff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',halo:1,x:{cui:'star',back:'ring',skirt:{n:10,len:.48,st:'cloth'},gor:.09,pad2:'tier',elbow:'wing'}}],
+  {n:'Ñamandu',a:0x5a20c0,b:0x2a0c60,m:0x8a48ff,t:0xf4e8ff,g:0xb070ff,helm:'halo',pads:'big',chest:'ornate',brace:'ornate',greave:'none',belt:'metal',halo:1,x:{cui:'star',back:'ring',skirt:{n:10,len:.48,st:'cloth'},gor:.09,pad2:'tier',elbow:'wing'}},
+  /* 7: set de Tapekuaa, el guía de la plaza. Solo lo lleva él: no se vende ni cae (los ítems llegan hasta el set 6) */
+  {n:'Tapekuaa',a:0xf4eedc,b:0xb8a67c,m:0xe8c25a,t:0xfff4c8,g:0xffd070,helm:'sunfan',pads:'big',chest:'ornate',brace:'wrap',greave:'none',belt:'metal',halo:1,x:{mat:'cloth',cui:'amulet',back:'sun',tab:'rune',skirt:{n:10,len:.5,st:'cloth'},gor:.08,pad2:'gemstack',elbow:'wing'}}],
  arquera:[
   {n:"Ao Po'i",a:0xbfe0d8,b:0x6a9a90,m:0x8a8a70,t:0xe8fff8,g:0x7ad8c8,helm:'band',pads:'none',chest:'none',brace:'wrap',greave:'leather',belt:'leather',x:{bare:['thigh'],skirt:{n:10,len:.15,st:'cloth'}}},
   {n:'Plumas',a:0x2a9a8a,b:0x145048,m:0x8a7a50,t:0xffe0a0,g:0x30e0c0,helm:'feather',pads:'feather',chest:'bones',brace:'leather',greave:'leather',belt:'leather',x:{bare:['spine_02','thigh'],skirt:{n:12,len:.2,st:'feather'}}},
@@ -4702,7 +4722,7 @@ function cc0Hero(cls,eq,o){if(!CC0.on||OAD.failed||!CC0_CLS[cls])return null;if(
   try{r=cc0Human(cls,eq,o);}catch(e){console.error(e);return null;}
   try{bodyShape(r.body,cls);}catch(e){console.error(e);}
   try{cc0APose(r.body,true);forgeApply(r,cls,eq);}catch(e){console.error(e);}finally{cc0APose(r.body,false);}
-  const body=r.body,w=eq&&eq.weapon,wt=w?Math.min(6,w.t|0):-1,S=w?forjaOf(cls,wt):null;
+  const body=r.body,w=eq&&eq.weapon,wt=w?Math.min(6,w.t|0):-1,S=w?forjaOf(cls,w.t|0):null;/* la forma del arma llega hasta el set 6; el color sale del set real (forjaOf ya lo acota: Tapekuaa lleva el suyo) */
   const clipsA={};['c_anim1','c_anim2'].forEach(f=>((OAD.ok[f]&&OAD.ok[f].animations)||[]).forEach(c=>clipsA[c.name]=c));
   try{if(w){let obj=null,bone='hand_r',dir=[-.15,.62,.77],side=[1,0,0],s=1,sd='r',clip=clipsA.Sword_Idle,tt=.5;
       if(cls==='hechicero'){obj=cc0Staff(S,1.55,wt);obj.position.y=-.9;const h=new THREE.Group();h.add(obj);obj=h;dir=[0,1,.08];clip=clipsA.Spell_Simple_Idle_Loop;}
@@ -5418,7 +5438,8 @@ const NPCLOOK={
  chamana:{body:{skin:0x9a6a48,female:true,shirt:0x3a5a3a,pants:0x2d4a32,hair:{style:'long',col:0x1a120c}},extra:'shaman'},
  baqueano:{body:{skin:0xb98058,shirt:0xeae4d8,pants:0x4a4a52,boots:0x3a2a1e,hair:{style:'short',col:0x2a1a10},mustache:0x2a1a10,bootsHigh:true},extra:'poncho'},
  baul:{body:{skin:0xc08a66,female:true,shirt:0x2a3a6a,pants:0x1e2a4a,hair:{style:'bun',col:0x3a2a1c}},extra:'skirt'},
- cronista:{body:{skin:0xc89a78,shirt:0x4a3a5a,pants:0x3a2e44,hair:{style:'short',col:0xb0aaa0},beard:0xb0aaa0},extra:'cassock'}
+ cronista:{body:{skin:0xc89a78,shirt:0x4a3a5a,pants:0x3a2e44,hair:{style:'short',col:0xb0aaa0},beard:0xb0aaa0},extra:'cassock'},
+ guia:{body:{skin:0xc89a78,shirt:0xf2ecdc,pants:0xe6dcc4,hair:{style:'short',col:0xe8e4dc},beard:0xe8e4dc},extra:'skirt'}
 };
 function npcModel(id){const oo=oadNpc(id);if(oo)return oo;const L=NPCLOOK[id],r=rigHuman();bodyHuman(r,L.body);
   if(L.extra==='apron'){part(BOX(.3,.7,.02),mtl(0x4a3020,'leather'),0,.15,.13,r.torso);const h=new THREE.Group();h.rotation.x=PI/2;r.handR.add(h);part(limbGeo(.4,.025,.022,0),mtl(0x5a3a22,'wood'),0,.1,0,h);part(BOX(.16,.08,.08),mat(0x4a4a50,{metalness:.8,roughness:.4}),0,-.32,0,h);}
@@ -5865,7 +5886,7 @@ const BUILD={
   scatter(30,42,(x,z)=>addRock(V,x,z,.3+srnd()*1));
   grassField(V,2400,[0x6e8f34,0x9a9a4a,0x5a7a2a],(x,z)=>Math.hypot(x,z)>37);
   // NPCs
-  for(const id in NPCS){const d=NPCS[id],m=npcLit(npcModel(id)),y=H(d.pos[0],d.pos[1]);m.g.position.set(d.pos[0],y,d.pos[1]);m.g.rotation.y=Math.atan2(-d.pos[0],-d.pos[1]);addBlob(m.g,1.3);G.add(m.g);
+  for(const id in NPCS){const d=NPCS[id],m=npcLit(npcModel(id)),y=H(d.pos[0],d.pos[1]);m.g.position.set(d.pos[0],y,d.pos[1]);m.g.rotation.y=d.ry!=null?d.ry:Math.atan2(-d.pos[0],-d.pos[1]);addBlob(m.g,1.3);G.add(m.g);
     const n={id,def:d,m,x:d.pos[0],z:d.pos[1],ry0:m.g.rotation.y,ph:srnd()*6};n.label=addLabel(`${esc(d.name)}<small>${esc(d.role)}</small>`,'npc',()=>[n.x,y+2.35,n.z]);npcs.push(n);colliders.push({x:n.x,z:n.z,r:.45});}
  },
  campos(G,V){
@@ -6795,7 +6816,7 @@ function auraFit(a){const ud=a.userData;ud.ang=(ud.ang||0)+.0035;const g=a.geome
   for(let i=0;i<P.count;i++){const bx=B[i*3],bz=B[i*3+2],x=bx*c-bz*sn,z=bx*sn+bz*c;_av.set(x,oy,z).applyMatrix4(M);let y=(H(_av.x,_av.z)+.05-_ap.y)/k-oy;y=Math.max(-1.2,Math.min(1.2,y));P.setXYZ(i,x,y,z);}
   P.needsUpdate=true;}
 
-function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);charShadow(n,n.m&&n.m.g,d);const want=d<7?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
+function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);/* en la portada no se ve a ningún PNJ parado entre la cámara y el personaje (Tapekuaa está justo detrás) */{const sv=!(mode==='select'&&Math.abs(n.x)<8&&n.z>1.5&&n.z<19);if(n.m.g.visible!==sv)n.m.g.visible=sv;}charShadow(n,n.m&&n.m.g,d);const want=d<7?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
 
 /* ================= entrada ================= */
 const joyEl=$('#joy'),knob=$('#knob'),joy={id:null,ox:0,oy:0,x:0,y:0};
@@ -7211,6 +7232,7 @@ function renderNpc(){const b=$('#npcBody');
     h=dailyHTML()+'<div class="sect"><h3>Misión principal</h3>'+h+'</div>';
     h+=`<p class="hint">Teclado: WASD moverse · Espacio atacar · 1–4 técnicas · Q/E pociones · I inventario · C personaje · M viajes · H automático · F hablar.</p>`;b.innerHTML=h;}
   else if(NPCV==='chamana')renderCaldero();
+  else if(NPCV==='guia')renderGuia();
 }
 /* botón para ir directo al spot (o al jefe) de la misión, con el mismo costo que el viaje a un spot */
 function questWarp(q){if(!q)return '';const z=Object.keys(ZONES).find(id=>(ZONES[id].spots||[]).some(sp=>sp.m===q.mob)||(ZONES[id].boss&&ZONES[id].boss[0]===q.mob));if(!z)return '';const Zd=ZONES[z];
@@ -7247,6 +7269,114 @@ function cauldGo(r){const it=C.inv[CALD.sel];if(!it)return;let ok=false,msg;
   else{const ch=Math.min(80,25+it.lv*5+(it.ex&&it.ex.length?15:0)+it.op*5),cost=500000;if(C.gold<cost||!takeItem('gem','kerana',1))return;C.gold-=cost;C.inv[CALD.sel]=null;CALD.sel=null;ok=Math.random()*100<ch;
     if(ok){const w=newEquip(C.cls,'wings',0,{luck:Math.random()<.3});addItem(w);msg=`¡Éxito! Creaste ${itemName(w)}`;}else msg='El caldero se tragó el ítem.';}
   CALD.res={ok,msg};toast(`<em style="color:${ok?'var(--good)':'var(--bad)'}">${esc(msg)}</em>`);persist();renderCaldero();}
+
+/* ===== Tapekuaa, el guía del reino (PNJ frente a la fuente de Asunción) =====
+   Las preguntas comunes las contesta el juego con los datos del personaje (gratis, sin límite): GUIA_T.
+   Las demás van a la IA por la API (`POST game/guia`, 10 por día por cuenta); el servidor lee el personaje de la base.
+   Si una pregunta escrita cae en un solo tema, responde el juego y ofrece «Preguntarle más a fondo» (eso sí gasta una). */
+const GUIA={log:[],left:null,max:10,busy:false,last:'',ft:0};
+const tkNorm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9ñ+ ]/g,' ');
+const tkB=s=>'<b>'+esc(s)+'</b>';
+const tkSlots=()=>EQK.filter(k=>!(k==='shield'&&C.cls!=='caballero')&&!(k==='helm'&&C.cls==='gladiador'));
+const tkGem=s=>countItem('gem',s);
+const tkZoneOf=mob=>ZORDER.find(id=>(ZONES[id].spots||[]).some(sp=>sp.m===mob)||(ZONES[id].boss&&ZONES[id].boss[0]===mob));
+/* la mejor caza para el nivel: la criatura común de más nivel que no pase del tuyo +3, en un mapa al que ya podés entrar */
+function tkHunt(minL){let best=null;for(const id of ZORDER){const z=ZONES[id];if(C.L<z.lvl)continue;for(const sp of z.spots||[]){const m=MOBS[sp.m];if(!m||m.lvl>C.L+3||(minL&&m.lvl<minL))continue;if(!best||m.lvl>best.m.lvl)best={m,sp,z,id};}}
+  if(!best&&!minL){const sp=ZONES.campos.spots[0];best={m:MOBS[sp.m],sp,z:ZONES.campos,id:'campos'};}return best;}
+const tkHuntTxt=h=>`${tkB(h.m.name)} (nivel ${h.m.lvl}) en ${tkB(h.sp.n)}, ${esc(h.z.name)}`;
+const TIER_MOBL=[1,12,24,38,52,70,88];
+const GUIA_T=[
+ {k:'nivel',q:'¿Cómo subo de nivel?',re:/\b(subo|subir|sub[ie]r de nivel|levelear|lvl|nivel(es)?|experiencia|exp|xp|farmear|farmeo|cazar|entrenar)\b/,f(){
+   if(C.L>=MAXL)return `Ya llegaste al nivel ${MAXL}, el máximo. Hablá con el ${tkB("Pa'i Antonio")} para reiniciar: volvés al nivel 1 con ${300*((C.resets||0)+1)} puntos libres.`;
+   const h=tkHunt(),q=QUESTS[C.q.i];let s=`Estás en el nivel ${C.L}. Tu mejor caza ahora: ${tkHuntTxt(h)}. No caces criaturas más de 10 niveles por debajo del tuyo: dan muy poca experiencia.`;
+   s+=` De noche dan 15 % más, en grupo hay bono, y las élite (rojas) y doradas dan mucho más.`;
+   if(q)s+=` Seguí también la misión del Capitán Cabañas y las diarias: dan oro y gemas.`;const nz=ZORDER.map(id=>ZONES[id]).find(z=>z.lvl>C.L);if(nz)s+=` En el nivel ${nz.lvl} se te abre ${tkB(nz.name)}.`;return s;}},
+ {k:'mision',q:'¿Cómo sigo mi misión?',re:/\b(mision(es)?|quest|capitan|caba[nñ]as|diaria(s)?|objetivo)\b/,f(){
+   const q=QUESTS[C.q.i];let s;
+   if(!q)s='Ya completaste las 34 misiones del Capitán Cabañas. Te quedan las diarias, los eventos y los jefes.';
+   else{const z=ZONES[tkZoneOf(q.mob)],nm=MOBS[q.mob].name,obj=q.n>1?`derrotar ${q.n} ${nm}`:`derrotar a ${nm}`;
+     if(!C.q.on)s=`Tu próxima misión es la ${C.q.i+1} de ${QUESTS.length}: ${tkB(obj)} en ${esc(spotOf(q.mob))}, ${esc(z.name)}. Primero aceptala con el ${tkB('Capitán Cabañas')}, al lado del portón de Asunción.`;
+     else if(C.q.n>=q.n)s=`¡Ya cumpliste la misión ${C.q.i+1}! Volvé con el ${tkB('Capitán Cabañas')}, al lado del portón, para cobrar ₲ ${fmt(q.gold)} y tus gemas.`;
+     else s=`Vas por la misión ${C.q.i+1} de ${QUESTS.length}: ${tkB(obj)}. Llevás ${tkB(C.q.n+' de '+q.n)}. Están en ${tkB(spotOf(q.mob))}, ${esc(z.name)}${C.L<z.lvl?` (ese mapa pide nivel ${z.lvl}: te faltan ${z.lvl-C.L})`:''}. En Misiones (L) hay un botón para viajar directo.`;
+     if(MOBS[q.mob].boss&&C.L<MOBS[q.mob].lvl-4)s+=` Ojo: es un jefe de nivel ${MOBS[q.mob].lvl}; subí un poco más o andá en grupo.`;}
+   const D=dailies(),pend=D.list.filter(x=>!x.cl),done=pend.filter(x=>x.n>=x.goal).length;
+   if(done)s+=` Tenés ${done} misi${done>1?'ones diarias cumplidas':'ón diaria cumplida'} sin reclamar en Misiones (L).`;else if(pend.length)s+=` Hoy te queda${pend.length>1?'n':''} ${pend.length} diaria${pend.length>1?'s':''}: ${esc(DAYT[pend[0].k].d(pend[0].goal))}${pend.length>1?', entre otras':''}.`;
+   if(C.L>=50&&!C.evo)s+=C.evoQ?` Y juntá las Plumas de Guyra Pytã (${countItem('quest','pluma')} de 5) en el Chaco o los Esteros.`:` Además, el Pa'i Antonio ya te espera para tu evolución.`;return s;}},
+ {k:'set',q:'¿Cómo mejoro mi set?',re:/\b(set|equipo|armadura|arma|espada|arco|baston|cetro|escudo|casco|botas|guantes|mejor[oa]r?|mas fuerte|defensa|da[nñ]o)\b/,f(){
+   const main=CLASSES[C.cls].main,ks=tkSlots().filter(k=>k!=='wings'),out=[];
+   const miss=ks.filter(k=>!C.eq[k]);let bt=0;for(let t=0;t<7;t++)if(C.L>=TREQ_LVL[t])bt=t;
+   const shopT=C.L>=25?2:1,low=ks.filter(k=>C.eq[k]&&C.eq[k].t<bt);
+   if(miss.length)out.push(`Te falta${miss.length>1?'n':''} ${tkB(miss.map(k=>SLOTLABEL[k].toLowerCase()).join(', '))}: Don Ramón, el herrero, te vende hasta el set ${shopT+1}.`);
+   if(low.length){const need=Math.round(TREQ_STAT[bt]*.85),have=C.st[main]||0,src=bt<=shopT?'lo vende Don Ramón, el herrero':(()=>{const h=tkHunt(TIER_MOBL[bt]);return h?`cae de criaturas de nivel ${TIER_MOBL[bt]} o más, como ${tkHuntTxt(h)}`:`cae de criaturas de nivel ${TIER_MOBL[bt]} o más`;})();
+     out.push(`Por tu nivel ya podés usar el ${tkB('set '+(bt+1)+' '+SETN[C.cls][bt])} y todavía tenés ${low.length} pieza${low.length>1?'s':''} de un set menor. Ese set ${src}.${have<need?` Pide ${need} de ${STATN[main]} (tenés ${have}).`:''}`);}
+   else if(bt<6)out.push(`Tu equipo está al día para tu nivel. El ${tkB('set '+(bt+2)+' '+SETN[C.cls][bt+1])} se abre en el nivel ${TREQ_LVL[bt+1]}.`);
+   const up=ks.concat(C.eq.wings?['wings']:[]).map(k=>C.eq[k]).filter(Boolean).sort((a,b)=>(b.k==='weapon')-(a.k==='weapon')||a.lv-b.lv),t6=up.find(it=>it.lv<6),tj=up.find(it=>it.lv>=6&&it.lv<9),nT=tkGem('tupa'),nJ=tkGem('jasy');
+   if(t6)out.push(`Con ${tkB('Gemas de Tupã')} subís hasta +6 sin riesgo${nT?` (tenés ${nT})`:' (no tenés ninguna: caen de criaturas de nivel 8 o más y las dan las misiones)'}. Empezá por ${tkB(itemName(t6))}: abrí la Bolsa (I), tocá la gema y después el ítem.`);
+   else if(tj)out.push(`Todo lo tuyo ya está en +6 o más. De +6 a +9 se usa la ${tkB('Gema de Jasy')}${nJ?` (tenés ${nJ})`:''}: 50 % de éxito, 75 % si el ítem tiene Suerte; si falla en +7 o más vuelve a +0.`);
+   else if(up.length)out.push(`Tu equipo ya está en +9 o más. De ahí a +15 se sube en el ${tkB('Caldero de Kerana')} con Jarýi Kuña (Gemas de Kerana, Tupã y Jasy); si falla, el ítem se destruye.`);
+   return out.join(' ');}},
+ {k:'alas',q:C=>C.cls==='mburuvicha'?'¿Cómo consigo mi capa?':'¿Cómo consigo alas?',re:/\b(alas?|capa|volar|vuelo|mainumby)\b/,f(){
+   const w=C.eq.wings,mb=C.cls==='mburuvicha',W=mb?'capa':'alas',nK=tkGem('kerana'),nJ=tkGem('jasy');
+   if(!w){const inv=C.inv.filter(x=>x&&x.k==='wings').length;if(inv)return `Ya tenés ${W} en la bolsa. ${C.L<20?`Se equipa${mb?'':'n'} desde el nivel 20: te faltan ${20-C.L} niveles.`:'Abrí la Bolsa (I) y equipala'+(mb?'':'s')+'.'}`;
+     const best=C.inv.filter(x=>x&&isEq(x)&&x.k!=='wings'&&x.lv>=4).sort((a,b)=>b.lv-a.lv)[0];
+     let s=`${mb?'La capa se crea':'Las alas se crean'} en el ${tkB('Caldero de Kerana')}, con Jarýi Kuña en la plaza. Necesitás un ítem de equipo ${tkB('+4 o más')} (se consume), ${tkB('1 Gema de Kerana')} y ₲ 500.000. Cuanto más alto el +, más probabilidad: +4 da 45 %, +9 da 70 %.`;
+     s+=` Tenés ${nK} Gema${nK===1?'':'s'} de Kerana y ₲ ${fmt(C.gold)}.`;s+=best?` En tu bolsa, ${tkB(itemName(best))} sirve.`:` Subí primero una pieza que no uses a +4 con Gemas de Tupã (no la que llevás puesta).`;if(C.L<20)s+=` Se equipa${mb?'':'n'} desde el nivel 20.`;return s;}
+   const g=w.g||1;
+   if(g>=3)return `Ya tenés ${tkB(itemName(w))}, la tercera generación: lo máximo. Seguí subiéndola${mb?'':'s'} con gemas hasta +15.`;
+   if(w.lv<9)return `Tenés ${tkB(itemName(w))}. Para la ${g+1}ª generación primero llevala${mb?'':'s'} a ${tkB('+9')}: Gemas de Tupã hasta +6 y de Jasy hasta +9 (tenés ${tkGem('tupa')} de Tupã y ${nJ} de Jasy).`;
+   return g===1?`Tu ${W} ya está${mb?'':'n'} en +${w.lv}: podés crear la ${tkB('segunda generación')} en el Caldero de Kerana con 3 Gemas de Kerana (tenés ${nK}), 3 de Jasy (tenés ${nJ}) y ₲ 5.000.000. Si falla, el caldero se la${mb?'':'s'} traga.`
+     :`Para la ${tkB('tercera generación')} llevá tu ${W} +${w.lv} al Caldero de Kerana con 1 Pluma de Mainumby (tenés ${tkGem('mainumby')}), 5 Gemas de Kerana (${nK}), 5 de Jasy (${nJ}), 1 de Yvy (${tkGem('yvy')}) y ₲ 20.000.000. La pluma cae de jefes, doradas y élites de nivel 50 o más.`;}},
+ {k:'gemas',q:'¿Para qué sirven las gemas?',re:/\b(gemas?|joyas?|tupa|jasy|yvy|kerana|caldero|\+ ?\d+)\b/,f(){
+   const n=k=>tkGem(k);return `${tkB('Tupã')} (tenés ${n('tupa')}): sube de +0 a +6 y nunca falla. ${tkB('Jasy')} (${n('jasy')}): de +6 a +9, 50 % de éxito; si falla en +7 o más, el ítem vuelve a +0. ${tkB('Yvy')} (${n('yvy')}): agrega opción adicional +4, hasta +16. ${tkB('Kerana')} (${n('kerana')}): va al Caldero de Kerana para subir de +9 a +15 y crear alas. Se usan desde la Bolsa (I): tocás la gema y después el ítem. Caen de las criaturas (mucho más de élites, doradas y jefes) y las dan las misiones.`;}},
+ {k:'puntos',q:'¿Dónde pongo mis puntos?',re:/\b(puntos?|stats?|fuerza|agilidad|vitalidad|energia|repart[oi]r?|build)\b/,f(){
+   const cl=CLASSES[C.cls],main=cl.main;let bt=0;for(let t=0;t<7;t++)if(C.L>=TREQ_LVL[t])bt=t;const nx=Math.min(6,bt+1),need=TREQ_STAT[nx];
+   return `${C.pts?`Tenés ${tkB(C.pts+' puntos')} sin repartir: abrí Personaje (C).`:'No tenés puntos libres ahora; ganás más con cada nivel.'} Para tu ${esc(cl.name)}: ${esc(cl.hint)} Tu stat principal es ${tkB(STATN[main])} (tenés ${C.st[main]}); el arma del set ${nx+1} pide ${need}. Si morís seguido, sumá Vitalidad.`;}},
+ {k:'evo',q:'¿Cómo evoluciono?',re:/\b(evolu\w*|pluma(s)? de guyra|reinici\w*|reset\w*)\b/,f(){
+   const cl=CLASSES[C.cls],rc=2000000*((C.resets||0)+1);let s;
+   if(C.evo)s=`Ya sos ${tkB(cl.evo)}: ganás un punto más por nivel.`;
+   else if(C.L<50)s=`En el nivel 50 (te faltan ${50-C.L}) el ${tkB("Pa'i Antonio")}, frente a la catedral, te pone a prueba para ser ${tkB(cl.evo)}: un punto más por nivel y tu cuarta técnica.`;
+   else if(!C.evoQ)s=`Ya podés evolucionar a ${tkB(cl.evo)}. Hablá con el ${tkB("Pa'i Antonio")}, frente a la catedral, y aceptá la prueba: te va a pedir 5 Plumas de Guyra Pytã.`;
+   else s=`Tenés ${tkB(countItem('quest','pluma')+' de 5')} Plumas de Guyra Pytã. Caen de las criaturas del Chaco Boreal y de los Esteros del Ñeembucú (los jefes las dan mucho más seguido). Con las 5, volvé con el Pa'i Antonio.`;
+   return s+` El reinicio es en el nivel ${MAXL}: volvés al nivel 1 con ${300*((C.resets||0)+1)} puntos libres y cuesta ₲ ${fmt(rc)}.`;}},
+ {k:'tecnicas',q:'¿Cómo aprendo técnicas?',re:/\b(tecnicas?|habilidad(es)?|skills?|poder(es)?|magia|hechizos?|aprend\w*)\b/,f(){
+   const nx=CSK[C.cls].map(id=>SKILLS[id]).find((s,i)=>!C.skills.includes(CSK[C.cls][i]));
+   if(!nx)return 'Ya aprendiste las cuatro técnicas de tu clase. Se usan con los botones de abajo; gastan maná.';
+   const st=nx.evo&&!C.evo?'pide haber evolucionado (nivel 50)':C.L<nx.lvl?`se abre en el nivel ${nx.lvl} (te faltan ${nx.lvl-C.L})`:C.gold<nx.price?`ya la podés aprender, pero te faltan ₲ ${fmt(nx.price-C.gold)}`:'ya la podés aprender';
+   return `Las técnicas las enseña el ${tkB("Pa'i Antonio")}, frente a la catedral. Tu próxima es ${tkB(nx.name)} (₲ ${fmt(nx.price)}): ${st}. ${esc(nx.desc)}`;}},
+ {k:'oro',q:'¿Cómo gano oro?',re:/\b(oro|plata|guaranies|dinero|zen|vender|comprar|rudolf|mascotas?|imp|hada)\b/,f(){
+   const junk=C.inv.filter(x=>x&&isEq(x)&&itemR(x)==='normal'&&x.lv<4).length;
+   return `Tenés ₲ ${fmt(C.gold)}. El oro sale de las criaturas, de las misiones del Capitán Cabañas y de vender lo que no usás${junk?` (tenés ${junk} pieza${junk>1?'s':''} común${junk>1?'es':''} en la bolsa: vendela${junk>1?'s':''} en cualquier tienda, pestaña Vender)`:''}. La mascota ${tkB('Rudolf')} (₲ 800.000, con Ña Eusebia) te da 50 % más de oro${C.pets&&C.pets.rudolf?', y ya la llevás':''}. El Imp suma 8 % de daño y el Hada 12 % de defensa; se pueden llevar las tres.`;}},
+ {k:'eventos',q:'¿Qué eventos hay?',re:/\b(eventos?|arena|ana|tuguy|fortaleza|invitacion(es)?|mascara|manto|guarida|duelos?|grupo|party|comerci\w*|intercambi\w*)\b/,f(){
+   const mm=k=>{try{const st=evState(k),s=Math.ceil(st.open?st.left:st.wait);return st.open?'abierta ahora':'en '+Math.max(1,Math.round(s/60))+' min';}catch(e){return 'cada 30 minutos';}};
+   return `${tkB('Arena de Añá')} (${mm('ana')}): sobreviví a los campeones mientras el piso se cae; se entra con la Máscara de Añá. ${tkB('Fortaleza de Tuguy')} (${mm('tuguy')}): rompé el portón, vencé al guardián y llevá el Arma de Tupã al altar; se entra con el Manto de Tuguy. Las invitaciones se hacen en el Caldero de Kerana con trofeos de las criaturas. En grupo ganás experiencia extra: tocá a otro jugador para invitarlo o comerciar.`;}}
+];
+/* temas que toca una pregunta escrita, primero el que más palabras suyas tiene */
+function guiaMatch(txt){const n=tkNorm(txt);return GUIA_T.map(t=>({t,c:(n.match(new RegExp(t.re.source,'g'))||[]).length})).filter(x=>x.c).sort((a,b)=>b.c-a.c).map(x=>x.t);}
+function guiaSay(who,html,o){GUIA.log.push(Object.assign({who,html},o||{}));if(GUIA.log.length>14)GUIA.log.splice(0,GUIA.log.length-14);}
+const guiaOnline=()=>NET.mode==='online'&&!!SRV.on&&!!(C&&C._id);
+function guiaLeftTxt(){if(!guiaOnline())return 'Las preguntas escritas a fondo necesitan jugar con tu cuenta. Los temas de arriba los respondo siempre.';
+  if(GUIA.left==null)return `Los temas de arriba son gratis. Las preguntas escritas que necesiten al sabio: ${GUIA.max} por día.`;
+  return GUIA.left>0?`Te queda${GUIA.left>1?'n':''} ${tkB(GUIA.left)} pregunta${GUIA.left>1?'s':''} al sabio hoy. Los temas de arriba no gastan.`:'Ya usaste tus preguntas al sabio de hoy. Los temas de arriba los respondo siempre.';}
+function renderGuia(){const b=$('#npcBody');if(!b)return;const keep=$('#gqIn')?$('#gqIn').value:'';
+  const log=GUIA.log.map(m=>`<div class="gq-m ${m.who}${m.wait?' wait':''}">${m.who==='he'?'<i>Tapekuaa</i>':''}<span>${m.html}</span>${m.deep&&guiaOnline()&&GUIA.left!==0&&!GUIA.busy?`<button class="btn sm ghost" data-act="guiaDeep">Preguntarle más a fondo</button>`:''}</div>`).join('');
+  b.innerHTML=`<div class="gq"><div class="gq-log" id="gqLog">${log||'<p class="hint" style="margin:0">Elegí un tema o escribí tu pregunta. Ya sé quién sos y por dónde vas.</p>'}</div>
+    <div class="gq-chips">${GUIA_T.map(t=>`<button class="btn sm ghost" data-act="guiaTopic" data-k="${t.k}">${esc(typeof t.q==='function'?t.q(C):t.q)}</button>`).join('')}</div>
+    <div class="namebox"><input id="gqIn" maxlength="100" placeholder="Escribí tu pregunta sobre NOX" autocomplete="off" enterkeyhint="send" ${GUIA.busy?'disabled':''}><button class="btn sm" data-act="guiaAsk" ${GUIA.busy?'disabled':''}>Preguntar</button></div>
+    <p class="hint" id="gqLeft">${guiaLeftTxt()}</p></div>`;
+  const i=$('#gqIn');if(i&&keep)i.value=keep;const L=$('#gqLog');if(L)L.scrollTop=L.scrollHeight;
+  if(guiaOnline()&&GUIA.left==null&&!GUIA.ft){GUIA.ft=1;srvApi('GET','game/guia').then(r=>{GUIA.left=r.left;GUIA.max=r.max||GUIA.max;if(NPCV==='guia'&&!$('#pNpc').hidden)renderGuia();}).catch(()=>{});}}
+function guiaTopic(k){const t=GUIA_T.find(x=>x.k===k);if(!t||!C)return;GUIA.log.forEach(m=>{m.deep=0;});guiaSay('me',esc(typeof t.q==='function'?t.q(C):t.q));let h;try{h=t.f();}catch(e){console.error(e);h='Ahora no lo tengo claro. Preguntame otra cosa.';}guiaSay('he',h);renderGuia();}
+function guiaAsk(){const i=$('#gqIn');if(!i||GUIA.busy||!C)return;const q=i.value.replace(/\s+/g,' ').trim().slice(0,100);if(q.length<3)return;i.value='';GUIA.log.forEach(m=>{m.deep=0;});guiaSay('me',esc(q));GUIA.last=q;
+  const m=guiaMatch(q);
+  if(m.length===1||(m.length>1&&(!guiaOnline()||GUIA.left===0))){let h;try{h=m[0].f();}catch(e){h='';}if(h){guiaSay('he',h,{deep:1});renderGuia();return;}}
+  if(!guiaOnline()){guiaSay('he','Eso no lo tengo tan claro. Probá con uno de los temas de arriba, o entrá con tu cuenta para preguntarme lo que quieras de NOX.');renderGuia();return;}
+  if(GUIA.left===0){guiaSay('he','Hoy ya me hiciste todas tus preguntas a fondo. Mañana seguimos; mientras, los temas de arriba los respondo siempre.');renderGuia();return;}
+  guiaIA(q);}
+async function guiaIA(q){if(GUIA.busy)return;GUIA.busy=true;GUIA.log.forEach(m=>{m.deep=0;});const w={who:'he',html:'Déjame pensar…',wait:1};GUIA.log.push(w);renderGuia();
+  try{persist();try{await flushNet();}catch(e){}const r=await srvApi('POST','game/guia',{q,id:C._id});w.html=esc(r.a);GUIA.left=r.left;GUIA.max=r.max||GUIA.max;}
+  catch(e){w.html=esc(e&&e.message&&e.status&&e.status!==500?e.message:'No pude responderte ahora. Probá de nuevo en un rato.');if(e&&e.status===429&&/hoy/.test(e.message||'')&&!/gente/.test(e.message||''))GUIA.left=0;}
+  w.wait=0;GUIA.busy=false;if(NPCV==='guia'&&!$('#pNpc').hidden){renderGuia();const i=$('#gqIn');if(i&&!IS_MOB)i.focus();}}
+addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='gqIn'){e.preventDefault();guiaAsk();}});
 
 /* personaje */
 function renderChar(){const cl=CLASSES[C.cls];
@@ -7314,6 +7444,7 @@ function titlesHTML(){const a=achData();return `<div class="sect"><h3>Títulos y
 
 /* acciones */
 const ACT={
+  guiaTopic(d){guiaTopic(d.k);},guiaAsk(){guiaAsk();},guiaDeep(){if(GUIA.last&&!GUIA.busy)guiaIA(GUIA.last);},
   petOn(){const it=C.inv[ICTX.i];if(!it||it.k!=='pet')return;C.pets=C.pets||{};const prev=C.pets[it.sub];C.pets[it.sub]=it;C.inv[ICTX.i]=prev||null;$('#pItem').hidden=true;toast(`<em>${esc(PETS[it.sub].n)}</em> te acompaña ahora`);snd(PETS[it.sub].snd,{vol:.8,jit:0});recalc();persist();renderInv();refreshPause();},
   petOff(d){const k=(d&&d.p)||(ICTX&&ICTX.sub)||petsOn()[0];const it=C.pets&&C.pets[k];if(!it)return;if(!addItem(it)){toast('Tu inventario está lleno');return;}toast(`Dejaste a ${esc(PETS[k].n)} en el inventario`);C.pets[k]=null;$('#pItem').hidden=true;recalc();persist();if(!$('#pInv').hidden)renderInv();renderChar();refreshPause();},
   petslot(d){const it=C.pets&&C.pets[d.p];if(!it)return;itemCard(it,{src:'pet',sub:d.p});},
@@ -8200,7 +8331,7 @@ async function gsClaim(){if(!SRV.on||NET.mode!=='online'||!srvTok()||window.__KI
   GSC.ok=true;}
 async function gsCheck(){if(!SRV.on||NET.mode!=='online'||!srvTok()||window.__KICKED||mode!=='game')return;if(!GSC.mine){gsClaim();return;}try{const r=await srvApi('GET','game/claim');if(r&&r.ok===false)gsKicked();}catch(e){}}
 setInterval(gsCheck,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)gsCheck();});
-function enterGame(i){CUR=i;C=fixChar(SAVE.chars[i]);SAVE.last=i;HERO_FACE=C.face!=null?C.face:hashName(C.name);
+function enterGame(i){CUR=i;GUIA.log=[];GUIA.left=null;GUIA.ft=0;GUIA.busy=false;C=fixChar(SAVE.chars[i]);SAVE.last=i;HERO_FACE=C.face!=null?C.face:hashName(C.name);
   P=freshP();recalc();P.hp=DS.maxHP;P.mp=DS.maxMP;rebuildHero(C.cls,C.eq);setupSkillButtons();
   mode='game';gsClaim();setTimeout(benchBtn,1500);$('#sel').hidden=true;$('#hud').hidden=false;{const ps=posStart();loadZone(ZONES[C.zone]?C.zone:'asuncion',ps?[ps.x,ps.z]:null);
     /* si el lugar guardado quedó dentro de algo (casa, roca) o fuera del mapa, aparece en la entrada de siempre */

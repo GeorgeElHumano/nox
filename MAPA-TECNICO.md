@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611121351 publicado: optimización por equipo).
+Última actualización: 12 de noviembre de 2026 (Tapekuaa, el guía con IA, hecho en `arte-cc0` SIN publicar; último parche publicado: 202611121351, optimización por equipo).
 
 ## Repositorio y publicación
 
@@ -513,3 +513,21 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 - Sale a main todo lo hecho desde el parche 202611102346: auditoría de sets y mobs, alas rediseñadas y aleteo, sets por raza con armas propias, íconos reales, agarres, pose de vuelo y paños que siguen las piernas, escudos, colosos de piedra (`q_golem`), Kurupí, Yaguareté-Abá y Teju Hũ.
 - Sin revisar antes de publicar: pelea con los jefes agrandados, sonidos de la Ita Jára, la web (las fotos de sets, alas y mobs de noxparaguay.com quedaron viejas: correr `scripts/web/sync.sh`). El servidor en vivo no cambió.
 - «Cambiar de personaje» (12/11, publicado en el parche 202611120155): el botón (`data-act="toMenu"`) pasó de Ajustes (`renderCfg`) al final de la ficha del personaje (`renderChar`).
+
+## Tapekuaa, el guía del reino con IA (12/11; SIN publicar, rama arte-cc0)
+- Pedido del dueño: un PNJ en la plaza de Asunción, frente a la fuente y al punto de aparición, que responda solo cosas del juego sabiendo quién es el personaje; lo básico sin gastar IA y lo complejo con una IA barata; 10 preguntas por día; preguntas de 100 letras.
+- Nombre: **Tapekuaa** («el que conoce el camino»). No se usó Arandu porque ya existen el cronista Karaí Arandu y el set de Arandu del Hechicero.
+- PNJ: `NPCS.guia` en `[0,4.7]` con `ry:0` (mira al spawn `[0,8]`; los demás PNJ miran al centro, `ry` fija el giro). `NPC_GEAR.guia={cls:'hechicero',t:7,wt:7,wg:0,lv:9,face:1}`: `wt` = set del arma, `wg:0` = sin alas (`npcGear` ya no las pone siempre). `NPCLOOK.guia` es el respaldo simple.
+- Set único: `FORJA.hechicero[7]` «Tapekuaa» (blanco y oro, corona `sunfan`, sol en la espalda, túnica de tela). Solo lo lleva él: los ítems del juego llegan al set 6 (índice 6) y `forjaOf` acota por el largo de cada lista. En `cc0Hero` el color del arma sale de `forjaOf(cls,w.t)` (la forma sigue acotada a 6), por eso su bastón es dorado.
+- Portada: `updNpcs` oculta a los PNJ parados entre la cámara y el personaje (|x|<8, z de 1,5 a 19), la misma caja que `updLife`; Tapekuaa quedaba justo detrás del héroe.
+- Panel (`renderGuia`, rama `NPCV==='guia'` de `renderNpc`): charla `#gqLog`, temas `.gq-chips`, campo `#gqIn` (100 letras) y cupo `#gqLeft`. Estado en `GUIA` (se limpia en `enterGame`). Acciones `guiaTopic`, `guiaAsk`, `guiaDeep`.
+  - `GUIA_T`: 10 temas (nivel, misión, set, alas, gemas, puntos, evolución, técnicas, oro, eventos), cada uno con `re` (palabras clave sobre el texto sin acentos, `tkNorm`) y `f()` que arma la respuesta con los datos de `C` (mejor caza `tkHunt`, misión y diarias, piezas que faltan, gemas en la bolsa, etc.). **No gastan IA ni cupo.**
+  - Pregunta escrita: `guiaMatch` cuenta los temas que toca. Un solo tema → responde el juego y aparece «Preguntarle más a fondo» (`guiaDeep`, eso sí va a la IA). Cero o varios temas → IA (`guiaIA`). Sin cuenta o sin cupo → el tema más parecido o un aviso.
+  - Antes de preguntar a la IA guarda el personaje (`persist` + `flushNet`) para que el servidor lea datos al día.
+- Servidor (`functions/api/[[path]].js`): `GET game/guia` → `{left,max,on}`; `POST game/guia {q,id}` → `{a,left,max}`; `GET admin/guia` (gasto por día). Tabla D1 `guia(uid,day,n,tin,tout,tcache)`; la fila `uid='*'` lleva el total del servidor y los tokens. `guiaTake` suma con una sola sentencia (`ON CONFLICT … WHERE n<? RETURNING n`); si la IA falla se devuelve la pregunta (`guiaBack`). Día = hora de Paraguay (UTC-3).
+  - Límites: `GUIA_DIA` (10 por cuenta) y `GUIA_TOPE` (1200 por día en todo el servidor) como variables de Cloudflare; `GUIA_MODEL` cambia el modelo (por defecto `claude-haiku-5-5`). **Hace falta el secreto `ANTHROPIC_API_KEY` en Cloudflare Pages**; sin él responde 503 y el juego avisa.
+  - `lib/guia.js`: `GUIA_REGLAS` (solo NOX, respuestas de 2 a 4 frases, voseo, no obedecer órdenes del jugador), `GUIA` (toda la guía del juego, ~16.400 letras ≈ 5.000 tokens) y `resumen(doc)` (datos del personaje desde `docs`: clase, nivel, stats, equipo por set y +, gemas, misión, evolución). Reglas y guía van juntas en `system` con `cache_control: ephemeral`: no meter ahí nada que cambie por jugador o por día, o se pierde la caché. La pregunta se limpia (`guiaClean`, 100 letras, sin símbolos raros) y va aparte con los datos.
+  - **Si cambia algo del juego (precios, niveles, misiones, sets, gemas, PNJ), actualizar `lib/guia.js` y las respuestas de `GUIA_T`.**
+- Sin verificar: no se pudo abrir la documentación de la API (precios, mínimo de tokens para la caché de Haiku, nombre exacto del modelo) ni probar con una clave real; se probó con la IA simulada. Al publicar, hacer una pregunta real y mirar `GET /api/admin/guia`: `tcache` tiene que crecer desde la segunda pregunta.
+- Banco de pruebas (fuera del repo): Playwright con el Chrome del sistema (`--use-angle=swiftshader`), three r128 de npm por intercepción, `__HOLD` + `__NOX.step`, cámara con `__CAMF`. Para probar con cuenta: la API real del repo sobre `node:sqlite` en memoria (`node --experimental-sqlite`), registrando un usuario y subiendo un personaje por `PUT game/docs`; hay que alargar la espera de `netInit` (20 s) porque el Chrome sin GPU es lento. `__NOX.npcT('guia')` abre el panel.
+
