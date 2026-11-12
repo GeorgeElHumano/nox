@@ -1,6 +1,6 @@
 // NOX · servidor (Cloudflare Pages Functions + D1)
-// Cuentas, guardado del juego en la nube, tienda por transferencia y panel de administración.
-import { CATALOG } from '../../lib/catalog.js';
+// Cuentas, guardado del juego en la nube, tienda Noxis (recargas por transferencia) y panel de administración.
+import { NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, nxFounderLevel, nxPackGrant } from '../../lib/noxis.js';
 import { IMPORTS } from '../../lib/imports.js';
 import { GUIA, GUIA_REGLAS, resumen } from '../../lib/guia.js';
 
@@ -9,7 +9,6 @@ const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]{3,14}$/;
 const DOC_RE = /^(c[a-z0-9]{4,30}|vault)$/;
 const SESSION_DAYS = 60;
 const keyOf = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-const CAT = new Map(CATALOG.map(i => [i.id, i]));
 
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY, name TEXT NOT NULL, nkey TEXT NOT NULL UNIQUE, pass TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'player', wa TEXT, created INTEGER, mustchange INTEGER NOT NULL DEFAULT 0, lastlogin INTEGER)`,
@@ -23,6 +22,9 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS gsess(uid TEXT PRIMARY KEY, gs TEXT NOT NULL, t INTEGER)`,
   `CREATE TABLE IF NOT EXISTS guia(uid TEXT NOT NULL, day TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0, tin INTEGER NOT NULL DEFAULT 0, tout INTEGER NOT NULL DEFAULT 0, tcache INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(uid,day))`,
   `CREATE TABLE IF NOT EXISTS downloads(id INTEGER PRIMARY KEY AUTOINCREMENT, plat TEXT NOT NULL, created INTEGER, ua TEXT)`,
+  `CREATE TABLE IF NOT EXISTS noxis(uid TEXT PRIMARY KEY, bal INTEGER NOT NULL DEFAULT 0, own TEXT NOT NULL DEFAULT '{}', eq TEXT NOT NULL DEFAULT '{}', upd INTEGER)`,
+  `CREATE TABLE IF NOT EXISTS noxlog(id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, d INTEGER NOT NULL, bal INTEGER, why TEXT, ref TEXT, t INTEGER)`,
+  `CREATE INDEX IF NOT EXISTS noxlog_uid ON noxlog(uid)`,
   `CREATE INDEX IF NOT EXISTS dl_created ON downloads(created)`,
   `CREATE INDEX IF NOT EXISTS orders_status ON orders(status)`,
   `CREATE INDEX IF NOT EXISTS orders_uid ON orders(uid)`,
@@ -81,25 +83,41 @@ async function auth(req, db) {
 }
 const pub = u => ({ id: u.id, name: u.name, role: u.role, wa: u.wa || '', mustchange: !!u.mustchange });
 
-function orderItems(list) {
-  if (!Array.isArray(list) || !list.length || list.length > 60) return null;
-  const out = [];
-  for (const x of list) {
-    const it = CAT.get(String(x && x.id));
-    const q = Math.floor(+(x && x.q) || 1);
-    if (!it || q < 1 || q > 20) return null;
-    out.push({ id: it.id, name: it.name, q, price: it.price });
-  }
-  return out;
+/* ---------- Noxis: saldo, compras y entregas. Todo se decide acá, nunca en el juego ---------- */
+const jp = id => `'$."${id}"'`; // ruta JSON de un artículo (los ids salen siempre del catálogo)
+async function noxRow(db, uid) {
+  await db.prepare("INSERT OR IGNORE INTO noxis(uid,bal,own,eq,upd) VALUES(?,0,'{}','{}',?)").bind(uid, now()).run();
+  const r = await db.prepare('SELECT bal,own,eq FROM noxis WHERE uid=?').bind(uid).first();
+  let own = {}, eq = {}; try { own = JSON.parse(r.own || '{}'); } catch {} try { eq = JSON.parse(r.eq || '{}'); } catch {}
+  return { bal: r.bal | 0, own, eq };
 }
-async function deliver(db, uid, oid, items) {
-  const st = [];
+const noxPub = n => ({ bal: n.bal, own: n.own, eq: n.eq, founder: nxFounderLevel(n.own) });
+const noxLog = (db, uid, d, bal, why, ref) => db.prepare('INSERT INTO noxlog(uid,d,bal,why,ref,t) VALUES(?,?,?,?,?,?)').bind(uid, d, bal, why, String(ref || ''), now());
+// suma Noxis y artículos en una sola sentencia
+async function noxGive(db, uid, nx, items, why, ref) {
+  await noxRow(db, uid);
+  let own = 'own'; for (const [id, n] of Object.entries(items || {})) own = `json_set(${own},${jp(id)},COALESCE(json_extract(own,${jp(id)}),0)+${n | 0})`;
+  const r = await db.prepare(`UPDATE noxis SET bal=bal+?, own=${own}, upd=? WHERE uid=? RETURNING bal`).bind(nx | 0, now(), uid).first();
+  await noxLog(db, uid, nx | 0, r ? r.bal : null, why, ref).run();
+  return r ? r.bal : 0;
+}
+function orderItems(list, own) {
+  if (!Array.isArray(list) || list.length !== 1) return null;
+  const pk = NX_PACK.get(String(list[0] && list[0].id)); if (!pk) return null;
+  const g = nxPackGrant(pk, own); if (!g) return 'Tu cuenta ya tiene ese pack Fundador o uno más alto.';
+  if (pk.f && NX_FOUNDER_END && now() > NX_FOUNDER_END) return 'Los packs Fundador ya no están a la venta.';
+  return [{ id: pk.id, name: pk.name, q: 1, price: g.gs, nx: g.nx }];
+}
+// un pedido pagado acredita los Noxis (y, si es un pack Fundador, sus artículos)
+async function deliver(db, uid, oid, items, why) {
+  let n = 0;
   for (const x of items) {
-    const it = CAT.get(x.id); if (!it) continue;
-    for (let k = 0; k < x.q; k++) for (const g of it.give) st.push(db.prepare('INSERT INTO deliveries(uid,oid,item,label,created) VALUES(?,?,?,?,?)').bind(uid, oid, JSON.stringify(g), it.name, now()));
+    const pk = NX_PACK.get(x.id); if (!pk) continue; // pedidos de la tienda vieja: no entregan nada
+    const { own } = await noxRow(db, uid);
+    const g = nxPackGrant(pk, own) || { nx: +x.nx || pk.nx, items: {} };
+    await noxGive(db, uid, g.nx, g.items, why || 'recarga', oid); n++;
   }
-  if (st.length) await db.batch(st);
-  return st.length;
+  return n;
 }
 async function pendingDeliveries(db, uid) {
   const v = await db.prepare("SELECT data FROM docs WHERE uid=? AND id='vault'").bind(uid).first();
@@ -114,7 +132,7 @@ const routes = [];
 const route = (m, p, f, opt = {}) => routes.push({ m, re: new RegExp('^' + p.replace(/:(\w+)/g, '(?<$1>[^/]+)') + '$'), f, opt });
 
 route('GET', 'ping', async () => json({ ok: true, t: now() }));
-route('GET', 'catalog', async () => json({ items: CATALOG }));
+route('GET', 'nox/catalog', async () => json({ items: NX_ITEMS, packs: NX_PACKS, gs: NOXIS_GS, founderEnd: NX_FOUNDER_END, pay: NX_PAY }));
 
 route('POST', 'register', async ({ db, req }) => {
   const b = await body(req);
@@ -187,11 +205,14 @@ route('POST', 'reset-request', async ({ db, req }) => {
 /* tienda */
 route('POST', 'orders', async ({ db, req, me }) => {
   const b = await body(req);
-  const items = orderItems(b.items);
-  if (!items) return fail('El carrito tiene algo que no está en la tienda. Recargá la página.');
+  const nx = await noxRow(db, me.id);
+  const items = orderItems(b.items, nx.own);
+  if (typeof items === 'string') return fail(items);
+  if (!items) return fail('Ese paquete no está en la tienda. Recargá la página.');
   const total = items.reduce((s, x) => s + x.price * x.q, 0);
-  const open = await db.prepare("SELECT COUNT(*) n FROM orders WHERE uid=? AND status='pendiente'").bind(me.id).first();
-  if (open && open.n >= 5) return fail('Ya tenés 5 pedidos esperando el pago. Esperá a que se aprueben o cancelá alguno.');
+  const pend = (await db.prepare("SELECT items FROM orders WHERE uid=? AND status='pendiente'").bind(me.id).all()).results || [];
+  if (pend.length >= 5) return fail('Ya tenés 5 pedidos esperando el pago. Esperá a que se aprueben o cancelá alguno.');
+  if (NX_PACK.get(items[0].id).f && pend.some(o => { try { return JSON.parse(o.items).some(i => (NX_PACK.get(i.id) || {}).f); } catch { return false; } })) return fail('Ya tenés un pack Fundador esperando el pago.');
   let c; for (let k = 0; k < 5; k++) { c = code('NOX', 5); if (!(await db.prepare('SELECT 1 FROM orders WHERE code=?').bind(c).first())) break; }
   const r = await db.prepare("INSERT INTO orders(code,uid,items,total,status,created) VALUES(?,?,?,?, 'pendiente', ?)").bind(c, me.id, JSON.stringify(items), total, now()).run();
   return json({ order: { id: r.meta.last_row_id, code: c, items, total, status: 'pendiente', created: now() } });
@@ -206,6 +227,55 @@ route('POST', 'orders/:id/cancel', async ({ db, me, p }) => {
   const r = await db.prepare("UPDATE orders SET status='cancelado',decided=? WHERE id=? AND uid=? AND status='pendiente'").bind(now(), +p.id, me.id).run();
   return r.meta.changes ? json({ ok: true }) : fail('Ese pedido ya no se puede cancelar.');
 }, { auth: true });
+
+/* tienda Noxis */
+route('GET', 'nox', async ({ db, me }) => json(noxPub(await noxRow(db, me.id))), { auth: true });
+
+route('POST', 'nox/buy', async ({ db, req, me }) => {
+  const b = await body(req), it = NX_BY.get(String(b.id || ''));
+  if (!it || !it.price) return fail('Ese artículo no está a la venta.');
+  await noxRow(db, me.id);
+  const once = it.kind === 'svc' ? 0 : 1; // lo permanente se compra una sola vez; los servicios se acumulan
+  const r = await db.prepare(`UPDATE noxis SET bal=bal-?1, own=json_set(own,${jp(it.id)},COALESCE(json_extract(own,${jp(it.id)}),0)+1), upd=?2 WHERE uid=?3 AND bal>=?1 AND (?4=0 OR json_extract(own,${jp(it.id)}) IS NULL) RETURNING bal`).bind(it.price, now(), me.id, once).first();
+  if (!r) { const n = await noxRow(db, me.id); return fail(once && n.own[it.id] ? 'Ya tenés ese artículo.' : 'No te alcanzan los Noxis. Te faltan ' + (it.price - n.bal) + '.', 402); }
+  await noxLog(db, me.id, -it.price, r.bal, 'compra', it.id).run();
+  return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
+}, { auth: true });
+
+const NX_SLOT = { title: 'title', frame: 'frame', trail: 'trail', pet_imp: 'pet', pet_hada: 'pet', pet_rudolf: 'pet' };
+route('POST', 'nox/equip', async ({ db, req, me }) => {
+  const b = await body(req), slot = String(b.slot || ''), kind = NX_SLOT[slot];
+  if (!kind) return fail('Eso no se puede equipar.');
+  const n = await noxRow(db, me.id);
+  if (b.id == null || b.id === '') { await db.prepare(`UPDATE noxis SET eq=json_remove(eq,'$.${slot}'),upd=? WHERE uid=?`).bind(now(), me.id).run(); }
+  else {
+    const it = NX_BY.get(String(b.id));
+    if (!it || it.kind !== kind || !n.own[it.id] || (kind === 'pet' && 'pet_' + it.pet !== slot)) return fail('No tenés ese artículo.');
+    await db.prepare(`UPDATE noxis SET eq=json_set(eq,'$.${slot}',?),upd=? WHERE uid=?`).bind(it.id, now(), me.id).run();
+  }
+  return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
+}, { auth: true });
+
+// gasta un servicio comprado; el juego hace el cambio recién cuando esto responde ok
+route('POST', 'nox/use', async ({ db, req, me }) => {
+  const b = await body(req), it = NX_BY.get(String(b.id || ''));
+  if (!it || it.kind !== 'svc') return fail('Eso no es un servicio.');
+  await noxRow(db, me.id);
+  const r = await db.prepare(`UPDATE noxis SET own=json_set(own,${jp(it.id)},json_extract(own,${jp(it.id)})-1), upd=? WHERE uid=? AND COALESCE(json_extract(own,${jp(it.id)}),0)>=1 RETURNING bal`).bind(now(), me.id).first();
+  if (!r) return fail('No tenés ese servicio. Compralo en la tienda Noxis.', 402);
+  await noxLog(db, me.id, 0, r.bal, 'uso', it.id + ':' + String(b.note || '').slice(0, 60)).run();
+  return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
+}, { auth: true });
+
+// Muro de Fundadores: cuentas con el pack de Oro
+let MURO = { t: 0, data: null };
+route('GET', 'nox/muro', async ({ db }) => {
+  if (!MURO.data || now() - MURO.t > 60000) {
+    const rows = (await db.prepare(`SELECT u.name FROM noxis n JOIN users u ON u.id=n.uid WHERE json_extract(n.own,'$.fund3')>=1 ORDER BY n.upd LIMIT 500`).all()).results || [];
+    MURO = { t: now(), data: rows.map(r => r.name) };
+  }
+  return json({ names: MURO.data });
+});
 
 /* juego */
 /* una sola partida por cuenta: el último dispositivo que entra a jugar se queda con la partida; el anterior queda afuera y no puede guardar */
@@ -417,7 +487,7 @@ route('POST', 'admin/orders/:id', async ({ db, req, p }) => {
   if (b.action === 'pagado') {
     const r = await db.prepare("UPDATE orders SET status='pagado',decided=?,note=? WHERE id=? AND status='pendiente'").bind(now(), note, o.id).run();
     if (!r.meta.changes) return fail('Ese pedido ya fue resuelto.');
-    const n = await deliver(db, o.uid, o.id, JSON.parse(o.items));
+    const n = await deliver(db, o.uid, o.id, JSON.parse(o.items), 'recarga ' + o.code);
     return json({ ok: true, delivered: n });
   }
   if (b.action === 'rechazado') {
@@ -472,12 +542,20 @@ route('POST', 'admin/give', async ({ db, req }) => {
   const b = await body(req);
   const u = await db.prepare('SELECT id,name FROM users WHERE id=?').bind(String(b.uid || '')).first();
   if (!u) return fail('No existe ese usuario.', 404);
-  const items = orderItems(b.items);
-  if (!items) return fail('Elegí al menos un ítem de la tienda.');
-  const c = code('REG', 5);
-  const r = await db.prepare("INSERT INTO orders(code,uid,items,total,status,created,decided,note) VALUES(?,?,?,0,'pagado',?,?,?)").bind(c, u.id, JSON.stringify(items.map(x => ({ ...x, price: 0 }))), now(), now(), String(b.note || 'Regalo del administrador').slice(0, 300)).run();
-  const n = await deliver(db, u.id, r.meta.last_row_id, items);
-  return json({ ok: true, delivered: n, code: c });
+  const nx = Math.max(0, Math.min(1e6, Math.floor(+b.nx || 0)));
+  const items = {}; for (const id of Array.isArray(b.items) ? b.items.slice(0, 40) : []) if (NX_BY.has(String(id))) items[String(id)] = 1;
+  if (!nx && !Object.keys(items).length) return fail('Poné una cantidad de Noxis o elegí algún artículo.');
+  const c = code('REG', 5), note = String(b.note || 'Regalo del administrador').slice(0, 300);
+  const list = [...(nx ? [{ id: 'regalo', name: nx + ' Noxis', q: 1, price: 0 }] : []), ...Object.keys(items).map(id => ({ id, name: NX_BY.get(id).name, q: 1, price: 0 }))];
+  await db.prepare("INSERT INTO orders(code,uid,items,total,status,created,decided,note) VALUES(?,?,?,0,'pagado',?,?,?)").bind(c, u.id, JSON.stringify(list), now(), now(), note).run();
+  const bal = await noxGive(db, u.id, nx, items, 'regalo', c);
+  return json({ ok: true, delivered: list.length, code: c, bal });
+}, { admin: true });
+
+route('GET', 'admin/nox/:uid', async ({ db, p }) => {
+  const n = await noxRow(db, p.uid);
+  const log = (await db.prepare('SELECT d,bal,why,ref,t FROM noxlog WHERE uid=? ORDER BY id DESC LIMIT 60').bind(p.uid).all()).results || [];
+  return json({ ...noxPub(n), log });
 }, { admin: true });
 
 /* parche mínimo para jugar en línea: lo dice public/jugar/build.json ("min"). El juego manda su versión en x-nox-build;
