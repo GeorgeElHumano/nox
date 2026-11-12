@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 11 de noviembre de 2026 (auditoría de sets y mobs, sin publicar).
+Última actualización: 12 de noviembre de 2026 (parche 202611120138 publicado: sets, alas, vuelo, colosos y jefes).
 
 ## Repositorio y publicación
 
@@ -489,3 +489,7 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 - Pendiente: en el juego las grietas brillan menos que en la muestra y en la Ita Jára se ven anchas; sonidos de la Ita Jára sin revisar; el viejo `q_mushking` ya no lo usa nadie (se puede borrar).
 - Jefes más grandes (12/11, SIN publicar): Kurupí `MYTH.kurupi.human.scale` .72 → 1.02 y `bulk` 1.45 → 1.7 (de 1,47 m a 2,10 m; "enano grande": más alto que el héroe y ancho). Yaguareté-Abá `MYTH.yaguaretaba.len` 3 → 4.5 (de 1,65 m a 2,19 m de alto). Medido en su zona con la caja del modelo; héroe = 1,90 m. Script `boss.sh` del banco (foto del jefe con el héroe al lado). El Kurupí también aparece como «Guardián de Tuguy» en el evento para niveles bajos: sale con el tamaño nuevo.
 - Teju Hũ más alto (12/11, SIN publicar): opción nueva `fat:[ancho,alto]` en los mitos con `beast` (escala el modelo en x e y sin alargarlo; ajusta `rad` y `hgt`). Teju Hũ usa `fat:[1.35,1.9]`: de 0,76 m a 1,61 m de alto con el mismo largo. Textura `tejuhuS2` más negra (antes tiraba a marrón). Ojo: la animación de muerte se ve exagerada con el estirón (se alza antes de caer). El Teju Guasu usa el mismo modelo y quedó sin tocar.
+
+## Parche 202611120138 publicado (12/11, madrugada)
+- Sale a main todo lo hecho desde el parche 202611102346: auditoría de sets y mobs, alas rediseñadas y aleteo, sets por raza con armas propias, íconos reales, agarres, pose de vuelo y paños que siguen las piernas, escudos, colosos de piedra (`q_golem`), Kurupí, Yaguareté-Abá y Teju Hũ.
+- Sin revisar antes de publicar: pelea con los jefes agrandados, sonidos de la Ita Jára, la web (las fotos de sets, alas y mobs de noxparaguay.com quedaron viejas: correr `scripts/web/sync.sh`). El servidor en vivo no cambió.

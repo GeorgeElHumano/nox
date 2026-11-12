@@ -1,5 +1,22 @@
 [
  {
+  "build": "202611120138",
+  "title": "Sets nuevos por raza, alas, vuelo y colosos",
+  "notes": [
+   "Sets rediseñados: cada set de cada raza tiene su propio diseño (casco, peto, hombreras y piezas) y gira en torno al color de su raza: Hechicero violeta, Arquera verde agua, Gladiador lila, Mburuvicha negro y rojo. El último set del Caballero ahora es azul.",
+   "Armas nuevas por set: espadas del Caballero, mandobles del Gladiador y arcos de la Arquera con forma propia; bastones y cetros con remate distinto en cada set.",
+   "El ícono de cada pieza en la bolsa es la misma pieza que se ve puesta, y el destello de cada set es de su color.",
+   "Alas rediseñadas para Caballero, Hechicero, Gladiador y Arquera, con aleteo nuevo (la Arquera vuela como mariposa).",
+   "Pose de vuelo nueva: flotando con una rodilla recogida y avanzando con el cuerpo inclinado; las armas ya no cruzan el cuerpo al volar ni al correr.",
+   "Faldellines, túnicas y tabardos siguen a las piernas al caminar, correr y volar.",
+   "El arco de la Arquera ahora va dentro del puño; agarres de espadas revisados.",
+   "Guardián de Kerana e Ita Jára son ahora colosos de piedra, cada uno con su aspecto.",
+   "Kurupí y Yaguareté-Abá más grandes; Teju Hũ más alto y más negro.",
+   "Arreglos en criaturas: Luisón, Ao Ao, Pombero y el cuello de las serpientes.",
+   "Escudos del Caballero con el color de su set, carcaj de la Arquera del color del set y texturas de metal mejoradas."
+  ]
+ },
+ {
   "build": "202611102346",
   "title": "Sets parejos en la cintura",
   "notes": [
