@@ -782,11 +782,11 @@
     },
     {
      "n": "del Yvága",
-     "col": "#9a3aff"
+     "col": "#fff0a0"
     },
     {
      "n": "de Yvy Marane'ỹ",
-     "col": "#fff0a0"
+     "col": "#4aa0ff"
     }
    ],
    "w": [
@@ -858,31 +858,31 @@
    "sets": [
     {
      "n": "de Lino",
-     "col": "#b08a5a"
+     "col": "#a890d8"
     },
     {
      "n": "de Ñandutí",
-     "col": "#f6f2ff"
+     "col": "#d8c0ff"
     },
     {
      "n": "de Paje",
-     "col": "#3ae07a"
+     "col": "#c050ff"
     },
     {
      "n": "de Jasy",
-     "col": "#4a52ff"
+     "col": "#7a6aff"
     },
     {
      "n": "de Tupã",
-     "col": "#ffe22a"
+     "col": "#b050ff"
     },
     {
      "n": "de Arandu",
-     "col": "#ff2a4a"
+     "col": "#e040ff"
     },
     {
      "n": "de Ñamandu",
-     "col": "#7af8ff"
+     "col": "#b070ff"
     }
    ],
    "w": [
@@ -954,31 +954,31 @@
    "sets": [
     {
      "n": "de Ñandu",
-     "col": "#8a6a4a"
+     "col": "#a890d0"
     },
     {
      "n": "de Kurusu",
-     "col": "#ff6a1a"
+     "col": "#b090ff"
     },
     {
      "n": "de Ara",
-     "col": "#2ae6ff"
+     "col": "#c8a0ff"
     },
     {
      "n": "del Tembetá",
-     "col": "#ff2aa0"
+     "col": "#a060ff"
     },
     {
      "n": "de Tupã Rendy",
-     "col": "#f4f8ff"
+     "col": "#d8c0ff"
     },
     {
      "n": "de Karai Ru",
-     "col": "#2aff8a"
+     "col": "#b080ff"
     },
     {
      "n": "de Ñamandu Ru",
-     "col": "#ffd23a"
+     "col": "#d0a8ff"
     }
    ],
    "w": [
@@ -1050,31 +1050,31 @@
    "sets": [
     {
      "n": "de Tuja",
-     "col": "#6a5a4a"
+     "col": "#8a3028"
     },
     {
      "n": "de Yvyrapã",
-     "col": "#9a2a2a"
+     "col": "#c02a20"
     },
     {
      "n": "del Cacique",
-     "col": "#8a3aff"
+     "col": "#ff3020"
     },
     {
      "n": "de Guyra Hũ",
-     "col": "#2a2a3a"
+     "col": "#d01828"
     },
     {
      "n": "del Mburuvicha Guasu",
-     "col": "#ffd23a"
+     "col": "#ff2a1a"
     },
     {
      "n": "del Tuvicha Guasu",
-     "col": "#ff1a3a"
+     "col": "#ff1010"
     },
     {
      "n": "de Ñanderu",
-     "col": "#e8f0ff"
+     "col": "#ff3a3a"
     }
    ],
    "w": [
@@ -1146,31 +1146,31 @@
    "sets": [
     {
      "n": "de Ao Po'i",
-     "col": "#c8a070"
+     "col": "#7ad8c8"
     },
     {
      "n": "de Plumas",
-     "col": "#ff4a1a"
+     "col": "#30e0c0"
     },
     {
      "n": "de Selva",
-     "col": "#46f040"
+     "col": "#40ffb0"
     },
     {
      "n": "de Kuarahy",
-     "col": "#ffb020"
+     "col": "#50f0e0"
     },
     {
      "n": "de Arasy",
-     "col": "#ff3ad0"
+     "col": "#60ffe8"
     },
     {
      "n": "de Jasy Porã",
-     "col": "#6ad0ff"
+     "col": "#40d8ff"
     },
     {
      "n": "del Yvága",
-     "col": "#f4fbff"
+     "col": "#80ffe8"
     }
    ],
    "w": [

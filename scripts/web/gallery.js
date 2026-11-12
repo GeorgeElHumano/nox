@@ -29,7 +29,7 @@ let shot=null;
       await p.evaluate(k=>window.__NOX.STUDIO.mob(k),k);
       // esperar modelos externos (hasta 12 s) y que se re-arme
       for(let i=0;i<44;i++){await wait(500);const st=await p.evaluate(()=>{const e=window.__NOX.enemies[0];return e?{kind:e.kind,oad:!!(e.oad||e.mixer)}:null});if(st&&['glb','snake','scorp','lizard'].includes(st.kind)||i>40)break;}
-      await wait(800);await p.evaluate(()=>{const X=window.__NOX,e=X.enemies[0];if(X.HERO)X.HERO.g.visible=false;if(e){const S=X.STUDIO;
+      await wait(800);await p.evaluate(()=>{const X=window.__NOX,e=X.enemies[0];if(X.HERO){X.HERO.g.visible=false;X.HERO.g.scale.setScalar(1e-4);}/* el juego vuelve a mostrar al héroe: se achica */if(e){const S=X.STUDIO;
         /* encuadre por la caja real del modelo, en tres cuartos: se ve el cuerpo entero (cuernos, cola, cuello) y no solo la cara */
         e.g.updateMatrixWorld(true);const bb=new THREE.Box3();e.g.traverse(o=>{if(o.isMesh&&o.visible&&o.geometry){o.geometry.computeBoundingBox();const b2=o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);bb.union(b2);}});
         const c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());const low=['snake','lizard','scorp'].includes(e.kind)||e.B&&e.B.len>3;
