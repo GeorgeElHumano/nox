@@ -9164,22 +9164,24 @@ Object.assign(GDEF,(()=>{
 carcajada: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), beat = Math.abs(Math.sin(t * TAU * 3.2)), w = Math.sin(t * TAU * .45);
   R(r, 'spine_01', X(L), (-.10 - .04 * w) * k); R(r, 'spine_02', X(L), (-.10 - .05 * beat) * k); R(r, 'spine_03', X(L), -.06 * k); R(r, 'Head', X(L), (-.22 - .10 * beat) * k);
   reach(r, 'r', at(r, 'upperarm_r', .10, .02 + .03 * beat, .9), k, L(-.5, -1, 0), L(1, .4, 0)); curl(r, 'r', ['middle', 'ring', 'pinky'], 1.35 * k);
-  reach(r, 'l', at(r, 'spine_01', -.02, .04, .17), k, L(1, -.3, -.3)); pelv(r, 0, -.015 * beat * k, 0); }, fx: ['JA JA', .5] },
+  reach(r, 'l', at(r, 'spine_01', -.02, .04, .17), k, L(1, -.3, -.3));  curl(r, 'l', ALLF, .3 * k); pelv(r, 0, -.015 * beat * k, 0); }, fx: ['JA JA', .5] },
 /* 2. Aplauso sarcástico: palmas lentas, cabeza ladeada */
 aplauso: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .35), d = .5 * (1 - Math.cos(t * TAU / 1.15)), gap = .012 + .15 * d;
   R(r, 'spine_02', X(L), -.07 * k); R(r, 'Head', Z(L), .16 * k); R(r, 'Head', X(L), .05 * k + .05 * (1 - d) * k); pelv(r, .03 * k, 0, 0);
   for (const [sd, s] of [['r', -1], ['l', 1]]) reach(r, sd, at(r, 'spine_03', s * gap, -.02 + (s > 0 ? .02 : 0), .40), k, L(s * .7, -1, -.1), L(0, 1, .2)); }, fx: ['bravo…', 2.3] },
 /* 3. Violín chiquito: toca un violín diminuto con la cabeza ladeada, burlándose de la queja del otro */
-violin: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .35), s = Math.sin(t * TAU * 1.4);
-  R(r, 'spine_02', Z(L), .05 * k); R(r, 'Head', Z(L), -.24 * k); R(r, 'Head', X(L), .10 * k); R(r, 'Head', Y(L), .22 * k);
-  const P0 = at(r, 'Head', .06, -.05, .10), Hl = at(r, 'Head', .21, -.09, .27), dir = Hl.clone().sub(P0).normalize(), C = P0.clone().addScaledVector(dir, .085).add(off(r, 0, .022, 0)), bd = L(-.62, .30, .55), Hr = C.clone().addScaledVector(bd, .10 + .05 * s);
-  reach(r, 'l', Hl, k, L(.3, -1, 0), L(-.2, 1, .3), .07); curl(r, 'l', ALLF, 1.0 * k);
-  reach(r, 'r', Hr, k, L(-.7, -.7, 0), null, .08); curl(r, 'r', ALLF, 1.1 * k);
-  if (ANIM_ISO) return; const v = nxProp(r, 'vio'), bw = nxProp(r, 'bow'); if (!v.children.length) { const wood = new THREE.MeshStandardMaterial({ color: 0x9a4f1e, roughness: .45 }), dark = new THREE.MeshStandardMaterial({ color: 0x2a1a10, roughness: .6 });
-    const b1 = new THREE.Mesh(new THREE.SphereGeometry(1, 14, 10), wood); b1.scale.set(.034, .042, .012); b1.position.y = .035; const b2 = new THREE.Mesh(new THREE.SphereGeometry(1, 14, 10), wood); b2.scale.set(.028, .034, .012); b2.position.y = .088;
-    const nk = new THREE.Mesh(new THREE.BoxGeometry(.009, .085, .008), dark); nk.position.set(0, .15, .006); const sc = new THREE.Mesh(new THREE.SphereGeometry(.009, 8, 6), dark); sc.position.set(0, .195, .006); v.add(b1, b2, nk, sc);
-    const st = new THREE.Mesh(new THREE.CylinderGeometry(.003, .003, .24, 6), dark); const hr = new THREE.Mesh(new THREE.CylinderGeometry(.0015, .0015, .22, 5), new THREE.MeshBasicMaterial({ color: 0xf2efe6 })); hr.position.x = .007; bw.add(st, hr); }
-  v.visible = bw.visible = true; v.position.copy(P0); v.quaternion.setFromUnitVectors(NXUP, dir); bw.position.copy(Hr).addScaledVector(bd, -.10); bw.quaternion.setFromUnitVectors(NXUP, bd); }, fx: ['♪', .8] },
+violin: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .4), s = Math.sin(t * TAU * 1.1), s2 = Math.sin(t * TAU * .37);
+  R(r, 'spine_02', Z(L), .05 * k); R(r, 'spine_02', Y(L), .10 * k); R(r, 'Head', Z(L), -.22 * k); R(r, 'Head', X(L), .12 * k); R(r, 'Head', Y(L), .30 * k); R(r, 'spine_01', Z(L), .03 * s2 * k); pelv(r, .02 * s2 * k, 0, 0);
+  const up = off(r, 0, 1, 0), dir = L(.80, -.10, .58).normalize(), P0 = at(r, 'Head', .08, -.085, .09), Hl = P0.clone().addScaledVector(dir, .37).addScaledVector(up, -.025), bd = L(-.66, -.22, .72).normalize(), C = P0.clone().addScaledVector(dir, .20).addScaledVector(up, .035), Hr = C.clone().addScaledVector(bd, .23 + .09 * s);
+  reach(r, 'l', Hl, k, L(.15, -1, .2), L(-.3, 1, .2), .06); curl(r, 'l', ALLF, 1.0 * k);
+  reach(r, 'r', Hr, k, L(-.8, -.5, -.2), L(1, .1, 0), .07); curl(r, 'r', ALLF, 1.1 * k);
+  if (ANIM_ISO) return; const v = nxProp(r, 'vio'), bw = nxProp(r, 'bow'); if (!v.children.length) { const wood = new THREE.MeshStandardMaterial({ color: 0xb5622a, roughness: .4 }), dark = new THREE.MeshStandardMaterial({ color: 0x2a1a10, roughness: .6 }), pale = new THREE.MeshBasicMaterial({ color: 0xf2efe6 });
+    const b1 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), wood); b1.scale.set(.068, .082, .020); b1.position.y = .075; const b2 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), wood); b2.scale.set(.054, .064, .020); b2.position.y = .185;
+    const nk = new THREE.Mesh(new THREE.BoxGeometry(.018, .19, .012), dark); nk.position.set(0, .30, .014); const sc = new THREE.Mesh(new THREE.SphereGeometry(.017, 8, 6), dark); sc.position.set(0, .405, .014);
+    const st = new THREE.Mesh(new THREE.BoxGeometry(.012, .30, .003), pale); st.position.set(0, .20, .024); v.add(b1, b2, nk, sc, st);
+    const stick = new THREE.Mesh(new THREE.CylinderGeometry(.005, .005, .56, 6), dark); const hair = new THREE.Mesh(new THREE.CylinderGeometry(.003, .003, .52, 5), pale); hair.position.x = .012; bw.add(stick, hair); }
+  const zx = up.clone().addScaledVector(dir, -up.dot(dir)).normalize(), xx = dir.clone().cross(zx).normalize(); v.visible = bw.visible = true; v.position.copy(P0); v.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xx, dir, zx));
+  bw.position.copy(Hr).addScaledVector(bd, -.24); bw.quaternion.setFromUnitVectors(NXUP, bd); }, fx: ['♪', .8] },
 /* 4. Llorá: se refriega los ojos con los puños y se balancea, burlándose */
 llora: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), sw = Math.sin(t * TAU * .9), c = Math.cos(t * TAU * 2.6), s = Math.sin(t * TAU * 2.6);
   R(r, 'spine_01', Z(L), .09 * sw * k); R(r, 'spine_02', X(L), .16 * k); R(r, 'Head', X(L), .12 * k); R(r, 'Head', Z(L), -.14 * sw * k); pelv(r, .03 * sw * k, 0, 0);
@@ -9187,12 +9189,12 @@ llora: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), sw = Math.si
 /* 5. Limpiarse el hombro: se sacude el hombro izquierdo y levanta el mentón */
 hombro: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), p = t % 2.6, kb = sm(p / .25) * (1 - sm((p - 1.5) / .3)), fl = (p * 2.6) % 1, f = sm(fl / .35);
   R(r, 'spine_02', Y(L), -.10 * k); R(r, 'Head', Y(L), (.45 * kb - .05) * k); R(r, 'Head', X(L), (.14 * kb - .16 * (1 - kb)) * k); R(r, 'spine_03', X(L), -.06 * (1 - kb) * k);
-  reach(r, 'r', at(r, 'upperarm_l', -.06 + .11 * f, .12 - .02 * f, .12 + .03 * f), k * kb, L(-.3, -1, .4)); pelv(r, -.025 * k, 0, 0); }, fx: ['✦', 1.3] },
+  reach(r, 'r', at(r, 'upperarm_l', -.06 + .11 * f, .12 - .02 * f, .12 + .03 * f), k * kb, L(-.3, -1, .4));  curl(r, 'l', ALLF, .55 * k); curl(r, 'r', ALLF, .25 * k * kb + .55 * k * (1 - kb)); pelv(r, -.025 * k, 0, 0); }, fx: ['✦', 1.3] },
 /* 6. Bostezo y siesta parado: bosteza estirándose, se va quedando dormido y se despierta de golpe */
 bostezo: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), p = t % 6.2, ya = sm(p / .6) * (1 - sm((p - 2.0) / .5)), nb = sm((p - 2.7) / 2.0) * (1 - sm((p - 5.55) / .12)), nod = Math.sin(p * 2.1);
   R(r, 'spine_02', X(L), (-.12 * ya + .14 * nb) * k); R(r, 'spine_03', X(L), (-.08 * ya + .08 * nb) * k); R(r, 'Head', X(L), (-.30 * ya + (.50 + .06 * nod) * nb) * k); R(r, 'Head', Z(L), .10 * nb * k); R(r, 'spine_01', Z(L), .05 * nod * nb * k);
   reach(r, 'r', at(r, 'Head', -.01, .10, .15), k * ya, L(-1, -.5, .2), null, .11);
-  gArm(r, 'l', L(.75, .65, -.1), L(.45, .9, -.1), k * ya, L(.6, 0, -.8), L(-1, 0, 0)); pelv(r, 0, -.02 * nb * k, 0); }, fx: ['z', 1.1] },
+  gArm(r, 'l', L(.75, .65, -.1), L(.45, .9, -.1), k * ya, L(.6, 0, -.8), L(-1, 0, 0));  curl(r, 'l', ALLF, (.5 + .7 * ya) * k); curl(r, 'r', ALLF, (.5 - .1 * ya) * k); pelv(r, 0, -.02 * nb * k, 0); }, fx: ['z', 1.1] },
 /* 7. Baile del robot: brazos en ángulo recto que cambian a golpes, tronco y cabeza por pasos */
 robot: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), st = .46, i = Math.floor(t / st), u = (t / st) % 1, e = sm(u / .22), hit = Math.sin(PI * cl(u / .22, 0, 1));
   const FR = [L(0, 1, 0), L(0, 0, 1), L(0, -1, .05), L(0, 0, 1)], FL = [L(0, -1, .05), L(0, 0, 1), L(0, 1, 0), L(0, 1, 0)], TW = [.22, 0, -.22, 0], HD = [-.5, 0, .5, 0];
@@ -9204,12 +9206,12 @@ moonwalk: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .35), ph = (t 
   R(r, 'spine_01', X(L), .10 * k); R(r, 'spine_02', X(L), .08 * k); R(r, 'Head', X(L), .22 * k); R(r, 'spine_02', Y(L), .10 * sd * a * k);
   gAim(r, 'thigh_' + sA, 'calf_' + sA, L(0, -1, .42 * a), k); gAim(r, 'calf_' + sA, 'foot_' + sA, L(0, -1, -.62 * a), k); gAim(r, 'foot_' + sA, 'ball_' + sA, L(0, -.75 * a - .05, 1), k * a);
   gAim(r, 'thigh_' + sB, 'calf_' + sB, L(0, -1, -.16 * a), k); pelv(r, .02 * sd * a * k, -.02 * a * k, -.03 * k);
-  reach(r, 'r', at(r, 'Head', -.05, .22, .15), k, L(-1, -.3, .3), L(0, -1, .3), .13); gArm(r, 'l', L(.35, -.9, -.2 + .25 * sd * a), L(.1, -.75, .45), k, L(0, 0, -1)); }, fx: ['♪', .9] },
+  reach(r, 'r', at(r, 'Head', -.05, .22, .15), k, L(-1, -.3, .3), L(0, -1, .3), .13); gArm(r, 'l', L(.35, -.9, -.2 + .25 * sd * a), L(.1, -.75, .45), k, L(0, 0, -1));  curl(r, 'l', ALLF, .6 * k); curl(r, 'r', ALLF, .3 * k); }, fx: ['♪', .9] },
 /* 9. Dab */
 dab: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .25), p = t % 1.9, kd = sm(p / .16) * (1 - sm((p - 1.25) / .3)), kk = k * kd;
-  R(r, 'spine_01', Z(L), -.10 * kk); R(r, 'spine_02', Z(L), -.12 * kk); R(r, 'spine_02', X(L), .10 * kk); R(r, 'Head', X(L), .42 * kk); R(r, 'Head', Y(L), -.30 * kk);
-  gArm(r, 'l', L(.78, .6, .05), L(.78, .6, .05), kk, L(0, -1, 0), L(0, 0, 1));
-  reach(r, 'r', at(r, 'Head', .15, .17, .21), kk, L(-.5, .8, .35), null, .12); pelv(r, -.03 * kk, -.02 * kk, 0); }, fx: ['¡dab!', 1.9] },
+  R(r, 'spine_01', Z(L), -.10 * kk); R(r, 'spine_02', Z(L), -.12 * kk); R(r, 'spine_02', X(L), .14 * kk); R(r, 'Head', X(L), .55 * kk); R(r, 'Head', Y(L), .25 * kk);
+  gArm(r, 'l', L(.78, .6, .05), L(.78, .6, .05), kk, L(0, -1, 0), L(0, 0, 1)); curl(r, 'l', ALLF, .5 * kk);
+  reach(r, 'r', at(r, 'Head', .20, .05, .12), kk, L(-.2, .5, 1), null, .12); curl(r, 'r', ALLF, .5 * kk); pelv(r, -.03 * kk, -.02 * kk, 0); }, fx: ['¡dab!', 1.9] },
 /* 10. Victoria con giro: salta girando una vuelta entera y cae con los puños arriba */
 victoria: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .25), p = t % 2.8, cr = sm(p / .22) * (1 - sm((p - .22) / .12)), j = cl((p - .3) / .75, 0, 1), hop = Math.sin(PI * j) * .26, ang = TAU * sm(j), land = sm((p - 1.02) / .12) * (1 - sm((p - 1.25) / .25)), up = sm((p - .25) / .3), pump = Math.max(0, Math.sin((p - 1.2) * TAU * 1.7)) * sm((p - 1.2) / .2);
   R(r, 'pelvis', NXUP, ang * k); pelv(r, 0, (hop - .09 * cr - .07 * land) * k, 0);
@@ -9220,12 +9222,13 @@ victoria: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .25), p = t % 
 militar: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .25), p = t % 2.6, fl = sm((p - 1.3) / .2) * (1 - sm((p - 2.4) / .2)), w = Math.sin(p * TAU * 2.2) * fl;
   R(r, 'spine_02', X(L), -.07 * k); R(r, 'spine_03', X(L), -.09 * k); R(r, 'Head', X(L), -.10 * k); R(r, 'Head', Z(L), .20 * w * k); R(r, 'spine_01', Z(L), .06 * w * k); pelv(r, .03 * w * k, -.02 * Math.abs(w) * k, 0);
   reach(r, 'r', at(r, 'Head', -.085 - .03 * fl, .15 + .03 * w, .135 + .05 * fl), k, L(-1, -.12, .05), L(0, -1, .2), .17);
-  gArm(r, 'l', L(.07, -1, 0), L(.05, -1, .02), k, L(0, 0, -1)); }, fx: ['¡señor, sí señor!', 2.6] },
+  gArm(r, 'l', L(.07, -1, 0), L(.05, -1, .02), k, L(0, 0, -1));  curl(r, 'l', ALLF, .25 * k); }, fx: ['¡señor, sí señor!', 2.6] },
 /* 12. Tirar besos: lleva la mano a la boca y la extiende, alternando manos */
-besos: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .25), n = Math.floor(t / 1.7), p = t % 1.7, sd = n % 2 ? 'l' : 'r', s = sd === 'l' ? 1 : -1, out = sm((p - .5) / .3), kk = sm(p / .25) * (1 - sm((p - 1.35) / .3));
-  R(r, 'spine_02', X(L), (.05 + .09 * out) * k * kk); R(r, 'Head', X(L), (.04 - .10 * out) * k * kk); R(r, 'Head', Y(L), .12 * s * out * k * kk);
-  const M = at(r, 'Head', s * .01, .06, .15), O = at(r, 'upperarm_' + sd, s * .10, .10, .52);
-  reach(r, sd, M.lerp(O, out), k * kk, L(s * .5, -1, 0), out > .5 ? L(s, .2, 0) : null, .13); }, fx: ['♥', .85] },
+besos: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .25), n = Math.floor(t / 1.7), p = t % 1.7, sd = n % 2 ? 'l' : 'r', s = sd === 'l' ? 1 : -1, out = sm((p - .55) / .32), kk = sm(p / .28) * (1 - sm((p - 1.35) / .3)), ko = k * kk;
+  R(r, 'spine_02', X(L), (.04 + .08 * out) * ko); R(r, 'Head', X(L), (.10 - .22 * out) * ko); R(r, 'Head', Z(L), .08 * s * ko); R(r, 'Head', Y(L), .10 * s * out * ko);
+  const M = at(r, 'Head', s * .015, -.005, .125), O = at(r, 'upperarm_' + sd, s * .05, .0, .56);
+  reach(r, sd, M.lerp(O, out), ko, L(s * .6, -1, .1), out > .45 ? L(s, .25, 0) : null, .12); curl(r, sd, ALLF, .35 * (1 - out) * ko);
+  curl(r, sd === 'l' ? 'r' : 'l', ALLF, .5 * k); }, fx: ['♥', .85] },
 /* 13. Fumar: pitada larga, baja la mano y larga el humo hacia arriba */
 fumar: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .35), p = t % 5.2, kd = sm(p / .45) * (1 - sm((p - 1.5) / .5)), ex = sm((p - 1.9) / .3) * (1 - sm((p - 3.3) / .4));
   R(r, 'spine_01', Z(L), -.05 * k); R(r, 'spine_02', X(L), -.04 * k); R(r, 'Head', X(L), (.03 * kd - .20 * ex) * k); R(r, 'Head', Y(L), -.10 * (1 - kd) * k); pelv(r, -.035 * k, -.01 * k, 0);
@@ -9250,6 +9253,16 @@ reverencia: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), p = t %
   gAim(r, 'thigh_r', 'calf_r', L(-.05, -1, -.30), kk); gAim(r, 'calf_r', 'foot_r', L(0, -1, -.25), kk); gAim(r, 'thigh_l', 'calf_l', L(.04, -1, .22), kk); gAim(r, 'calf_l', 'foot_l', L(0, -1, -.30), kk); pelv(r, 0, -.07 * kk, -.04 * kk);
   gArm(r, 'r', L(-.85, -.42, .15), L(-.80, -.05, .58), kk, L(0, -1, -.3), L(0, 1, 0));
   reach(r, 'l', at(r, 'spine_03', -.03, -.02, .17), kk, L(1, -.4, -.2)); }, fx: ['', 0] }
+,
+/* Saludo: mano abierta a la altura de la cabeza, codo doblado, moviendo el antebrazo de lado a lado */
+saludo: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), sw = Math.sin(t * TAU * 1.6), s2 = Math.sin(t * TAU * .5);
+  R(r, 'spine_02', Z(L), (.04 + .02 * s2) * k); R(r, 'Head', Z(L), .10 * k); R(r, 'Head', X(L), -.06 * k); R(r, 'Head', Y(L), -.08 * k); pelv(r, .02 * k, 0, 0);
+  reach(r, 'r', at(r, 'Head', -.30 - .09 * sw, .14 + .02 * Math.abs(sw), .10), k, L(-.8, -1, -.1), L(1, .1, 0), .10); curl(r, 'r', ALLF, .08 * k); curl(r, 'l', ALLF, .5 * k); }, fx: ['¡Hola!', 1.2] },
+/* Risa: carcajada de panza, se dobla hacia adelante y vuelve, con las manos en la barriga y los hombros que saltan */
+risa: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), beat = Math.abs(Math.sin(t * TAU * 3.2)), w = .5 - .5 * Math.cos(t * TAU * .45), fw = .22 * w - .10 * (1 - w);
+  R(r, 'spine_01', X(L), (fw * .5 - .02 * beat) * k); R(r, 'spine_02', X(L), (fw * .6) * k); R(r, 'spine_03', X(L), (fw * .4 - .04 * beat) * k); R(r, 'Head', X(L), (-.20 * (1 - w) + .10 * w - .08 * beat) * k); R(r, 'spine_02', Z(L), .05 * Math.sin(t * TAU * .8) * k);
+  pelv(r, 0, (-.02 * w - .012 * beat) * k, -.02 * w * k);
+  reach(r, 'r', at(r, 'spine_01', -.07, .05, .17), k, L(-1, -.4, -.2), null, .08); reach(r, 'l', at(r, 'spine_01', .07, .02, .17), k, L(1, -.4, -.2), null, .08); curl(r, 'r', ALLF, .25 * k); curl(r, 'l', ALLF, .25 * k); }, fx: ['JA', .45] }
 
   };})());
 NXGK.forEach(k=>{if(!GESTK.includes(k))GESTK.push(k);});
