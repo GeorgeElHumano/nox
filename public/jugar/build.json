@@ -1,9 +1,11 @@
 {
- "build": "202611130858",
- "min": "202611130858",
- "title": "Tarjeta del personaje más clara",
+ "build": "202611130916",
+ "min": "202611130916",
+ "title": "Nombres en 3ra persona y textos de ítems",
  "notes": [
-  "El nombre de tu personaje y tu nivel ahora se ven siempre enteros en el recuadro de vida, en cualquier pantalla.",
-  "Si el nombre es largo, la letra se achica sola para que entre."
+  "Tu nombre y tu título ahora se ven también en la cámara de 3ra persona, pegados a la cabeza de cada personaje",
+  "En 3ra persona los nombres de los jugadores lejanos se ven más chicos",
+  "Los nombres de los ítems en el piso son más transparentes",
+  "Nuevo: podés ocultar o mostrar los nombres de los ítems del piso en Ajustes (en PC, tecla Z)"
  ]
 }
