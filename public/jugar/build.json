@@ -1,9 +1,11 @@
 {
- "build": "202611122309",
+ "build": "202611130726",
  "min": "202611122202",
- "title": "Arreglo del cambio de nombre",
+ "title": "Gestos y ropa mejorados",
  "notes": [
-  "El servicio Cambio de nombre de la tienda no tomaba el nombre escrito: ya funciona.",
-  "Ya no se puede usar como nombre de personaje el nombre de la cuenta de otro jugador."
+  "Los gestos se ven más naturales: Dab, Besos, Violín, Hombro, Saludo, Risa, Reverencia y Polca fueron rehechos o retocados.",
+  "La piel ya no atraviesa la ropa de tela y los hombros acompañan al brazo.",
+  "Las hombreras sueltas ya no quedan flotando al levantar los brazos en un gesto.",
+  "El cigarrillo ya no queda en el aire al cambiar de gesto."
  ]
 }

@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611130726",
+  "title": "Gestos y ropa mejorados",
+  "notes": [
+   "Los gestos se ven más naturales: Dab, Besos, Violín, Hombro, Saludo, Risa, Reverencia y Polca fueron rehechos o retocados.",
+   "La piel ya no atraviesa la ropa de tela y los hombros acompañan al brazo.",
+   "Las hombreras sueltas ya no quedan flotando al levantar los brazos en un gesto.",
+   "El cigarrillo ya no queda en el aire al cambiar de gesto."
+  ]
+ },
+ {
   "build": "202611122309",
   "title": "Arreglo del cambio de nombre",
   "notes": [
