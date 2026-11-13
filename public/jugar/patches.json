@@ -1,5 +1,12 @@
 [
  {
+  "build": "202611122250",
+  "title": "Tienda más cómoda en el celular",
+  "notes": [
+   "En el celular, el botón de la tienda ahora es la moneda Noxis con la palabra Tienda abajo y ocupa mucho menos lugar."
+  ]
+ },
+ {
   "build": "202611122202",
   "title": "Cerro León y misiones que vuelven con cada reinicio",
   "notes": [
