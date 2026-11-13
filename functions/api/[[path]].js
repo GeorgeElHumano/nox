@@ -384,7 +384,10 @@ route('GET', 'game/taken', async ({ db, url, me }) => {
   const c = keyOf(url.searchParams.get('c') || '');
   if (!c) return json({ uid: null });
   const r = await db.prepare('SELECT uid FROM players WHERE ckeys LIKE ? AND uid<>? LIMIT 1').bind('%,' + c.replace(/[%_,]/g, '') + ',%', me.id).first();
-  return json({ uid: r ? r.uid : null });
+  if (r) return json({ uid: r.uid });
+  // tampoco se puede usar el nombre de la cuenta de otro jugador (evita hacerse pasar por él, por ejemplo por el administrador)
+  const u = await db.prepare('SELECT id FROM users WHERE nkey=? AND id<>? LIMIT 1').bind(c, me.id).first();
+  return json({ uid: u ? u.id : null });
 }, { auth: true });
 
 /* ranking: los personajes de más nivel de todas las cuentas (reinicios primero, después nivel); se arma desde el resumen que cada cuenta guarda */

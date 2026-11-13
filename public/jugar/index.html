@@ -9096,12 +9096,12 @@ function renderNoxOrder(b,err){const o=NX.order,pay=NX.cat.pay||{};if(!o){NX.vie
 async function nxOrders(){try{const r=await srvApi('GET','orders');NX.orders=r.orders||[];const p=$('#pNox');if(p&&!p.hidden&&NX.view==='pay')renderNox();}catch(e){}}
 /* --- servicios: se gastan en el servidor y recién entonces el juego hace el cambio --- */
 function renderNoxSvc(b,err){const id=NX.svc,n=NX.own[id]|0;
-  if(id==='s_nombre')b.innerHTML=err+`<div class="nx-box"><div class="sub">Nombre nuevo para <b>${esc(C.name)}</b> (3 a 14 letras o números, sin espacios)</div><input class="nx-in" id="nxName" maxlength="14" autocomplete="off" value=""><div class="acts"><button class="btn sm ok" data-act="nxSvcOk" ${NX.busy?'disabled':''}>Cambiar nombre</button><button class="btn sm ghost" data-act="nxShop">Cancelar</button></div><p class="hint">Te quedan ${n}. El cambio no se puede deshacer sin gastar otro.</p></div>`;
+  if(id==='s_nombre')b.innerHTML=err+`<div class="nx-box"><div class="sub">Nombre nuevo para <b>${esc(C.name)}</b> (3 a 14 letras o números, sin espacios)</div><input class="nx-in" id="nxName" maxlength="14" autocomplete="off" value="${esc(NX.nm||'')}"><div class="acts"><button class="btn sm ok" data-act="nxSvcOk" ${NX.busy?'disabled':''}>Cambiar nombre</button><button class="btn sm ghost" data-act="nxShop">Cancelar</button></div><p class="hint">Te quedan ${n}. El cambio no se puede deshacer sin gastar otro.</p></div>`;
   else if(id==='s_apariencia')b.innerHTML=err+`<div class="nx-box"><div class="sub">Elegí la cara de <b>${esc(C.name)}</b>. Cerrá el panel para verla mejor y volvé a abrir la tienda para confirmar.</div><div class="facepick"><button class="btn sm" data-act="nxFace" data-d="-1">◀</button><span>Cara <b>${(C.face|0)+1}</b> de ${HEADS[C.cls==='arquera'?'f':'m'].length}</span><button class="btn sm" data-act="nxFace" data-d="1">▶</button></div><div class="acts"><button class="btn sm ok" data-act="nxSvcOk" ${NX.busy||(C.face|0)===NX.face0?'disabled':''}>Quedarme con esta</button><button class="btn sm ghost" data-act="nxFaceNo">Cancelar</button></div><p class="hint">Te quedan ${n}.</p></div>`;
   else b.innerHTML=err+`<div class="nx-box"><div class="sub">A <b>${esc(C.name)}</b> se le devuelven todos los puntos repartidos para que los pongas de nuevo. El equipo que pida más puntos de los que tengas deja de servir hasta que los repartas.</div><div class="acts"><button class="btn sm ok" data-act="nxSvcOk" ${NX.busy?'disabled':''}>Devolver mis puntos</button><button class="btn sm ghost" data-act="nxShop">Cancelar</button></div><p class="hint">Te quedan ${n}.</p></div>`;}
 function nxFaceBack(){if(NX.face0!=null&&C&&(C.face|0)!==NX.face0){C.face=NX.face0;HERO_FACE=C.face;rebuildHero(C.cls,C.eq);}NX.face0=null;}
 async function nxSvcOk(){const id=NX.svc;if(mode!=='game'||!C)return;
-  if(id==='s_nombre'){const nm=($('#nxName')||{}).value||'',k=keyOf(nm);if(!NAME_RE.test(nm))throw new Error('El nombre tiene que tener de 3 a 14 letras o números, sin espacios.');
+  if(id==='s_nombre'){const nm=NX.nm||'',k=keyOf(nm);if(!NAME_RE.test(nm))throw new Error('El nombre tiene que tener de 3 a 14 letras o números, sin espacios.');
     if(SAVE.chars.some(c=>keyOf(c.name)===k))throw new Error('Ya tenés un personaje con ese nombre.');
     const tk=await srvApi('GET','game/taken?c='+encodeURIComponent(k));if(tk&&tk.uid)throw new Error('Ese nombre ya lo usa otro jugador.');
     const old=C.name;nxSet(await srvApi('POST','nox/use',{id,note:old+'>'+nm}),true);C.name=nm;persist();NET.lastSum='';try{flushNet(true);}catch(e){}if(HLBL)HLBL.html=null;nxCz();NX.view='shop';toast(`Ahora te llamás <em style="color:var(--gold)">${esc(nm)}</em>`);return;}
@@ -9116,8 +9116,8 @@ Object.assign(ACT,{
   nxEquip(d){nxDo(async()=>{nxSet(await srvApi('POST','nox/equip',{slot:d.slot,id:d.id||null}),true);});},
   nxGest(d){if(mode!=='game'){toast('Los gestos se hacen dentro del juego');return;}closeAll();gestStart(d.id);},
   nxTry(d){if(mode!=='game'){toast('Entrá al juego con un personaje para probar el gesto');return;}NX.prev=d.id;closeAll();gestStart(d.id);toast('Probando el gesto: solo lo ves vos. Movete para cortarlo.');},
-  nxSvc(d){if(mode!=='game'||!C){toast('Entrá al juego con el personaje al que se lo querés aplicar');return;}NX.svc=d.id;NX.view='svc';NX.err='';NX.face0=d.id==='s_apariencia'?(C.face|0):null;renderNox();},
-  nxSvcOk(){nxDo(nxSvcOk);},
+  nxSvc(d){if(mode!=='game'||!C){toast('Entrá al juego con el personaje al que se lo querés aplicar');return;}NX.nm='';NX.svc=d.id;NX.view='svc';NX.err='';NX.face0=d.id==='s_apariencia'?(C.face|0):null;renderNox();},
+  nxSvcOk(){const i=$('#nxName');if(i)NX.nm=i.value.trim();nxDo(nxSvcOk);},
   nxFace(d){if(NX.svc!=='s_apariencia'||!C)return;const n=HEADS[C.cls==='arquera'?'f':'m'].length;C.face=(((C.face|0)+(+d.d))%n+n)%n;HERO_FACE=C.face;rebuildHero(C.cls,C.eq);renderNox();},
   nxFaceNo(){nxFaceBack();NX.view='shop';NX.svc=null;renderNox();},
   nxFac(){nxFacRead();NX.fac.on=!NX.fac.on;renderNox();},
