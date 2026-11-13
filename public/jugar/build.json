@@ -1,11 +1,14 @@
 {
- "build": "202611121914",
- "min": "202611121914",
- "title": "Arandu: bastón y set corregidos",
+ "build": "202611122116",
+ "min": "202611122116",
+ "title": "Tienda Noxis",
  "notes": [
-  "El bastón de Arandu ya no atraviesa su túnica ni sus piernas: lo lleva derecho, al costado",
-  "Los personajes de la plaza que llevan bastón o cetro ahora lo sostienen derecho",
-  "Las hombreras, la corona y las botas de Arandu ahora son doradas, a juego con su bastón",
-  "Arandu ya responde las preguntas escritas (se corrigió el error 502)"
+  "Llegó la Tienda Noxis: gestos, bailes, títulos, marcos de nombre, estelas y apariencias de mascota. Todo es cosmético.",
+  "Botón TIENDA en la pantalla del juego y en la portada.",
+  "Recargas por transferencia desde 5.000 Gs, con acreditación automática si transferís el monto exacto del pedido.",
+  "Packs Fundador de Bronce, Plata y Oro con recompensas exclusivas.",
+  "Servicios: cambio de nombre, cambio de apariencia y reorganizar puntos.",
+  "Los Noxis se pueden intercambiar entre jugadores.",
+  "Lo que comprás vale para todos los personajes de tu cuenta."
  ]
 }

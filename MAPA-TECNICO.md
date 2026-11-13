@@ -556,7 +556,8 @@ Pedido: cada set de cada nivel y de cada raza distinto, en diseño y no solo en 
 
 
 
-## Tienda Noxis (12/11; en la rama `arte-cc0`, SIN publicar: falta `scripts/patch.sh` y el OK del dueño)
+## Tienda Noxis (publicada el 12/11 a las 21:16 con el OK del dueño, parche `202611122116`)
+- **Estado del cobro automático:** `BANK_SECRET` ya está cargado en Pages (lo puso el dueño). Falta: desplegar `mail/` (`nox-mail`) con el mismo secreto, Email Routing, `BANK_FWD`/`BANK_TO` y el reenvío en Gmail. Hasta entonces los pagos se aprueban a mano en la pestaña Banco/Pedidos. El dueño decidió NO pedir captura del comprobante: solo correo del banco + monto exacto.
 - **Aviso (12/11, 20:30):** por error de otra sesión, estos commits salieron a `main` unos minutos junto con un arreglo de Arandu (se publicó toda la rama sin mirar qué más traía). El dueño pidió sacarla: `main` se volvió atrás a `f18a383` + el arreglo de la IA (commit `073d832`, mismo cambio que `a1ff7cb` de esta rama). La tienda sigue intacta acá. **Antes de publicar esta rama hay que unir `origin/main` (`git merge origin/main`, no trae cambios nuevos) porque `main` ya no es antepasado directo.**
 - **Regla para publicar desde una rama compartida:** antes de `git push origin arte-cc0:main`, mirar `git log --oneline origin/main..HEAD` y confirmar que solo salen commits propios o ya aprobados; si hay trabajo de otra sesión sin publicar, publicar solo lo propio desde una rama aparte (`git branch pub origin/main && git cherry-pick …`).
 
