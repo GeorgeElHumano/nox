@@ -1,11 +1,10 @@
 {
- "build": "202611130916",
+ "build": "202611131326",
  "min": "202611130916",
- "title": "Nombres en 3ra persona y textos de ítems",
+ "title": "Manos naturales",
  "notes": [
-  "Tu nombre y tu título ahora se ven también en la cámara de 3ra persona, pegados a la cabeza de cada personaje",
-  "En 3ra persona los nombres de los jugadores lejanos se ven más chicos",
-  "Los nombres de los ítems en el piso son más transparentes",
-  "Nuevo: podés ocultar o mostrar los nombres de los ítems del piso en Ajustes (en PC, tecla Z)"
+  "La mano libre queda relajada, con los dedos apenas doblados y el pulgar junto al índice.",
+  "En los gestos los dedos ya no dan vueltas ni quedan torcidos al terminar.",
+  "Saludo, Venia, Aplauso y Hombro se hacen con la mano abierta."
  ]
 }
