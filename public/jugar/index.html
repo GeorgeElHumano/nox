@@ -2432,28 +2432,34 @@ function liteSprites(r){if(!r||!r.g)return;if(!r.liteSp){r.liteSp=[];let i=0;r.g
   const on=!LITE();for(const o of r.liteSp)o.visible=on;}
 function liteAll(){try{if(HERO)liteSprites(HERO);LIVE.others.forEach(o=>{if(o.m&&o.m.cc0)liteSprites(o.m);});}catch(e){}}
 /* (13/11) ropa ceñida al cuerpo: el cuerpo musculoso atravesaba la ropa (parches de piel en el pecho del chaleco, peor al levantar los brazos).
-   Para cada vértice de una prenda cosida (bakedSkin, mismo esqueleto que el cuerpo) que esté a menos de 8 cm de la piel:
-   1) copia los pesos de piel del vértice del cuerpo más cercano (la prenda se deforma igual que lo que tiene debajo) y
-   2) si queda por debajo de la piel (de todo el cuerpo, también la que no se muestra), lo saca 8 mm hacia afuera (tope 7,5 cm). Lo que está lejos del cuerpo (faldones, hombreras) no se toca.
-   La malla cosida es propia de cada personaje, así que no afecta a otros; la grilla del cuerpo se guarda en su geometría. */
-function fitBody(r){const root=r.g||r;let body=null;const cl=[];root.traverse(o=>{if(!o.isSkinnedMesh||!o.visible)return;if(/^SuperHero/i.test(o.name))body=o;else if(o.name==='bakedSkin'&&!o.geometry.userData.fit&&!/Eyes|Hair/i.test((o.material&&o.material.name)||''))cl.push(o);});
-  if(!body||!cl.length)return 0;const bg=body.geometry,BP=bg.attributes.position,BI=bg.attributes.skinIndex,BW=bg.attributes.skinWeight;if(!BP||!BI||!BW)return 0;
+   1) cada vértice de una prenda cosida (bakedSkin, mismo esqueleto que el cuerpo) a menos de 8 cm de la piel copia los pesos del vértice del cuerpo
+      más cercano: la prenda se deforma igual que lo que tiene debajo (todas las capas juntas, sin cambiar su orden);
+   2) la piel que queda tapada por tela se quita. NO se mueve la tela: sacarla hacia afuera juntaba las capas (camisa y túnica) y aparecían manchas.
+   Solo prendas de tela del modelo (material Ranger/Peasant): con las piezas forjadas que salen de la piel (peto del Gladiador) quitar piel dejaba el cuerpo invisible. */
+function fitBody(r){const root=r.g||r;let body=null;const cl=[];root.traverse(o=>{if(!o.isSkinnedMesh||!o.visible)return;if(/^SuperHero/i.test(o.name))body=o;else if(o.name==='bakedSkin'&&!o.geometry.userData.fit&&/Ranger|Peasant/i.test((o.material&&o.material.name)||''))cl.push(o);});
+  if(!body||!cl.length)return 0;const bg=body.geometry,BP=bg.attributes.position,BI=bg.attributes.skinIndex,BW=bg.attributes.skinWeight;if(!BP||!BI||!BW||!bg.index)return 0;
   let G=bg.userData.fitGrid;if(!G){const n=BP.count,x=new Float32Array(n*3),nm=new Float32Array(n*3);let lo=1e9,hi=-1e9;for(let i=0;i<n;i++){x[i*3]=BP.getX(i);x[i*3+1]=BP.getY(i);x[i*3+2]=BP.getZ(i);lo=Math.min(lo,x[i*3+1]);hi=Math.max(hi,x[i*3+1]);}
-    /* normales por caras con los triángulos del cuerpo ENTERO (también la piel que este personaje no muestra): la prenda se saca por fuera de todo el torso, no solo de la piel visible */
-    {const ix=bg.userData.fullIx||bg.index,nt=ix?ix.count/3:n/3;for(let t=0;t<nt;t++){const a=ix?ix.getX(t*3):t*3,b=ix?ix.getX(t*3+1):t*3+1,c=ix?ix.getX(t*3+2):t*3+2,ux=x[b*3]-x[a*3],uy=x[b*3+1]-x[a*3+1],uz=x[b*3+2]-x[a*3+2],vx=x[c*3]-x[a*3],vy=x[c*3+1]-x[a*3+1],vz=x[c*3+2]-x[a*3+2],nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;for(const k of[a,b,c]){nm[k*3]+=nx;nm[k*3+1]+=ny;nm[k*3+2]+=nz;}}
+    /* normales por caras con los triángulos del cuerpo entero (cc0Keep guarda el índice completo en userData.fullIx) */
+    {const ix=bg.userData.fullIx||bg.index;for(let t=0;t<ix.count;t+=3){const a=ix.getX(t),b=ix.getX(t+1),c=ix.getX(t+2),ux=x[b*3]-x[a*3],uy=x[b*3+1]-x[a*3+1],uz=x[b*3+2]-x[a*3+2],vx=x[c*3]-x[a*3],vy=x[c*3+1]-x[a*3+1],vz=x[c*3+2]-x[a*3+2],nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;for(const k of[a,b,c]){nm[k*3]+=nx;nm[k*3+1]+=ny;nm[k*3+2]+=nz;}}
       for(let i=0;i<n;i++){const l=Math.hypot(nm[i*3],nm[i*3+1],nm[i*3+2]);if(l>0){nm[i*3]/=l;nm[i*3+1]/=l;nm[i*3+2]/=l;}}}
     const sc=(hi-lo)/1.8||1,cs=.08*sc,m=new Map(),key=(a,b,c)=>a*73856093^b*19349663^c*83492791;for(let i=0;i<n;i++){const k=key(Math.floor(x[i*3]/cs),Math.floor(x[i*3+1]/cs),Math.floor(x[i*3+2]/cs));let l=m.get(k);if(!l)m.set(k,l=[]);l.push(i);}
     G=bg.userData.fitGrid={x,nm,sc,cs,m,key};}
-  const {x,nm,sc,cs,m,key}=G,R2=cs*cs,M=.008*sc,TOP=.075*sc,bn=body.skeleton.bones;let done=0;
+  const {x,nm,sc,cs,m,key}=G,R2=cs*cs,LAT2=(.016*sc)*(.016*sc),IN=.075*sc,OUT=.05*sc,bn=body.skeleton.bones,cov=new Uint8Array(BP.count);let done=0;
   for(const c of cl){const g=c.geometry,P=g.attributes.position,SI=g.attributes.skinIndex,SW=g.attributes.skinWeight;g.userData.fit=1;if(!P||!SI||!SW)continue;
     const cb=c.skeleton.bones;if(cb.length!==bn.length||cb.some((b,i)=>b.name!==bn[i].name))continue;const e1=c.bindMatrix.elements,e2=body.bindMatrix.elements;if(e1.some((v,i)=>Math.abs(v-e2[i])>1e-4))continue;
-    for(let i=0;i<P.count;i++){const px=P.getX(i),py=P.getY(i),pz=P.getZ(i),cx=Math.floor(px/cs),cy=Math.floor(py/cs),cz=Math.floor(pz/cs);let bd=R2,bi=-1;
-      for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let d=-1;d<=1;d++){const l=m.get(key(cx+a,cy+b,cz+d));if(!l)continue;for(const k of l){const dx=x[k*3]-px,dy=x[k*3+1]-py,dz=x[k*3+2]-pz,q=dx*dx+dy*dy+dz*dz;if(q<bd){bd=q;bi=k;}}}
-      if(bi<0)continue;SI.setXYZW(i,BI.getX(bi),BI.getY(bi),BI.getZ(bi),BI.getW(bi));SW.setXYZW(i,BW.getX(bi),BW.getY(bi),BW.getZ(bi),BW.getW(bi));
-      const o=(px-x[bi*3])*nm[bi*3]+(py-x[bi*3+1])*nm[bi*3+1]+(pz-x[bi*3+2])*nm[bi*3+2];if(o<M){const s=Math.min(M-o,TOP);P.setXYZ(i,px+nm[bi*3]*s,py+nm[bi*3+1]*s,pz+nm[bi*3+2]*s);}}
-    (P.data||P).needsUpdate=true;(SI.data||SI).needsUpdate=true;(SW.data||SW).needsUpdate=true;done++;}
+    /* solo los vértices que la prenda dibuja: lo recortado con cc0Drop (piel a la vista) sigue en los atributos y no tapa nada */
+    let used=null;if(g.index){used=new Uint8Array(P.count);const gi=g.index;for(let t=0;t<gi.count;t++)used[gi.getX(t)]=1;}
+    for(let i=0;i<P.count;i++){if(used&&!used[i])continue;const px=P.getX(i),py=P.getY(i),pz=P.getZ(i),cx=Math.floor(px/cs),cy=Math.floor(py/cs),cz=Math.floor(pz/cs);let bd=R2,bi=-1;
+      for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let d=-1;d<=1;d++){const l=m.get(key(cx+a,cy+b,cz+d));if(!l)continue;for(const k of l){const dx=px-x[k*3],dy=py-x[k*3+1],dz=pz-x[k*3+2],q=dx*dx+dy*dy+dz*dz;if(q<bd){bd=q;bi=k;}
+          /* ¿esta tela tapa ese punto de piel? casi sobre su normal (menos de 1,6 cm de costado), hasta 7,5 cm por debajo o 5 cm por encima */if(!cov[k]){const o=dx*nm[k*3]+dy*nm[k*3+1]+dz*nm[k*3+2];if(o>-IN&&o<OUT&&q-o*o<LAT2)cov[k]=1;}}}
+      if(bi<0)continue;SI.setXYZW(i,BI.getX(bi),BI.getY(bi),BI.getZ(bi),BI.getW(bi));SW.setXYZW(i,BW.getX(bi),BW.getY(bi),BW.getZ(bi),BW.getW(bi));}
+    (SI.data||SI).needsUpdate=true;(SW.data||SW).needsUpdate=true;done++;
+    /* sin piel debajo, por la sisa o el cuello se veía a través de la prenda: la tela se dibuja de los dos lados (el material es propio de este personaje) */if(c.material&&c.material.side!==THREE.DoubleSide){c.material.side=THREE.DoubleSide;c.material.needsUpdate=true;}}
+  /* piel tapada: fuera los triángulos del cuerpo con sus tres vértices tapados (la geometría del cuerpo se comparte: este personaje se lleva una copia que solo cambia el índice) */
+  if(done){const ix=bg.index,keep=[];let cut=0;for(let t=0;t<ix.count;t+=3){const a=ix.getX(t),b=ix.getX(t+1),c=ix.getX(t+2);if(cov[a]&&cov[b]&&cov[c]){cut++;continue;}keep.push(a,b,c);}
+    if(cut){const ng=new THREE.BufferGeometry();for(const k in bg.attributes)ng.setAttribute(k,bg.attributes[k]);ng.setIndex(keep);ng.userData=bg.userData;ng.boundingSphere=bg.boundingSphere;ng.boundingBox=bg.boundingBox;body.geometry=ng;}}
   return done;}
-function charBake(r){if(!r||window.__NOBAKE)return r;try{bakeRig(r);if(r.cc0){bakeInner(r);skinFlaps(r);liteSprites(r);try{fitBody(r);}catch(e){console.error(e);}}shadowTrim(r.g||r);}catch(e){console.error(e);}return r;}
+function charBake(r){if(!r||window.__NOBAKE)return r;try{bakeRig(r);if(r.cc0){bakeInner(r);skinFlaps(r);liteSprites(r);try{fitBody(r);}catch(e){console.error(e);}try{(r.g||r).traverse(o=>{if(o.userData&&o.userData.pad&&!o.userData.padB){o.userData.padB=1;bakeLocal(o);}});}catch(e){console.error(e);}}shadowTrim(r.g||r);}catch(e){console.error(e);}return r;}
 function part(geo,m,x,y,z,parent,sx,sy,sz){const o=mk(geo,m,x,y,z,parent);if(sx!=null)o.scale.set(sx,sy==null?sx:sy,sz==null?sx:sz);return o;}
 
 /* ---------- cuerpo humano ---------- */
@@ -4951,9 +4957,9 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
             if(z>-1e8){const fr=z-bp.z+.004;c.position.z=0;c.position.y=-.06;c.scale.z=Math.max(.3,Math.min(1.1,fr/.1685));}}}
         if(!return_){ch.add(c);add(c,eq.armor);}}}
     if(['round','square','layer','spike','big'].includes(S.pads)&&!(S.x&&S.x.padOnly)){const kind=S.pads==='big'||S.pads==='layer'?'ornate':'metal';
-      const mono=S.x&&S.x.mono,PS=b=>mono?[b+'_l']:CC0_SIDES(b);const sh=cc0Shell(r,PS('upperarm').concat(PS('clavicle')),{src:slotIs('armor','gloves'),minW:.6,inflate:.018,mat:cc0ArmorMat(S,kind,cls),uvk:4});grp(sh,eq.armor);if(cls!=='caballero'&&S.x&&S.x.padK)for(const s of(mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar(S.x.padK);at.add(p);add(p,eq.armor);}}
+      const mono=S.x&&S.x.mono,PS=b=>mono?[b+'_l']:CC0_SIDES(b);const sh=cc0Shell(r,PS('upperarm').concat(PS('clavicle')),{src:slotIs('armor','gloves'),minW:.6,inflate:.018,mat:cc0ArmorMat(S,kind,cls),uvk:4});grp(sh,eq.armor);if(cls!=='caballero'&&S.x&&S.x.padK)for(const s of(mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar(S.x.padK);p.userData.nobake=1;p.userData.pad=s;at.add(p);add(p,eq.armor);}}
       if(S.pads==='spike'||S.pads==='big')for(const s of(mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=new THREE.Group();const M=fOrnate(S.m,S.t,S.glow);for(let k=0;k<3;k++){const sp=part(CONE(.016,.06-k*.012,5),M,s*(.02+k*.045),.075-k*.01,0,p);sp.rotation.z=-s*(.15+k*.25);}if(S.pads==='big')gemAt(p,S.t,0,.07,.04,.016);at.add(p);add(p,eq.armor);}}}
-    else if(S.pads!=='none')for(const s of(S.x&&S.x.mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar((S.x&&S.x.padK)||1);at.add(p);add(p,eq.armor);}}}
+    else if(S.pads!=='none')for(const s of(S.x&&S.x.mono?[-1]:[-1,1])){const at=anchorFn(r.body)([s<0?'arm_L':'arm_R']);if(at){const p=forgePad(S,1,s,cls);p.position.set(s*.03,.005,0);p.rotation.z=-s*.42;p.scale.setScalar((S.x&&S.x.padK)||1);p.userData.nobake=1;p.userData.pad=s;at.add(p);add(p,eq.armor);}}}
   /* el resto del peto (mangas, codos, correas, cuello) va después de hombreras: lo que ellas no tomaron */
   const skinSrc=m=>!m.userData.file&&/Superhero/.test(m.material.name||'');
   if(r.restArmor){grp(cc0Rest(r,'armor',r.restArmor.mat),r.restArmor.it);
@@ -9215,7 +9221,7 @@ llora: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), sw = Math.si
 /* 5. Limpiarse el hombro: se sacude el hombro izquierdo y levanta el mentón */
 hombro: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), p = t % 2.6, kb = sm(p / .25) * (1 - sm((p - 1.5) / .3)), fl = (p * 2.6) % 1, f = sm(fl / .35);
   R(r, 'spine_02', Y(L), -.10 * k); R(r, 'Head', Y(L), (.45 * kb - .05) * k); R(r, 'Head', X(L), (.14 * kb - .16 * (1 - kb)) * k); R(r, 'spine_03', X(L), -.06 * (1 - kb) * k);
-  reach(r, 'r', at(r, 'upperarm_l', -.06 + .11 * f, .12 - .02 * f, .12 + .03 * f), k * kb, L(-.3, -1, .4));  curl(r, 'l', ALLF, .55 * k); curl(r, 'r', ALLF, .25 * k * kb + .55 * k * (1 - kb)); pelv(r, -.025 * k, 0, 0); }, fx: ['✦', 1.3] },
+  reach(r, 'r', at(r, 'upperarm_l', -.11 + .10 * f, .12 - .02 * f, .25 + .02 * f), k * kb, L(-.7, -.5, .6), null, .08);  curl(r, 'l', ALLF, .55 * k); curl(r, 'r', ALLF, .25 * k * kb + .55 * k * (1 - kb)); pelv(r, -.025 * k, 0, 0); }, fx: ['✦', 1.3] },
 /* 6. Bostezo y siesta parado: bosteza estirándose, se va quedando dormido y se despierta de golpe */
 bostezo: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), p = t % 6.2, ya = sm(p / .6) * (1 - sm((p - 2.0) / .5)), nb = sm((p - 2.7) / 2.0) * (1 - sm((p - 5.55) / .12)), nod = Math.sin(p * 2.1);
   R(r, 'spine_02', X(L), (-.12 * ya + .14 * nb) * k); R(r, 'spine_03', X(L), (-.08 * ya + .08 * nb) * k); R(r, 'Head', X(L), (-.30 * ya + (.50 + .06 * nod) * nb) * k); R(r, 'Head', Z(L), .10 * nb * k); R(r, 'spine_01', Z(L), .05 * nod * nb * k);
@@ -9270,29 +9276,29 @@ fumar: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .35), p = t % 5.2
 /* 14. Polca del Fundador: zapateo con las manos en la cintura */
 polca: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), ph = (t / .36) % 2, sA = ph < 1 ? 'l' : 'r', u = ph % 1, a = Math.sin(PI * u), sd = ph < 1 ? 1 : -1;
   R(r, 'spine_02', X(L), -.06 * k); R(r, 'spine_01', Z(L), .05 * sd * a * k); R(r, 'Head', Z(L), -.07 * sd * a * k); R(r, 'Head', X(L), -.06 * k);
-  gAim(r, 'thigh_' + sA, 'calf_' + sA, L(sd * .1, -1, .38 * a), k); gAim(r, 'calf_' + sA, 'foot_' + sA, L(0, -1, -.75 * a), k);
+  gAim(r, 'thigh_' + sA, 'calf_' + sA, L(sd * .1, -1, .62 * a), k); gAim(r, 'calf_' + sA, 'foot_' + sA, L(0, -1, -.95 * a), k);
   pelv(r, -.02 * sd * a * k, .035 * Math.abs(Math.sin(TAU * u)) * k, 0);
   for (const [sd2, s] of [['r', -1], ['l', 1]]) { reach(r, sd2, at(r, 'pelvis', s * .20, .07, .06), k, L(s, -.15, -.45), null, .07); curl(r, sd2, ALLF, .9 * k); } }, fx: ['¡ipu!', 1.44] },
 /* 15. Reverencia del Fundador: reverencia larga con el brazo extendido y un pie atrás */
 reverencia: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), p = t % 3.6, b = sm(p / .7) * (1 - sm((p - 2.5) / .7)), kk = k * b;
-  R(r, 'spine_01', X(L), .30 * kk); R(r, 'spine_02', X(L), .24 * kk); R(r, 'spine_03', X(L), .16 * kk); R(r, 'Head', X(L), .10 * kk);
+  R(r, 'spine_01', X(L), .36 * kk); R(r, 'spine_02', X(L), .28 * kk); R(r, 'spine_03', X(L), .18 * kk); R(r, 'Head', X(L), .16 * kk);
   gAim(r, 'thigh_r', 'calf_r', L(-.05, -1, -.30), kk); gAim(r, 'calf_r', 'foot_r', L(0, -1, -.25), kk); gAim(r, 'thigh_l', 'calf_l', L(.04, -1, .22), kk); gAim(r, 'calf_l', 'foot_l', L(0, -1, -.30), kk); pelv(r, 0, -.07 * kk, -.04 * kk);
-  gA(r, 'r', L(-.85, -.42, .15), L(-.80, -.05, .58), kk, L(0, -1, -.3), L(0, 1, 0));
+  gA(r, 'r', L(-.80, -.58, .12), L(-.86, -.40, .32), kk, L(0, -1, -.3), L(0, 1, 0)); curl(r, 'r', ALLF, .15 * kk);
   reach(r, 'l', at(r, 'spine_03', -.03, -.02, .17), kk, L(1, -.4, -.2)); }, fx: ['', 0] }
 ,
 /* Saludo: mano abierta a la altura de la cabeza, codo doblado, moviendo el antebrazo de lado a lado */
 saludo: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), sw = Math.sin(t * TAU * 1.6), s2 = Math.sin(t * TAU * .5);
   R(r, 'spine_02', Z(L), (.04 + .02 * s2) * k); R(r, 'Head', Z(L), .10 * k); R(r, 'Head', X(L), -.06 * k); R(r, 'Head', Y(L), -.08 * k); pelv(r, .02 * k, 0, 0);
-  reach(r, 'r', at(r, 'Head', -.30 - .09 * sw, .14 + .02 * Math.abs(sw), .10), k, L(-.8, -1, -.1), L(1, .1, 0), .10); curl(r, 'r', ALLF, .08 * k); curl(r, 'l', ALLF, .5 * k); }, fx: ['¡Hola!', 1.2] },
+  reach(r, 'r', at(r, 'Head', -.36 - .09 * sw, .15 + .02 * Math.abs(sw), .06), k, L(-.8, -1, -.1), L(1, .1, 0), .10); curl(r, 'r', ALLF, .08 * k); curl(r, 'l', ALLF, .5 * k); }, fx: ['¡Hola!', 1.2] },
 /* Risa: carcajada de panza, se dobla hacia adelante y vuelve, con las manos en la barriga y los hombros que saltan */
-risa: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), beat = Math.abs(Math.sin(t * TAU * 3.2)), w = .5 - .5 * Math.cos(t * TAU * .45), fw = .22 * w - .10 * (1 - w);
-  R(r, 'spine_01', X(L), (fw * .5 - .02 * beat) * k); R(r, 'spine_02', X(L), (fw * .6) * k); R(r, 'spine_03', X(L), (fw * .4 - .04 * beat) * k); R(r, 'Head', X(L), (-.20 * (1 - w) + .10 * w - .08 * beat) * k); R(r, 'spine_02', Z(L), .05 * Math.sin(t * TAU * .8) * k);
+risa: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), beat = Math.abs(Math.sin(t * TAU * 3.2)), w = .5 - .5 * Math.cos(t * TAU * .45), fw = .34 * w - .16 * (1 - w);
+  R(r, 'spine_01', X(L), (fw * .5 - .02 * beat) * k); R(r, 'spine_02', X(L), (fw * .6) * k); R(r, 'spine_03', X(L), (fw * .4 - .04 * beat) * k); R(r, 'Head', X(L), (-.30 * (1 - w) + .14 * w - .08 * beat) * k); R(r, 'spine_02', Z(L), .05 * Math.sin(t * TAU * .8) * k);
   pelv(r, 0, (-.02 * w - .012 * beat) * k, -.02 * w * k);
   reach(r, 'r', at(r, 'spine_01', -.07, .05, .17), k, L(-1, -.4, -.2), null, .08); reach(r, 'l', at(r, 'spine_01', .07, .02, .17), k, L(1, -.4, -.2), null, .08); curl(r, 'r', ALLF, .25 * k); curl(r, 'l', ALLF, .25 * k); }, fx: ['JA', .45] }
 
   };})());
 /* utilería (cigarrillo, violín): si se pasa de un gesto a otro sin terminar el primero, la del anterior quedaba flotando; cada gesto esconde la que no es suya */
-for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);};G.f.__p=1;}
+for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);padFollow(r);};G.f.__p=1;}
 NXGK.forEach(k=>{if(!GESTK.includes(k))GESTK.push(k);});
 /* --- estelas: partículas que quedan atrás al moverse --- */
 const NXTR={e_oro:{c:[0xffc84a,0xfff0b0],sz:.3,up:.3,gr:-.2},e_luna:{c:[0x6fc2ff,0xdff1ff],sz:.32,up:.2,gr:-.1},e_brasas:{c:[0xff5a20,0xffa030],sz:.28,up:.9,gr:-.7},e_fund:{c:[0xffd24a,0xffffff],sz:.38,up:.35,gr:-.15}};
@@ -9322,7 +9328,17 @@ function gestAnim(r,dt){const g=P.gest,D=GDEF[g.k];g.t+=dt;
   const key='g:'+clip.name;if(!r.acts[key])r.acts[key]=r.mixer.clipAction(clip);if(r.curK!==key)oadPlay(r,key,D.lay?.35:.25);
   if(D.lay&&clip.name==='LayToIdle'){const a=r.cur,Ld=clip.duration;a.paused=true;if(g.up!=null){const u=(g.t-g.up)*1.25;a.time=Math.min(Ld,u);if(u>=Ld+.05)g.done=true;}else a.time=Math.max(0,Ld-g.t*1.1);}
   else if(g.up!=null&&(!D.sit||g.t-g.up>=SITUP))g.done=true;}
-function gestOff(r){r.gOn=false;nxPropsOff(r);(r.gHid||[]).forEach(o=>o.visible=true);r.gHid=null;const pl=gB(r,'pelvis');if(r.gBub){r.gBub.remove();r.gBub=null;}}
+/* hombreras sueltas: van colgadas del brazo, así que con el brazo en alto giraban con él y quedaban flotando delante del pecho o de la cara.
+   Durante un gesto se les deshace hasta el 72 % del giro del brazo (nada con el brazo colgando), así quedan sobre el hombro; al terminar vuelven a su lugar. */
+const _pfA=new THREE.Vector3(),_pfB=new THREE.Vector3(),_pfQ=new THREE.Quaternion(),_pfP=new THREE.Quaternion(),_pfI=new THREE.Quaternion();
+function padList(r){if(!r._pads){r._pads=[];(r.g||r).traverse(o=>{if(o.userData&&o.userData.pad){o.userData.p0=o.position.clone();o.userData.q0=o.quaternion.clone();r._pads.push(o);}});}return r._pads;}
+function padFollow(r){const l=padList(r);if(!l.length)return;for(const p of l){const sd=p.userData.pad<0?'l':'r',ua=gB(r,'upperarm_'+sd),la=gB(r,'lowerarm_'+sd);if(!ua||!la||!p.parent)continue;
+    ua.updateWorldMatrix(true,false);la.updateWorldMatrix(true,false);ua.getWorldPosition(_pfA);la.getWorldPosition(_pfB);_pfB.sub(_pfA).normalize();const D0=gL(r,-p.userData.pad*.3,-1,0).normalize(),ang=_pfB.angleTo(D0),w=gSm((ang-.35)/.7)*.72;
+    if(w<=0){p.position.copy(p.userData.p0);p.quaternion.copy(p.userData.q0);continue;}
+    _pfQ.setFromUnitVectors(_pfB,D0);_pfI.set(0,0,0,1).slerp(_pfQ,w);p.parent.getWorldQuaternion(_pfP);_pfQ.copy(_pfP).invert().multiply(_pfI).multiply(_pfP);
+    p.quaternion.copy(_pfQ).multiply(p.userData.q0);p.position.copy(p.userData.p0).applyQuaternion(_pfQ);}}
+function padRest(r){if(r&&r._pads)for(const p of r._pads){p.position.copy(p.userData.p0);p.quaternion.copy(p.userData.q0);}}
+function gestOff(r){r.gOn=false;nxPropsOff(r);padRest(r);(r.gHid||[]).forEach(o=>o.visible=true);r.gHid=null;const pl=gB(r,'pelvis');if(r.gBub){r.gBub.remove();r.gBub=null;}}
 function gestPose(r,dt){const g=P.gest,D=GDEF[g.k];r.g.getWorldQuaternion(_gqR);const L=(x,y,z)=>gL(r,x,y,z);
   if(D.f&&(g.up==null||D.sit))D.f(r,g.t,L,g);
   if(ANIM_ISO)return;
