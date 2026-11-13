@@ -75,7 +75,9 @@ export const NX_PACKS = [
 export const NX_FOUNDER_END = 0;
 
 // Datos para pagar por transferencia (antes estaban en la página de la cuenta).
-export const NX_PAY = { whatsapp: '595981187259', bank: 'Banco Familiar\nAlias: CI 4804865\nTitular: Jorge Duarte', iva: 10, hours: 48 };
+export const NX_PAY = { whatsapp: '595981187259', bank: 'Banco Familiar\nAlias: CI 4804865\nTitular: Jorge Duarte', iva: 10, hours: 48,
+  /* condiciones de compra: se muestran en la pantalla de pago del juego y de la web (pedido del dueño, 13/11) */
+  legal: 'Al transferir aceptás estas condiciones: los Noxis y los artículos de la tienda son bienes virtuales sin valor monetario real, se usan solo dentro de NOX y no se canjean por dinero. Las compras son finales y no reembolsables, salvo lo que exija la ley. Con el monto exacto los Noxis se acreditan solos; si no, el pago se revisa a mano dentro de las 48 horas. La factura legal se emite solo si la pedís al comprar (RUC y razón social) y suma el 10 % de IVA. Los Packs Fundador no vencen: quien compra el de Oro queda en el Muro de Fundadores para siempre. NOX está en beta y puede cambiar. Menores de 18 años, solo con autorización de un adulto.' };
 
 export const NX_BY = new Map(NX_ITEMS.map(i => [i.id, i]));
 export const NX_PACK = new Map(NX_PACKS.map(p => [p.id, p]));
