@@ -247,7 +247,7 @@ input{user-select:text;-webkit-user-select:text}
 .lbl.boss{color:#ff7a66;font-family:var(--display);font-size:13px}
 .lbl.golden{color:#ffd76a;font-family:var(--display)}
 .lbl.portal{color:#9fd4ff}
-.lbl.drop{font-size:11.5px}
+.lbl.drop{font-size:11.5px;opacity:.62}.lbl.me.tp{opacity:.88}
 .num{position:absolute;left:0;top:0;font-family:var(--display);font-weight:800;font-size:18px;color:#ffd9a0;text-shadow:0 2px 3px #000,0 0 2px #000;white-space:nowrap;font-variant-numeric:tabular-nums}
 .num.c{color:#5fb6ff;font-size:22px;animation:npop .34s ease-out}
 .num.c::after{content:' ¡Crítico!';font-size:12px}
@@ -6586,6 +6586,9 @@ function bossDash(e,dt){const D=e.dash;D.t+=dt;const k=Math.min(1,D.t/D.dur);con
 const coinGeo=keep(new THREE.CylinderGeometry(.2,.2,.05,14)),coinMat=keep(regMetal(new MSM({color:0xe8b84a,metalness:.95,roughness:.25,emissive:0x3a2600})));
 const gemGeo=keep(new THREE.OctahedronGeometry(.25,0)),potGeo=keep(new THREE.SphereGeometry(.18,10,8));
 const beamGeo=keep((()=>{const g=new THREE.CylinderGeometry(.14,.28,4,10,1,true);g.translate(0,2,0);return g;})());
+/* textos de los ítems del piso: se pueden ocultar (Ajustes o tecla Z); el brillo del ítem sigue */
+let DROPLBL=true;try{DROPLBL=localStorage.getItem('noxDropLbl')!=='0';}catch(e){}
+function dropLblSet(on){DROPLBL=!!on;try{localStorage.setItem('noxDropLbl',DROPLBL?'1':'0');}catch(e){}toast('Nombres de ítems en el piso: <em>'+(DROPLBL?'visibles':'ocultos')+'</em>');}
 function dropAt(x,z,obj,quiet){
   if(DROPQ){DROPQ.push({x:+x.toFixed(2),z:+z.toFixed(2),o:obj});return null;}
   if(mode==='game'&&deepWater(x,z)){for(let i=0;i<40&&deepWater(x,z);i++){const dx=P.x-x,dz=P.z-z,l=Math.hypot(dx,dz)||1;x+=dx/l*.6;z+=dz/l*.6;}}
@@ -6602,7 +6605,7 @@ function dropAt(x,z,obj,quiet){
   g.position.set(x,H(x,z),z);zoneG.add(g);
   if(obj.item&&mode==='game'&&!quiet){if(obj.item.k==='gem')snd('mu_gem',{x,z,vol:1,jit:0,min:.15,maxD:45});else if(isEq(obj.item)&&itemR(obj.item)==='normal')snd('mu_drop',{x,z,vol:.55,min:.1});}
   if(obj.item&&isEq(obj.item)&&mode==='game'&&!quiet){const rr=itemR(obj.item);if(rr==='epic'||rr==='anc'||rr==='exc'||rr==='uniq'){if(!snd('mu_rare',{vol:.9,jit:0,min:.3}))sfx('rare');if(rr!=='exc')toast(`<em style="color:${RAR[rr].c}">¡Cayó un objeto ${RAR[rr].n.toLowerCase()}!</em>`);}}
-  const d={g,x,z,obj,t:0,vy:3.4};if(g.children[0]&&g.children[0].userData.icoDrop)d.ico=g.children[0];if(g.userData.gl)d.gl=g.userData.gl;d.label=addLabel(`<span style="color:${col}">${lbl}</span>`,'drop',()=>[d.x,d.g.position.y+.75,d.z]);drops.push(d);return d;
+  const d={g,x,z,obj,t:0,vy:3.4};if(g.children[0]&&g.children[0].userData.icoDrop)d.ico=g.children[0];if(g.userData.gl)d.gl=g.userData.gl;d.label=addLabel(`<span style="color:${col}">${lbl}</span>`,'drop',()=>[d.x,d.g.position.y+.75,d.z],()=>DROPLBL);drops.push(d);return d;
 }
 const ICOTEX={};function icoTex(u){if(ICOTEX[u])return ICOTEX[u];const t=new THREE.TextureLoader().load(u);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);ICOTEX[u]=t;return t;}
 function removeDrop(d){const i=drops.indexOf(d);if(i>=0)drops.splice(i,1);zoneG.remove(d.g);disposeTree(d.g);removeLabel(d.label);if(P.pick===d)P.pick=null;}
@@ -7045,7 +7048,7 @@ addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;co
   if(k==='escape'){const w=$('#wheel'),open=paused||(w&&!w.hidden)||['partyBox','chatBox'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});if(open||mode!=='game'){closeAll();closeBigMap();}else wheelToggle(true);return;}
   if(mode!=='game')return;
   if(paused){if(k==='i'||k==='v'||k==='c'||k==='m')closeAll();return;}
-  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);return;}
+  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);return;}if(k==='z'&&!e.repeat){dropLblSet(!DROPLBL);return;}
   const wasd=WASD();if(wasd&&k===' '){e.preventDefault();if(!e.repeat)ACT.toggleAuto();}else if(k===' '||k==='j'){e.preventDefault();if(!atkHeld){atkHeld=true;attackPress();}}
   const SKK=wasd?{q:1,e:2,r:3}:{q:0,w:1,e:2,r:3};if(k in SKK)useSkill(SKK[k]);if(k==='1')usePot('hp');if(k==='2')usePot('mp');if(!wasd&&k==='a'&&!atkHeld){atkHeld=true;attackPress();setTimeout(()=>{if(!keys[' '])atkHeld=false;},150);}
   if(k==='i'||k==='v')ACT.openInv();if(k==='c')ACT.openChar();if(k==='m')ACT.openTravel();if(k==='h')ACT.toggleAuto();if(k==='l')ACT.openQuests();
@@ -7576,6 +7579,7 @@ function renderChar(){const cl=CLASSES[C.cls];
 function renderCfg(){$('#cfgBody').innerHTML=`<div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p></div>
   <div class="sect"><h3>Gráficos</h3><div class="tabs"><button data-act="quality" data-q="auto" class="${Q.auto?'on':''}">Auto</button>${['bajo','medio','alto'].map(l=>`<button data-act="quality" data-q="${l}" class="${!Q.auto&&Q.level===l?'on':''}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div><p class="hint" style="margin:0">${Q.auto?'Automático: ahora en <b>'+Q.level+'</b>. El juego sube o baja solo según lo que da tu equipo. ':''}Alto: más nitidez, sombras finas y brillos. Bajo: sin brillos ni sombras, para celulares más simples.</p></div>
   <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Acercá o alejá con dos dedos o la rueda del mouse. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
+  <div class="sect"><h3>Nombres de ítems en el piso</h3><div class="tabs"><button data-act="dropLbl" data-v="1" class="${DROPLBL?'on':''}">Mostrar</button><button data-act="dropLbl" data-v="0" class="${DROPLBL?'':'on'}">Ocultar</button></div><p class="hint" style="margin:0">Ocultos, los ítems siguen brillando en el piso y se levantan igual. En PC, tecla <b>Z</b>.</p></div>
   <div class="sect"><h3>Cuadros por segundo</h3><div class="tabs">${[30,60].map(f=>`<button data-act="fpsCap" data-f="${f}" class="${FCAP.fps===f?'on':''}">${f}</button>`).join('')}<button data-act="fpsShow" class="${FPSM.on?'on':''}">Ver FPS</button></div><p class="hint" style="margin:0">30 gasta menos batería y calienta menos el celular. 60 se ve más suave si tu equipo lo aguanta.</p></div>
   <div class="sect"><h3>Sonido</h3><label class="vol"><span>Música</span><input type="range" id="volMus" min="0" max="1" step="0.05" value="${SND.vol.mus}"></label><label class="vol"><span>Efectos y ambiente</span><input type="range" id="volSfx" min="0" max="1" step="0.05" value="${SND.vol.sfx}"></label></div>
   ${KEEPF.on?`<div class="sect"><h3>Guardado en el dispositivo</h3><div class="tabs">${[['auto','Auto'],['todo','Todo'],['no','Apagado']].map(k=>`<button data-act="keepSet" data-k="${k[0]}" class="${KEEPF.pref===k[0]?'on':''}">${k[1]}</button>`).join('')}</div><p class="hint" style="margin:0"><b id="keepTxt"></b> El juego guarda sus archivos en tu equipo para abrir más rápido y gastar menos datos. Auto: adelanta mapas y sonidos mientras jugás, y la música solo con wifi. Todo: guarda también la música ahora. Apagado: solo guarda lo que vas usando.</p></div>`:''}`;if(KEEPF.on){keepPaint();if(!KEEPF.run)keepStat();}}
@@ -7609,8 +7613,8 @@ function achCheck(){if(!C)return;const a=achData();
     toast(`<em style="color:var(--gold)">Logro: ${esc(L.d)}</em><br>Título nuevo: <b>${esc(t)}</b> · +₲ ${fmt(L.g)}`);if(!snd('mu_levelup',{vol:.8,jit:0}))sfx('level');if(!C.title)C.title=L.id;persist();}}
 let HLBL=null;
 function heroLabelTick(){if(!C||mode!=='game'){if(HLBL)HLBL.el.hidden=true;return;}
-  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+2.25+y,P.z];},()=>mode==='game'&&!P.dead&&CAMM==='iso');}
-  const L=C.title&&LOGROS.find(x=>x.id===C.title),cl=CLASSES[C.cls],h=`${LIVE.myBub?`<span class="bub">${esc(LIVE.myBub)}</span>`:''}${NXT[NX.eq.title]?nxTitle(NX.eq.title):L?`<small class="tt">${esc(logroT(L,C.cls))}</small>`:''}${nxFrame(NX.eq.frame,`<i>★</i> ${esc(C.name)}`)}<small>Vos · Nv ${C.L} · ${cl?(C.evo?cl.evo:cl.name):''}</small>`;if(LIVE.myBubT&&T>LIVE.myBubT){LIVE.myBub=null;LIVE.myBubT=0;}if(HLBL.html!==h){HLBL.html=h;HLBL.el.innerHTML=h;}}
+  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+(CAMM==='tercera'?2.02:2.25)+y,P.z];},()=>mode==='game'&&!P.dead&&CAMM!=='primera');}
+  const L=C.title&&LOGROS.find(x=>x.id===C.title),cl=CLASSES[C.cls],h=`${LIVE.myBub?`<span class="bub">${esc(LIVE.myBub)}</span>`:''}${NXT[NX.eq.title]?nxTitle(NX.eq.title):L?`<small class="tt">${esc(logroT(L,C.cls))}</small>`:''}${nxFrame(NX.eq.frame,`<i>★</i> ${esc(C.name)}`)}<small>Vos · Nv ${C.L} · ${cl?(C.evo?cl.evo:cl.name):''}</small>`;if(LIVE.myBubT&&T>LIVE.myBubT){LIVE.myBub=null;LIVE.myBubT=0;}if(HLBL.html!==h){HLBL.html=h;HLBL.el.innerHTML=h;}const tp=CAMM==='tercera';if(HLBL.tp!==tp){HLBL.tp=tp;HLBL.el.classList.toggle('tp',tp);}}
 /* misiones diarias: tres por día, cambian a medianoche */
 const DAYT={kill:{d:n=>`Derrotá ${n} bestias`,n:L=>40+Math.min(60,L)},elite:{d:()=>'Derrotá 1 bestia élite',n:()=>1,hard:1},gem:{d:n=>`Usá ${n} gemas en tu equipo`,n:()=>2},event:{d:()=>'Ganá un evento (Añá o Tuguy)',n:()=>1,hard:1},gold:{d:n=>`Derrotá ${n} bestias doradas`,n:()=>2,hard:1},night:{d:n=>`Derrotá ${n} bestias de noche`,n:()=>30}};
 function dayKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
@@ -7683,7 +7687,7 @@ const ACT={
     else travel(d.z,pos);},
   fpsCap(d){FCAP.fps=+d.f===30?30:60;try{localStorage.setItem('tsm-fps',FCAP.fps);}catch(e){}DYN.t=DYN.acc=DYN.n=0;toast('Cuadros por segundo: '+FCAP.fps);renderChar();},
   fpsShow(){FPSM.on=!FPSM.on;fpsBox();try{localStorage.setItem('tsm-fpsv',FPSM.on?'1':'0');}catch(e){}renderChar();},
-  camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},keepSet(d){KEEPF.pref=d.k==='todo'||d.k==='no'?d.k:'auto';try{if(KEEPF.pref==='auto')localStorage.removeItem('noxSave');else localStorage.setItem('noxSave',KEEPF.pref);}catch(e){}renderCfg();keepWarm();},quality(d){if(d.q==='auto'){Q.auto=true;try{localStorage.removeItem('tsm-calidad');const a=JSON.parse(localStorage.getItem('nox-q2')||'null');Q.level=(a&&a.lv)||DEV.tier;}catch(e){Q.level=DEV.tier;}DYN.good=0;DYN.upAt=0;}else{Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}}applyQuality();renderChar();try{renderCfg();}catch(e){}toast('Gráficos: '+(Q.auto?'automático ('+Q.level+')':d.q));},
+  dropLbl(d){dropLblSet(d.v==='1');renderCfg();},camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},keepSet(d){KEEPF.pref=d.k==='todo'||d.k==='no'?d.k:'auto';try{if(KEEPF.pref==='auto')localStorage.removeItem('noxSave');else localStorage.setItem('noxSave',KEEPF.pref);}catch(e){}renderCfg();keepWarm();},quality(d){if(d.q==='auto'){Q.auto=true;try{localStorage.removeItem('tsm-calidad');const a=JSON.parse(localStorage.getItem('nox-q2')||'null');Q.level=(a&&a.lv)||DEV.tier;}catch(e){Q.level=DEV.tier;}DYN.good=0;DYN.upAt=0;}else{Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}}applyQuality();renderChar();try{renderCfg();}catch(e){}toast('Gráficos: '+(Q.auto?'automático ('+Q.level+')':d.q));},
   cauldSel(d){CALD.sel=+d.i;CALD.res=null;renderCaldero();const pb=$('#npcBody');const sc=pb&&(pb.closest('.card')||pb);try{sc.scrollTo({top:0,behavior:'smooth'});pb.scrollTo&&pb.scrollTo({top:0,behavior:'smooth'});}catch(e){}},
   cauldGo(d){cauldGo(d.r);},
   selPlay(d){enterGame(+d.i);},
@@ -7955,7 +7959,7 @@ function liveModel(o){const old=o.m;const eq=liveEqObj(o.s),hf=HERO_FACE;HERO_FA
   /* si faltan los modelos de esa clase (o de esa cara), se bajan y se rearma con el modelo completo */
   if(!r.oad&&sp)try{const files=CC0.on&&CC0_CLS[o.s.c]?cc0Files(o.s.c,eq):sp.files;if(!CC0.on)(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!o.waitOad){o.waitOad=true;oadNeed(files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o&&!(o.m&&o.m.oad))liveModel(o);});}}catch(e){}}
 function liveLabel(o){const cls=CLASSES[o.s.c];const h=`${o.sh?`<span class="shopTag">🏪 ${esc(o.sh.title)}</span>`:''}${o.bub?`<span class="bub">${esc(o.bub)}</span>`:''}${nxTitle((o.s.cz||[])[0])}${nxFrame((o.s.cz||[])[1],esc(o.s.n))}<small>Nv ${o.s.L|0} · ${cls?(o.s.evo?cls.evo:cls.name):''}${o.inParty?' · grupo':''}</small>`;
-  if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>[o.x,(o.m?o.m.g.position.y:0)+2.35,o.z]);else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
+  if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>[o.x,(o.m?o.m.g.position.y:0)+(CAMM==='tercera'?2.1:2.35),o.z]);else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
 function liveAdd(d){if(!d||!d.s||d.id===LIVE.me)return;let o=LIVE.others.get(d.id);
   if(!o){if(LIVE.others.size>=LIVE_MAX)return;const p=d.p||{x:0,z:0,ry:0};o={id:d.id,s:d.s,x:p.x,z:p.z,ry:p.ry,tx:p.x,tz:p.z,tr:p.ry,tmv:0,ac:p.ac|0,walk:0,P:{mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false}};LIVE.others.set(d.id,o);liveModel(o);}
   else{o.s=d.s;liveModel(o);}o.sh=d.sh||null;o.inParty=!!(LIVE.party&&LIVE.party.members.some(m=>m.id===d.id));liveLabel(o);}
@@ -8355,7 +8359,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611130726';const UPD={shown:'',req:false};
+const NOX_BUILD='202611130845';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
