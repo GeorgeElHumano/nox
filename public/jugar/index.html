@@ -9312,7 +9312,7 @@ risa: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), beat = Math.a
 
   };})());
 /* utilería (cigarrillo, violín): si se pasa de un gesto a otro sin terminar el primero, la del anterior quedaba flotando; cada gesto esconde la que no es suya */
-for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);padFollow(r);};G.f.__p=1;}
+for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{gReset(r);if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);padFollow(r);gMark(r);};G.f.__p=1;}
 NXGK.forEach(k=>{if(!GESTK.includes(k))GESTK.push(k);});
 /* --- estelas: partículas que quedan atrás al moverse --- */
 const NXTR={e_oro:{c:[0xffc84a,0xfff0b0],sz:.3,up:.3,gr:-.2},e_luna:{c:[0x6fc2ff,0xdff1ff],sz:.32,up:.2,gr:-.1},e_brasas:{c:[0xff5a20,0xffa030],sz:.28,up:.9,gr:-.7},e_fund:{c:[0xffd24a,0xffffff],sz:.38,up:.35,gr:-.15}};
@@ -9351,8 +9351,16 @@ function padFollow(r){const l=padList(r);if(!l.length)return;for(const p of l){c
     if(w<=0){p.position.copy(p.userData.p0);p.quaternion.copy(p.userData.q0);continue;}
     _pfQ.setFromUnitVectors(_pfB,D0);_pfI.set(0,0,0,1).slerp(_pfQ,w);p.parent.getWorldQuaternion(_pfP);_pfQ.copy(_pfP).invert().multiply(_pfI).multiply(_pfP);
     p.quaternion.copy(_pfQ).multiply(p.userData.q0);p.position.copy(p.userData.p0).applyQuaternion(_pfQ);}}
+/* huesos que ninguna animación mueve (los dedos de la mano izquierda, por ejemplo): los gestos los giran sobre su valor actual,
+   así que sin volverlos a su lugar cada cuadro el giro se acumulaba (los dedos daban vueltas) y quedaban torcidos al terminar.
+   Cada cuadro, si el hueso sigue con lo que dejó el gesto (nadie lo animó), vuelve a su valor anterior al gesto. */
+function gBones(r){if(!r._gb){r._gb=[];const seen=new Set();(r.g||r).traverse(o=>{if(o.isBone&&!seen.has(o)){seen.add(o);r._gb.push({b:o,pre:o.quaternion.clone(),last:null});}});}return r._gb;}
+/* si el hueso tiene lo que dejó el gesto, nadie lo tocó desde entonces: vuelve a como estaba antes del gesto en ese cuadro (el reposo, o la última pose de la animación si esta se saltó un cuadro) */
+function gReset(r){for(const e of gBones(r)){if(e.last&&e.b.quaternion.equals(e.last))e.b.quaternion.copy(e.pre);e.pre.copy(e.b.quaternion);}}
+function gMark(r){for(const e of gBones(r))(e.last||(e.last=new THREE.Quaternion())).copy(e.b.quaternion);}
+function gClear(r){if(!r._gb)return;gReset(r);for(const e of r._gb)e.last=null;}
 function padRest(r){if(r&&r._pads)for(const p of r._pads){p.position.copy(p.userData.p0);p.quaternion.copy(p.userData.q0);}}
-function gestOff(r){r.gOn=false;nxPropsOff(r);padRest(r);(r.gHid||[]).forEach(o=>o.visible=true);r.gHid=null;const pl=gB(r,'pelvis');if(r.gBub){r.gBub.remove();r.gBub=null;}}
+function gestOff(r){r.gOn=false;nxPropsOff(r);padRest(r);gClear(r);(r.gHid||[]).forEach(o=>o.visible=true);r.gHid=null;const pl=gB(r,'pelvis');if(r.gBub){r.gBub.remove();r.gBub=null;}}
 function gestPose(r,dt){const g=P.gest,D=GDEF[g.k];r.g.getWorldQuaternion(_gqR);const L=(x,y,z)=>gL(r,x,y,z);
   if(D.f&&(g.up==null||D.sit))D.f(r,g.t,L,g);
   if(ANIM_ISO)return;
