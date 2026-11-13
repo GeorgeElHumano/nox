@@ -235,7 +235,7 @@ input{user-select:text;-webkit-user-select:text}
 
 /* etiquetas y números */
 #labels,#nums{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:3}
-.lbl{position:absolute;left:0;top:0;white-space:nowrap;font-size:12px;font-weight:800;text-shadow:0 1px 2px #000,0 0 3px #000;will-change:transform;text-align:center;line-height:1.15}
+.lbl{position:absolute;left:0;top:0;transform-origin:50% 100%;white-space:nowrap;font-size:12px;font-weight:800;text-shadow:0 1px 2px #000,0 0 3px #000;will-change:transform;text-align:center;line-height:1.15}
 .lbl small{display:block;font-size:10px;font-weight:500;color:var(--dim)}
 .lbl.npc{color:#ffe08a}
 .lbl.mob{color:#ffc4b5}
@@ -6413,11 +6413,15 @@ function travel(id,pos){if(fading)return;fading=true;if(!snd('mu_teleport',{vol:
 
 /* ================= entidades ================= */
 const labelBox=$('#labels'),LBL=[];
+/* en 3ra persona la etiqueta va pegada a la cabeza real (hueso head), así queda encuadrada con cualquier raza, en vuelo o sentado */
+const _lbV=new THREE.Vector3();function lblHead(r,g){if(!r||!g)return null;let b=r.lbHead;if(b){let o=b;while(o&&o!==g)o=o.parent;if(!o)b=r.lbHead=null;}
+  if(!b){const now=performance.now();if(now<(r.lbHeadT||0))return null;r.lbHeadT=now+1000;g.traverse(o=>{if(!b&&o.isBone&&/^head$/i.test(o.name))b=o;});if(!b)return null;r.lbHead=b;}
+  b.getWorldPosition(_lbV);return[_lbV.x,_lbV.y+.22,_lbV.z];}
 function addLabel(html,cls,getPos,vis){const el=document.createElement('div');el.className='lbl '+cls;el.innerHTML=html;el.hidden=true;labelBox.appendChild(el);const L={el,getPos,vis:vis||(()=>true)};LBL.push(L);return L;}
 function removeLabel(L){if(!L)return;L.el.remove();const i=LBL.indexOf(L);if(i>=0)LBL.splice(i,1);}
 function updLabels(){const show=mode==='game';for(const L of LBL){if(!show||!L.vis()){if(!L.el.hidden)L.el.hidden=true;continue;}const p=L.getPos();tv.set(p[0],p[1],p[2]);
-  if(tv.distanceToSquared(camera.position)>60*60){L.el.hidden=true;continue;}tv.project(camera);if(tv.z>1||Math.abs(tv.x)>1.1||Math.abs(tv.y)>1.1){L.el.hidden=true;continue;}
-  L.el.hidden=false;L.el.style.transform=`translate3d(${((tv.x+1)/2*innerWidth).toFixed(1)}px,${((1-tv.y)/2*innerHeight).toFixed(1)}px,0) translate(-50%,-100%)`;}}
+  const dq=tv.distanceToSquared(camera.position);if(dq>60*60){L.el.hidden=true;continue;}tv.project(camera);if(tv.z>1||Math.abs(tv.x)>1.1||Math.abs(tv.y)>1.1){L.el.hidden=true;continue;}
+  L.el.hidden=false;const sc=CAMM==='tercera'?Math.max(.6,Math.min(1,6/Math.sqrt(dq))):1;L.el.style.transform=`translate3d(${((tv.x+1)/2*innerWidth).toFixed(1)}px,${((1-tv.y)/2*innerHeight).toFixed(1)}px,0) translate(-50%,-100%)`+(sc<.99?` scale(${sc.toFixed(2)})`:'');}}
 
 const barFillGeo=keep((()=>{const g=new THREE.PlaneGeometry(1.2,.12);g.translate(.6,0,0);return g;})());
 /* barra sobre el enemigo: borde, fondo, golpe reciente (claro) y vida; se resalta cuando es tu objetivo */
@@ -7616,7 +7620,7 @@ function achCheck(){if(!C)return;const a=achData();
     toast(`<em style="color:var(--gold)">Logro: ${esc(L.d)}</em><br>Título nuevo: <b>${esc(t)}</b> · +₲ ${fmt(L.g)}`);if(!snd('mu_levelup',{vol:.8,jit:0}))sfx('level');if(!C.title)C.title=L.id;persist();}}
 let HLBL=null;
 function heroLabelTick(){if(!C||mode!=='game'){if(HLBL)HLBL.el.hidden=true;return;}
-  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;return[P.x,H(P.x,P.z)+(CAMM==='tercera'?2.02:2.25)+y,P.z];},()=>mode==='game'&&!P.dead&&CAMM!=='primera');}
+  if(!HLBL||!LBL.includes(HLBL)){HLBL=addLabel('','me',()=>{const y=HERO&&HERO.model?HERO.model.position.y:0;if(CAMM==='tercera'&&HERO){const h=lblHead(HERO,HERO.g);if(h)return h;}return[P.x,H(P.x,P.z)+2.25+y,P.z];},()=>mode==='game'&&!P.dead&&CAMM!=='primera');}
   const L=C.title&&LOGROS.find(x=>x.id===C.title),cl=CLASSES[C.cls],h=`${LIVE.myBub?`<span class="bub">${esc(LIVE.myBub)}</span>`:''}${NXT[NX.eq.title]?nxTitle(NX.eq.title):L?`<small class="tt">${esc(logroT(L,C.cls))}</small>`:''}${nxFrame(NX.eq.frame,`<i>★</i> ${esc(C.name)}`)}<small>Vos · Nv ${C.L} · ${cl?(C.evo?cl.evo:cl.name):''}</small>`;if(LIVE.myBubT&&T>LIVE.myBubT){LIVE.myBub=null;LIVE.myBubT=0;}if(HLBL.html!==h){HLBL.html=h;HLBL.el.innerHTML=h;}const tp=CAMM==='tercera';if(HLBL.tp!==tp){HLBL.tp=tp;HLBL.el.classList.toggle('tp',tp);}}
 /* misiones diarias: tres por día, cambian a medianoche */
 const DAYT={kill:{d:n=>`Derrotá ${n} bestias`,n:L=>40+Math.min(60,L)},elite:{d:()=>'Derrotá 1 bestia élite',n:()=>1,hard:1},gem:{d:n=>`Usá ${n} gemas en tu equipo`,n:()=>2},event:{d:()=>'Ganá un evento (Añá o Tuguy)',n:()=>1,hard:1},gold:{d:n=>`Derrotá ${n} bestias doradas`,n:()=>2,hard:1},night:{d:n=>`Derrotá ${n} bestias de noche`,n:()=>30}};
@@ -7962,7 +7966,7 @@ function liveModel(o){const old=o.m;const eq=liveEqObj(o.s),hf=HERO_FACE;HERO_FA
   /* si faltan los modelos de esa clase (o de esa cara), se bajan y se rearma con el modelo completo */
   if(!r.oad&&sp)try{const files=CC0.on&&CC0_CLS[o.s.c]?cc0Files(o.s.c,eq):sp.files;if(!CC0.on)(OAD_CLSP[o.s.c]||[]).forEach(p=>oadGLB('p_'+p));if(!o.waitOad){o.waitOad=true;oadNeed(files,()=>{o.waitOad=false;if(LIVE.others.get(o.id)===o&&!(o.m&&o.m.oad))liveModel(o);});}}catch(e){}}
 function liveLabel(o){const cls=CLASSES[o.s.c];const h=`${o.sh?`<span class="shopTag">🏪 ${esc(o.sh.title)}</span>`:''}${o.bub?`<span class="bub">${esc(o.bub)}</span>`:''}${nxTitle((o.s.cz||[])[0])}${nxFrame((o.s.cz||[])[1],esc(o.s.n))}<small>Nv ${o.s.L|0} · ${cls?(o.s.evo?cls.evo:cls.name):''}${o.inParty?' · grupo':''}</small>`;
-  if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>[o.x,(o.m?o.m.g.position.y:0)+(CAMM==='tercera'?2.1:2.35),o.z]);else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
+  if(!o.lbl||!LBL.includes(o.lbl))o.lbl=addLabel(h,'pl'+(o.inParty?' pty':''),()=>{if(CAMM==='tercera'&&o.m){const h=lblHead(o.m,o.m.g);if(h)return h;}return[o.x,(o.m?o.m.g.position.y:0)+2.35,o.z];});else{o.lbl.el.innerHTML=h;o.lbl.el.className='lbl pl'+(o.inParty?' pty':'');}}
 function liveAdd(d){if(!d||!d.s||d.id===LIVE.me)return;let o=LIVE.others.get(d.id);
   if(!o){if(LIVE.others.size>=LIVE_MAX)return;const p=d.p||{x:0,z:0,ry:0};o={id:d.id,s:d.s,x:p.x,z:p.z,ry:p.ry,tx:p.x,tz:p.z,tr:p.ry,tmv:0,ac:p.ac|0,walk:0,P:{mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false}};LIVE.others.set(d.id,o);liveModel(o);}
   else{o.s=d.s;liveModel(o);}o.sh=d.sh||null;o.inParty=!!(LIVE.party&&LIVE.party.members.some(m=>m.id===d.id));liveLabel(o);}
