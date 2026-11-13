@@ -124,13 +124,13 @@ if len(R)==5:
     lineup(['mburuvicha','gladiador','caballero','arquera','hechicero'],1100,*V5,'cut_razas',gap=.22)
 # ---- sets: retratos de ficha y recorte del capítulo
 S={}
-for f in glob.glob(AS+'/*_[0-6].png'):
+for f in glob.glob(AS+'/*_[0-8].png'):
     b=os.path.basename(f)[:-4];cls,t=b.rsplit('_',1)
     if cls not in CLS:continue
     im=trim(mainpart(Image.open(f)),.03);S[(cls,int(t))]=im
     c=canvas(max(im.width,int(im.height*3/4)),max(im.height,int(im.width*4/3)));c.paste(im,((c.width-im.width)//2,c.height-im.height));savew(c,f'set_{cls}_{t}',720)
-if all((k,6) in S for k in CLS):
-    R0=R;R={k:S[(k,6)] for k in CLS}
+if all((k,8) in S for k in CLS):
+    R0=R;R={k:S[(k,8)] for k in CLS}
     lineup(['hechicero','caballero','gladiador','mburuvicha','arquera'],1100,*V5,'cut_sets',gap=.12)
     R=R0
 # ---- ítems: armas en abanico, el escudo atrás

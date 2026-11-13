@@ -6,7 +6,7 @@ const path=require('path');const VENDOR=process.env.VENDOR||path.join(__dirname,
 for(const f of ['loaders/GLTFLoader.js','utils/SkeletonUtils.js','shaders/CopyShader.js','shaders/LuminosityHighPassShader.js','postprocessing/EffectComposer.js','postprocessing/RenderPass.js','postprocessing/ShaderPass.js','postprocessing/UnrealBloomPass.js'])MAP['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/'+f]=VENDOR+'/examples/'+f;
 const OUT=process.argv[2]||'/tmp/nox-gal';fs.mkdirSync(OUT,{recursive:true});
 const MODE=process.argv[3]||'mobs';const ONLY=(process.argv[4]||'').split(',').filter(Boolean);
-const NOGLOW=`(()=>{const X=window.__NOX,H=X.HERO;if(!H||!window.__ALPHA_HIDE)return;const Wg=H.wings&&H.wings.g;const inW=o=>{let q=o;while(q){if(q===Wg)return true;q=q.parent;}return false;};(H.g.parent||H.g).traverse(o=>{const m=o.material;if(!m)return;if((m.blending===THREE.AdditiveBlending||o.isSprite||o.isPoints)&&!inW(o))o.visible=false;});})()`;
+const NOGLOW=`(()=>{const X=window.__NOX,H=X.HERO;if(!H||!window.__ALPHA_HIDE)return;const Wg=H.wings&&H.wings.g;const inW=o=>{let q=o;while(q){if(q===Wg)return true;q=q.parent;}return false;};/* el efecto de set (partículas, anillos, luna, columna) no va en la foto recortada: dejaba rayas y manchas */[H.setFx,H.epicFx,H.epicAura].forEach(f=>{if(f)f.visible=false;});(H.g.parent||H.g).traverse(o=>{const m=o.material;if(!m)return;if((m.blending===THREE.AdditiveBlending||o.isSprite||o.isPoints)&&!inW(o))o.visible=false;});})()`;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 /* foto con pose congelada: dos fotos del mismo modelo salen iguales */
 let shot=null;
@@ -38,7 +38,7 @@ let shot=null;
       await shot(`${OUT}/${k}.png`);console.log('foto',k);}}
   if(MODE==='sets'){const LV=+(process.argv[5]||0);const classes=ONLY.length?ONLY:['caballero','hechicero','arquera','gladiador','mburuvicha'];
     await p.evaluate(()=>{window.__NOX.STUDIO.hero();});
-    for(const cls of classes)for(let t=0;t<7;t++){
+    for(const cls of classes)for(let t=0;t<9;t++){
       await p.evaluate(([cls,t,LV])=>{const X=window.__NOX;const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=X.newEquip(cls,k,t,{lv:LV});eq.weapon=X.newEquip(cls,'weapon',Math.min(4,t),{lv:LV});if(cls==='caballero')eq.shield=X.newEquip(cls,'shield',Math.min(4,t),{lv:LV});X.setEq(cls,eq);X.STUDIO.hero();},[cls,t,LV]);
       for(let i=0;i<30;i++){await wait(500);const ok=await p.evaluate(()=>{const X=window.__NOX;return !!(X.HERO&&X.HERO.oad&&X.HERO.forge&&X.HERO.forge.length);});if(ok)break;}
       await wait(1200);await p.evaluate(()=>{window.__NOX.STUDIO.hero();});await p.evaluate(NOGLOW);await wait(300);await shot(`${OUT}/${cls}_${t}.png`);console.log('foto',cls,t);}
@@ -77,10 +77,10 @@ let shot=null;
       if(d&&d!=='WAIT'&&!String(d).startsWith('ERR'))fs.writeFileSync(`${OUT}/${name}.png`,Buffer.from(d.split(',')[1],'base64'));else console.log('sin icono',name,String(d).slice(0,80));};
     const CLS=ONLY.length?ONLY:['caballero','hechicero','arquera','gladiador','mburuvicha'];
     for(const cls of CLS){await p.evaluate(cls=>{const X=window.__NOX;X.setEq(cls,{weapon:X.newEquip(cls,'weapon',0,{})});X.STUDIO.hero();},cls);for(let i=0;i<40;i++){await wait(500);if(await p.evaluate(()=>!!(window.__NOX.HERO&&window.__NOX.HERO.oad)))break;}await wait(800);
-      for(let t=0;t<7;t++)for(const k of ['weapon','helm','armor','pants','gloves','boots']){if(cls==='gladiador'&&k==='helm')continue;const it=await p.evaluate(([c,k,t])=>window.__NOX.newEquip(c,k,t,{}),[cls,k,t]);if(it)await shot(`${cls}_${t}_${k}`,it);}
+      for(let t=0;t<9;t++)for(const k of ['weapon','helm','armor','pants','gloves','boots']){if(cls==='gladiador'&&k==='helm')continue;const it=await p.evaluate(([c,k,t])=>window.__NOX.newEquip(c,k,t,{}),[cls,k,t]);if(it)await shot(`${cls}_${t}_${k}`,it);}
       for(const g of [1,2,3])await shot(`wings_${cls}_g${g}`,{u:1,k:'wings',c:cls,t:0,lv:0,g});
       console.log('iconos',cls);}
-    for(let t=0;t<7;t++){const it=await p.evaluate(t=>window.__NOX.newEquip('caballero','shield',t,{}),t);if(it)await shot(`shield_${t}`,it);}
+    for(let t=0;t<9;t++){const it=await p.evaluate(t=>window.__NOX.newEquip('caballero','shield',t,{}),t);if(it)await shot(`shield_${t}`,it);}
     for(const g of ['tupa','jasy','yvy','mainumby','kerana'])await shot('gem_'+g,{u:1,k:'gem',sub:g});
     for(const q of ['hp1','hp2','hp3','mp1','mp2','mp3'])await shot('pot_'+q,{u:1,k:'pot',sub:q});
     console.log('iconos listos');}

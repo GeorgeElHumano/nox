@@ -956,6 +956,14 @@
     {
      "n": "de Yvy Marane'ỹ",
      "col": "#4aa0ff"
+    },
+    {
+     "n": "de Tupã Ryapu",
+     "col": "#38dcff"
+    },
+    {
+     "n": "del Ára Jára",
+     "col": "#3a8cff"
     }
    ],
    "w": [
@@ -1052,6 +1060,14 @@
     {
      "n": "de Ñamandu",
      "col": "#b070ff"
+    },
+    {
+     "n": "de Yvytu Ñe'ẽ",
+     "col": "#7a4aff"
+    },
+    {
+     "n": "de Mbyja Pytũ",
+     "col": "#b040ff"
     }
    ],
    "w": [
@@ -1148,6 +1164,14 @@
     {
      "n": "de Ñamandu Ru",
      "col": "#d0a8ff"
+    },
+    {
+     "n": "del Mbói Hovy",
+     "col": "#ff8ae8"
+    },
+    {
+     "n": "del Ita Vera",
+     "col": "#e8dcff"
     }
    ],
    "w": [
@@ -1244,6 +1268,14 @@
     {
      "n": "de Ñanderu",
      "col": "#ff3a3a"
+    },
+    {
+     "n": "del Yaguareté-Abá",
+     "col": "#ff3a10"
+    },
+    {
+     "n": "del Y Jára",
+     "col": "#ff1a3a"
     }
    ],
    "w": [
@@ -1338,8 +1370,16 @@
      "col": "#40d8ff"
     },
     {
-     "n": "del Yvága",
+     "n": "del Arapy",
      "col": "#80ffe8"
+    },
+    {
+     "n": "de Mainumby Ruvicha",
+     "col": "#2affa8"
+    },
+    {
+     "n": "del Ysyry Mimbi",
+     "col": "#5affe0"
     }
    ],
    "w": [
@@ -1370,7 +1410,9 @@
   38,
   52,
   70,
-  88
+  88,
+  133,
+  177
  ],
  "sh": [
   "Escudo de Madera",
@@ -1960,7 +2002,7 @@
    "role": "Guía del reino",
    "greet": "Mba'éichapa. Soy Arandu, la sabiduría del reino. Preguntame lo que quieras de NOX.",
    "cls": "hechicero",
-   "t": 7,
+   "t": 9,
    "wg": 3,
    "lv": 9
   }
