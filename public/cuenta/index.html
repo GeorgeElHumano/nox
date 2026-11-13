@@ -200,6 +200,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
           <li><span>Solo si transferiste otro monto o los Noxis no llegan: mandá el comprobante por WhatsApp al <b>+595 981 187 259</b>.</span></li>
           <li><span>Con el monto exacto, los Noxis aparecen solos en tu cuenta en cuanto el banco confirma. El pedido vence en 48 horas.</span></li>
         </ol>
+        <div id="poLegal" style="margin:4px 0 16px;padding:12px 14px;border:1px solid rgba(232,180,74,.4);border-radius:10px;font-size:.88rem;line-height:1.45"><b style="display:block;margin-bottom:4px">Condiciones de compra</b><span class="muted" id="poLegalT"></span></div>
         <div class="field"><label>Mensaje</label><div class="msgbox" id="poMsg"></div></div>
         <div class="actions"><a class="btn btn-gold" id="poWa" target="_blank" rel="noopener">Enviar por WhatsApp</a><button class="btn btn-line" type="button" id="poCopy">Copiar mensaje</button><a class="btn btn-line" href="#pedidos">Ver mis pedidos</a></div>
         <p class="muted" style="font-size:.88rem">Si el botón no abre WhatsApp, copiá el mensaje y mandalo al +595 981 187 259.</p>
@@ -319,7 +320,7 @@ $('#authForm').addEventListener('submit',async e=>{e.preventDefault();const btn=
 
 /* ---------- tienda Noxis ---------- */
 const nf=n=>Math.round(n).toLocaleString('es-PY');
-async function loadCatalog(){if(S.cat)return;const r=await api('GET','nox/catalog');S.cat=r;S.byId=new Map(r.items.map(i=>[i.id,i]));if(r.pay){CONFIG.bank=r.pay.bank||'';CONFIG.whatsapp=r.pay.whatsapp||CONFIG.whatsapp;}}
+async function loadCatalog(){if(S.cat)return;const r=await api('GET','nox/catalog');S.cat=r;S.byId=new Map(r.items.map(i=>[i.id,i]));if(r.pay){CONFIG.bank=r.pay.bank||'';CONFIG.legal=r.pay.legal||'';CONFIG.whatsapp=r.pay.whatsapp||CONFIG.whatsapp;}}
 function chip(id,label,on,attr){return `<button type="button" class="chip ${on?'on':''}" ${attr}="${id}">${label}</button>`;}
 const FUND={fund1:['Título Fundador','Marco de bronce','Baile exclusivo: Polca del Fundador'],fund2:['Título Fundador de Plata','Marco de plata','Baile exclusivo: Polca del Fundador','Aspecto de mascota: Imp del Fundador','1 cambio de nombre'],fund3:['Título Fundador de Oro','Marco de oro','2 bailes exclusivos','Aspecto de mascota: Imp del Fundador','Estela del Fundador','1 cambio de nombre y 1 reorganizar puntos','Tu nombre en el Muro de Fundadores']};
 function facRead(){const r=$('#facRuc'),n=$('#facRs');if(r)S.fac.ruc=r.value.trim();if(n)S.fac.rs=n.value.trim();}
@@ -342,7 +343,7 @@ $('#nxShop').addEventListener('click',async e=>{const b=e.target.closest('[data-
   try{await api('POST','nox/buy',{id});toast('Compra hecha: '+S.byId.get(id).name);renderShop();}catch(err){await renderShop();$('#nxErr').textContent=err.message;$('#nxErr').scrollIntoView({block:'center'});}});
 document.addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();const t=$('#'+a.dataset.go);if(t)t.scrollIntoView({behavior:'smooth'});});
 function orderMsg(o){return `Hola, soy ${S.me.user.name}, jugador de NOX. Pedido ${o.code} · ${o.items.map(i=>i.name).join(', ')} · Total ${gs(o.total)}.\nAdjunto el comprobante de la transferencia.`;}
-function renderOrderDone(){const o=S.lastOrder;$('#poCode').textContent=o.code;$('#poCode2').textContent=gs(o.total);$('#poFac').innerHTML=o.items[0].iva?`<br><span class="muted">Incluye ${gs(o.items[0].iva)} de IVA. Factura a nombre de ${esc(o.fac?o.fac.rs:'')} · RUC ${esc(o.fac?o.fac.ruc:'')}.</span>`:'';$('#poWhat').textContent=o.items.map(i=>i.name).join(', ');$('#poTot').textContent=gs(o.total);
+function renderOrderDone(){const o=S.lastOrder;$('#poCode').textContent=o.code;$('#poCode2').textContent=gs(o.total);$('#poFac').innerHTML=o.items[0].iva?`<br><span class="muted">Incluye ${gs(o.items[0].iva)} de IVA. Factura a nombre de ${esc(o.fac?o.fac.rs:'')} · RUC ${esc(o.fac?o.fac.ruc:'')}.</span>`:'';$('#poWhat').textContent=o.items.map(i=>i.name).join(', ');$('#poLegalT').textContent=CONFIG.legal||'Los Noxis son bienes virtuales sin valor monetario real, no son canjeables por dinero y las compras son finales, salvo lo que exija la ley.';$('#poTot').textContent=gs(o.total);
   $('#poCodeCopy').onclick=()=>{try{navigator.clipboard.writeText(String(o.total)).then(()=>toast('Monto copiado'),()=>toast('Seleccioná el monto y copialo'));}catch(e){toast('Seleccioná el monto y copialo');}};
   $('#poBank').innerHTML=CONFIG.bank?`Datos de la cuenta:<br>${esc(CONFIG.bank).replace(/\n/g,'<br>')}`:`Escribinos por WhatsApp con tu código <b class="code">${esc(o.code)}</b> y te pasamos los datos de la cuenta para transferir <b>${gs(o.total)}</b>.`;
   const m=orderMsg(o);$('#poMsg').textContent=m;$('#poWa').href=waLink(m);
