@@ -4,6 +4,7 @@
    "name": "Asunción",
    "sub": "Capital del reino",
    "lvl": 1,
+   "rst": 0,
    "cost": 0,
    "spots": [
     [
@@ -31,6 +32,7 @@
    "name": "Campos de Ypacaraí",
    "sub": "Cordillera",
    "lvl": 1,
+   "rst": 0,
    "cost": 2000,
    "spots": [
     [
@@ -67,6 +69,7 @@
    "name": "Ruinas de Trinidad",
    "sub": "Itapúa",
    "lvl": 15,
+   "rst": 0,
    "cost": 10000,
    "spots": [
     [
@@ -95,6 +98,7 @@
    "name": "Arena de Añá",
    "sub": "Evento",
    "lvl": 1,
+   "rst": 0,
    "cost": 0,
    "spots": [],
    "portals": []
@@ -103,6 +107,7 @@
    "name": "Guarida de Añaretã",
    "sub": "Desafío de grupo",
    "lvl": 1,
+   "rst": 0,
    "cost": 0,
    "spots": [],
    "portals": []
@@ -111,6 +116,7 @@
    "name": "Arena de Duelos",
    "sub": "Uno contra uno",
    "lvl": 1,
+   "rst": 0,
    "cost": 0,
    "spots": [],
    "portals": []
@@ -119,6 +125,7 @@
    "name": "Fortaleza de Tuguy",
    "sub": "Evento",
    "lvl": 1,
+   "rst": 0,
    "cost": 0,
    "spots": [],
    "portals": []
@@ -127,6 +134,7 @@
    "name": "Chaco Boreal",
    "sub": "Alto Paraguay",
    "lvl": 30,
+   "rst": 0,
    "cost": 25000,
    "spots": [
     [
@@ -155,6 +163,7 @@
    "name": "Esteros del Ñeembucú",
    "sub": "Pilar",
    "lvl": 48,
+   "rst": 0,
    "cost": 50000,
    "spots": [
     [
@@ -183,6 +192,7 @@
    "name": "Cordillera del Ybytyruzú",
    "sub": "Guairá",
    "lvl": 62,
+   "rst": 0,
    "cost": 80000,
    "spots": [
     [
@@ -211,6 +221,7 @@
    "name": "Saltos del Monday",
    "sub": "Alto Paraná",
    "lvl": 70,
+   "rst": 0,
    "cost": 120000,
    "spots": [
     [
@@ -239,6 +250,7 @@
    "name": "Selva del Mbaracayú",
    "sub": "Canindeyú",
    "lvl": 78,
+   "rst": 0,
    "cost": 180000,
    "spots": [
     [
@@ -267,6 +279,7 @@
    "name": "Cerro Corá",
    "sub": "Amambay",
    "lvl": 86,
+   "rst": 0,
    "cost": 260000,
    "spots": [
     [
@@ -291,6 +304,7 @@
    "name": "Bahía Negra",
    "sub": "Pantanal del norte",
    "lvl": 94,
+   "rst": 0,
    "cost": 350000,
    "spots": [
     [
@@ -315,6 +329,7 @@
    "name": "Saltos del Mbocaruzú",
    "sub": "Ybycuí, Paraguarí",
    "lvl": 100,
+   "rst": 0,
    "cost": 450000,
    "spots": [
     [
@@ -347,6 +362,7 @@
    "name": "Salto Cristal",
    "sub": "La Colmena, Paraguarí",
    "lvl": 150,
+   "rst": 0,
    "cost": 600000,
    "spots": [
     [
@@ -371,7 +387,60 @@
     ]
    ],
    "portals": [
-    "mbocaruzu"
+    "mbocaruzu",
+    "cerroleon"
+   ]
+  },
+  "cerroleon": {
+   "name": "Cerro León",
+   "sub": "Defensores del Chaco, Alto Paraguay",
+   "lvl": 30,
+   "rst": 5,
+   "cost": 800000,
+   "spots": [
+    [
+     "Cañadón de los Aguara",
+     "aguaraym"
+    ],
+    [
+     "Aguada de los Taitetu",
+     "taitetuym"
+    ],
+    [
+     "Quebrachal del Jaguareté",
+     "jaguareteym"
+    ],
+    [
+     "Hondonada de los Luisones",
+     "luisonym"
+    ],
+    [
+     "Salitral de los Escorpiones",
+     "escorpionym"
+    ],
+    [
+     "Peladar del Teju Jagua",
+     "tejuym"
+    ],
+    [
+     "Laguna seca del Mbói Tu'i",
+     "mboituiym"
+    ],
+    [
+     "Monte del Pombero viejo",
+     "pomberoym"
+    ],
+    [
+     "Quemazón del Mbói Tata",
+     "mboijaguaym"
+    ],
+    [
+     "Falda del Cerro León",
+     "malavisionym"
+    ]
+   ],
+   "portals": [
+    "saltocristal"
    ]
   }
  },
@@ -710,6 +779,106 @@
    "zones": [
     "ev_raid"
    ]
+  },
+  "aguaraym": {
+   "name": "Aguara Guasu Ymaguare",
+   "lvl": 210,
+   "boss": false,
+   "ficha": "Aguara Guasu Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "aguara"
+  },
+  "taitetuym": {
+   "name": "Taitetu Ymaguare",
+   "lvl": 220,
+   "boss": false,
+   "ficha": "Taitetu Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "taitetu"
+  },
+  "jaguareteym": {
+   "name": "Jaguareté Ymaguare",
+   "lvl": 230,
+   "boss": false,
+   "ficha": "Jaguareté Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "jaguarete"
+  },
+  "luisonym": {
+   "name": "Luisón Ymaguare",
+   "lvl": 240,
+   "boss": false,
+   "ficha": "Luisón Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "luison"
+  },
+  "escorpionym": {
+   "name": "Escorpión del Chaco Ymaguare",
+   "lvl": 250,
+   "boss": false,
+   "ficha": "Escorpión del Chaco Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "escorpion"
+  },
+  "tejuym": {
+   "name": "Teju Jagua Ymaguare",
+   "lvl": 260,
+   "boss": false,
+   "ficha": "Teju Jagua Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "teju"
+  },
+  "mboituiym": {
+   "name": "Mbói Tu'i Ymaguare",
+   "lvl": 270,
+   "boss": false,
+   "ficha": "Mbói Tu'i Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "mboitui"
+  },
+  "pomberoym": {
+   "name": "Pombero Ymaguare",
+   "lvl": 280,
+   "boss": false,
+   "ficha": "Pombero Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "pombero"
+  },
+  "mboijaguaym": {
+   "name": "Mbói Tata Ymaguare",
+   "lvl": 290,
+   "boss": false,
+   "ficha": "Mbói Tata Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "mboijagua"
+  },
+  "malavisionym": {
+   "name": "Mala Visión Ymaguare",
+   "lvl": 300,
+   "boss": false,
+   "ficha": "Mala Visión Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.",
+   "zones": [
+    "cerroleon"
+   ],
+   "base": "malavision"
   }
  },
  "cls": {
@@ -2000,6 +2169,36 @@
    "n": 1,
    "gold": 250000000,
    "txt": "Y Jára, el dueño del agua, se levantó de la pileta turquesa. Es la pelea más grande de NOX."
+  },
+  {
+   "mob": "aguaraym",
+   "n": 50,
+   "gold": 280000000,
+   "txt": "En Cerro León, en lo hondo del Chaco, las bestias del reino se hicieron viejas y mañosas. Empezá por los Aguara Guasu Ymaguare del cañadón."
+  },
+  {
+   "mob": "luisonym",
+   "n": 55,
+   "gold": 320000000,
+   "txt": "Los Luisones Ymaguare aúllan en la hondonada y ya nadie cruza el parque de noche. Hacelos callar."
+  },
+  {
+   "mob": "tejuym",
+   "n": 55,
+   "gold": 360000000,
+   "txt": "El Teju Jagua Ymaguare cuida el peladar con sus cabezas de perro. Ninguna espada común le entra."
+  },
+  {
+   "mob": "pomberoym",
+   "n": 60,
+   "gold": 400000000,
+   "txt": "El Pombero viejo silba desde el monte de Cerro León. No le debas nada: enfrentalo."
+  },
+  {
+   "mob": "malavisionym",
+   "n": 60,
+   "gold": 500000000,
+   "txt": "La Mala Visión Ymaguare espera en la falda del cerro. Es lo más peligroso que camina en NOX: solo los que renacieron muchas veces vuelven de ahí."
   }
  ]
 }

@@ -2,7 +2,24 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA).
+Última actualización: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). En la rama `mapa-final` (sin publicar): Cerro León y reinicio de misiones.
+
+## Cerro León y reinicio de misiones (12/11, noche; rama `mapa-final`, SIN publicar: falta `scripts/patch.sh` y el OK del dueño)
+
+Rama aparte, sacada de `main` (no trae la Tienda Noxis de `arte-cc0`). Para publicarla: `scripts/patch.sh`, `git push origin mapa-final:main` y después unir `origin/main` en `arte-cc0`. La web ya está armada en la misma rama.
+
+- **Reinicio**: `ACT.reset` ahora pone `C.q={i:0,n:0,on:false}`: las misiones del Capitán vuelven a empezar y se cobran de nuevo en cada reinicio. Las diarias no cambian. Textos del Pa'i Antonio, de Arandu (`GUIA_T`) y de `lib/guia.js` actualizados.
+- **Zona `cerroleon`** (Cerro León, Defensores del Chaco): último de `ZORDER`, `lvl:30` (pedido del dueño: se entra desde el 30 pero va último en la lista), `rst:5` = reinicios recomendados (cartel "Recomendado: 5 reinicios o más", aviso al entrar con menos, "ideal 5 reinicios" en las listas de viaje), ₲ 800.000, portal desde `saltocristal` en [-40,70]. Sin jefe. `Z.hills=[[x,z,radio,alto]]` son lomas que suma `H()`. Usa las piezas del Chaco (`DMAP.cerroleon=DMAP.chaco`, `DECZ.cerroleon`, `ZTEX`, música `chaco`, pasos de arena), así que no baja archivos nuevos. También en `LIFE_POP`, `AMBPROF`, `BEDZ`, `BORDERK`, `ZLOAD_IMG`, `PYP/PYL`, `BUILD.cerroleon` y `live/src/data.js`.
+- **Mobs Ymaguare** (`YMAG`, después de `MOBS`): 10 copias de bestias que ya existen, una por spot: `aguaraym` 210, `taitetuym` 220, `jaguareteym` 230, `luisonym` 240, `escorpionym` 250, `tejuym` 260, `mboituiym` 270, `pomberoym` 280, `mboijaguaym` 290, `malavisionym` 300. Cada una es `Object.assign` de su bestia con `base` (de quién toma modelo, voz y trofeos), escala ×1,22, velocidad +0,4, `aggro:13` y `k` (`YMAG_K={dmg:2.5,df:2.3,xp:2}`).
+  - `def.key` ahora es `base||id` (antes siempre el id): todo lo que busca apariencia por `def.key` (`MYTH`, `OAD_BEAST`, `CC0_BEAST_SRC`) sirve solo. Lo que buscaba por `e.type` pasó a `e.def.key` (`OAD_BEAST` en `oadMobDead` y `oadZone`, `BSND` en `beastSnd`/`hitSnd`) o a `mobBase(t)` (`beastFiles`). **Para sumar otra variante de una bestia alcanza con agregarla a `YMAG` o darle `base`.**
+  - `mobStats` aplica `def.k` a daño, defensa y experiencia. La vida NO se toca: la calcula el servidor en vivo (`live/src/sim.js`) solo con el nivel, y así no hubo que cambiarlo.
+  - Botín: trofeos de su bestia (`LOOTDEF[e.def.base||e.type]`) sin la pieza única; gemas ×2 y equipo 16 % (antes 9 %) si el mob tiene `k`.
+  - Dureza: la defensa del mob se resta de cada golpe, así que es lo que separa a los que tienen reinicios. Medido con `AUTO` 2 minutos y pociones (Caballero nivel 200, 50 % fuerza / 20 % agilidad / 30 % vitalidad): sin reinicios 0 cazas y 16 a 41 pociones; con 5 reinicios 5 a 12 cazas en los spots 210 a 250 y 2 a 4 en el de 300; con 8, 11 y 4. Con pociones nadie muere (curan más de lo que pegan); sin pociones, caer en el medio de un spot mata a cualquiera en menos de un minuto.
+- **Misiones**: 5 nuevas (35 a 39: `aguaraym`, `luisonym`, `tejuym`, `pomberoym`, `malavisionym`). Total 39.
+- **Fotos**: `assets/ui/zona_cerroleon.webp` y `top_cerroleon.webp`, hechas con un script propio fuera del repo (cámara nueva + `RND.render(SCN,cam)` + `toDataURL` en la misma tarea; la de arriba con cámara ortogonal de 260 m, `up=(0,0,-1)` y la niebla lejos).
+- **Web**: `ZK`, `PINS`, `LBLPOS`/`LP`, textos (trece tierras, 47 criaturas), `web/img/w/z_cerroleon.webp`. `extract.js` exporta `rst` de la zona y `base` del mob; `views.js` usa la foto de la bestia base (`mob_<base>`), así que no hacen falta fotos nuevas de criaturas.
+- Aviso viejo que se ve en las pruebas y no es de este cambio: `THREE.Object3D.add: object not an instance` desde `dropModel` cuando `irObject` devuelve un ítem sin modelo (queda atrapado y el ítem usa su ícono).
+- Ojo con la experiencia: no hay castigo por cazar criaturas de mucho más nivel, así que un personaje de nivel 30 en grupo con uno fuerte sube varios niveles por caza en este mapa.
 
 ## Repositorio y publicación
 

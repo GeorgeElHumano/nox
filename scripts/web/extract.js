@@ -11,8 +11,8 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   await p.goto(BASE,{waitUntil:'commit',timeout:120000});
   for(let i=0;i<200;i++){if(await p.evaluate(()=>!!(window.__NOX&&window.__NOX.GAMEDATA)).catch(()=>false))break;await wait(500);}
   const D=await p.evaluate(()=>{const G=window.__NOX.GAMEDATA;const hex=h=>'#'+h.toString(16).padStart(6,'0');
-    const ZK=Object.keys(G.ZONES).filter(k=>k!=='studio');const zones={};for(const k of ZK){const z=G.ZONES[k];zones[k]={name:z.name,sub:z.sub,lvl:z.lvl,cost:z.cost,spots:(z.spots||[]).map(s=>[s.n,s.m]),portals:(z.portals||[]).map(p=>p[2])};}
-    const mobs={};for(const [k,m] of Object.entries(G.MOBS)){const zs=ZK.filter(z=>(G.ZONES[z].spots||[]).some(s=>s.m===k)||(G.ZONES[z].boss&&G.ZONES[z].boss[0]===k)||m.zone===z);mobs[k]={name:m.name,lvl:m.lvl,boss:!!m.boss,ficha:(G.MYTH[k]&&G.MYTH[k].ficha)||m.ficha||'',zones:zs};}
+    const ZK=Object.keys(G.ZONES).filter(k=>k!=='studio');const zones={};for(const k of ZK){const z=G.ZONES[k];zones[k]={name:z.name,sub:z.sub,lvl:z.lvl,rst:z.rst||0,cost:z.cost,spots:(z.spots||[]).map(s=>[s.n,s.m]),portals:(z.portals||[]).map(p=>p[2])};}
+    const mobs={};for(const [k,m] of Object.entries(G.MOBS)){const zs=ZK.filter(z=>(G.ZONES[z].spots||[]).some(s=>s.m===k)||(G.ZONES[z].boss&&G.ZONES[z].boss[0]===k)||m.zone===z);mobs[k]={name:m.name,lvl:m.lvl,boss:!!m.boss,ficha:(!m.base&&G.MYTH[k]&&G.MYTH[k].ficha)||m.ficha||'',zones:zs};if(m.base)mobs[k].base=m.base;/* los Ymaguare usan la foto de su bestia */}
     const cls={};for(const [k,c] of Object.entries(G.CLASSES)){cls[k]={name:c.name,evo:c.evo,base:c.base,desc:c.desc,hint:c.hint,unlock:c.unlock||null,
       skills:(G.CSK[k]||[]).map(id=>{const s=G.SKILLS[id];return {cls:k,name:s.name,lvl:s.lvl,evo:!!s.evo,mp:s.mp,desc:s.desc};}),
       sets:G.SETN[k].map((n,i)=>({n,col:hex(G.TIERGLOW[k][i])})),w:G.WNAME[k],slots:G.SLOTN[k],wn:G.WINGN[k],wn2:G.WINGN2[k],wn3:G.WINGN3?G.WINGN3[k]:null};}
