@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611130858",
+  "title": "Tarjeta del personaje más clara",
+  "notes": [
+   "El nombre de tu personaje y tu nivel ahora se ven siempre enteros en el recuadro de vida, en cualquier pantalla.",
+   "Si el nombre es largo, la letra se achica sola para que entre."
+  ]
+ },
+ {
   "build": "202611130726",
   "title": "Gestos y ropa mejorados",
   "notes": [

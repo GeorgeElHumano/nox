@@ -1,11 +1,9 @@
 {
- "build": "202611130726",
- "min": "202611122202",
- "title": "Gestos y ropa mejorados",
+ "build": "202611130858",
+ "min": "202611130858",
+ "title": "Tarjeta del personaje más clara",
  "notes": [
-  "Los gestos se ven más naturales: Dab, Besos, Violín, Hombro, Saludo, Risa, Reverencia y Polca fueron rehechos o retocados.",
-  "La piel ya no atraviesa la ropa de tela y los hombros acompañan al brazo.",
-  "Las hombreras sueltas ya no quedan flotando al levantar los brazos en un gesto.",
-  "El cigarrillo ya no queda en el aire al cambiar de gesto."
+  "El nombre de tu personaje y tu nivel ahora se ven siempre enteros en el recuadro de vida, en cualquier pantalla.",
+  "Si el nombre es largo, la letra se achica sola para que entre."
  ]
 }
