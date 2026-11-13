@@ -119,6 +119,9 @@ html.cur.dn :not(input):not(textarea):not(select),html.cur.dn{cursor:url(assets/
 .noxshop{align-self:flex-end;display:inline-flex;align-items:center;gap:7px;margin-top:6px;padding:7px 12px 7px 8px;border-radius:12px;border:0;cursor:pointer;pointer-events:auto;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.06em;color:#1a1405;background:linear-gradient(#ffe39a,#e8b44a 55%,#b9822a);box-shadow:0 0 0 1px #3a2408,0 0 0 2.5px rgba(255,226,150,.55),0 4px 12px rgba(0,0,0,.55),0 0 14px rgba(232,180,74,.45);white-space:nowrap;text-decoration:none;-webkit-tap-highlight-color:transparent}
 .noxshop small{font-family:var(--body);font-weight:800;font-size:11px;background:#101a4a;color:#f6d892;border-radius:9px;padding:2px 7px;letter-spacing:0}
 .noxshop:active{transform:translateY(1px)}
+#hNox .nxl{text-transform:uppercase}
+/* en pantallas táctiles el botón de la tienda es solo la moneda con la palabra abajo: ocupa mucho menos */
+@media (pointer:coarse){#hNox{flex-direction:column;gap:2px;padding:0;align-self:center;margin-top:5px;background:none;box-shadow:none;border-radius:0;color:#ffe39a;font-size:9.5px;letter-spacing:.06em;text-shadow:0 1px 2px #000,0 0 5px #000}#hNox .nxc{width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 1px #3a2408,0 2px 8px rgba(0,0,0,.6),0 0 10px rgba(232,180,74,.5)}#hNox .nxl{text-transform:none}#hNox small{display:none}}
 #sel .noxshop{margin-top:0;align-self:center}
 #pNox .tabs{display:flex;flex-wrap:wrap;gap:6px}#pNox .tabs button{flex:1 1 auto}
 #pNox .nx-bal{display:inline-flex;align-items:center;gap:6px;font-weight:800;color:#f6d892}
@@ -1161,7 +1164,7 @@ body.pad #joy{display:none!important}
     <div class="mm-wrap"><button class="mb camq" data-act="camCycle" aria-label="Cambiar cámara" id="mbCam"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg><small id="camQ"></small></button><canvas id="mm" width="184" height="184"></canvas><div class="mm-z" id="mmZ"></div></div>
     <div class="hr-side">
       <div class="goldv">₲ <span id="hGold">0</span></div>
-      <button class="noxshop" id="hNox" data-act="openNox" aria-label="Tienda Noxis"><svg class="nxc" width="18" height="18" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#e8b44a"/><circle cx="32" cy="32" r="25" fill="#101a4a"/><path d="M22 44V20l20 24V20" fill="none" stroke="#e8b44a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>TIENDA <small id="hNoxB"></small></button>
+      <button class="noxshop" id="hNox" data-act="openNox" aria-label="Tienda Noxis"><svg class="nxc" width="18" height="18" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#e8b44a"/><circle cx="32" cy="32" r="25" fill="#101a4a"/><path d="M22 44V20l20 24V20" fill="none" stroke="#e8b44a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nxl">Tienda</span> <small id="hNoxB"></small></button>
       <div class="menu">
         <button class="mb" data-act="openChar" aria-label="Personaje" id="mbChar"><span class="dot" id="ptsDot" hidden></span></button>
         <button class="mb" data-act="openInv" aria-label="Inventario" id="mbInv"></button>
