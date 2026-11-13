@@ -3648,7 +3648,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     for(const n in AL){let o=null;for(const a of AL[n]){o=r.body.getObjectByName(a);if(o)break;}if(o)r.fl.push([o,bindQ(o)||o.quaternion.clone(),n]);}r.flB={};for(const [o,,n] of r.fl)r.flB[n]=o;}
   for(const [o,q] of r.fbq)o.quaternion.copy(q);if(r.flS)for(let i=0;i<r.fl.length;i++)r.fl[i][0].quaternion.copy(r.flS[i]);/* los huesos de la pose vuelven a lo que dejó la animación el cuadro anterior (no al reposo en T): así las correcciones no se acumulan y un clip sin pista para un hueso no lo deja en pose T *//* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
   if(!r.gripOk){r.gripOk=1;try{gripFit(r);}catch(e){console.error('agarre',e);}}
-  r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);if(r.fist)for(const [b,q] of r.fist)b.quaternion.copy(q);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
+  r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);if(r.cc0)try{handRelax(r);}catch(e){}if(r.fist)for(const [b,q] of r.fist)b.quaternion.copy(q);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
   if((r.flyK||0)>.01){const k=r.flyK,ke=k*k*(3-2*k);
     const sw=Math.sin(T*1.1)*.03,mvS=r.flyMv||0,mx=(a,b,i)=>{const p=a?a[i]||0:0,q=b?b[i]||0:p;return p+(q-p)*mvS;};
     /* pose absoluta de vuelo (como en MU): parte del reposo del esqueleto y le suma la pose; se mezcla con la animación según ke */
@@ -9312,7 +9312,10 @@ risa: { base: 'Idle_Loop', f: (r, t, L) => { const k = sm(t / .3), beat = Math.a
 
   };})());
 /* utilería (cigarrillo, violín): si se pasa de un gesto a otro sin terminar el primero, la del anterior quedaba flotando; cada gesto esconde la que no es suya */
-for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{gReset(r);if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);padFollow(r);gMark(r);};G.f.__p=1;}
+/* manos durante un gesto: el arma está escondida, así que no tiene sentido el puño de agarrarla; arrancan de la mano relajada, o abierta (la pose de fábrica, dedos rectos) en los gestos de mano plana */
+const G_OPEN={saludo:['r'],militar:['r'],aplauso:['l','r'],hombro:['r']};
+function gHands(r,k){if(!r._hr)return;const op=G_OPEN[k]||[];for(const e of r._hr)e.b.quaternion.copy(op.includes(e.b.name.slice(-1))?e.q0:e.q);}
+for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{gReset(r);gHands(r,k);if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);padFollow(r);gMark(r);};G.f.__p=1;}
 NXGK.forEach(k=>{if(!GESTK.includes(k))GESTK.push(k);});
 /* --- estelas: partículas que quedan atrás al moverse --- */
 const NXTR={e_oro:{c:[0xffc84a,0xfff0b0],sz:.3,up:.3,gr:-.2},e_luna:{c:[0x6fc2ff,0xdff1ff],sz:.32,up:.2,gr:-.1},e_brasas:{c:[0xff5a20,0xffa030],sz:.28,up:.9,gr:-.7},e_fund:{c:[0xffd24a,0xffffff],sz:.38,up:.35,gr:-.15}};
@@ -9354,6 +9357,25 @@ function padFollow(r){const l=padList(r);if(!l.length)return;for(const p of l){c
 /* huesos que ninguna animación mueve (los dedos de la mano izquierda, por ejemplo): los gestos los giran sobre su valor actual,
    así que sin volverlos a su lugar cada cuadro el giro se acumulaba (los dedos daban vueltas) y quedaban torcidos al terminar.
    Cada cuadro, si el hueso sigue con lo que dejó el gesto (nadie lo animó), vuelve a su valor anterior al gesto. */
+/* mano relajada: ninguna animación del modelo mueve los dedos, así que la mano libre quedaba en la pose de fábrica (dedos rectos y abiertos, pulgar afuera).
+   Se calcula una vez una mano suelta (dedos apenas doblados, más el meñique que el índice, pulgar hacia la palma) y cada cuadro se aplica a los dedos
+   que nadie animó (si un clip o el puño del arma los mueve, se respetan). */
+const HR_ANG={index:[.16,.26,.18],middle:[.2,.32,.2],ring:[.26,.38,.24],pinky:[.32,.44,.28]};
+function handRelax(r){if(r._hrOff)return;if(!r._hr){let sk=null;const out=[],bp=(r,n)=>{const b=gB(r,n),v=new THREE.Vector3();if(b)b.getWorldPosition(v);return v;};for(const sd of['l','r']){const h=gB(r,'hand_'+sd),i1=gB(r,'index_01_'+sd),p1=gB(r,'pinky_01_'+sd);if(!h||!i1||!p1)continue;
+      const bs=[];for(const f of['index','middle','ring','pinky','thumb'])for(const j of['_01_','_02_','_03_']){const b=gB(r,f+j+sd);if(b)bs.push(b);}const save=bs.map(b=>b.quaternion.clone());
+      /* se parte de la pose de fábrica real (la del esqueleto), no de la actual: la mano del arma ya puede tener el puño puesto */
+      if(!sk){(r.body||r.g).traverse(o=>{if(!sk&&o.isSkinnedMesh&&o.skeleton&&o.skeleton.bones.includes(h))sk=o.skeleton;});}
+      const bind=b=>{const i=sk?sk.bones.indexOf(b):-1,j=sk?sk.bones.indexOf(b.parent):-1;if(i<0||j<0)return null;const mi=new THREE.Matrix4().copy(sk.boneInverses[i]).invert(),mj=new THREE.Matrix4().copy(sk.boneInverses[j]);const m=mj.multiply(mi),q=new THREE.Quaternion();m.decompose(new THREE.Vector3(),q,new THREE.Vector3());return q;};
+      const b0=bs.map(b=>bind(b)||b.quaternion.clone());bs.forEach((b,i)=>b.quaternion.copy(b0[i]));
+      const ax=bp(r,'index_01_'+sd).sub(bp(r,'pinky_01_'+sd)).normalize(),s=sd==='r'?1:-1;
+      const m3=bp(r,'middle_03_'+sd);for(const f in HR_ANG)['_01_','_02_','_03_'].forEach((j,n)=>gRot(r,f+j+sd,ax,HR_ANG[f][n]*s));
+      /* pulgar: en la pose de fábrica sale hacia el costado; se lo lleva junto al índice, un poco por delante de la palma, y se dobla apenas */
+      {const fw=bp(r,'middle_01_'+sd).sub(bp(r,'hand_'+sd)).normalize(),palm=bp(r,'middle_03_'+sd).sub(m3);palm.addScaledVector(fw,-palm.dot(fw));if(palm.lengthSq()>1e-8){palm.normalize();
+        const t1=bp(r,'thumb_01_'+sd),cur=bp(r,'thumb_02_'+sd).sub(t1).normalize(),tg=bp(r,'index_01_'+sd).lerp(bp(r,'index_02_'+sd),.6).addScaledVector(palm,.03).sub(t1).normalize(),want=cur.clone().lerp(tg,.75).normalize(),axT=cur.clone().cross(want);
+        if(axT.lengthSq()>1e-8)gRot(r,'thumb_01_'+sd,axT.normalize(),cur.angleTo(want));const td=bp(r,'thumb_03_'+sd).sub(bp(r,'thumb_02_'+sd)).normalize(),ab=td.clone().cross(palm).normalize().negate();gRot(r,'thumb_02_'+sd,ab,.15);gRot(r,'thumb_03_'+sd,ab,.25);}}
+      bs.forEach((b,i)=>{out.push({b,q:b.quaternion.clone(),q0:b0[i],last:null});b.quaternion.copy(save[i]);});}
+    r._hr=out;if(!out.length){r._hrOff=1;return;}}
+  for(const e of r._hr){const q=e.b.quaternion;if(e.last===null||q.equals(e.last)){q.copy(e.q);(e.last||(e.last=new THREE.Quaternion())).copy(e.q);}}}
 function gBones(r){if(!r._gb){r._gb=[];const seen=new Set();(r.g||r).traverse(o=>{if(o.isBone&&!seen.has(o)){seen.add(o);r._gb.push({b:o,pre:o.quaternion.clone(),last:null});}});}return r._gb;}
 /* si el hueso tiene lo que dejó el gesto, nadie lo tocó desde entonces: vuelve a como estaba antes del gesto en ese cuadro (el reposo, o la última pose de la animación si esta se saltó un cuadro) */
 function gReset(r){for(const e of gBones(r)){if(e.last&&e.b.quaternion.equals(e.last))e.b.quaternion.copy(e.pre);e.pre.copy(e.b.quaternion);}}
