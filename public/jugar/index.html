@@ -879,10 +879,13 @@ body.induel #track,body.induel #evClock{display:none}
 #hud .unit{display:none}
 #lifeCard{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;width:min(232px,40vw);padding:7px 10px 8px;border-radius:12px;color:#f3ead2}
 #lifeCard .lc-h{display:flex;align-items:center;gap:7px;min-width:0}
-#lifeCard .lc-av{width:26px;height:26px;flex:none;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#3a3f8c,#14163d);box-shadow:0 0 0 1.5px #f6d892}
+#lifeCard .lc-av{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#3a3f8c,#14163d);box-shadow:0 0 0 1.5px #f6d892}
 #lifeCard .lc-av svg{width:17px;height:17px}
-#lifeCard b{font-family:var(--display);font-size:13px;letter-spacing:.05em;color:#f6d892;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-#lifeCard .lc-l{font-size:10.5px;color:#c9c3e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lifeCard b{display:block;font-family:var(--display);font-size:13px;line-height:1.15;letter-spacing:.05em;color:#f6d892;white-space:nowrap;overflow:hidden;text-overflow:clip;min-width:0}
+#lifeCard .lc-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+#lifeCard .lc-l{display:flex;min-width:0;font-size:10.5px;line-height:1.1;color:#c9c3e8;white-space:nowrap}
+#lifeCard .lc-lv{flex:none;font-weight:800;color:#f3ead2}
+#lifeCard .lc-c{min-width:0;overflow:hidden;text-overflow:ellipsis}
 #lifeCard .lc-r{display:grid;grid-template-columns:1fr auto;gap:3px 7px;align-items:center;margin-top:6px;font:800 10.5px var(--body);font-variant-numeric:tabular-nums}
 #lifeCard .lc-b{position:relative;height:8px;border-radius:9px;background:rgba(0,0,0,.5);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
 #lifeCard .lc-b.mp{height:6px}
@@ -8665,7 +8668,7 @@ const lsGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}},lsSe
 const IS_FINE=matchMedia('(hover:hover) and (pointer:fine)').matches;
 const WASD=()=>IS_FINE&&CAMM!=='iso'&&!PAD.on;
 function hudV2Init(){if($('#lifeCard'))return;
-  $('.hud-l').insertAdjacentHTML('afterbegin',`<div id="lcRow"><div id="lifeCard" class="tg2" data-act="openChar" role="button" aria-label="Personaje"><div class="lc-h"><span class="lc-av" id="lcAv"></span><b id="lcN"></b><span class="lc-l" id="lcL"></span></div><div class="lc-r"><div class="lc-b hp"><i id="lcHp"></i></div><span class="lc-hpT" id="lcHpT"></span><div class="lc-b mp"><i id="lcMp"></i></div><span class="lc-mpT" id="lcMpT"></span></div></div><div id="lcSide"><button class="sbtn" data-act="openChar" aria-label="Personaje" title="Personaje (C)">${UIC('person')}<i class="dot" id="lcPts" hidden></i></button><button class="sbtn" data-act="openInv" aria-label="Bolsa" title="Bolsa (I)">${UIC('bag')}</button></div></div><div id="partyHud" hidden></div>`);
+  $('.hud-l').insertAdjacentHTML('afterbegin',`<div id="lcRow"><div id="lifeCard" class="tg2" data-act="openChar" role="button" aria-label="Personaje"><div class="lc-h"><span class="lc-av" id="lcAv"></span><div class="lc-t"><b id="lcN"></b><span class="lc-l"><span class="lc-lv" id="lcL"></span><span class="lc-c" id="lcC"></span></span></div></div><div class="lc-r"><div class="lc-b hp"><i id="lcHp"></i></div><span class="lc-hpT" id="lcHpT"></span><div class="lc-b mp"><i id="lcMp"></i></div><span class="lc-mpT" id="lcMpT"></span></div></div><div id="lcSide"><button class="sbtn" data-act="openChar" aria-label="Personaje" title="Personaje (C)">${UIC('person')}<i class="dot" id="lcPts" hidden></i></button><button class="sbtn" data-act="openInv" aria-label="Bolsa" title="Bolsa (I)">${UIC('bag')}</button></div></div><div id="partyHud" hidden></div>`);
   $('.hud-r').insertAdjacentHTML('afterbegin',`<div id="sunWrap"><button id="sunBtn" aria-label="Menú">${sunSVG()}</button><span class="sl">MENÚ</span><span id="sunN" hidden></span><span id="dayDot" hidden></span></div>`);
   const mw=$('.mm-wrap');$('#mmZ').insertAdjacentHTML('afterend','<div id="mmClock"><i></i><b></b></div>');mw.insertAdjacentHTML('beforeend','<div id="mmFoot"></div>');const ft=$('#mmFoot');ft.appendChild($('#mbCam'));ft.insertAdjacentHTML('beforeend',`<button class="mb camq" id="mbGest" data-act="gestWheel" aria-label="Gestos" title="Gestos (G)">${UIC('smile')}</button>`);const gv=document.querySelector('.hud-r .hr-side .goldv');if(gv)mw.appendChild(gv);/* el oro en su propia fila, debajo de cámara y gestos: así los montos grandes no se cortan */
   $('.actions').appendChild($('#autoBtn'));
@@ -8689,9 +8692,12 @@ function hudV2Tick(){const lc=$('#lifeCard');invSyncTick();if((hudV2Tick.n=(hudV
 /* botones de acción en pantallas bajas (iPhone 11 en horizontal): se achican lo justo para no taparse con el minimapa, el oro y el reloj */
 function hudFit(){try{const a=$('.actions'),mm=$('.mm-wrap');if(!a||!mm||!matchMedia('(pointer:coarse)').matches)return;const bt=parseFloat(getComputedStyle(a).bottom)||16,mb=mm.getBoundingClientRect().bottom;
   const free=innerHeight-bt-(mb+6);let k=Math.max(.66,Math.min(1,free/184));k=Math.round(k*100)/100;const cur=document.documentElement.style.getPropertyValue('--hs');if(cur!==String(k))document.documentElement.style.setProperty('--hs',k);}catch(e){}}
+/* nombre del personaje en la tarjeta de vida: siempre entero; si no entra, se achica la letra */
+function lcFit(){const e=$('#lcN');if(!e)return;e.style.fontSize='';e.style.letterSpacing='';let fs=parseFloat(getComputedStyle(e).fontSize)||13;e._fw=e.clientWidth;if(!e._fw)return;let n=0;while(e.scrollWidth>e.clientWidth+.5&&fs>7&&n++<40){fs-=.5;e.style.fontSize=fs+'px';if(fs<11)e.style.letterSpacing='.01em';}}
+addEventListener('resize',()=>setTimeout(lcFit,80));addEventListener('orientationchange',()=>setTimeout(lcFit,320));
 addEventListener('resize',()=>setTimeout(hudFit,60));addEventListener('orientationchange',()=>setTimeout(hudFit,300));setTimeout(hudFit,1500);
   const set=(id,v)=>{const e=$('#'+id);if(e._v!==v){e._v=v;e.textContent=v;}},wd=(id,v)=>{const e=$('#'+id),s=v.toFixed(1)+'%';if(e._w!==s){e._w=s;e.style.width=s;}};
-  set('lcN',C.name);{const lv=$('#hLvl').textContent;set('lcL',innerWidth<=440&&innerHeight>innerWidth?lv.split(' · ')[0]:lv);}const hp=Math.max(0,P.hp)/DS.maxHP;wd('lcHp',hp*100);set('lcHpT',String(Math.max(0,Math.ceil(P.hp))));wd('lcMp',Math.min(1,P.mp/DS.maxMP)*100);set('lcMpT',String(Math.floor(P.mp)));
+  {const ne=$('#lcN');if(ne._v!==C.name||ne._fw!==ne.clientWidth){set('lcN',C.name);lcFit();}}set('lcL','Nv '+C.L+(C.resets?' · R'+C.resets:''));set('lcC','\u00a0·\u00a0'+(C.evo?CLASSES[C.cls].evo:CLASSES[C.cls].name));const hp=Math.max(0,P.hp)/DS.maxHP;wd('lcHp',hp*100);set('lcHpT',String(Math.max(0,Math.ceil(P.hp))));wd('lcMp',Math.min(1,P.mp/DS.maxMP)*100);set('lcMpT',String(Math.floor(P.mp)));
   lc.classList.toggle('low',P.hp>0&&hp<.3);if(lc._cls!==C.cls){lc._cls=C.cls;$('#lcAv').innerHTML=SKIC('atk_'+C.cls);}
   {let dn=0;try{if(C.daily&&C.daily.d===dayKey())dn=C.daily.list.filter(q=>q.n>=q.goal&&!q.cl).length;}catch(e){}const dd=$('#dayDot');if(dd&&dd._n!==dn){dd._n=dn;dd.hidden=!dn;dd.textContent=dn;}}
   let n=0;['ptsDot','chatDot','partyN','dayDot'].forEach(id=>{const e=$('#'+id);if(e&&!e.hidden)n++;});try{if(LIVE.inv)n++;if(DUEL.inv)n++;}catch(e){}
