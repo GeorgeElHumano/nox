@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611122309",
+  "title": "Arreglo del cambio de nombre",
+  "notes": [
+   "El servicio Cambio de nombre de la tienda no tomaba el nombre escrito: ya funciona.",
+   "Ya no se puede usar como nombre de personaje el nombre de la cuenta de otro jugador."
+  ]
+ },
+ {
   "build": "202611122250",
   "title": "Tienda más cómoda en el celular",
   "notes": [

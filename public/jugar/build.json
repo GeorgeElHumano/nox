@@ -1,8 +1,9 @@
 {
- "build": "202611122250",
+ "build": "202611122309",
  "min": "202611122202",
- "title": "Tienda más cómoda en el celular",
+ "title": "Arreglo del cambio de nombre",
  "notes": [
-  "En el celular, el botón de la tienda ahora es la moneda Noxis con la palabra Tienda abajo y ocupa mucho menos lugar."
+  "El servicio Cambio de nombre de la tienda no tomaba el nombre escrito: ya funciona.",
+  "Ya no se puede usar como nombre de personaje el nombre de la cuenta de otro jugador."
  ]
 }
