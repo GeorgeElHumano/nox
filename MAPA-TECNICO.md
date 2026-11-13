@@ -443,7 +443,8 @@ Un solo archivo HTML de unos 1,4 MB con three.js r128, servido desde `public/jug
 - Arandu Guasu pasó de `FORJA.hechicero[7]` a `[9]` (`npcP.guia` con `t:9,wt:9`). El set 7 del Hechicero ahora es Yvytu Ñe'ẽ.
 - Caída (`mobDrop`): en `mbocaruzu` todo el equipo es set 7 y en `saltocristal` set 8 (`rollEquip(...,tFix)`), Excelente 6 % común, 30 % élite/dorada, 100 % jefe, sin épicos. En `cerroleon` solo épicos (`rollEquip(L,0,1,0,L<=250?7:8)`): 1,5 % común, 8 % élite, 15 % dorada, con aviso y sonido de ítem raro. El resto de los mapas sigue igual (tope set 6).
 - Guía: `lib/guia.js` (9 sets, requisitos y dónde caen) y el consejo armado de sets de `GUIA_T`.
-- Falta al publicar: `sync.sh datos sets iconos armas` para la web y revisar la portada de sets.
+- Íconos (13/11): `irRenderIcon` pasa la caja real de la pieza (`R0.o.userData.box`) al grupo de la foto; antes se encuadraba con la caja de todo el cuerpo y los guantes salían chiquitos. Para guantes, la caja se arma solo con vértices de antebrazo y mano, y `cc0GlovePose` junta los antebrazos en V. Vale para todos los sets.
+- Falta al publicar: `sync.sh datos sets iconos armas` (los íconos de guantes de todos los sets cambian) para la web y revisar la portada de sets.
 
 ## Rediseño de sets, piloto Caballero (11/11, tarde; SIN publicar)
 - Pedido del dueño: cada raza gira en torno a un color en sus 7 sets (Caballero como está, Hechicero azul, Arquera verde agua y siempre algo sexy, Gladiador lila con blanco y gris, Mburuvicha negro con rojo), cada set con diseño propio (no sólo color, como en MU), destellos del color del set, e ícono de la bolsa idéntico a la pieza puesta.
