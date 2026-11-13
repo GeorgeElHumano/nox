@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
+Última actualización: 13 de noviembre de 2026 (sets 133 y 177 en la rama de trabajo, sin publicar). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
 
 ## Parche 202611122202: Cerro León y reinicio de misiones (12/11, noche; publicado con OK del dueño)
 
@@ -431,6 +431,19 @@ Un solo archivo HTML de unos 1,4 MB con three.js r128, servido desde `public/jug
 - Ajuste a pedido del dueño (11/11, mediodía): el Caballero usa los colores de antes (4 paletas tomadas de `WPALS.caballero`, elegidas con la fórmula vieja `gen>=3?3:min(3,floor(lv/4)+(gen>=2?1:0))`; la clave de textura incluye ese índice). Gladiador = metal y magia: paleta de acero + `P.mg` (pluma de energía, `glowFill` la enciende en el mapa emisivo); primarias y secundarias alternan acero/energía y la fila media de cobertoras es de energía.
 - Aleteo (11/11, tarde): en el bloque de alas de `oadHeroAnim` cada grupo de `sides` lleva `userData.ws` (lado) y `wk` (0 par principal, 1 de abajo, 2 de arriba); antes el lado salía del índice en la lista (`i?1:-1`) y con 2 o 3 pares batían cruzados. Aves: además de `beat` (arriba/abajo) usan `wsw` (coseno de la misma fase): barrido adelante/atrás en `rotation.y`, giro en `rotation.x` y pliegue al subir (`scale.x` hasta −20 %). Hada (`P.key` empieza con `fy`): aleteo de mariposa, las alas se juntan atrás y se abren (`rotation.y` .1→1.1, a 1,5× del ritmo). GIF de prueba: `gif.sh` del banco (16 cuadros a 1/20 s = un ciclo; hada 32).
 - Pendiente de pulir: Arasy (fase 3 de la Arquera) se ve casi blanca, el tornasol se pierde; Kuarahy (fase 3 del Caballero) sale rojo anaranjado y no negro con filo de brasa. Íconos de inventario de las alas nuevas sin revisar.
+
+## Sets de nivel 133 y 177 (13/11; aprobados en muestra, SIN publicar)
+- Pedido del dueño: dos sets nuevos por raza, los más fuertes del juego, con la línea de armadura y el color de cada raza, nombres y colores sin repetir entre razas, brillos y efectos nuevos. Caen en Mbocaruzú (133) y Salto Cristal (177), también Excelentes; sus épicos solo en Cerro León.
+- Índices 7 (nivel 133) y 8 (nivel 177). Tablas extendidas a 9: `TREQ_LVL` (133, 177), `TREQ_STAT` (560, 760), `WDMG` (≈ +60 % por set), `ADEF` (86, 128), `TPRICE`, `SETN`, `TIER_MOBL`, `SETFX`, `NXSW`, `NXGL`, `CC0_SH`/`CC0_SHT` (con color de brillo propio en `[2]`), bucles de `GUIA_T` (`t<9`).
+- Sets: Caballero Tupã Ryapu / Ára Jára; Hechicero Yvytu Ñe'ẽ / Mbyja Pytũ; Arquera Mainumby Ruvicha / Ysyry Mimbi; Gladiador Mbói Hovy / Ita Vera; Mburuvicha Yaguareté-Abá / Y Jára. El set 6 de la Arquera pasó de «del Yvága» a «del Arapy» (repetía el nombre del set 5 del Caballero).
+- Piezas nuevas: cascos `thunder`, `seraph`, `sigilhood`, `starcrown`, `hummer`, `pearl`, `jaguar`, `bloodmoon`; `x.cui` `bolt`, `nova`, `sigil`, `eclipse`, `plume`, `pearl`, `serpent`, `geode`, `claws`, `moon`; `x.pad2` `crag`, `crystal`, `orbs`, `starpad`, `plume`, `drops`, `fang`, `rock`, `paw`, `horns`; `x.back` `storm`, `crystalwing`, `sigils`, `constellation`, `hummwings`, `cascade`, `fangs`, `monolith`, `warfan`, `moonfan`. Geometría `nxBoltGeo()` (rayo en zigzag).
+- Armas: espadas del Caballero 7-8 (guardas `gt` 7 y 8), mandobles del Gladiador 7-8 (guardas `gt` 9 y 10), arcos 7-8 (plumas iridiscentes; gotas y perlas), bastones 7-8 (sellos cruzados; media luna con estrella; el sol del set 6 ya no sale desde el 7), cetros 7-8 (calavera de yaguareté; luna de sangre). Topes: `wt` hasta 8 (un `t` mayor a 8, como el 9 de Arandu, usa la forma del 6), `cc0ItemObj`, `cc0Sword`, `cc0Bow`.
+- Efectos: `storm` y `nova` (Caballero, hechos a mano) y un kit por datos `FXK` (anillos `ring`/`ring2`, `orb` con `m` = rune/star/glow/drop/blade/rock/claw, `pillar`, `moon`, `parts` = tipo de partícula, `fall`, `spiral`) para `sigil`, `eclipse`, `bloom`, `mist`, `fangs`, `rocks`, `jaguar`, `bloodmoon`. `U.pk` es el tipo de partícula (antes se usaba `U.kind`).
+- Épico de los sets 7-8 con set completo: además del aura, `r.epicFx` = `makeSetFx('halo',0xc98cff)` con el aro a 2,02 m (se anima dentro de `auraTick`).
+- Arandu Guasu pasó de `FORJA.hechicero[7]` a `[9]` (`npcP.guia` con `t:9,wt:9`). El set 7 del Hechicero ahora es Yvytu Ñe'ẽ.
+- Caída (`mobDrop`): en `mbocaruzu` todo el equipo es set 7 y en `saltocristal` set 8 (`rollEquip(...,tFix)`), Excelente 6 % común, 30 % élite/dorada, 100 % jefe, sin épicos. En `cerroleon` solo épicos (`rollEquip(L,0,1,0,L<=250?7:8)`): 1,5 % común, 8 % élite, 15 % dorada, con aviso y sonido de ítem raro. El resto de los mapas sigue igual (tope set 6).
+- Guía: `lib/guia.js` (9 sets, requisitos y dónde caen) y el consejo armado de sets de `GUIA_T`.
+- Falta al publicar: `sync.sh datos sets iconos armas` para la web y revisar la portada de sets.
 
 ## Rediseño de sets, piloto Caballero (11/11, tarde; SIN publicar)
 - Pedido del dueño: cada raza gira en torno a un color en sus 7 sets (Caballero como está, Hechicero azul, Arquera verde agua y siempre algo sexy, Gladiador lila con blanco y gris, Mburuvicha negro con rojo), cada set con diseño propio (no sólo color, como en MU), destellos del color del set, e ícono de la bolsa idéntico a la pieza puesta.
