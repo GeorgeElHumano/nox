@@ -2,11 +2,11 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). En la rama `mapa-final` (sin publicar): Cerro León y reinicio de misiones.
+Última actualización: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
 
-## Cerro León y reinicio de misiones (12/11, noche; rama `mapa-final`, SIN publicar: falta `scripts/patch.sh` y el OK del dueño)
+## Parche 202611122202: Cerro León y reinicio de misiones (12/11, noche; publicado con OK del dueño)
 
-Rama aparte, sacada de `main` (no trae la Tienda Noxis de `arte-cc0`). Para publicarla: `scripts/patch.sh`, `git push origin mapa-final:main` y después unir `origin/main` en `arte-cc0`. La web ya está armada en la misma rama.
+Se hizo en la rama `mapa-final` y se publicó encima de la Tienda Noxis (parche 202611122116) con `git push origin mapa-final:main`, juego y web juntos. Falta unir `origin/main` en `arte-cc0`.
 
 - **Reinicio**: `ACT.reset` ahora pone `C.q={i:0,n:0,on:false}`: las misiones del Capitán vuelven a empezar y se cobran de nuevo en cada reinicio. Las diarias no cambian. Textos del Pa'i Antonio, de Arandu (`GUIA_T`) y de `lib/guia.js` actualizados.
 - **Zona `cerroleon`** (Cerro León, Defensores del Chaco): último de `ZORDER`, `lvl:30` (pedido del dueño: se entra desde el 30 pero va último en la lista), `rst:5` = reinicios recomendados (cartel "Recomendado: 5 reinicios o más", aviso al entrar con menos, "ideal 5 reinicios" en las listas de viaje), ₲ 800.000, portal desde `saltocristal` en [-40,70]. Sin jefe. `Z.hills=[[x,z,radio,alto]]` son lomas que suma `H()`. Usa las piezas del Chaco (`DMAP.cerroleon=DMAP.chaco`, `DECZ.cerroleon`, `ZTEX`, música `chaco`, pasos de arena), así que no baja archivos nuevos. También en `LIFE_POP`, `AMBPROF`, `BEDZ`, `BORDERK`, `ZLOAD_IMG`, `PYP/PYL`, `BUILD.cerroleon` y `live/src/data.js`.

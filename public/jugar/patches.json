@@ -1,5 +1,16 @@
 [
  {
+  "build": "202611122202",
+  "title": "Cerro León y misiones que vuelven con cada reinicio",
+  "notes": [
+   "Mapa nuevo y último: Cerro León, en lo hondo del Chaco. Se entra desde el nivel 30 (₲ 800.000 con el Baqueano o por el portal de Salto Cristal).",
+   "Diez spots con las bestias del reino en su versión Ymaguare, del nivel 210 al 300: pegan mucho más fuerte y casi no reciben daño de héroes sin reinicios. Pensado para 5 reinicios o más.",
+   "Las Ymaguare dan el doble de experiencia, el doble de gemas y más equipo.",
+   "Al reiniciar con el Pa'i Antonio, las misiones del Capitán Cabañas vuelven a empezar y se cobran de nuevo.",
+   "5 misiones nuevas del Capitán en Cerro León (ahora son 39)."
+  ]
+ },
+ {
   "build": "202611122116",
   "title": "Tienda Noxis",
   "notes": [
