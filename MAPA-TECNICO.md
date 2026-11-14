@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 14 de noviembre de 2026 (avisos al administrador y pestaña En línea, sin publicar). Antes: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
+Última actualización: 14 de noviembre de 2026 (avisos al administrador y pestaña En línea, publicado). Antes: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
 
 ## Parche 202611122202: Cerro León y reinicio de misiones (12/11, noche; publicado con OK del dueño)
 
@@ -21,7 +21,7 @@ Se hizo en la rama `mapa-final` y se publicó encima de la Tienda Noxis (parche 
 - Aviso viejo que se ve en las pruebas y no es de este cambio: `THREE.Object3D.add: object not an instance` desde `dropModel` cuando `irObject` devuelve un ítem sin modelo (queda atrapado y el ítem usa su ícono).
 - Ojo con la experiencia: no hay castigo por cazar criaturas de mucho más nivel, así que un personaje de nivel 30 en grupo con uno fuerte sube varios niveles por caza en este mapa.
 
-## Avisos al administrador y jugadores en línea (14/11; rama `avisos-admin`, SIN publicar hasta el OK del dueño)
+## Avisos al administrador y jugadores en línea (14/11; publicado con OK del dueño)
 
 - **Motor**: `lib/alerts.js` (copia en `live/src/alerts.js`, la pone `scripts/noxis-sync.sh`). Web Push estándar hecho con WebCrypto, sin librerías: firma VAPID ES256 y cifrado `aes128gcm` (RFC 8291). Las claves VAPID se crean solas la primera vez y quedan en `pushkv` (`k='vapid'`): **no hay secretos que cargar**. Probado con un descifrado independiente (node:crypto) y verificación de la firma.
 - Tablas nuevas (en `ALERT_SCHEMA`, las crean la API y el servidor en vivo): `pushsub(ep,uid,p256,auth,prefs,ua,t,last,fails)` (un dispositivo por fila; `prefs` = qué avisos quiere), `pushkv(k,v,t)` (claves VAPID, récord `peak`, antirrepetición `a:<clave>`, contadores `guiafail`, estado `down:*`), `alertlog` (historial, se recorta solo), `logins(day,uid,n,t)` (cuentas que entraron cada día, día de Paraguay), `onlinepk(day,n,t)` (pico a la vez por día).
