@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611141634",
+  "title": "El aviso En vivo ya no tapa nada",
+  "notes": [
+   "El aviso «En vivo» queda siempre arriba de todo, en su propia franja",
+   "El nombre y la barra de los jefes, los avisos, la tarjeta de vida y el minimapa quedan debajo y ya no se pisan con él",
+   "Arreglado en PC y en celulares, de pie y acostados"
+  ]
+ },
+ {
   "build": "202611131943",
   "title": "Sets de nivel 133 y 177",
   "notes": [
