@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
+Última actualización: 14 de noviembre de 2026 (avisos al administrador y pestaña En línea, sin publicar). Antes: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611122202 (Cerro León y reinicio de misiones).
 
 ## Parche 202611122202: Cerro León y reinicio de misiones (12/11, noche; publicado con OK del dueño)
 
@@ -20,6 +20,18 @@ Se hizo en la rama `mapa-final` y se publicó encima de la Tienda Noxis (parche 
 - **Web**: `ZK`, `PINS`, `LBLPOS`/`LP`, textos (trece tierras, 47 criaturas), `web/img/w/z_cerroleon.webp`. `extract.js` exporta `rst` de la zona y `base` del mob; `views.js` usa la foto de la bestia base (`mob_<base>`), así que no hacen falta fotos nuevas de criaturas.
 - Aviso viejo que se ve en las pruebas y no es de este cambio: `THREE.Object3D.add: object not an instance` desde `dropModel` cuando `irObject` devuelve un ítem sin modelo (queda atrapado y el ítem usa su ícono).
 - Ojo con la experiencia: no hay castigo por cazar criaturas de mucho más nivel, así que un personaje de nivel 30 en grupo con uno fuerte sube varios niveles por caza en este mapa.
+
+## Avisos al administrador y jugadores en línea (14/11; rama `avisos-admin`, SIN publicar hasta el OK del dueño)
+
+- **Motor**: `lib/alerts.js` (copia en `live/src/alerts.js`, la pone `scripts/noxis-sync.sh`). Web Push estándar hecho con WebCrypto, sin librerías: firma VAPID ES256 y cifrado `aes128gcm` (RFC 8291). Las claves VAPID se crean solas la primera vez y quedan en `pushkv` (`k='vapid'`): **no hay secretos que cargar**. Probado con un descifrado independiente (node:crypto) y verificación de la firma.
+- Tablas nuevas (en `ALERT_SCHEMA`, las crean la API y el servidor en vivo): `pushsub(ep,uid,p256,auth,prefs,ua,t,last,fails)` (un dispositivo por fila; `prefs` = qué avisos quiere), `pushkv(k,v,t)` (claves VAPID, récord `peak`, antirrepetición `a:<clave>`, contadores `guiafail`, estado `down:*`), `alertlog` (historial, se recorta solo), `logins(day,uid,n,t)` (cuentas que entraron cada día, día de Paraguay), `onlinepk(day,n,t)` (pico a la vez por día).
+- `alert(db, tipo, título, texto, {url, key, every})` nunca tira error (un aviso no puede romper un pago). 404/410 del servicio de push borran la suscripción. `once` y `tally` son una sola sentencia SQL.
+- **Los 12 avisos** (`ALERT_TYPES`): `pedido` (POST orders), `auto` y `suelto` (bank/mail), `vencido` (`expireOrders` ahora es el de `lib/alerts.js`: marca y avisa cada pedido una vez; lo corre la API y el cron), `fundador` (dentro de `settle`), `cuenta` (register), `record` (servidor en vivo, `connMark` al recibir `hi`; solo si n≥2), `nivel` (PUT game/summary compara con lo guardado: llegó a 200 sin reiniciar, o pasó de 0 a 1 reinicio), `resumen` (cron 00:00 UTC = 21:00 PY, `daySummary`), `arandu` (tope del servidor alcanzado, o 3 fallas de la IA en 15 min; crédito agotado o clave mala avisa a la primera; como mucho 1 por hora), `servidor` (cron cada 10 min prueba el objeto World y `/api/ping`; avisa a la 2ª falla seguida y avisa cuando vuelve; además `World.oops` cuenta errores y avisa con 20 en 10 min), `trade` (intercambio con ≥ `TRADE_ALERT_NX` = 5.000 Noxis).
+- Avisos que se mandan después de responder: la API pasa `bg` (= `ctx.waitUntil`) a cada ruta.
+- `live/wrangler.toml` tiene `[triggers] crons = ["*/10 * * * *", "0 0 * * *"]` (`scheduled` en `live/src/index.js`). `webSocketMessage` ahora envuelve a `onMsg` con try/catch para contar errores.
+- **API**: `GET/POST admin/push` (clave pública, tipos, estado de este dispositivo / guardar suscripción), `POST admin/push/prefs`, `POST admin/push/off`, `POST admin/push/test {type?}` (`resumen` manda el resumen real), `GET admin/alerts` (historial), `GET admin/online` (entradas por día, picos, semana, mes, récord, quiénes entraron hoy).
+- **Panel** (`web/cuenta/index.html`): pestañas nuevas **En línea** (conectados ahora desde `/live/online`, se refresca cada 20 s) y **Avisos** (activar, interruptor por tipo, prueba, desactivar, historial). Subpestañas por enlace: `#admin/online`, `#admin/alerts`, etc. (`ADM_TABS`). App instalable: `web/cuenta/manifest.webmanifest` ("NOX Admin", `start_url /cuenta/?app=1`: abierta como app, un administrador cae directo en Administración) y `web/cuenta/sw.js` (solo push y clic; sin caché). `_headers`: sw y manifiesto sin caché. En iPhone hay que agregarla al inicio (iOS 16.4+) para que existan los avisos; el panel lo explica en 3 pasos. Si los push están activos, el aviso local viejo de `admPoll` no se repite.
+- Pruebas (fuera del repo): API completa con una D1 simulada sobre node:sqlite y un servicio de push falso que descifra; servidor en vivo con conexiones falsas, intercambio, errores y cron.
 
 ## Repositorio y publicación
 

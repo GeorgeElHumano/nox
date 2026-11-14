@@ -5,6 +5,7 @@
 import { Sim, RAID_KEY } from './sim.js';
 import { ZONES } from './data.js';
 import { NX_ITEMS, NX_BY } from './noxis.js'; // copia de lib/noxis.js (scripts/noxis-sync.sh)
+import { alert, loginMark, peakMark, expireOrders, daySummary, summaryText, pyDay, tally, TRADE_ALERT_NX, nTxt } from './alerts.js'; // copia de lib/alerts.js (scripts/noxis-sync.sh)
 
 const enc = new TextEncoder();
 const hex = u => [...u].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -24,7 +25,30 @@ const GESTOS = ['saludo', 'baile', 'risa', 'llanto', 'burla', 'celebracion', 'de
 const GESTOS_NX = NX_ITEMS.filter(i => i.kind === 'gest').map(i => i.id);
 const CZ_SLOTS = ['title', 'frame', 'trail', 'pet_imp', 'pet_hada', 'pet_rudolf'];
 
+/* tareas programadas (wrangler.toml, [triggers]): cada 10 minutos vence pedidos y revisa que el servidor y la API respondan;
+   a las 00:00 UTC (21:00 de Paraguay) manda el resumen del día. Todo termina en avisos al celular del administrador. */
+async function health(env) {
+  const db = env.DB, probe = async (name, f) => {
+    let ok = false, why = '';
+    try { const r = await Promise.race([f(), new Promise((_, no) => setTimeout(() => no(new Error('no respondió en 15 s')), 15000))]); ok = r.ok; if (!ok) why = 'respondió ' + r.status; } catch (e) { why = String(e && e.message || e).slice(0, 80); }
+    const k = 'down:' + name, was = await db.prepare('SELECT v FROM pushkv WHERE k=?').bind(k).first();
+    if (ok) { if (was) { await db.prepare('DELETE FROM pushkv WHERE k=?').bind(k).run(); if (was.v === 'avisado') await alert(db, 'servidor', name + ' volvió a andar', 'Ya responde de nuevo.', { url: '/cuenta/#admin/online' }); } return; }
+    if (await tally(db, 'fail:' + name, 25 * 60e3) >= 2) { // dos revisiones seguidas: no avisa por un tropezón
+      await db.prepare("INSERT INTO pushkv(k,v,t) VALUES(?,'avisado',?) ON CONFLICT(k) DO UPDATE SET v='avisado'").bind(k, Date.now()).run();
+      await alert(db, 'servidor', name + ' no responde', why + '. Revisá Cloudflare (Workers y Pages).', { url: '/cuenta/#admin/online', key: k, every: 3 * 3600e3 });
+    }
+  };
+  await probe('El servidor en vivo', () => env.WORLD.get(env.WORLD.idFromName('reino')).fetch(new Request('https://noxparaguay.com/live/online')));
+  await probe('La web y la API', () => fetch('https://noxparaguay.com/api/ping', { cf: { cacheTtl: 0 } }));
+}
+
 export default {
+  async scheduled(ev, env, ctx) {
+    const db = env.DB;
+    if (ev.cron === '0 0 * * *') { const s = await daySummary(db, pyDay()); await alert(db, 'resumen', 'NOX · resumen de hoy', summaryText(s), { url: '/cuenta/#admin/online', key: 'resumen:' + s.day, every: 20 * 3600e3 }); return; }
+    try { await expireOrders(db); } catch {}
+    await health(env);
+  },
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/live/ping') return new Response('ok');
@@ -86,6 +110,13 @@ export class World {
     server.serializeAttachment({ uid, acc, role, sid: crypto.randomUUID().slice(0, 8), zone: null, s: null, p: null, pid, pl, vc: false });
   }
 
+  // entrada del día (una por conexión) y pico de conectados; un récord nuevo de siempre avisa al administrador
+  async connMark(uid, n) {
+    const db = this.env.DB; await loginMark(db, uid);
+    if (n <= (this.pkMem || 0)) return; this.pkMem = n;
+    const prev = await peakMark(db, n);
+    if (prev !== null && n >= 2) await alert(db, 'record', '¡Récord: ' + n + ' jugando a la vez!', 'El récord anterior era ' + prev + '. ' + this.all().filter(x => x.a.s).map(x => x.a.s.n).slice(0, 8).join(', ') + '.', { url: '/cuenta/#admin/online', key: 'rec' + n, every: 864e5 });
+  }
   att(ws) { try { return ws.deserializeAttachment(); } catch { return null; } }
   save(ws, a) { try { ws.serializeAttachment(a); } catch {} }
   send(ws, o) { try { ws.send(typeof o === 'string' ? o : JSON.stringify(o)); } catch {} }
@@ -96,7 +127,14 @@ export class World {
   pub(a) { return { id: a.uid, s: a.s, p: a.p, sh: a.shop ? { title: a.shop.title, n: a.shop.items.length } : null }; }
   simZone(zone) { if (!zone) return false; if (zone.startsWith(RAID_KEY)) return this.sims.has(zone); const z = ZONES[zone]; return !!z && !z.safe && !z.event; }
   ensureSim(zone) { if (!this.simZone(zone)) return null; let sim = this.sims.get(zone); if (!sim) { sim = new Sim(zone); this.sims.set(zone, sim); } this.startLoop(); return sim; }
-  startLoop() { if (this.loop) return; this.lastStep = Date.now(); this.loop = setInterval(() => { try { this.stepAll(); } catch (e) {} }, 100); }
+  startLoop() { if (this.loop) return; this.lastStep = Date.now(); this.loop = setInterval(() => { try { this.stepAll(); } catch (e) { this.oops('loop', e); } }, 100); }
+  // errores: si se juntan 20 en 10 minutos, aviso al administrador (como mucho uno por hora)
+  oops(where, e) {
+    try { console.log('nox-live', where, e && e.stack || e); } catch {}
+    const now = Date.now(); this.errs = (this.errs || []).filter(t => now - t < 600e3); this.errs.push(now);
+    if (this.errs.length >= 20 && now - (this.errAt || 0) > 3600e3) { this.errAt = now; const n = this.errs.length;
+      alert(this.env.DB, 'servidor', 'Muchos errores en el servidor en vivo', n + ' errores en 10 minutos (el último en ' + where + ': ' + String(e && e.message || e).slice(0, 90) + '). Revisá los registros del Worker nox-live.', { url: '/cuenta/#admin/online', key: 'liveerr', every: 3600e3 }).catch(() => {}); }
+  }
   stepAll() {
     const now = Date.now(), dt = Math.min(.3, (now - this.lastStep) / 1000); this.lastStep = now;
     for (const [key, sim] of this.sims) {
@@ -318,7 +356,9 @@ export class World {
           this.tradeSend(tr, { t: 'tend', ok: false, refund: 1, m: nxFail + ' no tiene los Noxis que ofreció: lo que entregaste vuelve a tu bolsa.' }); return; }
         await this.deliver(tr.a, tr.got[tr.b].items, tr.got[tr.b].gold, 'Intercambio con ' + tr.nb);
         await this.deliver(tr.b, tr.got[tr.a].items, tr.got[tr.a].gold, 'Intercambio con ' + tr.na);
-        this.tradeSend(tr, { t: 'tend', ok: true, nx: na + nb > 0 ? 1 : 0 }); }
+        this.tradeSend(tr, { t: 'tend', ok: true, nx: na + nb > 0 ? 1 : 0 });
+        if (na + nb >= TRADE_ALERT_NX) { const side = (n, nn, it) => n ? nTxt(n) + ' Noxis' + (it ? ' + ' + it + ' ítem' + (it === 1 ? '' : 's') : '') : (it ? it + ' ítem' + (it === 1 ? '' : 's') : 'nada');
+          alert(this.env.DB, 'trade', 'Intercambio grande de Noxis', `${tr.na} dio ${side(na, tr.na, tr.got[tr.a].items.length)}${tr.got[tr.a].gold ? ' y ' + nTxt(tr.got[tr.a].gold) + ' de oro' : ''} · ${tr.nb} dio ${side(nb, tr.nb, tr.got[tr.b].items.length)}${tr.got[tr.b].gold ? ' y ' + nTxt(tr.got[tr.b].gold) + ' de oro' : ''}. Revisá si es legítimo.`, { url: '/cuenta/#admin/users' }).catch(() => {}); } }
       return;
     }
     if (tr.stage === 'commit' && t === 'tno') { await this.tradeEnd(k, tr, 'Un ítem ya no estaba en la bolsa: se canceló el intercambio.'); }
@@ -351,6 +391,9 @@ export class World {
   }
 
   async webSocketMessage(ws, raw) {
+    try { await this.onMsg(ws, raw); } catch (e) { this.oops('mensaje', e); }
+  }
+  async onMsg(ws, raw) {
     if (typeof raw !== 'string' || raw.length > 60000) return;
     let m; try { m = JSON.parse(raw); } catch { return; }
     const a = this.att(ws); if (!a) return;
@@ -425,7 +468,8 @@ export class World {
         const sim = this.ensureSim(zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: zone });
       } else for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'eq', id: a.uid, s: a.s });
       const [pid, p] = this.partyOf(a.uid); if (p) this.partyBroadcast(pid, p);
-      if (t === 'hi') this.send(ws, { t: 'online', n: this.all().filter(x => x.a.s).length, ts: Date.now() });
+      if (t === 'hi') { const n = this.all().filter(x => x.a.s).length; this.send(ws, { t: 'online', n, ts: Date.now() });
+        if (!a.lg) { a.lg = 1; this.save(ws, a); this.connMark(a.uid, n).catch(e => this.oops('conexiones', e)); } }
       // bienvenida de un administrador a todo el servidor (como en MU); como mucho una vez cada 10 minutos por cuenta
       if (t === 'hi' && a.role === 'admin' && a.s && a.s.n) { this.admWel = this.admWel || new Map(); const last = this.admWel.get(a.uid) || 0; if (Date.now() - last > 600000) { this.admWel.set(a.uid, Date.now()); for (const x of this.all()) this.send(x.ws, { t: 'ann', k: 'adm', n: a.s.n }); } }
       return;

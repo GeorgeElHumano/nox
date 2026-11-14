@@ -20,3 +20,7 @@ class_name = "World"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["World"]
+
+# Tareas programadas (avisos al administrador): cada 10 min vence pedidos y revisa que todo responda; 00:00 UTC = 21:00 de Paraguay, resumen del día
+[triggers]
+crons = ["*/10 * * * *", "0 0 * * *"]
