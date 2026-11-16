@@ -1706,7 +1706,7 @@ async function benchRun(){if(BENCH.on)return;BENCH.on=true;const z0=Z.id,p0=[P.x
     if(r.v)t+='\n  '+Object.entries(r.v).map(([k,v])=>k+' '+v+' FPS').join(' · ')+'\n  '+benchWhy(r);return t;};
   const txt='NOX · prueba de rendimiento v2\n'+new Date().toLocaleString()+'\nGráficos: '+QNAME[Q.level]+(Q.auto?' (auto, equipo: '+DEV.tier+' por '+DEV.why+')':' (a mano)')+' · tope '+FCAP.fps+' FPS · resolución '+f1(pr0)+'\nNúcleos: '+I.nucleos+' · memoria: '+I.memoria+' · WebGL '+I.webgl+'\nGPU: '+I.gpu+'\nPantalla: '+I.pantalla+'\nEn la placa: '+mem.textures+' texturas · '+mem.geometries+' geometrías · '+((renderer.info.programs||[]).length)+' sombreadores\n'+I.nav+'\n\n'+res.map(zoneTxt).join('\n\n');
   const verdict=r=>r.fps>=FCAP.fps*.9?'#7fd38a':r.fps>=FCAP.fps*.65?'#f2d98a':'#ef7a6a';
-  benchMsg('<div style="font:600 12px Cinzel,serif;letter-spacing:.12em;color:#c9a24a">PRUEBA DE RENDIMIENTO</div><table style="width:100%;margin:10px 0;border-collapse:collapse">'+res.map(r=>'<tr><td style="padding:3px 0">'+r.zona+(r.v?'<div style="font-size:11px;opacity:.7">'+benchWhy(r)+'</div>':'')+'</td><td style="text-align:right;color:'+verdict(r)+'"><b>'+r.fps+'</b> FPS</td><td style="text-align:right;opacity:.75;font-size:12px">bajones '+r.bajo+'</td></tr>').join('')+'</table><div style="font-size:12px;opacity:.8">Gráficos '+Q.level+' · tope '+FCAP.fps+' · '+I.gpu+'</div><div style="font-size:12px;opacity:.8;margin-top:4px">Copiá el resultado: trae el detalle de cada parte.</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn sm" id="benchCopy">Copiar resultado</button><button class="btn sm ghost" id="benchClose">Cerrar</button></div>');
+  benchMsg('<div style="font:600 12px Cinzel,serif;letter-spacing:.12em;color:#c9a24a">PRUEBA DE RENDIMIENTO</div><table style="width:100%;margin:10px 0;border-collapse:collapse">'+res.map(r=>'<tr><td style="padding:3px 0">'+r.zona+(r.v?'<div style="font-size:11px;opacity:.7">'+benchWhy(r)+'</div>':'')+'</td><td style="text-align:right;color:'+verdict(r)+'"><b>'+r.fps+'</b> FPS</td><td style="text-align:right;opacity:.75;font-size:12px">bajones '+r.bajo+'</td></tr>').join('')+'</table><div style="font-size:12px;opacity:.8">Gráficos '+QNAME[Q.level]+' · tope '+FCAP.fps+' · '+I.gpu+'</div><div style="font-size:12px;opacity:.8;margin-top:4px">Copiá el resultado: trae el detalle de cada parte.</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn sm" id="benchCopy">Copiar resultado</button><button class="btn sm ghost" id="benchClose">Cerrar</button></div>');
   document.getElementById('benchCopy').onclick=async()=>{try{if(navigator.share)await navigator.share({text:txt});else{await navigator.clipboard.writeText(txt);toast('Copiado: pegalo en WhatsApp');}}catch(e){try{await navigator.clipboard.writeText(txt);toast('Copiado');}catch(e2){}}};
   document.getElementById('benchClose').onclick=()=>{const m=document.getElementById('benchBox');if(m)m.remove();};window.__BENCH=res;window.__BENCHTXT=txt;}
 function setPR(pr){DYN.cur=pr;renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);if(composer){composer.setPixelRatio(pr);composer.setSize(innerWidth,innerHeight);}}
@@ -3714,7 +3714,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     for(const n in AL){let o=null;for(const a of AL[n]){o=r.body.getObjectByName(a);if(o)break;}if(o)r.fl.push([o,bindQ(o)||o.quaternion.clone(),n]);}r.flB={};for(const [o,,n] of r.fl)r.flB[n]=o;}
   for(const [o,q] of r.fbq)o.quaternion.copy(q);if(r.flS)for(let i=0;i<r.fl.length;i++)r.fl[i][0].quaternion.copy(r.flS[i]);/* los huesos de la pose vuelven a lo que dejó la animación el cuadro anterior (no al reposo en T): así las correcciones no se acumulan y un clip sin pista para un hueso no lo deja en pose T *//* los huesos sin pista en la animación vuelven a reposo: así la pose de vuelo no se acumula */
   if(!r.gripOk){r.gripOk=1;try{gripFit(r);}catch(e){console.error('agarre',e);}}
-  r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);if(r.cc0)try{handRelax(r);}catch(e){}if(r.fist)for(const [b,q] of r.fist)b.quaternion.copy(q);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
+  r.mixer.update(STUDIO.frozen?0:dt);mixWrite(r.mixer);if(r.cc0&&!r.lodFar)try{handRelax(r);}catch(e){}if(r.fist)for(const [b,q] of r.fist)b.quaternion.copy(q);r.mixT=(r.mixT||0)+dt;if(!r.flS)r.flS=r.fl.map(x=>x[0].quaternion.clone());else for(let i=0;i<r.fl.length;i++)r.flS[i].copy(r.fl[i][0].quaternion);if(P.gest&&r.cc0&&r.gOn)try{gestPose(r,dt);}catch(e){window.__GERR=String(e&&e.stack||e);}
   if((r.flyK||0)>.01){const k=r.flyK,ke=k*k*(3-2*k);
     const sw=Math.sin(T*1.1)*.03,mvS=r.flyMv||0,mx=(a,b,i)=>{const p=a?a[i]||0:0,q=b?b[i]||0:p;return p+(q-p)*mvS;};
     /* pose absoluta de vuelo (como en MU): parte del reposo del esqueleto y le suma la pose; se mezcla con la animación según ke */
@@ -3724,7 +3724,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     /* brazos: la animación ya los deja colgando junto al cuerpo; se les suma la apertura, el codo y el vaivén lento de las manos. La muñeca del arma tiene su giro por clase, para que el arma no cruce el cuerpo */
     const hb=Math.sin(r.flyPh*.5+.6)*FT.hand,HB={arm_L:hb,arm_R:-hb*.5,forearm_L:hb*1.6,forearm_R:-hb*.4},Wc=FT.W[r.cls]||FT.W.caballero,wn=r.cls==='arquera'?'hand_L':'hand_R';
     for(const [o,,n] of r.fl){if(n===wn){_fq.setFromEuler(_fe.set(mx(Wc.h,Wc.f,0)*ke,mx(Wc.h,Wc.f,1)*ke,mx(Wc.h,Wc.f,2)*ke));o.quaternion.multiply(_fq);continue;}const a=FT.A[n];if(!a)continue;const b=FT.AF[n];_fq.setFromEuler(_fe.set((mx(a,b,0)+(HB[n]||0))*ke,mx(a,b,1)*ke,mx(a,b,2)*ke));o.quaternion.multiply(_fq);}}
-  if(r.skF||r.tbF)skirtFollow(r);
+  if((r.skF||r.tbF)&&!r.lodFar)skirtFollow(r);
   if(r.poleH&&r.cc0&&r.gripOk){/* bastón, cetro y arco en movimiento: el braceo los cruzaba por delante del cuerpo o entre las piernas. Mientras se mueve en tierra el arma se mantiene derecha (apenas inclinada adelante) pasando por el puño; el arco sólo al correr, caminando va atravesado en la mano */
     const h=r.poleH,bow=r.cls==='arquera',base=bow?h.userData.qC:r.poleQ0;if(!bow&&!r.poleQ1){r.poleQ1=1;r.poleQ0.copy(h.quaternion);}
     /* los PNJ de la plaza están siempre quietos: su bastón o cetro va siempre derecho y apenas abierto hacia afuera, para que no cruce la túnica ni las piernas (Arandu) */const want=P.npc&&!bow?1:!act&&!(P.deadK>0)&&!(P.gest&&r.gOn)&&(!bow||r.curK==='run')?Math.min(1,(P.mv||0)*3)*(1-Math.min(1,(r.flyK||0)*1.5)):0;r.poleK=(r.poleK||0)+(want-(r.poleK||0))*Math.min(1,dt*8);
@@ -3748,7 +3748,7 @@ function oadHeroAnim(r,dt,act){const pre=VIS(r.cls)==='caballero'?'k':r.cls==='h
     const want=act&&r.cls==='arquera'?1:0;r.aimK=(r.aimK||0)+(want-(r.aimK||0))*Math.min(1,dt*14);const k=r.aimK*(window.__AIMK!=null?window.__AIMK:.85);
     const B=r.fb;if(k>.01&&B.spine&&B.chest&&B.spine.parent){r.g.updateMatrixWorld(true);B.chest.getWorldQuaternion(_aq1);_av1.set(0,1,0).applyQuaternion(_aq1);r.g.getWorldQuaternion(_aq3);_av2.set(0,1,0).applyQuaternion(_aq3);
       _av3.copy(_av1).lerp(_av2,k).normalize();_aq2.setFromUnitVectors(_av1,_av3);B.spine.getWorldQuaternion(_aq1);_aq1.premultiply(_aq2);B.spine.parent.getWorldQuaternion(_aq3);B.spine.quaternion.copy(_aq3.invert().multiply(_aq1));}}
-  try{footIK(r,dt);}catch(e){window.__IKERR=String(e&&e.stack||e);r.ikB=[];}
+  if(!r.lodFar)try{footIK(r,dt);}catch(e){window.__IKERR=String(e&&e.stack||e);r.ikB=[];}
   if(r.chest&&!r.sock){if(!act&&!(r.flyK>.01)&&(P.mv||0)<.05&&r.curK&&r.mixT>.3)wingSocket(r);else{r.chest.getWorldPosition(_ov);r.g.worldToLocal(_ov);r.anchor.position.set(_ov.x,_ov.y-.42,_ov.z);
     r.g.updateMatrixWorld();r.chest.getWorldQuaternion(_cq);r.g.getWorldQuaternion(_gq);_cq.premultiply(_gq.invert());if(!r.cq0&&!(r.flyK>.01)&&!act){r.cq0=_cq.clone().invert();}if(r.cq0){r.anchor.quaternion.copy(_cq).multiply(r.cq0);}}}
   if(r.cape){animCape(r.cape,T,P.mv,0,r.flyK||0);capeSparkTick(r,dt);}}
@@ -3758,7 +3758,7 @@ const NPC_GEAR={herrero:{cls:'caballero',t:6,wg:2,lv:11,face:3},boticaria:{cls:'
   chamana:{cls:'arquera',t:5,wg:1,lv:9,face:5},baqueano:{cls:'mburuvicha',t:6,wg:2,lv:11,face:7},baul:{cls:'arquera',t:4,wg:1,lv:4,face:2},cronista:{cls:'hechicero',t:5,wg:1,lv:9,face:14},
   /* Arandu: set único (FORJA.hechicero[9], «Arandu Guasu»: blanco y oro), con su bastón, y alas propias (wc:'arandu' = paleta WART.PAL.arandu, tres pares, wlv = nivel de las alas) */
   guia:{cls:'hechicero',t:9,wt:9,wg:3,wc:'arandu',wlv:13,lv:9,face:1}};
-function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',G.wt!=null?G.wt:Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});if(G.wg){eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.wlv!=null?G.wlv:G.lv,g:G.wg};if(G.wc)eq.wings.wc=G.wc;}return eq;}
+function npcGear(G){const eq={};for(const k of ['helm','armor','pants','gloves','boots'])eq[k]=newEquip(G.cls,k,G.t,{lv:G.lv});eq.weapon=newEquip(G.cls,'weapon',G.wt!=null?G.wt:Math.min(4,G.t),{lv:G.lv});if(G.cls==='caballero')eq.shield=newEquip(G.cls,'shield',Math.min(4,G.t),{lv:G.lv});if(G.wg){eq.wings={u:0,k:'wings',c:G.cls,t:0,lv:G.wlv!=null?G.wlv:G.lv,g:QHI()?G.wg:1};/* (16/11) en Lite y Media un solo par */if(G.wc)eq.wings.wc=G.wc;}return eq;}
 function oadNpc(id){const G=NPC_GEAR[id];if(G&&OAD.on&&!OAD.failed){const eq=npcGear(G);const hf=HERO_FACE;HERO_FACE=G.face;let r=null;try{if(CC0.on){if(cc0Want(G.cls,eq,oadUpgradeNpcs))r=cc0Hero(G.cls,eq);}else{const sp=oadHeroSpec(G.cls,eq);if(!oadHave(sp.files)){oadNeed(sp.files,oadUpgradeNpcs);}else r=oadHero(G.cls,eq);}}catch(e){console.error(e);}finally{HERO_FACE=hf;}
     if(r){(r.faceMats||[]).forEach(m=>m.userData.npc=1);r.npcP={npc:1,mv:0,swingT:-1,spinT:-1,deadK:0,hitK:0,lastAtk:-99,lastHurt:-99,combat:0,dead:false,flyK:0};return r;}return null;}
   if(CC0.on&&!OAD.failed&&CC0_NPC[id])return cc0Npc(id);
@@ -7215,7 +7215,10 @@ function auraFit(a){const ud=a.userData;ud.ang=(ud.ang||0)+.0035;const g=a.geome
   for(let i=0;i<P.count;i++){const bx=B[i*3],bz=B[i*3+2],x=bx*c-bz*sn,z=bx*sn+bz*c;_av.set(x,oy,z).applyMatrix4(M);let y=(H(_av.x,_av.z)+.05-_ap.y)/k-oy;y=Math.max(-1.2,Math.min(1.2,y));P.setXYZ(i,x,y,z);}
   P.needsUpdate=true;}
 
-function updNpcs(dt){for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);/* en la portada no se ve a ningún PNJ parado entre la cámara y el personaje (Arandu está justo detrás) */{const sv=!(mode==='select'&&Math.abs(n.x)<8&&n.z>1.5&&n.z<19);if(n.m.g.visible!==sv)n.m.g.visible=sv;}charShadow(n,n.m&&n.m.g,d);const want=d<7&&HC.npc!==n?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){if(n.m.npcP){const sP=P;P=n.m.npcP;try{oadHeroAnim(n.m,dt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */const r=n.m;try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,dt);if(r.setFx)setFxTick(r,dt);}catch(e){}}else n.m.mixer.update(dt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
+/* (16/11) PNJ livianos: medido en un iPhone 12, los 9 PNJ de Asunción costaban 4,5 ms por cuadro (sin personajes: 19 → 27 FPS).
+   Fuera de cámara no se animan; a más de NPCLOD m se animan un cuadro sí y otro no, sin pies al suelo, manos ni paños (r.lodFar). */
+const NPCF=new THREE.Frustum(),_npM=new THREE.Matrix4(),_npS=new THREE.Sphere(new THREE.Vector3(),2.6),NPCLOD=IS_MOB?15:22;
+function updNpcs(dt){NPCF.setFromProjectionMatrix(_npM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));for(const n of npcs){const d=Math.hypot(P.x-n.x,P.z-n.z);/* en la portada no se ve a ningún PNJ parado entre la cámara y el personaje (Arandu está justo detrás) */{const sv=!(mode==='select'&&Math.abs(n.x)<8&&n.z>1.5&&n.z<19);if(n.m.g.visible!==sv)n.m.g.visible=sv;}charShadow(n,n.m&&n.m.g,d);const want=d<7&&HC.npc!==n?Math.atan2(P.x-n.x,P.z-n.z):n.ry0;n.m.g.rotation.y=lerpAngle(n.m.g.rotation.y,want,Math.min(1,dt*4));if(n.m.oad){if(d<60){const r=n.m,talk=HC.npc===n;_npS.center.set(n.x,H(n.x,n.z)+1.2,n.z);n.acc=Math.min(1,(n.acc||0)+dt);if(!talk&&mode==='game'&&!NPCF.intersectsSphere(_npS))continue;r.lodFar=!talk&&d>(r.lodFar?NPCLOD-2:NPCLOD);if(r.lodFar&&((n.fr=(n.fr|0)+1)&1))continue;const adt=Math.min(.25,n.acc);n.acc=0;if(r.npcP){const sP=P;P=r.npcP;try{oadHeroAnim(r,adt,null);}catch(e){}finally{P=sP;}/* los PNJ con equipo también llevan el brillo, el aura y los efectos del set */try{if(r.glowMats)for(const m of r.glowMats)if(m.userData.coatU)m.userData.coatU.t.value=T;if(r.epicAura)auraTick(r,adt);if(r.setFx)setFxTick(r,adt);}catch(e){}}else r.mixer.update(adt);}}else{poseHuman(n.m,{t:T+n.ph,seed:n.ph});animCape(n.m.cape,T+n.ph,0);}}}
 
 /* ================= entrada ================= */
 const joyEl=$('#joy'),knob=$('#knob'),joy={id:null,ox:0,oy:0,x:0,y:0};
@@ -7496,15 +7499,21 @@ function evTick(dt){const E=EV;if(!E||!Z.event||P.dead)return;E.t+=dt;
       const gems=[pick(['tupa','jasy']),pick(['tupa','jasy','yvy','kerana'])];gems.forEach(x=>evGive(stackItem('gem',x,1)));let extra='';if(Math.random()<.4){const ks=['helm','armor','pants','gloves','boots'],it=newEquip(C.cls,pick(ks),evTier(),{lv:RI(2,5),luck:true,op:RI(1,2),anc:pick(Object.keys(ANCS))});evGive(it);extra=` y ${itemName(it)}`;}
       evFinish(true,`El Arcángel te premia: ₲ ${fmt(g)}, 2 gemas${extra}`);persist();}}
   if(left<=0&&E.phase!=='end'){if(E.spear){scene.remove(E.spear);E.spear=null;}takeItem('quest','arma_tupa',1);evFinish(false,'Se acabó el tiempo: la fortaleza se cierra.');}}
+/* (16/11) el HUD escribe en la página solo lo que cambió: cada escritura obliga al navegador a recalcular estilos (medido: 1,5-2,6 ms por cuadro en un iPhone 12) */
+const HUDE={};function hEl(id){const e=HUDE[id];return e&&e.isConnected?e:(HUDE[id]=document.getElementById(id));}
+function hT(id,v){const e=hEl(id);v=String(v);if(e&&e._ht!==v){e._ht=v;e.textContent=v;}}
+function hS(id,p,v){const e=hEl(id);if(e&&e['_h'+p]!==v){e['_h'+p]=v;e.style[p]=v;}}
+function hC(e,c,on){on=!!on;if(e&&e.classList.contains(c)!==on)e.classList.toggle(c,on);}
+const hPct=x=>(Math.round(Math.max(0,Math.min(1,x))*1000)/10)+'%';
 function hud(){
-  const L=C.L;$('#hLvl').textContent=`Nv ${L}${C.resets?' · R'+C.resets:''} · ${C.evo?CLASSES[C.cls].evo:CLASSES[C.cls].name}`;
-  $('#hpF').style.height=(Math.max(0,P.hp)/DS.maxHP*100)+'%';const _hpo=$('#hpF').parentNode;_hpo.classList.toggle('low',P.hp>0&&P.hp/DS.maxHP<.3);$('#hpT').textContent=Math.max(0,Math.ceil(P.hp));
-  $('#mpF').style.height=(P.mp/DS.maxMP*100)+'%';$('#mpT').textContent=Math.floor(P.mp);
-  $('#xpF').style.width=(L>=MAXL?100:C.xp/xpNeed(L)*100)+'%';$('#hGold').textContent=fmt(C.gold);
-  $('#nHP').textContent=countItem('pot','hp1')+countItem('pot','hp2')+countItem('pot','hp3');$('#nMP').textContent=countItem('pot','mp1')+countItem('pot','mp2')+countItem('pot','mp3');
-  CSK[C.cls].forEach((id,i)=>{const b=$('#sk'+i),sk=SKILLS[id];b.classList.toggle('locked',!C.skills.includes(id));b.classList.toggle('nomp',P.mp<sk.mp);b.style.setProperty('--cd',sk.cd>0?(P.cd[id]||0)/sk.cd:0);});
-  const pd=$('#ptsDot');pd.hidden=!C.pts;pd.textContent=C.pts;
-  $('#autoBtn').classList.toggle('on',AUTO.on);
+  const L=C.L;hT('hLvl',`Nv ${L}${C.resets?' · R'+C.resets:''} · ${C.evo?CLASSES[C.cls].evo:CLASSES[C.cls].name}`);
+  hS('hpF','height',hPct(P.hp/DS.maxHP));hC(hEl('hpF')&&hEl('hpF').parentNode,'low',P.hp>0&&P.hp/DS.maxHP<.3);hT('hpT',Math.max(0,Math.ceil(P.hp)));
+  hS('mpF','height',hPct(P.mp/DS.maxMP));hT('mpT',Math.floor(P.mp));
+  hS('xpF','width',L>=MAXL?'100%':hPct(C.xp/xpNeed(L)));hT('hGold',fmt(C.gold));
+  hT('nHP',countItem('pot','hp1')+countItem('pot','hp2')+countItem('pot','hp3'));hT('nMP',countItem('pot','mp1')+countItem('pot','mp2')+countItem('pot','mp3'));
+  CSK[C.cls].forEach((id,i)=>{const b=hEl('sk'+i),sk=SKILLS[id];if(!b)return;hC(b,'locked',!C.skills.includes(id));hC(b,'nomp',P.mp<sk.mp);const cd=sk.cd>0?String(Math.round((P.cd[id]||0)/sk.cd*100)/100):'0';if(b._hcd!==cd){b._hcd=cd;b.style.setProperty('--cd',cd);}});
+  {const pd=hEl('ptsDot');if(pd){if(pd.hidden!==!C.pts)pd.hidden=!C.pts;hT('ptsDot',C.pts);}}
+  hC(hEl('autoBtn'),'on',AUTO.on);
   let bh='';if(P.buffs.vida>0)bh+=`<span class="buff">${ICON_SVG('shout')}${Math.ceil(P.buffs.vida)}s</span>`;if(P.buffs.def>0)bh+=`<span class="buff">${ICON_SVG('shield2')}${Math.ceil(P.buffs.def)}s</span>`;
   evClockTick();heroLabelTick();hudV2Tick();ACHT+=1;if(ACHT%20===0)achCheck();
   if(DS.set)bh+=`<span class="buff set" data-act="setInfo" role="button" title="Ver las stats del set">Set completo${DS.setLv>=10?' +10':''} <i>ⓘ</i></span>`;const bb=$('#buffs');if(bb.innerHTML!==bh)bb.innerHTML=bh;
@@ -7515,8 +7524,8 @@ function hud(){
   else{tk='Misión '+(C.q.i+1);tt=`${esc(MOBS[q.mob].name)} <b>${C.q.n} / ${q.n}</b>`;}
   if(C.L>=50&&!C.evo&&C.evoQ&&countItem('quest','pluma')<5)tt+=`<br>Plumas de Guyra Pytã <b>${countItem('quest','pluma')} / 5</b>`;
   if($('#trK').textContent!==tk)$('#trK').textContent=tk;if($('#trT').innerHTML!==tt)$('#trT').innerHTML=tt;
-  const t=P.target&&!P.target.dead&&!P.target.pvp?P.target:null;$('#tf').hidden=!t;if(t){$('#tfN').textContent=t.golden?t.def.name+' Dorado':t.elite?t.def.name+' Élite':t.def.name;$('#tfL').textContent='Nv '+t.def.lvl;$('#tfF').style.width=(t.hp/t.max*100)+'%';}
-  const n=nearNpc(),cx=$('#ctx');if(n&&!paused){cx.hidden=false;cx.textContent='Hablar con '+n.def.name;cx._npc=n;}else cx.hidden=true;
+  const t=P.target&&!P.target.dead&&!P.target.pvp?P.target:null;{const tf=hEl('tf');if(tf&&tf.hidden!==!t)tf.hidden=!t;}if(t){hT('tfN',t.golden?t.def.name+' Dorado':t.elite?t.def.name+' Élite':t.def.name);hT('tfL','Nv '+t.def.lvl);hS('tfF','width',hPct(t.hp/t.max));}
+  const n=nearNpc(),cx=hEl('ctx');if(n&&!paused){if(cx.hidden)cx.hidden=false;hT('ctx','Hablar con '+n.def.name);cx._npc=n;}else if(!cx.hidden)cx.hidden=true;
 }
 
 /* inventario */
@@ -8822,7 +8831,7 @@ function tickOnce(dt,rdt,draw){
     if(mode==='game'&&C){updatePlayer(gdt);fpFace(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}(MOBNET.role==='guest'?updateEnemiesGuest:updateEnemies)(gdt);mobNetTick(dt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}pk('juego');
     if(BENCH.nochar)benchHideChars();else{updNpcs(dt);pk('pnj');faceTick(dt);updLife(mode==='select'?dt:gdt);pk('ambiente');}if(!$('#pInv').hidden)irPreview(dt);if(MATE.on||!$('#pMate').hidden)mateTick(dt);animHero(mode==='select'?dt:gdt);pk('heroe');liveTick(dt);if(mode==='game'){liveAnim(Math.min(.5,rdt));duelTick(dt);}pk('jugadores');updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);pk('efectos');
     padTick(dt);hcTick();updCamera(dt);updLabels();updNums(gdt);if(AU.ctx&&AU.on){musicTick();ambTick();sndTick(dt);}pk('camara');
-    if(mode==='game'&&C){hudT+=dt;if(hudT>.07){hudT=0;hud();}mmT+=dt;if(mmT>.2){mmT=0;drawMinimap();}saveT+=dt;if(saveT>10){saveT=0;persist();}}
+    if(mode==='game'&&C){hudT+=dt;if(hudT>(IS_MOB?.1:.07)){hudT=0;hud();}mmT+=dt;if(mmT>(IS_MOB?.33:.2)){mmT=0;drawMinimap();}saveT+=dt;if(saveT>10){saveT=0;persist();}}
     if(NET.mode==='online'&&NET.dirty.size&&!NET.writing&&performance.now()-NET.last>6000)flushNet();pk('hud');
   }catch(err){console.error(err);}
   if(FINAL)FINAL.uniforms.uTime.value=windT;
