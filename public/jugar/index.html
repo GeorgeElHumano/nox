@@ -609,7 +609,7 @@ input{user-select:text;-webkit-user-select:text}
 .cell .ico,.slot .ico{width:92%;height:92%;object-fit:contain;pointer-events:none;-webkit-user-drag:none;user-select:none;filter:drop-shadow(0 0 1.5px rgba(255,236,200,.55)) drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 .cell.has,.slot:not(.empty){background:radial-gradient(circle at 50% 45%,rgba(120,96,70,.35),var(--cell) 75%)}
 .slot .ico{width:80%;height:80%;margin-bottom:8px}
-#invGrid .cell,#eqGrid .slot{touch-action:none}
+#invGrid .cell,#eqGrid .slot,#pVault .vc{touch-action:pan-y;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#invGrid .cell.lp,#eqGrid .slot.lp,#pVault .vc.lp{transform:scale(1.08);box-shadow:0 0 0 2px #f6d892,0 0 14px #f6d89288;transition:transform .12s}
 .cell.has.q1{background:radial-gradient(circle,rgba(124,184,255,.2),var(--cell) 72%)}
 .cell.has.q2{background:radial-gradient(circle,rgba(255,207,87,.22),var(--cell) 72%)}
 .cell.has.q3{background:radial-gradient(circle,rgba(99,224,138,.25),var(--cell) 72%);border-color:rgba(99,224,138,.6)}
@@ -1019,7 +1019,7 @@ body.half #hud .actions,body.half #joy,body.half #ctx,body.half #sunTip{display:
 #pMap .card{display:flex;flex-direction:column}
 #pMap .mp-b{flex:1;min-height:0;display:flex;gap:12px}
 #pMap .mp-l{flex:none;display:flex;flex-direction:column;gap:6px}
-#pMap canvas{display:block;border-radius:12px;box-shadow:0 0 0 1px var(--gl2)}
+#pMap canvas{touch-action:pan-y;display:block;border-radius:12px;box-shadow:0 0 0 1px var(--gl2)}
 #pMap .mp-leg{display:flex;flex-wrap:wrap;gap:3px 9px;font-size:10px;color:#c9c3e8}#pMap .mp-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:0}
 #pMap .mp-r{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 #pMap .mp-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px}
@@ -1129,6 +1129,14 @@ body.pad #joy{display:none!important}
 #boot .b-tip{font-family:var(--serif);font-size:18px;color:#e9dfcc;font-style:italic;line-height:1.3}
 #boot .b-logo{filter:drop-shadow(0 10px 30px rgba(226,168,63,.25))}
 </style>
+<style id="scrollFix">/* 16/11: scroll de todos los menús. Las tarjetas medían 100 % + su relleno, así que el final quedaba fuera de la pantalla (mapa en PC, bolsa, ficha, tienda, ajustes, baúl) y a la derecha sobraba. Ahora el relleno va adentro del tamaño. */
+.card{box-sizing:border-box;width:min(492px,100%)}.card.wide{width:min(652px,100%)}
+/* la cabecera fija ya trae su propio relleno arriba: sin el de la tarjeta no queda una franja por donde se ve pasar el contenido al deslizar */
+.panel:not(.top)>.card:has(>.card-h:first-child){padding-top:0!important}
+.hp-tc{display:none}@media (pointer:coarse){.hp-pc{display:none}.hp-tc{display:inline}}
+/* deslizar suave y sin arrastrar el juego de fondo */
+.card,#pMap .mp-b,#pMap .mp-list,#pMap .py,#vGrid,#chatList,#partyBody,.gq-log{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+</style>
 <script>
 /* guardado en el dispositivo: registra sw.js lo antes posible para que ya guarde lo que baja esta primera carga.
    En localhost queda apagado (se prende con ?sw=1) para que las pruebas no lean archivos viejos; ?nosw=1 lo quita y borra lo guardado. */
@@ -1228,7 +1236,7 @@ body.pad #joy{display:none!important}
 <div class="panel" id="pInv" hidden><div class="card wide">
   <div class="card-h"><h2>Bolsa</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
   <div id="gemBar" class="gembar" hidden></div>
-  <div class="inv-wrap"><div class="inv-left"><div class="inv-prev" id="invPrev" aria-label="Vista de tu personaje"></div><div class="eqgrid" id="eqGrid"></div></div><div class="inv-side"><div class="invgrid" id="invGrid"></div><div class="foot"><span class="goldv">₲ <span id="invGold">0</span></span><span id="invFree"></span></div><p class="hint inv-hint">Arrastrá los objetos para moverlos, equiparlos o tirarlos fuera de la ventana.</p><div class="rar-legend"><b class="rar r-opt">● Con opciones</b><b class="rar r-exc">● Excelente</b><b class="rar r-anc">● Antiguo</b><b class="rar r-epic">● Épico</b> <b class="rar r-uniq">● Único</b></div></div></div>
+  <div class="inv-wrap"><div class="inv-left"><div class="inv-prev" id="invPrev" aria-label="Vista de tu personaje"></div><div class="eqgrid" id="eqGrid"></div></div><div class="inv-side"><div class="invgrid" id="invGrid"></div><div class="foot"><span class="goldv">₲ <span id="invGold">0</span></span><span id="invFree"></span></div><p class="hint inv-hint"><span class="hp-pc">Arrastrá los objetos para moverlos, equiparlos o tirarlos fuera de la ventana.</span><span class="hp-tc">Deslizá para ver toda la bolsa. Mantené apretado un objeto (o movelo de costado) para arrastrarlo, equiparlo o tirarlo fuera de la ventana.</span></p><div class="rar-legend"><b class="rar r-opt">● Con opciones</b><b class="rar r-exc">● Excelente</b><b class="rar r-anc">● Antiguo</b><b class="rar r-epic">● Épico</b> <b class="rar r-uniq">● Único</b></div></div></div>
 </div></div>
 
 <div class="panel" id="pNox" hidden><div class="card wide">
@@ -5736,13 +5744,20 @@ function irPreview(dt){const pv=$('#invPrev');if(!pv||$('#pInv').hidden||!C||!ir
 function heroApplyTex(r,cls,eq){if(!r||!r.oad||!r.body||r.cc0)return;const ids=heroTexIds(cls,eq);const body=cls==='hechicero'?'m_robe':cls==='arquera'?'f_tunic':'m_tunic';
   bodyComposite(body,ids).then(t=>{r.body.userData.mats.forEach(m=>{m.map=t;m.needsUpdate=true;});gearGlow(r);}).catch(()=>{});}
 /* ================= arrastrar y soltar ================= */
+/* 16/11: en pantallas táctiles deslizar sobre la bolsa o el baúl tiene que mover la lista. Arrastrar un objeto: mantener apretado un momento (tdArm) o moverlo de costado. Si el dedo va primero hacia arriba o abajo, es scroll y no aparece el fantasma. */
+function tdTm(e){const D=DRAG.src?DRAG:VDRAG.s?VDRAG:null;if(D&&(D.moved||D.lp)&&e.cancelable)e.preventDefault();}
+function tdArm(D,e){clearTimeout(D.lpT);D.lp=false;D.tch=e.pointerType!=='mouse';if(!D.tch)return;const el=D.el;el.addEventListener('touchmove',tdTm,{passive:false});D.lpT=setTimeout(()=>{if(D.el!==el||D.moved)return;D.lp=true;el.classList.add('lp');try{navigator.vibrate&&navigator.vibrate(12);}catch(_){}},280);}
+function tdOff(D,end){clearTimeout(D.lpT);D.lpT=0;if(D.el)D.el.classList.remove('lp');D.lp=false;if(!end)return;if(D.el)D.el.removeEventListener('touchmove',tdTm);D.tch=false;if(D.redo){const f=D.redo;D.redo=0;setTimeout(f,380);}}
+function tdHold(v,f){try{const D=v?VDRAG:DRAG;if((D.src||D.s)&&D.tch){D.redo=f;return true;}}catch(_){}return false;}
+function tdScroll(D,e,dx,dy){return D.tch&&!D.lp&&Math.abs(dy)>=Math.abs(dx);}
+document.addEventListener('touchmove',e=>{if(((DRAG.src&&(DRAG.moved||DRAG.lp))||(VDRAG.s&&(VDRAG.moved||VDRAG.lp)))&&e.cancelable)e.preventDefault();},{passive:false});
 const DRAG={src:null,it:null,el:null,sx:0,sy:0,moved:false,id:null,ghost:null,block:0,over:null};
 function dragTarget(x,y){const el=document.elementFromPoint(x,y);if(!el)return {t:'none'};const c=el.closest('#invGrid .cell');if(c)return {t:'inv',i:+c.dataset.i,el:c};const s=el.closest('#eqGrid .slot');if(s)return {t:'eq',k:s.dataset.k,el:s};
   if(el.closest('#eqGrid'))return {t:'eq',k:null};if(el.closest('#pInv .card'))return {t:'none'};return {t:'out',hero:heroDropZone(x,y)};}
-function dragEnd(){if(DRAG.ghost)DRAG.ghost.remove();if(DRAG.el)DRAG.el.classList.remove('dragging');document.querySelectorAll('#pInv .drop-ok,#pInv .drop-hover').forEach(e=>e.classList.remove('drop-ok','drop-hover'));DRAG.src=null;DRAG.ghost=null;DRAG.it=null;DRAG.el=null;DRAG.over=null;}
+function dragEnd(){tdOff(DRAG,1);if(DRAG.ghost)DRAG.ghost.remove();if(DRAG.el)DRAG.el.classList.remove('dragging');document.querySelectorAll('#pInv .drop-ok,#pInv .drop-hover').forEach(e=>e.classList.remove('drop-ok','drop-hover'));DRAG.src=null;DRAG.ghost=null;DRAG.it=null;DRAG.el=null;DRAG.over=null;}
 document.addEventListener('pointerdown',e=>{if(!C||GEM||$('#pInv').hidden||!$('#pItem').hidden)return;const c=e.target.closest('#invGrid .cell,#eqGrid .slot');if(!c||c.disabled)return;
-  const src=c.matches('.cell')?{t:'inv',i:+c.dataset.i}:{t:'eq',k:c.dataset.k};const it=src.t==='inv'?C.inv[src.i]:C.eq[src.k];if(!it)return;Object.assign(DRAG,{src,it,el:c,sx:e.clientX,sy:e.clientY,moved:false,id:e.pointerId});},{passive:true});
-document.addEventListener('pointermove',e=>{if(!DRAG.src||e.pointerId!==DRAG.id)return;const dx=e.clientX-DRAG.sx,dy=e.clientY-DRAG.sy;if(!DRAG.moved){if(Math.hypot(dx,dy)<9)return;DRAG.moved=true;
+  const src=c.matches('.cell')?{t:'inv',i:+c.dataset.i}:{t:'eq',k:c.dataset.k};const it=src.t==='inv'?C.inv[src.i]:C.eq[src.k];if(!it)return;Object.assign(DRAG,{src,it,el:c,sx:e.clientX,sy:e.clientY,moved:false,id:e.pointerId});tdArm(DRAG,e);},{passive:true});
+document.addEventListener('pointermove',e=>{if(!DRAG.src||e.pointerId!==DRAG.id)return;const dx=e.clientX-DRAG.sx,dy=e.clientY-DRAG.sy;if(!DRAG.moved){if(Math.hypot(dx,dy)<9)return;if(tdScroll(DRAG,e,dx,dy)){dragEnd();return;}tdOff(DRAG);DRAG.moved=true;
     const g=document.createElement('div');g.className='drag-ghost';g.innerHTML=cellHTML(DRAG.it);document.body.appendChild(g);DRAG.ghost=g;DRAG.el.classList.add('dragging');
     if(isEq(DRAG.it)&&!canEquip(DRAG.it)){const s=document.querySelector(`#eqGrid .slot[data-k="${DRAG.it.k}"]`);if(s)s.classList.add('drop-ok');}}
   DRAG.ghost.style.transform=`translate(${e.clientX-30}px,${e.clientY-30}px)`;const t=dragTarget(e.clientX,e.clientY);if(DRAG.over&&DRAG.over!==t.el)DRAG.over.classList.remove('drop-hover');if(t.el){t.el.classList.add('drop-hover');DRAG.over=t.el;}
@@ -7534,7 +7549,7 @@ let GEM=null;
 const TIPREG=new Map();let TIPN=0;function tipK(it){if(!it)return '';if(TIPREG.size>4000)TIPREG.clear();const n=++TIPN;TIPREG.set(n,it);return `<i class="tk" data-tk="${n}" hidden></i>`;}
 function cellHTML(it){if(!it)return '';const u=iconURL(it),rr=itemR(it);return `${rr!=='normal'?`<span class="rg r-${rr}"></span>`:''}${u?`<img class="ico q${itemQ(it)} i-${rr}" src="${u}" alt="" draggable="false">`:`<span style="color:${itemColor(it)}">${ICON_SVG(iconOf(it))}</span>`}${isEq(it)&&it.lv?`<span class="lv">+${it.lv}</span>`:''}${it.n>1?`<span class="n">${it.n}</span>`:''}${tipK(it)}`;}
 function gemOk(it,sub){if(!isEq(it))return false;if(sub==='tupa')return it.lv<6;if(sub==='jasy')return it.lv>=6&&it.lv<9;if(sub==='yvy')return it.op<4;return false;}
-function renderInv(){
+function renderInv(){if(tdHold(0,renderInv))return;
   const lay=[null,'helm','wings','shield','armor','weapon','gloves','pants','boots'];
   const pg=PETK.map(k=>{const it=C.pets&&C.pets[k];return `<button class="slot pslot ${it?'':'empty'}" data-act="petslot" data-p="${k}" aria-label="Mascota: ${PETS[k].n}" style="--pc:${PETS[k].col}"><img class="ico pimg ${it?'':'off'}" src="assets/ui/pet_${k}.webp" alt="" draggable="false"><span class="sl">${PETS[k].n.split(' ')[0]}</span></button>`;}).join('');
   $('#eqGrid').innerHTML=lay.map(k=>{if(!k)return '<span></span>';const it=C.eq[k],na=k==='shield'&&C.cls!=='caballero'||k==='helm'&&C.cls==='gladiador';const ok=GEM&&it&&gemOk(it,GEM.sub);
@@ -7957,7 +7972,7 @@ function vMove(from,i,to,j){const V=vaultData().items,A=from==='v'?V:C.inv,B=to=
   return true;}
 function vAfter(){vaultSave();persist();renderVault();}
 function vCell(it,s,i){const q=it?'has q'+itemQ(it):'';return `<button class="cell vc ${q}" data-act="vcell" data-s="${s}" data-i="${i}" aria-label="${it?esc(itemName(it)):'Vacío'}">${cellHTML(it)}</button>`;}
-function renderVault(){const v=vaultData(),lk=vaultLocked();
+function renderVault(){if(tdHold(1,renderVault))return;const v=vaultData(),lk=vaultLocked();
   $('#vGrid').innerHTML=v.items.map((it,i)=>vCell(it,'v',i)).join('');$('#vInv').innerHTML=C.inv.map((it,i)=>vCell(it,'i',i)).join('');
   $('#vGold').textContent=fmt(v.gold);$('#vInvGold').textContent=fmt(C.gold);
   const used=v.items.filter(Boolean).length;$('#vCount').textContent=`${used} / ${VAULT_N}`;$('#vFree').textContent=freeSlots()+' lugares libres';
@@ -7982,11 +7997,11 @@ function vPinKey(k){if(!VST.pin)return;if(k==='del'){VST.buf=VST.buf.slice(0,-1)
     vAfter();},120);}
 /* arrastre dentro del baúl */
 const VDRAG={s:null,i:-1,it:null,el:null,sx:0,sy:0,moved:false,id:null,ghost:null,block:0,over:null};
-function vDragEnd(){if(VDRAG.ghost)VDRAG.ghost.remove();if(VDRAG.el)VDRAG.el.classList.remove('dragging');if(VDRAG.over)VDRAG.over.classList.remove('drop-hover');VDRAG.s=null;VDRAG.ghost=null;VDRAG.it=null;VDRAG.el=null;VDRAG.over=null;}
+function vDragEnd(){tdOff(VDRAG,1);if(VDRAG.ghost)VDRAG.ghost.remove();if(VDRAG.el)VDRAG.el.classList.remove('dragging');if(VDRAG.over)VDRAG.over.classList.remove('drop-hover');VDRAG.s=null;VDRAG.ghost=null;VDRAG.it=null;VDRAG.el=null;VDRAG.over=null;}
 function vTarget(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const c=el.closest('#pVault .vc');if(c)return {s:c.dataset.s,i:+c.dataset.i,el:c};const g=el.closest('#vStore,#vInvBox');if(g)return {s:g.id==='vStore'?'v':'i',i:null,el:g};return null;}
 document.addEventListener('pointerdown',e=>{if(!C||$('#pVault').hidden||!$('#pItem').hidden||VST.pin||VST.amt)return;const c=e.target.closest('#pVault .vc');if(!c)return;const s=c.dataset.s,i=+c.dataset.i,it=(s==='v'?vaultData().items:C.inv)[i];if(!it)return;
-  Object.assign(VDRAG,{s,i,it,el:c,sx:e.clientX,sy:e.clientY,moved:false,id:e.pointerId});},{passive:true});
-document.addEventListener('pointermove',e=>{if(!VDRAG.s||e.pointerId!==VDRAG.id)return;if(!VDRAG.moved){if(Math.hypot(e.clientX-VDRAG.sx,e.clientY-VDRAG.sy)<9)return;VDRAG.moved=true;
+  Object.assign(VDRAG,{s,i,it,el:c,sx:e.clientX,sy:e.clientY,moved:false,id:e.pointerId});tdArm(VDRAG,e);},{passive:true});
+document.addEventListener('pointermove',e=>{if(!VDRAG.s||e.pointerId!==VDRAG.id)return;if(!VDRAG.moved){if(Math.hypot(e.clientX-VDRAG.sx,e.clientY-VDRAG.sy)<9)return;if(tdScroll(VDRAG,e,e.clientX-VDRAG.sx,e.clientY-VDRAG.sy)){vDragEnd();return;}tdOff(VDRAG);VDRAG.moved=true;
     const g=document.createElement('div');g.className='drag-ghost';g.innerHTML=cellHTML(VDRAG.it);document.body.appendChild(g);VDRAG.ghost=g;VDRAG.el.classList.add('dragging');}
   VDRAG.ghost.style.transform=`translate(${e.clientX-30}px,${e.clientY-30}px)`;const t=vTarget(e.clientX,e.clientY);const el=t&&t.i!=null?t.el:null;if(VDRAG.over&&VDRAG.over!==el)VDRAG.over.classList.remove('drop-hover');if(el){el.classList.add('drop-hover');VDRAG.over=el;}});
 document.addEventListener('pointerup',e=>{if(!VDRAG.s||e.pointerId!==VDRAG.id)return;if(!VDRAG.moved){vDragEnd();return;}VDRAG.block=performance.now();const t=vTarget(e.clientX,e.clientY),s=VDRAG.s,i=VDRAG.i;vDragEnd();
