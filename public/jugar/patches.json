@@ -1,5 +1,16 @@
 [
  {
+  "build": "202611161256",
+  "title": "Rendimiento: el juego corre más fluido en celulares",
+  "notes": [
+   "Cuatro niveles de gráficos: Lite, Media, Alta y Ultra (Ajustes → Gráficos)",
+   "Alta ahora pesa mucho menos en celulares y se ve igual de bien",
+   "En automático el celular arranca en Media y sube solo a Alta si le sobra potencia",
+   "Asunción más fluida: los PNJ y la gente del ambiente consumen menos",
+   "El HUD y el minimapa usan menos batería"
+  ]
+ },
+ {
   "build": "202611141634",
   "title": "El aviso En vivo ya no tapa nada",
   "notes": [

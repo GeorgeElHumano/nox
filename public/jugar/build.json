@@ -1,10 +1,12 @@
 {
- "build": "202611141634",
- "min": "202611141634",
- "title": "El aviso En vivo ya no tapa nada",
+ "build": "202611161256",
+ "min": "202611161256",
+ "title": "Rendimiento: el juego corre más fluido en celulares",
  "notes": [
-  "El aviso «En vivo» queda siempre arriba de todo, en su propia franja",
-  "El nombre y la barra de los jefes, los avisos, la tarjeta de vida y el minimapa quedan debajo y ya no se pisan con él",
-  "Arreglado en PC y en celulares, de pie y acostados"
+  "Cuatro niveles de gráficos: Lite, Media, Alta y Ultra (Ajustes → Gráficos)",
+  "Alta ahora pesa mucho menos en celulares y se ve igual de bien",
+  "En automático el celular arranca en Media y sube solo a Alta si le sobra potencia",
+  "Asunción más fluida: los PNJ y la gente del ambiente consumen menos",
+  "El HUD y el minimapa usan menos batería"
  ]
 }
