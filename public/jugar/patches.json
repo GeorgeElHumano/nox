@@ -1,5 +1,12 @@
 [
  {
+  "build": "202611161320",
+  "title": "Nombres de armas y escudos",
+  "notes": [
+   "Las armas y los escudos de los sets de nivel 133 y 177 ya muestran su nombre (antes decían «undefined»)"
+  ]
+ },
+ {
   "build": "202611161256",
   "title": "Rendimiento: el juego corre más fluido en celulares",
   "notes": [

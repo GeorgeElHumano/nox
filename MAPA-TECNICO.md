@@ -2,7 +2,7 @@
 
 Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se actualiza cada vez que cambia algo importante.
 
-Última actualización: 16 de noviembre de 2026 (parche 202611161256 publicado: rendimiento en celulares, cuatro niveles de gráficos, PNJ y HUD livianos, prueba de rendimiento v2). Antes: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611161256 (rendimiento).
+Última actualización: 16 de noviembre de 2026 (parche 202611161256 publicado: rendimiento en celulares, cuatro niveles de gráficos, PNJ y HUD livianos, prueba de rendimiento v2). Antes: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611161320 (nombres de armas y escudos de los sets 133 y 177; antes 202611161256, rendimiento).
 
 ## Parche 202611122202: Cerro León y reinicio de misiones (12/11, noche; publicado con OK del dueño)
 
@@ -471,7 +471,7 @@ Un solo archivo HTML de unos 1,4 MB con three.js r128, servido desde `public/jug
 - Épico de los sets 7-8 con set completo: además del aura, `r.epicFx` = `makeSetFx('halo',0xc98cff)` con el aro a 2,02 m (se anima dentro de `auraTick`).
 - Arandu Guasu pasó de `FORJA.hechicero[7]` a `[9]` (`npcP.guia` con `t:9,wt:9`). El set 7 del Hechicero ahora es Yvytu Ñe'ẽ.
 - Caída (`mobDrop`): en `mbocaruzu` todo el equipo es set 7 y en `saltocristal` set 8 (`rollEquip(...,tFix)`), Excelente 6 % común, 30 % élite/dorada, 100 % jefe, sin épicos. En `cerroleon` solo épicos (`rollEquip(L,0,1,0,L<=250?7:8)`): 1,5 % común, 8 % élite, 15 % dorada, con aviso y sonido de ítem raro. El resto de los mapas sigue igual (tope set 6).
-- Nombres (arreglo del 16/11): `WNAME` (armas por raza) y `SHNAME` (escudos) se habían quedado en 7 y las armas y escudos de los sets 7-8 salían «undefined». Ahora tienen 9 (siguen el nombre del set de `SETN`) e `itemName` arma un nombre con `SETN` si alguna vez falta uno. **Al sumar un set, extender también `WNAME` y `SHNAME`.**
+- Nombres (arreglo del 16/11, publicado en el parche 202611161320): `WNAME` (armas por raza) y `SHNAME` (escudos) se habían quedado en 7 y las armas y escudos de los sets 7-8 salían «undefined». Ahora tienen 9 (siguen el nombre del set de `SETN`) e `itemName` arma un nombre con `SETN` si alguna vez falta uno. **Al sumar un set, extender también `WNAME` y `SHNAME`.**
 - Guía: `lib/guia.js` (9 sets, requisitos y dónde caen) y el consejo armado de sets de `GUIA_T`.
 - Íconos (13/11): `irRenderIcon` pasa la caja real de la pieza (`R0.o.userData.box`) al grupo de la foto; antes se encuadraba con la caja de todo el cuerpo y los guantes salían chiquitos. Para guantes, la caja se arma solo con vértices de antebrazo y mano, y `cc0GlovePose` junta los antebrazos en V. Vale para todos los sets.
 - Web: `gallery.js` saca 9 sets (bucles `t<9`) y apaga el efecto de set (`H.setFx`, `epicFx`, `epicAura`) en las fotos recortadas porque dejaba rayas; `cutouts.py` recorta `_[0-8]` y la portada `cut_sets` usa el set más alto (8). Textos «nueve sets por raza» en `web/shell_body.html` y `web/shell_head.html`. Íconos de guantes de todos los sets rehechos.
