@@ -973,7 +973,9 @@
     "Espada del Guardián",
     "Espada de Tau",
     "Espada del Yvága",
-    "Espada de Yvy Marane'ỹ"
+    "Espada de Yvy Marane'ỹ",
+    "Espada de Tupã Ryapu",
+    "Espada del Ára Jára"
    ],
    "slots": {
     "helm": "Yelmo",
@@ -1077,7 +1079,9 @@
     "Bastón de Jasy",
     "Bastón de Tupã",
     "Bastón de Arandu",
-    "Bastón de Ñamandu"
+    "Bastón de Ñamandu",
+    "Bastón de Yvytu Ñe'ẽ",
+    "Bastón de Mbyja Pytũ"
    ],
    "slots": {
     "helm": "Capucha",
@@ -1181,7 +1185,9 @@
     "Espada del Tembetá",
     "Espada de Tupã Rendy",
     "Espada de Karai Ru",
-    "Espada de Ñamandu Ru"
+    "Espada de Ñamandu Ru",
+    "Espada del Mbói Hovy",
+    "Espada del Ita Vera"
    ],
    "slots": {
     "helm": "Yelmo",
@@ -1285,7 +1291,9 @@
     "Cetro de Guyra Hũ",
     "Cetro del Mburuvicha",
     "Cetro del Tuvicha Guasu",
-    "Cetro de Ñanderu"
+    "Cetro de Ñanderu",
+    "Cetro del Yaguareté-Abá",
+    "Cetro del Y Jára"
    ],
    "slots": {
     "helm": "Corona",
@@ -1389,7 +1397,9 @@
     "Arco de Kuarahy",
     "Arco de Arasy",
     "Arco de Jasy Porã",
-    "Arco del Yvága"
+    "Arco del Yvága",
+    "Arco de Mainumby Ruvicha",
+    "Arco del Ysyry Mimbi"
    ],
    "slots": {
     "helm": "Diadema",
@@ -1421,7 +1431,9 @@
   "Escudo del Guardián",
   "Escudo de Tau",
   "Escudo del Yvága",
-  "Escudo de Yvy Marane'ỹ"
+  "Escudo de Yvy Marane'ỹ",
+  "Escudo de Tupã Ryapu",
+  "Escudo del Ára Jára"
  ],
  "lore": [
   {
