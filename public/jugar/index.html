@@ -1351,7 +1351,7 @@ const host=$('#game');
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:!!window.__ALPHA});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));
 renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;let SHF=0;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=matchMedia('(pointer:coarse)').matches?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;/* (16/11) celular: borde simple, la suave cuesta muchos píxeles */renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;let SHF=0;
 renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;
 host.appendChild(renderer.domElement);
 const scene=new THREE.Scene();
@@ -1678,7 +1678,7 @@ function benchHideChars(){for(const n of npcs)if(n.m&&n.m.g)n.m.g.visible=false;
 /* mide unos segundos: cuadros por segundo, bajones, dibujos, triángulos y el tiempo de cada parte en el procesador */
 async function benchMeasure(ms){FPSM.frames.length=0;PRF.s={};PRF.n=0;PRF.on=true;let calls=0,tris=0,nc=0;const t0=performance.now();
   while(performance.now()-t0<ms){await wait_(250);calls+=renderer.info.render.calls;tris+=renderer.info.render.triangles;nc++;}
-  PRF.on=false;const f=FPSM.frames.slice().filter(x=>x>0&&x<1),avg=f.length/f.reduce((a,b)=>a+b,0)||0,sorted=f.slice().sort((a,b)=>b-a),low=1/(sorted[Math.floor(sorted.length*.05)]||1);
+  PRF.on=false;const f=FPSM.frames.slice().filter(x=>x>0&&x<3),avg=f.length?f.length/f.reduce((a,b)=>a+b,0):0,sorted=f.slice().sort((a,b)=>b-a),low=1/(sorted[Math.floor(sorted.length*.05)]||1);
   const n=Math.max(1,PRF.n),p={};for(const k in PRF.s)p[k]=PRF.s[k]/n;
   return {fps:Math.round(avg),bajo:Math.round(low),dib:Math.round(calls/Math.max(1,nc)),tri:Math.round(tris/Math.max(1,nc)),ms:avg?1000/avg:0,p};}
 const BPART=[['juego','juego'],['pnj','PNJ'],['ambiente','ambiente'],['heroe','héroe'],['jugadores','jugadores'],['efectos','efectos'],['camara','cámara y textos'],['hud','HUD'],['sombra','sombra'],['escena','escena']];
@@ -1687,13 +1687,13 @@ function benchCpu(p){const q=Object.assign({},p);q.escena=Math.max(0,(q.dibujo||
 function benchWhy(r){if(!r.v)return '';const g=[['sin personajes','personajes (PNJ y ambiente)'],['sin sombras','sombras'],['mitad de resolución','píxeles (placa de video)']].map(([k,t])=>[t,(r.v[k]||0)-r.fps]).sort((a,b)=>b[1]-a[1]);
   return g[0][1]>=3?'Lo que más pesa: '+g[0][0]+(g[1][1]>=3?', después '+g[1][0]:''):'Ninguna prueba sola lo mejora: pesa todo junto (procesador)';}
 async function benchRun(){if(BENCH.on)return;BENCH.on=true;const z0=Z.id,p0=[P.x,P.z],list=['asuncion','campos','chaco','esteros','cerrocora'],res=[];const fv=FPSM.on;FPSM.on=true;fpsBox();const pr0=DYN.cur||renderer.getPixelRatio();
-  try{for(let i=0;i<list.length;i++){const z=list[i];benchMsg('<b>Midiendo '+ZONES[z].name+'</b><br>'+(i+1)+' de '+list.length+'. No toques la pantalla.');loadZone(z);await wait_(7000);const m=document.getElementById('benchBox');if(m)m.style.background='transparent',m.style.alignItems='flex-end';
+  try{for(let i=0;i<list.length;i++){const z=list[i];benchMsg('<b>Midiendo '+ZONES[z].name+'</b><br>'+(i+1)+' de '+list.length+'. No toques la pantalla.');loadZone(z);await wait_(4000);{const tw=performance.now();while(OAD.pend>0&&performance.now()-tw<30000)await wait_(500);}await wait_(3000);const m=document.getElementById('benchBox');if(m)m.style.background='transparent',m.style.alignItems='flex-end';
       const r=await benchMeasure(8000);r.zona=ZONES[z].name;
       r.pnj=npcs.filter(n=>n.m&&n.m.oad&&Math.hypot(P.x-n.x,P.z-n.z)<60).length;r.vida=LIFE.filter(c=>c.g&&c.g.visible).length;
       /* zona lenta: tres pruebas cortas sacando una cosa por vez */
       if(r.fps<FCAP.fps*.9){r.v={};
         BENCH.nosh=true;await wait_(600);r.v['sin sombras']=(await benchMeasure(4000)).fps;BENCH.nosh=false;
-        setPR(Math.max(.5,pr0*.5));await wait_(600);r.v['mitad de resolución']=(await benchMeasure(4000)).fps;setPR(pr0);
+        setPR(Math.max(.5,pr0*.5));await wait_(600);await wait_(900);r.v['mitad de resolución']=(await benchMeasure(4000)).fps;setPR(pr0);
         BENCH.nochar=true;await wait_(600);r.v['sin personajes']=(await benchMeasure(4000)).fps;BENCH.nochar=false;}
       res.push(r);}}
   catch(e){console.error(e);}
@@ -1723,7 +1723,7 @@ function qLevel(lv,extra){if(!lv||lv===Q.level)return;const up=QLV.indexOf(lv)>Q
   try{toast(up?'Tu equipo da para más: subimos los gráficos a <em>'+lv+'</em>':'Ajustamos los gráficos a <em>'+lv+'</em> para que el juego corra más fluido');}catch(e){}}
 function applyQuality(){
   /* presupuesto de píxeles: en monitores grandes (PC) la resolución interna se limita para mantener los FPS */
-  const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS *//* (12/11) en alto el celular ya no se queda en 1,5: un teléfono que da para alto se ve nítido como la PC; si no aguanta, dynRes baja la resolución sola */let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,mob?1.3:1.5):Math.min(dpr,2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
+  const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:1.5e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS *//* (12/11) en alto el celular ya no se queda en 1,5: un teléfono que da para alto se ve nítido como la PC; si no aguanta, dynRes baja la resolución sola *//* (16/11) medido en un iPhone 12: en alto con 1,8 se iba a 10-24 FPS por la cantidad de píxeles; con 1,35 en una pantalla de celular casi no se nota */let pr=Q.level==='bajo'?1:Q.level==='medio'?Math.min(dpr,mob?1.2:1.5):Math.min(dpr,mob?1.35:2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
   renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);DYN.base=pr;DYN.cur=pr;
   sun.castShadow=Q.level!=='bajo';SHMOD=mob&&Q.level!=='alto'?2:1;const ms=Q.level==='alto'&&!big?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
   if(typeof liteAll==='function'&&typeof HERO!=='undefined')liteAll();
@@ -1734,7 +1734,7 @@ function applyQuality(){
       if(!rt)rt=new THREE.WebGLRenderTarget(Math.round(w*pr),Math.round(h*pr),{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,stencilBuffer:true});
       composer=new THREE.EffectComposer(renderer,rt);composer.setPixelRatio(pr);composer.setSize(w,h);
       composer.addPass(new THREE.RenderPass(scene,camera));
-      /* el brillo (bloom) son muchas pasadas de pantalla completa: en el celular solo en alto y a media resolución */if(!(mob&&Q.level!=='alto')){bloom=new THREE.UnrealBloomPass(new THREE.Vector2(big||mob?w*.5:w,big||mob?h*.5:h),.26,.55,.93);composer.addPass(bloom);}
+      /* el brillo (bloom) son muchas pasadas de pantalla completa: en el celular solo en alto y a media resolución */if(!(mob&&Q.level!=='alto')){bloom=new THREE.UnrealBloomPass(new THREE.Vector2(big||mob?w*.5:w,big||mob?h*.5:h),.26,.55,.93);/* (16/11) el composer le pasa su tamaño completo: en el celular y monitores grandes se achica a la mitad (sus pasadas ya van a la mitad de eso) */if(big||mob){const bs=bloom.setSize.bind(bloom);bloom.setSize=(a,b)=>bs(Math.max(2,a*.5),Math.max(2,b*.5));}composer.addPass(bloom);}
       FINAL=new THREE.ShaderPass(FinalShader);FINAL.uniforms.uRes.value.set(w,h);composer.addPass(FINAL);}
     catch(e){console.error(e);composer=null;bloom=null;}}
 }
@@ -5395,7 +5395,7 @@ function lifeCritter(kind){const K=AMBK[kind],g0=OAD.ok[K.f];if(!g0)return null;
 function lifePoint(cx,cz,rad,clr){for(let t=0;t<30;t++){const a=Math.random()*TAU,d=Math.sqrt(Math.random())*rad,x=cx+Math.cos(a)*d,z=cz+Math.sin(a)*d;if(Math.abs(x)>114||Math.abs(z)>114)continue;if(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]+2)continue;if(!blocked(x,z,clr||.6))return [x,z];}return null;}
 function lifePut(c,x,z,o){Object.assign(c,{x,z,hx:x,hz:z,ry:Math.random()*TAU,st:'idle',t:R(.5,5),tx:x,tz:z},o||{});c.g.position.set(x,H(x,z),z);c.g.rotation.y=c.ry;c.g.traverse(m=>{if(m.isMesh)m.castShadow=!c.fly&&(c.hum||c.K&&c.K.len>1);});zoneG.add(c.g);LIFE.push(c);}
 function lifeZone(id){lifeClear();if(!OAD.on||OAD.failed||!LIFE_POP[id])return;const files=lifeFiles(id);if(!oadHave(files)){oadLater(files,()=>{if(Z&&Z.id===id&&!LIFE.length)lifeZone(id);});return;}
-  const P0=LIFE_POP[id],low=Q.level==='bajo'?.5:LITE()?.75:1;/* (12/11) celular en medio: 3/4 de la gente y animales del ambiente */
+  const P0=LIFE_POP[id],low=Q.level==='bajo'?(IS_MOB?.4:.5):LITE()?.55:IS_MOB?.7:1;/* (16/11) Asunción tenía ~60 en escena: en el celular alto 70 %, medio 55 %, bajo 40 % *//* (12/11) celular en medio: 3/4 de la gente y animales del ambiente */
   for(let i=0;i<Math.round((P0.vill||0)*low);i++){const v=VILL[i%VILL.length];const r=oadHuman({body:v.body,tex:OAD_PLAN.tex.npc[v.tex],props:v.props},{team:v.team});if(!r)continue;if(v.col)r.body.userData.mats.forEach(m=>m.color.setHex(v.col));
     oadActs(r,r.body,{idle:v.m?'n_idle_m':'n_idle_f',walk:v.m?'n_walk_m':'n_walk_f'});oadPlay(r,'idle',0);r.mixer.update(Math.random()*3);const p=lifePoint(0,10,17,.8);if(!p)continue;addBlob(r.g,1);lifePut(r,p[0],p[1],{hum:true,sp:1.15,home:16,cx:0,cz:10});}
   (P0.guards||[]).forEach(pt=>{const r=oadHuman({body:'m_tunic',tex:OAD_PLAN.tex.caballero[2],props:['head_m','kh2','ks1','kd2']},{team:0x7a1a1a});if(!r)return;oadActs(r,r.body,{idle:'k_idle',walk:'k_walk'});oadPlay(r,'idle',0);addBlob(r.g,1);lifePut(r,pt[0][0],pt[0][1],{hum:true,sp:1,patrol:pt,pi:1});});
@@ -5403,7 +5403,7 @@ function lifeZone(id){lifeClear();if(!OAD.on||OAD.failed||!LIFE_POP[id])return;c
   (P0.fly||[]).forEach(([kind,n,cx,cz,rad,h])=>{for(let i=0;i<Math.round(n*low);i++){const c=lifeCritter(kind);if(!c)continue;lifePut(c,cx,cz,{fly:true,cx:cx+R(-3,3),cz:cz+R(-3,3),rad:rad*R(.85,1.15),h:h+R(-2,3),ang:R(0,TAU)+i*.25,w:(kind==='hawk'?.18:.32)*(Math.random()<.5?1:-1),ph:R(0,6)});}});}
 /* portada: el empedrado de la plaza está 3 cm sobre el suelo y los pies de la pose quieta bajan unos 6 cm: se sube al personaje para que no se hunda */
 const SELY=.09;
-function updLife(dt){if(!LIFE.length)return;for(const c of LIFE){const d=Math.hypot(P.x-c.x,P.z-c.z);c.g.visible=d<(c.fly?110:66)&&!(mode==='select'&&!c.fly&&Math.abs(c.x)<8&&c.z>1.5&&c.z<19);if(!c.fly)charShadow(c,c.g,d);/* en la portada nadie cruza entre la cámara y el personaje */if(!c.g.visible)continue;
+function updLife(dt){if(!LIFE.length)return;for(const c of LIFE){const d=Math.hypot(P.x-c.x,P.z-c.z);c.g.visible=d<(c.fly?(IS_MOB?80:110):(IS_MOB?50:66))&&!(mode==='select'&&!c.fly&&Math.abs(c.x)<8&&c.z>1.5&&c.z<19);if(!c.fly)charShadow(c,c.g,d);/* en la portada nadie cruza entre la cámara y el personaje */if(!c.g.visible)continue;
   if(c.fly){c.ang+=dt*c.w;const x=c.cx+Math.cos(c.ang)*c.rad,z=c.cz+Math.sin(c.ang)*c.rad;c.x=x;c.z=z;c.g.position.set(x,c.h+Math.sin(T*.6+c.ph)*1.4,z);
     c.g.rotation.set(0,Math.atan2(-Math.sin(c.ang)*c.w,Math.cos(c.ang)*c.w),-Math.sign(c.w)*.35);c.mixer.update(dt);continue;}
   if(c.flee&&d<c.flee&&!P.dead&&mode==='game'){const ax=c.x-P.x,az=c.z-P.z,ad=Math.hypot(ax,az)||1;c.st='run';c.t=1.4;c.tx=c.x+ax/ad*7;c.tz=c.z+az/ad*7;}
