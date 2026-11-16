@@ -1629,13 +1629,14 @@ const DEV=(()=>{const n=navigator,ua=n.userAgent||'';let gpu='';try{const gl=ren
   if(mem&&mem<=2)t='bajo';else if(mem&&mem<=3&&t==='alto')t='medio';
   return {gpu,tier:t,why,ios,iosV,mem};})();
 const QLV=['bajo','medio','alto'];
-/* nivel elegido a mano (tsm-calidad), o el automático guardado (nox-q2: el que quedó después de subir o bajar solo),
+/* nivel elegido a mano (tsm-calidad), o el automático guardado (nox-q3: el que quedó después de subir o bajar solo; nox-q2 se dejó de leer el 16/11 porque venía del alto viejo, mucho más pesado),
    o el del equipo. Las claves viejas de automático no se usan: venían del cálculo que dejaba los iPhone en bajo. */
-const Q={level:'medio',auto:true,top:'alto'};try{const q=localStorage.getItem('tsm-calidad');Q.auto=!q;let a=null;try{a=JSON.parse(localStorage.getItem('nox-q2')||'null');}catch(e){}
+const QSTART=()=>IS_MOB&&DEV.tier==='alto'?'medio':DEV.tier;
+const Q={level:'medio',auto:true,top:'alto'};try{const q=localStorage.getItem('tsm-calidad');Q.auto=!q;let a=null;try{a=JSON.parse(localStorage.getItem('nox-q3')||'null');}catch(e){}
   /* "top" = el nivel más alto al que puede subir solo: si un nivel ya anduvo lento en este equipo, no se vuelve a probar por 10 días */
   if(a&&a.fail&&Date.now()-a.ft<864e6)Q.top=QLV[Math.max(0,QLV.indexOf(a.fail)-1)];
-  Q.level=q||(a&&a.lv)||DEV.tier;if(QLV.indexOf(Q.level)<0)Q.level='medio';}catch(e){Q.level=DEV.tier||'medio';}
-function qSave(o){try{const a=JSON.parse(localStorage.getItem('nox-q2')||'null')||{};Object.assign(a,o);localStorage.setItem('nox-q2',JSON.stringify(a));}catch(e){}}
+  /* (16/11) todo celular arranca como máximo en medio y sube solo a alto si le sobra (15 s holgados, dynRes): así el primer minuto nunca se traba */Q.level=q||(a&&a.lv)||QSTART();if(QLV.indexOf(Q.level)<0)Q.level='medio';}catch(e){Q.level=DEV.tier||'medio';}
+function qSave(o){try{const a=JSON.parse(localStorage.getItem('nox-q3')||'null')||{};Object.assign(a,o);localStorage.setItem('nox-q3',JSON.stringify(a));}catch(e){}}
 /* recortes de celular: solo por debajo de alto. En alto un teléfono potente se ve como la PC (sombras, brillo, distancias). */
 const LITE=()=>IS_MOB&&Q.level!=='alto';
 let SHMOD=1;let composer=null,bloom=null,FINAL=null,windT=0,shake=0;
@@ -1718,7 +1719,7 @@ function dynRes(dt){if(mode!=='game'||paused||BENCH.on){RAWF.acc=RAWF.n=0;return
      15 segundos seguidos así y se sube un nivel (hasta Q.top) */
   else if(Q.auto&&QLV.indexOf(Q.level)<QLV.indexOf(Q.top)&&DYN.cur>=DYN.base&&(c30?(a<1/27&&raw<21):(a<1/58.5))){if(++DYN.good>=10){DYN.good=0;DYN.upAt=now;qLevel(QLV[QLV.indexOf(Q.level)+1]);}}
   else DYN.good=0;}
-/* cambia el nivel automático, lo recuerda (nox-q2) y avisa */
+/* cambia el nivel automático, lo recuerda (nox-q3) y avisa */
 function qLevel(lv,extra){if(!lv||lv===Q.level)return;const up=QLV.indexOf(lv)>QLV.indexOf(Q.level);Q.level=lv;qSave(Object.assign({lv},extra||{}));applyQuality();
   try{toast(up?'Tu equipo da para más: subimos los gráficos a <em>'+lv+'</em>':'Ajustamos los gráficos a <em>'+lv+'</em> para que el juego corra más fluido');}catch(e){}}
 function applyQuality(){
@@ -7899,7 +7900,7 @@ const ACT={
     else travel(d.z,pos);},
   fpsCap(d){FCAP.fps=+d.f===30?30:60;try{localStorage.setItem('tsm-fps',FCAP.fps);}catch(e){}DYN.t=DYN.acc=DYN.n=0;toast('Cuadros por segundo: '+FCAP.fps);renderChar();},
   fpsShow(){FPSM.on=!FPSM.on;fpsBox();try{localStorage.setItem('tsm-fpsv',FPSM.on?'1':'0');}catch(e){}renderChar();},
-  dropLbl(d){dropLblSet(d.v==='1');renderCfg();},camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},keepSet(d){KEEPF.pref=d.k==='todo'||d.k==='no'?d.k:'auto';try{if(KEEPF.pref==='auto')localStorage.removeItem('noxSave');else localStorage.setItem('noxSave',KEEPF.pref);}catch(e){}renderCfg();keepWarm();},quality(d){if(d.q==='auto'){Q.auto=true;try{localStorage.removeItem('tsm-calidad');const a=JSON.parse(localStorage.getItem('nox-q2')||'null');Q.level=(a&&a.lv)||DEV.tier;}catch(e){Q.level=DEV.tier;}DYN.good=0;DYN.upAt=0;}else{Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}}applyQuality();renderChar();try{renderCfg();}catch(e){}toast('Gráficos: '+(Q.auto?'automático ('+Q.level+')':d.q));},
+  dropLbl(d){dropLblSet(d.v==='1');renderCfg();},camCycle(){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);},camSet(d){setCam(d.c);renderChar();renderCfg();},keepSet(d){KEEPF.pref=d.k==='todo'||d.k==='no'?d.k:'auto';try{if(KEEPF.pref==='auto')localStorage.removeItem('noxSave');else localStorage.setItem('noxSave',KEEPF.pref);}catch(e){}renderCfg();keepWarm();},quality(d){if(d.q==='auto'){Q.auto=true;try{localStorage.removeItem('tsm-calidad');const a=JSON.parse(localStorage.getItem('nox-q3')||'null');Q.level=(a&&a.lv)||QSTART();}catch(e){Q.level=QSTART();}DYN.good=0;DYN.upAt=0;}else{Q.auto=false;Q.level=d.q;try{localStorage.setItem('tsm-calidad',Q.level);}catch(e){}}applyQuality();renderChar();try{renderCfg();}catch(e){}toast('Gráficos: '+(Q.auto?'automático ('+Q.level+')':d.q));},
   cauldSel(d){CALD.sel=+d.i;CALD.res=null;renderCaldero();const pb=$('#npcBody');const sc=pb&&(pb.closest('.card')||pb);try{sc.scrollTo({top:0,behavior:'smooth'});pb.scrollTo&&pb.scrollTo({top:0,behavior:'smooth'});}catch(e){}},
   cauldGo(d){cauldGo(d.r);},
   selPlay(d){enterGame(+d.i);},
