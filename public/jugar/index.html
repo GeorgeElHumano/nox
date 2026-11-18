@@ -5686,7 +5686,7 @@ function decPoint(cx,cz,rad,d){if(Z&&Z.tiers){const p=decPoint0(cx,cz,rad,d);ret
 function decPoint0(cx,cz,rad,d){const wet=/cattail|papyrus|reed/.test(d);for(let t=0;t<14;t++){const a=Math.random()*TAU,r=Math.sqrt(Math.random())*rad,x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r;if(Math.abs(x)>96||Math.abs(z)>96)continue;
   if(nearSpecial(x,z,5))continue;if(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]-(wet?-1.5:-.5)&&!wet)continue;
   if(Z.marsh){const h=H(x,z);if(wet?(h>WATER_Y+.6||h<WATER_Y-.5):h<WATER_Y+.1)continue;}else if(wet&&!(Z.lake&&Math.abs(Math.hypot(x-Z.lake[0],z-Z.lake[1])-Z.lake[2])<3))continue;
-  if(Z.safe&&Math.hypot(x,z-6)<15&&!/rock|bush/.test(d))continue;if(Z.id==='asuncion'&&z<-9.5&&z>-19&&Math.abs(x-1.2)<10.2)continue;/* nada delante del Muro, la Placa ni el Pa'i */if(blocked(x,z,.7))continue;return [x,z];}return null;}
+  if(Z.safe&&Math.hypot(x,z-6)<15&&!/rock|bush/.test(d))continue;if(Z.id==='asuncion'&&z<-9.5&&z>-19&&Math.abs(x-1.2)<10.2)continue;if(Z.id==='asuncion'&&Math.abs(x)<2.3&&z<-2.4&&z>-16)continue;/* ni sobre la alfombra de la Apertura *//* nada delante del Muro, la Placa ni el Pa'i */if(blocked(x,z,.7))continue;return [x,z];}return null;}
 /* ================= ropa por partes: cada pieza cambia su zona del cuerpo ================= */
 const BODYM={};const IMGD={};const BODYV={};
 /* pieza de ropa en 3D: se recortan del cuerpo los triángulos de esa prenda (guantes, botas, pantalón o pechera) */
@@ -6308,6 +6308,52 @@ function apeRender(){const b=$('#apeBody');if(!b)return;const d=apeDay(),st=APE.
       <div class="ap-tt">${nxTitle('t_dragon')}<small>Para todos los que lo derroten, más oro, experiencia, un cofre y Escamas Doradas para canjear en la tienda.</small></div><div class="ap-tt mt">${nxTitle('t_mata')}<small>Para quien más daño le haga en una pelea. Queda para siempre.</small></div>`;}
   b.innerHTML=h;}
 function apeOpen(tab){if(mode!=='game')return;closeAll();if(tab)APE.tab=tab;apeRender();showPanel('pApe');apeLoad(false);clearInterval(APE.tm);APE.tm=setInterval(()=>{const p=$('#pApe');if(!p||p.hidden){clearInterval(APE.tm);return;}$('#apeSub').innerHTML=apeSub();if(APE.tab==='dragon')apeRender();},1000);}
+/* ===== Apertura del Reino: Asunción de fiesta =====
+   apeDecor(G) se llama al final de BUILD.asuncion y solo arma algo entre el 28/11 y el 14/12 de 2026 (apeFiesta; fuera de noxparaguay.com se fuerza con ?fiesta=1).
+   Todo liviano: banderines (1 malla + 1 línea) de farola a farola, 2 estandartes en las torres de la catedral, cartel colgante en la puerta sur,
+   alfombra de la fuente al Muro y faroles de papel que suben (sprites; menos en calidad baja). Sin luces ni sombras nuevas. */
+function apeFiesta(){try{if(!/(^|\.)noxparaguay\.com$/.test(location.hostname)&&/[?&]fiesta=1/.test(location.search))return true;}catch(e){}const n=apeNow();return n>=APE.t0-3*864e5&&n<APE.t0+APE.days*864e5;}
+function apeDecor(G){if(!apeFiesta())return;const g=new THREE.Group();g.name='apeDecor';G.add(g);const DS=THREE.DoubleSide;
+  /* banderines: de farola a farola alrededor de la plaza (el tramo del norte no, para no cruzar el Muro) */
+  {const lamps=[];for(let i=0;i<8;i++){const a=(i+.5)/8*TAU;let x=Math.sin(a)*14.8,z=Math.cos(a)*14.8;if(z<-13){x=Math.sign(x)*5.2;z=-14.8;}lamps.push([x,z]);}
+   const COL=[0xe2a83f,0x38d6ae,0xfff3d6,0xa46bff,0xff8ad8,0x4aa8ff].map(c=>new THREE.Color(c)),pos=[],col=[],line=[];let k=0;
+   for(let i=0;i<8;i++){if(i===3)continue;const A=lamps[i],B=lamps[(i+1)%8],dx=B[0]-A[0],dz=B[1]-A[1],L=Math.hypot(dx,dz),n=Math.max(6,Math.round(L/.62)),ux=dx/L,uz=dz/L,sag=Math.min(1.1,L*.085);
+     for(let j=0;j<=n;j++){const t=j/n,x=A[0]+dx*t,z=A[1]+dz*t,y=3.15-sag*4*t*(1-t);line.push(x,y,z);
+       if(j<n){const t2=(j+.5)/n,xm=A[0]+dx*t2,zm=A[1]+dz*t2,ym=3.15-sag*4*t2*(1-t2),w=.19,c=COL[k++%COL.length];pos.push(xm-ux*w,ym,zm-uz*w, xm+ux*w,ym,zm+uz*w, xm,ym-.5,zm);for(let q=0;q<3;q++)col.push(c.r,c.g,c.b);}}
+     line.push(NaN,NaN,NaN);}
+   const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));bg.setAttribute('color',new THREE.Float32BufferAttribute(col,3));bg.computeVertexNormals();
+   const bm=new THREE.Mesh(bg,new MSM({vertexColors:true,side:DS,roughness:.85,emissive:0xffffff,emissiveIntensity:.08}));bm.frustumCulled=false;g.add(bm);
+   /* el hilo: un tramo de línea por vano */
+   const segs=[];for(let i=0;i+5<line.length;i+=3){if(isNaN(line[i])||isNaN(line[i+3]))continue;segs.push(line[i],line[i+1],line[i+2],line[i+3],line[i+4],line[i+5]);}
+   const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(segs,3));const ln=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x3a2a1c}));ln.frustumCulled=false;g.add(ln);}
+  /* estandartes en las torres de la catedral */
+  {const cv=document.createElement('canvas');cv.width=256;cv.height=768;const x=cv.getContext('2d'),W=256,H0=768;
+   const draw=()=>{x.clearRect(0,0,W,H0);x.beginPath();x.moveTo(0,0);x.lineTo(W,0);x.lineTo(W,H0);x.lineTo(W/2,H0-90);x.lineTo(0,H0);x.closePath();x.save();x.clip();
+     const gr=x.createLinearGradient(0,0,0,H0);gr.addColorStop(0,'#23276a');gr.addColorStop(1,'#12143c');x.fillStyle=gr;x.fillRect(0,0,W,H0);x.restore();
+     x.strokeStyle='#e2a83f';x.lineWidth=12;x.beginPath();x.moveTo(6,6);x.lineTo(W-6,6);x.lineTo(W-6,H0-14);x.lineTo(W/2,H0-102);x.lineTo(6,H0-14);x.closePath();x.stroke();
+     x.strokeStyle='#f6d892';x.lineWidth=3;x.strokeRect(24,24,W-48,H0-190);
+     const cx=W/2,cy=170;x.strokeStyle='#f6d892';x.lineWidth=7;x.lineCap='round';for(let i=0;i<16;i++){const a=i/16*TAU;x.beginPath();x.moveTo(cx+Math.cos(a)*62,cy+Math.sin(a)*62);x.lineTo(cx+Math.cos(a)*(i%2?82:94),cy+Math.sin(a)*(i%2?82:94));x.stroke();}
+     x.fillStyle='#e2a83f';x.beginPath();x.arc(cx,cy,54,0,TAU);x.fill();x.fillStyle='#12143c';x.beginPath();x.arc(cx+9,cy-5,46,0,TAU);x.fill();
+     x.textAlign='center';x.textBaseline='middle';x.fillStyle='#f6d892';x.font='800 40px Cinzel, Georgia, serif';x.fillText('APERTURA',cx,330);x.font='700 30px Cinzel, Georgia, serif';x.fillText('DEL',cx,384);x.font='800 52px Cinzel, Georgia, serif';x.fillText('REINO',cx,444);
+     x.fillStyle='#e2a83f';x.fillRect(cx-70,490,140,4);x.font='700 26px Cinzel, Georgia, serif';x.fillStyle='#e8dcc0';x.fillText('1 · 14 DIC',cx,530);x.font='700 24px Cinzel, Georgia, serif';x.fillText('MMXXVI',cx,570);};
+   draw();const tx=new THREE.CanvasTexture(cv);tx.encoding=THREE.sRGBEncoding;tx.anisotropy=4;if(document.fonts&&document.fonts.load)document.fonts.load('800 40px Cinzel').then(()=>{draw();tx.needsUpdate=true;}).catch(()=>{});
+   const m=new MSM({map:tx,transparent:true,alphaTest:.5,side:DS,roughness:.9,emissive:0xffffff,emissiveMap:tx,emissiveIntensity:.22});
+   for(const sx of[-1,1]){const geo=new THREE.PlaneGeometry(2.2,6.6,4,12),b=new THREE.Mesh(geo,m);b.position.set(sx*7.6,9.6,-18.93);g.add(b);mk(BOX(2.6,.14,.14),mat(0x3a2a20),sx*7.6,12.95,-18.9,g);
+     const base=geo.attributes.position.array.slice(),ph=sx;AMB.push(()=>{const a=geo.attributes.position.array;for(let i=0;i<a.length;i+=3){const v=(3.3-base[i+1])/6.6;a[i+2]=Math.sin(T*1.6+v*4+ph)*.11*v;}geo.attributes.position.needsUpdate=true;});}}
+  /* cartel colgante en la puerta sur: de un lado se lee al entrar a la ciudad, del otro al salir hacia el dragón */
+  {const mkT=(l1,l2)=>{const cv=document.createElement('canvas');cv.width=1024;cv.height=200;const x=cv.getContext('2d');const draw=()=>{const gr=x.createLinearGradient(0,0,0,200);gr.addColorStop(0,'#23276a');gr.addColorStop(1,'#12143c');x.fillStyle=gr;x.fillRect(0,0,1024,200);x.strokeStyle='#e2a83f';x.lineWidth=10;x.strokeRect(5,5,1014,190);x.strokeStyle='#f6d892';x.lineWidth=2;x.strokeRect(18,18,988,164);
+       x.textAlign='center';x.textBaseline='middle';x.fillStyle='#f6d892';x.font='800 78px Cinzel, Georgia, serif';x.fillText(l1,512,82);x.fillStyle='#e8dcc0';x.font='600 34px Cinzel, Georgia, serif';x.fillText(l2,512,152);};
+     draw();const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;if(document.fonts&&document.fonts.load)document.fonts.load('800 78px Cinzel').then(()=>{draw();t.needsUpdate=true;}).catch(()=>{});return new MSM({map:t,roughness:.9,emissive:0xffffff,emissiveMap:t,emissiveIntensity:.25});};
+   const z=32.6,y=5.1,pg=new THREE.PlaneGeometry(6.6,1.29);const a=new THREE.Mesh(pg,mkT('APERTURA DEL REINO','1 AL 14 DE DICIEMBRE · EL DRAGÓN DORADO ESPERA AFUERA'));a.position.set(0,y,z-.03);a.rotation.y=PI;g.add(a);
+   const b=new THREE.Mesh(pg,mkT('BIENVENIDOS AL REINO','ASUNCIÓN ABRE SUS PUERTAS'));b.position.set(0,y,z+.03);g.add(b);
+   const wood=mat(0x3a2a20);for(const sx of[-1,1]){mk(CYL(.09,.11,5.9,8),wood,sx*3.45,2.95,z,g);mk(CONE(.16,.4,6),mtl(0xd9a441,'gold'),sx*3.45,6.1,z,g);colliders.push({x:sx*3.45,z,r:.22});}}
+  /* alfombra de la fuente al Muro de Fundadores */
+  {const tx=canvasTex(128,(x,sz)=>{x.fillStyle='#1c2060';x.fillRect(0,0,sz,sz);x.fillStyle='#e2a83f';x.fillRect(0,0,10,sz);x.fillRect(sz-10,0,10,sz);x.fillStyle='#f6d892';x.fillRect(14,0,3,sz);x.fillRect(sz-17,0,3,sz);x.fillStyle='rgba(246,216,146,.5)';x.beginPath();x.moveTo(sz/2,sz*.25);x.lineTo(sz*.62,sz/2);x.lineTo(sz/2,sz*.75);x.lineTo(sz*.38,sz/2);x.closePath();x.fill();});
+   tx.repeat.set(1,5);const c=new THREE.Mesh(new THREE.PlaneGeometry(2.6,12.2),new MSM({map:tx,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));c.rotation.x=-PI/2;c.position.set(0,.05,-9.55);c.receiveShadow=true;g.add(c);}
+  /* faroles de papel que suben despacio sobre la plaza (de noche brillan más) */
+  {const n=Q.level==='bajo'?5:IS_MOB?8:12,L=[];for(let i=0;i<n;i++){const s=glowSprite(i%3?0xffb85a:0xffe2a0,.85,.9);const a=srndF(i+40)*TAU,d=5+srndF(i+80)*22;g.add(s);L.push({s,x:Math.cos(a)*d,z:Math.sin(a)*d,ph:srndF(i+7)*1,sp:.022+srndF(i+3)*.012});}
+   AMB.push(()=>{const hh=typeof DN!=='undefined'?DN.h:12,night=hh<6||hh>18.5?1:.45;for(const f of L){const k=(T*f.sp+f.ph)%1;f.s.position.set(f.x+Math.sin(T*.25+f.ph*9)*1.4,3+k*24,f.z+Math.cos(T*.2+f.ph*7)*1.4);f.s.material.opacity=Math.min(1,k*8,(1-k)*4)*night;}});}
+}
 /* cuenta regresiva de la Apertura en el HUD (#apeCd: arriba al centro en horizontal, bajo el reloj de eventos en vertical; tocarla abre el panel)
    y en la pantalla de personajes (#selApe). Desaparecen solas cuando termina el evento. */
 function apeCdTick(){const d=apeDay(),now=apeNow();
@@ -6504,6 +6550,7 @@ const BUILD={
   // NPCs
   for(const id in NPCS){const d=NPCS[id],m=npcLit(npcModel(id)),y=H(d.pos[0],d.pos[1]);m.g.position.set(d.pos[0],y,d.pos[1]);m.g.rotation.y=d.ry!=null?d.ry:Math.atan2(-d.pos[0],-d.pos[1]);addBlob(m.g,1.3);G.add(m.g);
     const n={id,def:d,m,x:d.pos[0],z:d.pos[1],ry0:m.g.rotation.y,ph:srnd()*6};n.label=addLabel(`${esc(d.name)}<small>${esc(d.role)}</small>`,'npc',()=>[n.x,y+2.35,n.z]);npcs.push(n);colliders.push({x:n.x,z:n.z,r:.45});}
+  try{apeDecor(G);}catch(e){console.warn('apeDecor',e);}
  },
  campos(G,V){
   // ranchos
