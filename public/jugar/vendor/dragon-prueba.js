@@ -87,13 +87,17 @@ class Dragon {
     if (d > 13 && off < 1) { const nx = this.x + Math.sin(this.ry) * sp * dt, nz = this.z + Math.cos(this.ry) * sp * dt; if (this.okSpot(nx, nz)) { this.x = nx; this.z = nz; } }
     this.bcd -= dt; this.atkCD -= dt;
     if (this.bcd <= 0) { this.bcd = this.phase >= 3 ? R(2.2, 3) : this.phase === 2 ? R(3.2, 4.2) : R(4.5, 6); this.pick(near, tg, d, off); }
+    else if (this.atkCD <= 0 && this.under(near)) { this.atkCD = 4.5; this.ab(this.ln++ % 3 === 2 ? 'brasa' : 'pisa', tg, near); } // nadie está a salvo debajo del cuerpo
     else if (this.atkCD <= 0 && d > 11 && d < 25 && off < .45) { this.atkCD = 3.2; this.ab('mord', tg, near); }
   }
+  // jugadores pegados al cuerpo (debajo o entre las patas)
+  under(near) { let n = 0; const c = this.fwd(1); for (const p of near) if (Math.hypot(p.p.x - c[0], p.p.z - c[1]) < 11) n++; return n; }
   turn(want, dt) { const da = angd(want, this.ry), mx = (this.phase >= 3 ? 2.2 : 1.6) * dt; this.ry += Math.max(-mx, Math.min(mx, da)); }
   pick(near, tg, d, off) {
     const behind = near.filter(p => Math.hypot(p.p.x - this.x, p.p.z - this.z) < 24 && Math.abs(angd(Math.atan2(p.p.x - this.x, p.p.z - this.z), this.ry)) > 1.9).length;
     const L = this.phase === 1 ? ['zarpa', 'fuego', 'cola', 'carga'] : this.phase === 2 ? ['fuego', 'zarpa', 'lluvia', 'cola', 'carga', 'fuego', 'lluvia'] : ['fuego', 'lluvia', 'carga', 'cola', 'zarpa', 'lluvia'];
     let ab = L[this.rot++ % L.length];
+    if (this.under(near) && Math.random() < .35) return this.ab(Math.random() < .5 ? 'brasa' : 'pisa', tg, near);
     if (behind && ab !== 'lluvia' && Math.random() < .65) ab = 'cola';
     else if (ab === 'cola' && !behind) ab = d < 15 ? 'zarpa' : 'fuego';
     if (ab === 'zarpa' && d > 17) ab = 'fuego';
@@ -107,6 +111,8 @@ class Dragon {
     const a = Math.atan2(tg.p.x - this.x, tg.p.z - this.z), big = this.phase >= 3 ? 1.15 : 1;
     if (ab === 'fuego') { this.ry = a; this.stun = 3.6; const q = this.fwd(11); this.tele('d_fuego', { t: 'cone', r: 23, a, half: .62 }, q[0], q[1], 1.15, .26 * big, 0, { tk: 4, ti: .45 }); }
     else if (ab === 'zarpa') { this.ry = a; this.stun = 1.7; const q = this.fwd(8); this.tele('d_zarpa', { t: 'cone', r: 12, a: a - .3, half: .9 }, q[0], q[1], .88, .55 * big); }
+    else if (ab === 'pisa') { this.stun = 2; const q = this.fwd(1); this.tele('d_pisa', { t: 'circle', r: 10.5 }, q[0], q[1], 1, .6 * big); }
+    else if (ab === 'brasa') { this.stun = 3.4; const q = this.fwd(-1); this.tele('d_brasa', { t: 'circle', r: 14 }, q[0], q[1], 1.56, .4 * big, 0, { bz: 6, bpc: .1 }); }
     else if (ab === 'mord') { this.stun = 1.3; this.ln++; const q = this.fwd(20.5); this.tele('d_mord', { t: 'circle', r: 4.6 }, q[0], q[1], .65, .4 * big); }
     else if (ab === 'cola') { this.stun = 2.3; const q = this.fwd(-5); this.tele('d_cola', { t: 'cone', r: 25, a: this.ry + Math.PI, half: 1.95 }, q[0], q[1], 1.15, .7 * big); }
     else if (ab === 'carga') {
