@@ -7563,7 +7563,8 @@ function cellHTML(it){if(!it)return '';const u=iconURL(it),rr=itemR(it);return `
 function gemOk(it,sub){if(!isEq(it))return false;if(sub==='tupa')return it.lv<6;if(sub==='jasy')return it.lv>=6&&it.lv<9;if(sub==='yvy')return it.op<4;return false;}
 function renderInv(){
   const lay=[null,'helm','wings','shield','armor','weapon','gloves','pants','boots'];
-  const pg=PETK.map(k=>{const it=C.pets&&C.pets[k];return `<button class="slot pslot ${it?'':'empty'}" data-act="petslot" data-p="${k}" aria-label="Mascota: ${PETS[k].n}" style="--pc:${PETS[k].col}"><img class="ico pimg ${it?'':'off'}" src="assets/ui/pet_${k}.webp" alt="" draggable="false"><span class="sl">${PETS[k].n.split(' ')[0]}</span></button>`;}).join('');
+  const crOn=NX.eq&&NX.eq.mas==='cria',crPg=NX.own&&NX.own.cria?`<button class="slot pslot ${crOn?'':'empty'}" data-act="criaSlot" aria-label="Mascota: Cría de Dragón Dorado" style="--pc:#ffc24a"><img class="ico pimg ${crOn?'':'off'}" src="assets/ui/dragon_cria.webp" alt="" draggable="false"><span class="sl">Cría</span></button>`:'';
+  const pg=crPg+PETK.map(k=>{const it=C.pets&&C.pets[k];return `<button class="slot pslot ${it?'':'empty'}" data-act="petslot" data-p="${k}" aria-label="Mascota: ${PETS[k].n}" style="--pc:${PETS[k].col}"><img class="ico pimg ${it?'':'off'}" src="assets/ui/pet_${k}.webp" alt="" draggable="false"><span class="sl">${PETS[k].n.split(' ')[0]}</span></button>`;}).join('');
   $('#eqGrid').innerHTML=lay.map(k=>{if(!k)return '<span></span>';const it=C.eq[k],na=k==='shield'&&C.cls!=='caballero'||k==='helm'&&C.cls==='gladiador';const ok=GEM&&it&&gemOk(it,GEM.sub);
     return `<button class="slot ${it?'':'empty'} ${na?'na':''} ${ok?'ok':''}" data-act="eqslot" data-k="${k}" ${na?'disabled':''} aria-label="${SLOTLABEL[k]}">${it?cellHTML(it):`<span style="color:var(--dim)">${ICON_SVG(k==='weapon'?'weapon_'+C.cls:k)}</span>`}<span class="sl">${SLOTLABEL[k]}</span></button>`;}).join('')+pg;
   $('#invGrid').innerHTML=C.inv.map((it,i)=>{const ok=GEM&&it&&gemOk(it,GEM.sub);const dim=GEM&&!ok;return `<button class="cell ${it?'has q'+itemQ(it):''} ${ok?'ok':''} ${dim?'dim':''}" data-act="cell" data-i="${i}" aria-label="${it?esc(itemName(it)):'Vacío'}">${cellHTML(it)}</button>`;}).join('');
@@ -7884,6 +7885,7 @@ const ACT={
   guiaTopic(d){guiaTopic(d.k);},guiaAsk(){guiaAsk();},guiaDeep(){if(GUIA.last&&!GUIA.busy)guiaIA(GUIA.last);},
   petOn(){const it=C.inv[ICTX.i];if(!it||it.k!=='pet')return;C.pets=C.pets||{};const prev=C.pets[it.sub];C.pets[it.sub]=it;C.inv[ICTX.i]=prev||null;$('#pItem').hidden=true;toast(`<em>${esc(PETS[it.sub].n)}</em> te acompaña ahora`);snd(PETS[it.sub].snd,{vol:.8,jit:0});recalc();persist();renderInv();refreshPause();},
   petOff(d){const k=(d&&d.p)||(ICTX&&ICTX.sub)||petsOn()[0];const it=C.pets&&C.pets[k];if(!it)return;if(!addItem(it)){toast('Tu inventario está lleno');return;}toast(`Dejaste a ${esc(PETS[k].n)} en el inventario`);C.pets[k]=null;$('#pItem').hidden=true;recalc();persist();if(!$('#pInv').hidden)renderInv();renderChar();refreshPause();},
+  criaSlot(){if(NX.busy)return;const on=NX.eq.mas==='cria';nxDo(async()=>{nxSet(await srvApi('POST','nox/equip',{slot:'mas',id:on?null:'cria'}),true);toast(on?'La Cría de Dragón Dorado se queda descansando':'<em style="color:var(--gold)">La Cría de Dragón Dorado</em> vuela a tu lado');renderInv();});},
   petslot(d){const it=C.pets&&C.pets[d.p];if(!it)return;itemCard(it,{src:'pet',sub:d.p});},
   dailyClaim(d){const q=dailies().list[+d.i];if(!q||q.cl||q.n<q.goal)return;const r=dayReward(q);if(!addItem(stackItem('gem',r.gem,1))){toast('Tu inventario está lleno');return;}C.gold+=r.gold;q.cl=true;toast(`<em style="color:var(--good)">Recompensa: ₲ ${fmt(r.gold)} + ${esc(GEMS[r.gem].name)}</em>`);if(!snd('mu_gem',{vol:.8,jit:0}))sfx('rare');persist();renderNpc();},
   setTitle(d){C.title=C.title===d.t?null:d.t;persist();renderChar();},
@@ -8331,12 +8333,40 @@ function wbTele(m){const e=WB.e;if(!e||e.dead||e.nid!==m.n)return;const f=m.f||{
       for(let k=1;k<(m.tk|0);k++)later(k*(m.ti||.45),()=>{if(e.dead||WB.e!==e)return;tele(x,z,f,m.ti||.45,col);if(inTele(P.x,P.z,x,z,f))wbHurt(e,pc);});
       if(m.bz)for(let k=1;k<=Math.round(m.bz*2);k++)later(k*.5,()=>{if(WB.e===e&&inTele(P.x,P.z,x,z,f))wbHurt(e,+m.bpc||.08);});});};
   if(m.d)later(m.d,go);else go();}
+/* --- premios que se ven en el mundo: Cría de Dragón Dorado (mascota de la cuenta, casillero `mas`) y Alas del Dragón Dorado (casillero `wing`).
+   Propias (NX.eq) y de los demás (cz[6] y cz[7]). Usan el mismo modelo del dragón en versión liviana (opt.pet). --- */
+const DRP={cria:new Map()};
+function drCria(id,want,px,pz,ry,dt){let Q=DRP.cria.get(id);if(!want){if(Q){scene.remove(Q.D.g);try{disposeTree(Q.D.g);}catch(e){}DRP.cria.delete(id);}return;}
+  if(!Q){const D=makeDragon(THREE,{host:1,pet:1,baby:1});D.g.scale.setScalar(.042);scene.add(D.g);Q={D,x:px,z:pz,ok:false,ry};DRP.cria.set(id,Q);}
+  Q.seen=T;const fx=Math.sin(ry),fz=Math.cos(ry),tx=px-fx*.5+fz*1.25,tz=pz-fz*.5-fx*1.25,ox=Q.x,oz=Q.z;
+  if(!Q.ok||Math.hypot(tx-Q.x,tz-Q.z)>12){Q.x=tx;Q.z=tz;Q.ok=true;}else{const k=Math.min(1,dt*4);Q.x+=(tx-Q.x)*k;Q.z+=(tz-Q.z)*k;}
+  const sp=dt>0?Math.hypot(Q.x-ox,Q.z-oz)/dt:0;Q.ry=lerpAngle(Q.ry,sp>.5?Math.atan2(Q.x-ox,Q.z-oz):ry,Math.min(1,dt*7));
+  const D=Q.D;D.g.position.set(Q.x,H(Q.x,Q.z)+1.45+Math.sin(T*2.6+px)*.1,Q.z);D.g.rotation.y=Q.ry-PI/2;D.anim('vuelo',0);D.st.gy=0;D.st.jaw=.12;D.st.flapSpd=1.7;D.step(T);}
+function drWings(r,want,mv){if(!r||!r.g)return;let W=r.drW;
+  if(!want){if(W){r.g.remove(W.grp);try{disposeTree(W.grp);}catch(e){}r.drW=null;if(r.wings&&r.wings.g)r.wings.g.visible=true;}return;}
+  if(!W){const D=makeDragon(THREE,{host:1,pet:1,wingsOnly:1,goldWing:1}),grp=new THREE.Group();grp.add(D.g);D.g.rotation.y=-PI/2;D.g.scale.setScalar(.085);D.g.position.set(0,.72,-.3);r.g.add(grp);W=r.drW={D,grp};}
+  if(r.wings&&r.wings.g)r.wings.g.visible=false;const D=W.D;D.anim('quieto',0);if(mv>.3){D.st.wflap=.5+Math.sin(T*7)*.26;D.st.wfold=.28;}D.step(T);}
+function drTick(dt){if(mode!=='game'||!P||!C){if(DRP.cria.size)for(const id of [...DRP.cria.keys()])drCria(id,false);return;}
+  const eq=NX.eq||{},mc=eq.mas==='cria'&&!P.dead,mw=eq.wing==='alas_dragon';let any=mc||mw||DRP.cria.size>0||(HERO&&HERO.drW);
+  if(!any)for(const o of LIVE.others.values()){const cz=o.s&&o.s.cz;if(cz&&(cz[6]||cz[7])){any=true;break;}}
+  if(!any)return;if(!window.makeDragon){wbLoad();return;}
+  drCria('yo',mc,P.x,P.z,P.ry,dt);drWings(HERO,mw,P.mv||0);
+  for(const o of LIVE.others.values()){const cz=(o.s&&o.s.cz)||[],near=o.m&&Math.hypot(o.x-P.x,o.z-P.z)<45;drCria(o.id,near&&cz[6]==='cria'&&!o.P.dead,o.x,o.z,o.ry,dt);if(o.m)drWings(o.m,near&&cz[7]==='alas_dragon',o.P.mv||0);}
+  for(const [id,Q] of DRP.cria)if(Q.seen!==T)drCria(id,false);}
+/* oro, experiencia y Cofre del Dragón (los diez mejores): se entregan al abrir la tarjeta de premio */
+function wbLoot(m){const L=C.L,k=m.rank===1?2:m.rank<=10?1.5:1,out={gold:Math.round(L*20000*k/1000)*1000,xp:C.L>=MAXL?0:Math.round(xpNeed(L)*(m.rank===1?.6:m.rank<=10?.4:.25)),items:[]};
+  C.gold+=out.gold;if(out.xp)gainXP(out.xp);
+  if(m.chest){const give=it=>{out.items.push(itemName(it)+(it.n>1?' × '+it.n:''));if(!addItem(it))dropAt(P.x+R(-1,1),P.z+R(-1,1),{item:it});};
+    give(stackItem('gem',pick(['tupa','jasy','yvy','kerana']),m.rank===1?5:3));if(L>=50&&m.rank<=3)give(stackItem('gem','mainumby',1));
+    const ks=Object.keys(C.eq||{}).filter(q=>C.eq[q]&&q!=='wings');if(ks.length){const q=pick(ks);try{give(newEquip(C.cls,q,C.eq[q].t,{lv:RI(5,8),luck:true,op:RI(2,3),ex:randomEx(q,RI(2,3))}));}catch(e){}}}
+  try{persist();}catch(e){}return out;}
 /* tarjeta «¡Felicidades!»: la manda el servidor (wbr) a cada uno que participó; lo que dice ya está guardado en la cuenta */
-function wbReward(m){try{nxLoad();}catch(e){}const old=$('#wbCard');if(old)old.remove();const el=document.createElement('div');el.id='wbCard';
+function wbReward(m){try{nxLoad();}catch(e){}let lt=null;if(!m.test&&C&&mode==='game'){try{lt=wbLoot(m);}catch(e){}}const old=$('#wbCard');if(old)old.remove();const el=document.createElement('div');el.id='wbCard';
   const E=`<svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M32 4C46 10 56 22 56 36c0 12-10 22-24 24C18 58 8 48 8 36 8 22 18 10 32 4z" fill="#f2c24e" stroke="#5a3306" stroke-width="3"/><path d="M32 9v46M32 22c-7 3-12 9-14 16M32 22c7 3 12 9 14 16" fill="none" stroke="rgba(90,50,4,.6)" stroke-width="2.5"/></svg>`;
   el.innerHTML=`<div class="wc"><img class="wh" src="assets/ui/dragon_cabeza.webp" alt=""><h2>¡Felicidades!</h2><div class="ws">Derrotaste al Dragón Dorado · puesto ${m.rank|0} de ${m.np|0}${m.pct?` · ${m.pct} % del daño`:''}</div>
    ${m.alas?`<div class="wr al"><span>🪽</span><div>¡Alas del Dragón Dorado!<small>Suerte del dragón: 1 de cada 100</small></div></div>`:''}
    <div class="wr"><span>${E}</span><div>Escamas Doradas<small>${m.rank===1?'Fuiste quien más daño hizo':m.rank<=10?'Estás entre los 10 mejores':'Por participar'} · ahora tenés ${m.tot|0}</small></div><b>× ${m.esc|0}</b></div>
+   ${lt?`<div class="wr"><span>🪙</span><div>Oro</div><b>₲ ${fmt(lt.gold)}</b></div>${lt.xp?`<div class="wr"><span>✨</span><div>Experiencia</div><b>${fmt(lt.xp)}</b></div>`:''}${lt.items.length?`<div class="wr"><span>🎁</span><div>Cofre del Dragón<small>${lt.items.map(esc).join(' · ')}</small></div></div>`:''}`:''}
    ${m.mata?`<div class="wr tt">${nxTitle('t_mata')}<small>Título nuevo, para siempre</small></div>`:''}${m.first?`<div class="wr tt">${nxTitle('t_dragon')}<small>Título nuevo</small></div>`:''}
    <button class="btn" data-act="wbCardOk">Recibir</button><div class="wn">${m.test?'Pelea de prueba: no se guardó nada en la cuenta.':'<a data-act="wbCardOk" data-go="1" style="color:#ffd76a;text-decoration:underline;cursor:pointer">Ver el Tesoro del Dragón</a>'}</div></div>`;
   document.body.appendChild(el);if(!snd('mu_levelup',{vol:.6,jit:0}))sfx('level');}
@@ -8925,7 +8955,7 @@ function frame(now){if(window.__KICKED)return;
 function tickOnce(dt,rdt,draw){
   if(PRF.on){PRF.t=performance.now();PRF.n++;}
   if(draw&&!renderer.info.autoReset)renderer.info.reset();
-  if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);nxTick(dt);ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
+  if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);nxTick(dt);try{drTick(dt);}catch(e){}ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
   try{
     if(mode==='game'&&C){updatePlayer(gdt);fpFace(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}(MOBNET.role==='guest'?updateEnemiesGuest:updateEnemies)(gdt);mobNetTick(dt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}pk('juego');
     if(BENCH.nochar)benchHideChars();else{updNpcs(dt);pk('pnj');faceTick(dt);updLife(mode==='select'?dt:gdt);pk('ambiente');}if(!$('#pInv').hidden)irPreview(dt);if(MATE.on||!$('#pMate').hidden)mateTick(dt);animHero(mode==='select'?dt:gdt);pk('heroe');liveTick(dt);if(mode==='game'){liveAnim(Math.min(.5,rdt));duelTick(dt);}pk('jugadores');updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);pk('efectos');

@@ -56,13 +56,14 @@ const mk=(parts,mat,par)=>{const m=new THREE.Mesh(merge(parts),mat);m.castShadow
 /* ---- columna: dos poses, por puntos de control (cabeza → cola) ---- */
 const STAND=[[14.2,9.4],[12.9,10.9],[11,12.1],[8.8,11.8],[6.8,9.7],[4.6,7.4],[2.2,6.3],[-.4,6.0],[-2.8,5.9],[-5,5.9],[-7.6,5.3],[-10.6,3.9],[-13.8,2.4],[-17.5,1.5],[-21.5,1.4],[-25.5,2.0],[-29,3.1]];
 const FLY=[[15.4,6.0],[13.6,6.5],[11.5,6.8],[9.3,6.6],[7.2,6.3],[4.8,6.0],[2.2,5.9],[-.4,5.9],[-2.8,5.9],[-5,5.9],[-7.6,5.7],[-10.8,5.4],[-14.2,5.1],[-17.8,4.9],[-21.4,4.9],[-25,5.1],[-28.6,5.5]];
+if(opt.baby)for(const A of [STAND,FLY])for(const p of A){if(p[0]>2.2){p[0]=2.2+(p[0]-2.2)*.5;p[1]=6+(p[1]-6)*.62;}else if(p[0]<-5){p[0]=-5+(p[0]+5)*.42;p[1]=5.9+(p[1]-5.9)*.6;}}
 const NC=STAND.length,U_SH=6/(NC-1),U_HIP=9/(NC-1);
 const Z0={pose:0,gy:0,gx:0,gry:0,sw:0,nx:0,ny:0,nz:0,by:0,pitch:0,tz:0,tamp:1,hp:0,jaw:.25,glow:.9,wflap:null,wfold:null,dead:0,flapSpd:1};
 const st=Object.assign({t:0},Z0);
-const N=132,RING=24,BR=8;
+const N=opt.pet?46:132,RING=opt.pet?12:24,BR=opt.pet?4:8; /* opt.pet: versión liviana para la cría y las alas del jugador */
 const P=[],TG=[],SD=[],UP=[];for(let i=0;i<=N;i++){P.push(V(0,0,0));TG.push(V(0,0,0));SD.push(V(0,0,0));UP.push(V(0,0,0));}
 const RT=[[0,.8],[.06,.95],[.2,1.15],[.3,1.75],[U_SH,2.9],[.47,2.75],[U_HIP,2.45],[.64,1.6],[.75,1.05],[.88,.5],[1,.07]];
-function radius(u){for(let k=1;k<RT.length;k++)if(u<=RT[k][0]){const a=RT[k-1],b=RT[k],t=(u-a[0])/(b[0]-a[0]),s=t*t*(3-2*t);return a[1]+(b[1]-a[1])*s;}return .07;}
+function radius(u){for(let k=1;k<RT.length;k++)if(u<=RT[k][0]){const a=RT[k-1],b=RT[k],t=(u-a[0])/(b[0]-a[0]),s=t*t*(3-2*t);return (a[1]+(b[1]-a[1])*s)*(opt.baby?1.3:1);}return .07;}
 const Gs=(u,c,w)=>Math.exp(-((u-c)/w)*((u-c)/w));
 const ctrl=STAND.map(()=>V(0,0,0)),curve=new THREE.CatmullRomCurve3(ctrl,false,'centripetal');
 function spineAt(time){const k=st.pose,dd=st.dead,lv=1-dd;for(let i=0;i<NC;i++){const a=STAND[i],f=FLY[i],tt=i/(NC-1);let X=a[0]+(f[0]-a[0])*k,Y=a[1]+(f[1]-a[1])*k,Z=0;
@@ -101,7 +102,7 @@ const head=new THREE.Group();g.add(head);const jaw=new THREE.Group();head.add(ja
  for(const s of [-1,1]){
   // ceño: placa gruesa que baja hacia el hocico (mirada enojada) + pómulo
   PL.push({g:taper([V(-1.2,1.2,s*.9),V(.1,1.12,s*.8),V(1.5,.68,s*.46)],.25,.08,10,7)});PL.push({g:taper([V(-1,-.02,s*1.05),V(.6,.0,s*.92),V(2.3,-.1,s*.62)],.22,.06,10,6)});
-  EY.push({g:new THREE.SphereGeometry(.34,14,10),m:MX(V(.35,.56,s*.9),[0,s*.3,-.2],V(1.45,.62,.5))});
+  EY.push(opt.baby?{g:new THREE.SphereGeometry(.5,16,12),m:MX(V(.5,.5,s*.86),[0,s*.3,0],V(1.05,1.05,.5))}:{g:new THREE.SphereGeometry(.34,14,10),m:MX(V(.35,.56,s*.9),[0,s*.3,-.2],V(1.45,.62,.5))});if(opt.baby)TO.push({gl:1,g:new THREE.SphereGeometry(.12,8,6),m:MX(V(.74,.7,s*1.1),[0,0,0])});
   PL.push({g:new THREE.TorusGeometry(.35,.04,5,18),m:MX(V(.35,.56,s*.93),[0,s*.3,-.2],V(1.45,.62,1))});
   // cuernos: par grande hacia atrás, par de mejilla y gola
   HO.push({g:taper([V(-.9,.95,s*.55),V(-2.6,1.75,s*.95),V(-4.6,2.1,s*1.3),V(-6.4,1.6,s*1.45),V(-7.7,.6,s*1.4)],.52,.02,22,8)});
@@ -121,8 +122,8 @@ const head=new THREE.Group();g.add(head);const jaw=new THREE.Group();head.add(ja
  HO.push({g:new THREE.ConeGeometry(.2,.9,6),m:MX(V(3.75,.72,0),[0,0,.5])});
  JG.push({g:lathe([[0,-.3],[.72,0],[.64,1.3],[.48,2.5],[.3,3.5],[0,3.85]],1,.36,.82)});
  JM.push({g:taper([V(.2,.14,0),V(1.5,.22,0),V(2.7,.1,0)],.34,.08,8,6)});
- mk(G,hm,head);mk(PL,plateM,head);mk(HO,hornM,head);mk(TO,toothM,head);mk(EY,eyeM,head);mk(MW,mawM,head);
- mk(JG,hm,jaw);mk(JH,hornM,jaw);mk(JT,toothM,jaw);mk(JM,mawM,jaw);head.scale.setScalar(1.5);}
+ mk(G,hm,head);mk(PL,plateM,head);mk(HO,hornM,head);mk(opt.baby?TO.filter(p=>p.gl):TO,toothM,head);mk(EY,eyeM,head);mk(MW,mawM,head);
+ mk(JG,hm,jaw);mk(JH,hornM,jaw);if(!opt.baby)mk(JT,toothM,jaw);mk(JM,mawM,jaw);if(opt.baby)head.scale.set(1.2,2.2,2.2);else head.scale.setScalar(1.5);}
 /* púas del lomo + garras de las alas: una sola malla con instancias */
 const spG=new THREE.ConeGeometry(.3,1,5);spG.translate(0,.5,0);const SPK=new THREE.InstancedMesh(spG,hornM,96);SPK.castShadow=true;SPK.frustumCulled=false;g.add(SPK);
 /* punta de la cola: hoja con púas */
@@ -130,6 +131,7 @@ const tip=mk([{g:(()=>{const s=new THREE.Shape();s.moveTo(-.4,0);s.lineTo(-1,1.3
 /* ---- alas: huesos con instancias y membrana que se actualiza por cuadro ---- */
 const boneG=new THREE.CylinderGeometry(.5,1,1,7,1,true);boneG.translate(0,.5,0);const WB=new THREE.InstancedMesh(boneG,goldS,12);WB.castShadow=true;WB.frustumCulled=false;g.add(WB);
 const wl={S:V(0,0,0),E:V(.9,1.6,4.2),W:V(-.2,2.6,8.6),T:[V(-.4,3.3,18.5),V(-6,2.4,17.2),V(-10.8,1.2,13.6),V(-13.6,.4,8.4)],R:V(-9,-1,.5)};
+if(opt.baby){for(const k of ['E','W','R'])wl[k].multiplyScalar(.62);wl.T.forEach(t=>t.multiplyScalar(.62));}
 const WJ=[0,1].map(()=>Array.from({length:8},()=>V(0,0,0)));
 const NU=6,NV=5,PAN=4,per=(NU+1)*(NV+1),mG=new THREE.BufferGeometry();
 {const n=2*PAN*per,idx=[],uv=new Float32Array(n*2);for(let w=0;w<2;w++)for(let p=0;p<PAN;p++){const o=(w*PAN+p)*per;for(let a=0;a<NU;a++)for(let b=0;b<NV;b++){const i0=o+a*(NV+1)+b,i1=i0+NV+1;idx.push(i0,i1,i0+1,i1,i1+1,i0+1);}
@@ -170,18 +172,22 @@ function legIK(){for(const L of legs){const i=Math.round(L.u*N),r=radius(L.u);hi
   const [m1,m2,m3]=L.m;m1.position.copy(hip);m1.quaternion.setFromUnitVectors(dn,pp.subVectors(kn,hip).normalize());m2.position.copy(kn);m2.quaternion.setFromUnitVectors(dn,pp.subVectors(ank,kn).normalize());
   m3.position.copy(ank);m3.rotation.set(0,-L.s*.22,L.fa*st.pose);}}
 /* chispas */
-const SPN=opt.lite?40:120,spA=new Float32Array(SPN*3),sseed=[];for(let i=0;i<SPN;i++)sseed.push([rnd(),rnd()*6.28,rnd()*3+1,rnd()]);
+const SPN=opt.pet?2:opt.lite?40:120,spA=new Float32Array(SPN*3),sseed=[];for(let i=0;i<SPN;i++)sseed.push([rnd(),rnd()*6.28,rnd()*3+1,rnd()]);
 const spG2=new THREE.BufferGeometry();spG2.setAttribute('position',new THREE.BufferAttribute(spA,3));const sparks=new THREE.Points(spG2,new THREE.PointsMaterial({map:glowTex,size:.4,color:0xffd070,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));sparks.frustumCulled=false;g.add(sparks);
 const hf=V(0,0,0),hs=V(0,0,0),hu=V(0,0,0),Mb=new THREE.Matrix4();
-function step(time){st.t=time;spineAt(time);rebuild();legIK();
+function step(time){st.t=time;spineAt(time);if(!opt.wingsOnly){rebuild();legIK();}
  {const pa=(-.3+.24*st.pose)*(1-st.dead)+st.hp;hf.copy(TG[1]).negate().lerp(Vt.set(Math.cos(pa),Math.sin(pa),0),.7).normalize();}g.position.set(st.gx,st.gy,0);g.rotation.y=st.gry;hs.crossVectors(hf,up).normalize();hu.crossVectors(hs,hf);
  head.position.copy(P[0]).addScaledVector(hf,-.9);head.quaternion.setFromRotationMatrix(Mb.makeBasis(hf,hu,hs));head.rotateZ(Math.sin(time*1.3)*.04);head.rotateX(Math.sin(time*.7)*.05*(1-st.dead)+st.dead*1.15);sparks.material.opacity=Math.min(1,st.glow);
  jaw.rotation.z=-.1-st.jaw*.75-.05*(.5+.5*Math.sin(time*1.9));mawM.emissiveIntensity=.03+st.glow*.08+.05*Math.sin(time*3);bellyM.emissiveIntensity=st.glow*(.8+.25*Math.sin(time*2.2));
- let n=0;for(let i=5;i<N-6&&n<70;i+=2+(i>N*.6?1:0)){const u=i/N,r=radius(u),big=n%2?.62:1,hgt=1.35*(.8+1.6*Gs(u,U_SH+.03,.12)+.5*Gs(u,U_HIP,.1)+(u>.7?(1-u)*-.6:0))*big;
+ let n=0;for(let i=5;i<N-6&&n<70&&!opt.wingsOnly;i+=2+(i>N*.6?1:0)){const u=i/N,r=radius(u),big=n%2?.62:1,hgt=1.35*(.8+1.6*Gs(u,U_SH+.03,.12)+.5*Gs(u,U_HIP,.1)+(u>.7?(1-u)*-.6:0))*big;
   Qt.setFromUnitVectors(up,Vt.copy(UP[i]).addScaledVector(TG[i],.75).normalize());ring(i,u,0,1,r,.9,v0);Sc.set(.6+r*.42,Math.max(.25,hgt),.5+r*.3);Mx.compose(v0,Qt,Sc);SPK.setMatrixAt(n++,Mx);}
  n=wings(time,n);SPK.count=n;SPK.instanceMatrix.needsUpdate=true;
  tip.position.copy(P[N]);hf.copy(TG[N]);hs.crossVectors(hf,up).normalize();hu.crossVectors(hs,hf);tip.quaternion.setFromRotationMatrix(Mb.makeBasis(hf,hu,hs));
  for(let i=0;i<SPN;i++){const s=sseed[i],k=Math.min(N,Math.round(s[0]*N*.85)),r=radius(k/N)+1.2+s[3]*2.5,life=(time*s[2]*.25+s[3])%1;Vt.copy(P[k]).addScaledVector(SD[k],Math.cos(s[1]+time*.5)*r).addScaledVector(UP[k],Math.sin(s[1]+time*.5)*r+life*4);spA[i*3]=Vt.x;spA[i*3+1]=Vt.y;spA[i*3+2]=Vt.z;}spG2.attributes.position.needsUpdate=true;}
+/* opt.wingsOnly: solo las alas (premio «Alas del Dragón Dorado»); opt.goldWing: membrana dorada */
+if(opt.wingsOnly){for(const m of [body,belly,head,tip,sparks])m.visible=false;for(const L of legs)L.m.forEach(m=>m.visible=false);}
+if(opt.goldWing){membM.emissiveMap=null;membM.emissive.setRGB(.9,.58,.12);membM.emissiveIntensity=.42;membM.color.setRGB(1.12,.96,.55);membM.metalness=.5;membM.roughness=.35;membM.needsUpdate=true;}
+if(opt.pet){sparks.visible=false;g.traverse(o=>{if(o.isMesh)o.castShadow=false;});}
 step(0);
 /* ---- animaciones: cada una mueve unos pocos mandos (cuello, cuerpo, cola, patas, alas, boca) ---- */
 const sm=(t,a,b)=>{t=Math.min(1,Math.max(0,(t-a)/(b-a)));return t*t*(3-2*t);},bp=(t,a,b,c,d)=>sm(t,a,b)*(1-sm(t,c,d)),FR=legs.find(L=>L.s===1&&L.bend===-1);
@@ -208,7 +214,7 @@ const CLIPS={
    Sin luces nuevas (no recompila nada del juego). opt.host: el juego pone las marcas y el daño; acá solo va lo que se ve ---- */
 const HOST=!!opt.host,LQ=opt.lite?.5:1,gH=(x,z)=>opt.H?opt.H(x,z):0;
 const fx=new THREE.Group(),mkG=new THREE.Group();outer.add(mkG);if(HOST)mkG.visible=false;
-const FXN=opt.lite?600:1100,fP=new Float32Array(FXN*3),fC=new Float32Array(FXN*3),fS=new Float32Array(FXN),fV=new Float32Array(FXN*3),fL=new Float32Array(FXN*3),fF=new Float32Array(FXN),fK=new Uint8Array(FXN);let fI=0;
+const FXN=opt.pet?4:opt.lite?600:1100,fP=new Float32Array(FXN*3),fC=new Float32Array(FXN*3),fS=new Float32Array(FXN),fV=new Float32Array(FXN*3),fL=new Float32Array(FXN*3),fF=new Float32Array(FXN),fK=new Uint8Array(FXN);let fI=0;
 const fG=new THREE.BufferGeometry();fG.setAttribute('position',new THREE.BufferAttribute(fP,3));fG.setAttribute('col',new THREE.BufferAttribute(fC,3));fG.setAttribute('sz',new THREE.BufferAttribute(fS,1));
 const fM=new THREE.ShaderMaterial({uniforms:{map:{value:glowTex},sc:{value:500}},blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false,
  vertexShader:'uniform float sc;attribute float sz;attribute vec3 col;varying vec3 vC;void main(){vC=col;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(256.,sz*sc/-mv.z);gl_Position=projectionMatrix*mv;}',
