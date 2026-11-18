@@ -142,3 +142,12 @@ if(matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').match
  addEventListener('keydown',e=>{if(lb.hidden)return;if(e.key==='Escape'){e.stopPropagation();e.preventDefault();close();}else if(e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();show(ci+1);}else if(e.key==='ArrowLeft'){e.preventDefault();e.stopPropagation();show(ci-1);}},true);
  lb.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});lb.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>45)show(ci+(dx<0?1:-1));},{passive:true});
  const ob=new MutationObserver(()=>{if(!document.getElementById('deep').classList.contains('open'))lb.hidden=true;});ob.observe(document.getElementById('deep'),{attributes:true,attributeFilter:['class']});})();
+
+/* ===== franja del evento Apertura del Reino: cuenta regresiva (hora de Paraguay, UTC-3) ===== */
+(()=>{const el=document.getElementById('evb');if(!el)return;const T0=Date.UTC(2026,11,1,3),T1=T0+14*864e5,L=document.getElementById('evbL'),T=document.getElementById('evbT'),X=document.getElementById('evbX'),B=document.getElementById('evbB');
+ const dur=ms=>{const d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3),p=n=>String(n).padStart(2,'0');return d?d+' d '+p(h)+' h '+p(m)+' m':p(h)+':'+p(m)+':'+p(s);};
+ let tm=0;const tick=()=>{const n=Date.now();if(n>=T1){el.hidden=true;document.body.classList.remove('ev');clearInterval(tm);return;}
+  if(n<T0){L.textContent='empieza en';T.textContent=dur(T0-n);X.textContent='· título Pionero para quien entre en los 14 días';B.textContent='Registrarme';el.href='cuenta/#cuenta';}
+  else{L.textContent='día '+(Math.floor((n-T0)/864e5)+1)+' de 14 · termina en';T.textContent=dur(T1-n);X.textContent='· regalo cada día y el Dragón Dorado 4 veces por día';B.textContent='Jugar ahora';el.href='jugar/';}
+  if(el.hidden){el.hidden=false;document.body.classList.add('ev');}};
+ tick();tm=setInterval(tick,1000);})();
