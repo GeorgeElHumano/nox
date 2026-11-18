@@ -6682,7 +6682,7 @@ function animEnemy(e,dt,sp){const w=Math.min(1,sp/2.5);e.phase+=dt*(2+sp*2.2);/*
   if(e.head&&e.head.children)for(const c of e.head.children)if(c.userData.flame!=null){const k=.7+Math.abs(Math.sin(T*9+c.userData.flame*1.3))*.45;if(c.isSprite)c.scale.setScalar(k*.7);else{c.scale.y=k;c.scale.x=c.scale.z=1.15-k*.25;c.rotation.z=Math.sin(T*7+c.userData.flame)*.2;}}}
 function updateEnemies(dt){
   if(STUDIO.on){for(const e of enemies){if(e.pvp||e.dead)continue;e.lunge=Math.max(0,e.lunge-dt);e.flash-=dt;animEnemy(e,STUDIO.frozen?0:dt,STUDIO.walk?2.6:0);e.bar.visible=false;}return;}
-  for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.pvp)continue;
+  for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.pvp)continue;if(e.wb){wbUpdate(e,dt);continue;}
     if(e.dead){e.deadT+=dt;const k=Math.min(1,e.deadT/.6);if(e.kind==='glb')oadMobDead(e,dt,k);else if(e.kind==='biped')poseHuman(e,{t:T,dead:smooth(0,1,k),lean:e.hunch||0});else if(e.kind==='snake'){e.deadK=smooth(0,1,Math.min(1,e.deadT/.9));updSnake(e,T,0,0);}else if(e.kind==='scorp')deadScorp(e,smooth(0,1,Math.min(1,e.deadT/.7)));else if(e.kind==='lizard')deadLizard(e,smooth(0,1,Math.min(1,e.deadT/.7)));else e.rig.rotation.z=smooth(0,1,k)*PI/2;
       if(e.deadT>1.4)e.rig.position.y-=dt*.8;if(e.deadT>3)e.g.visible=false;if(e.deadT>e.respawn){if(e.golden||e.summon)removeEnemy(e);else respawnEnemy(e);}continue;}
     const p=e.p;let tx=P.x,tz=P.z,tdead=P.dead,tid=null;const dl=Math.hypot(P.x-p.x,P.z-p.z);let d=dl;
@@ -6925,7 +6925,7 @@ function damageMob(e,mult,strong){if(e.dead)return;let d,kind='';
   d=Math.max(1,Math.round(d*mult*DS.dmgMul-e.st.df));applyMobDmg(e,d,kind,strong);}
 function sparkFx(x,y,z,col,n){const geo=new THREE.BufferGeometry(),a=new Float32Array(n*3),v=[];for(let i=0;i<n;i++){a[i*3]=x;a[i*3+1]=y;a[i*3+2]=z;v.push([R(-4,4),R(1,6),R(-4,4)]);}geo.setAttribute('position',new THREE.BufferAttribute(a,3));
   addFx(new THREE.Points(geo,new THREE.PointsMaterial({map:glowTex,color:col,size:.32,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})),.45,(o,k,dt)=>{for(let i=0;i<n;i++){v[i][1]-=14*dt;a[i*3]+=v[i][0]*dt;a[i*3+1]+=v[i][1]*dt;a[i*3+2]+=v[i][2]*dt;}geo.attributes.position.needsUpdate=true;o.material.opacity=1-k;});}
-function applyMobDmg(e,d,kind,strong){if(e.pvp){duelHit(e,d,kind,strong);return;}if(MOBNET.role==='guest'&&!e.local){mobGuestHit(e,d,kind,strong);return;}if(MOBNET.share)e.contrib[LIVE.me]=(e.contrib[LIVE.me]||0)+d;if(AU.ctx&&SND.buf.flesh0)hitSnd(e,kind,strong);else sfx(kind==='e'||kind==='c'?'crit':'hit');e.hp-=d;e.flash=.12;e.hitK=1;e.aggro=10;e.ret=false;popNum(String(d),e.p.x+(Math.random()<.5?-1:1)*R(.55,.95),e.p.y+e.hgt+1.15,e.p.z,kind+(strong?' big':''));if(kind||strong)HITSTOP=Math.max(HITSTOP,strong?.075:.05);
+function applyMobDmg(e,d,kind,strong){if(e.pvp){duelHit(e,d,kind,strong);return;}if(e.wb||MOBNET.role==='guest'&&!e.local){mobGuestHit(e,d,kind,strong);return;}if(MOBNET.share)e.contrib[LIVE.me]=(e.contrib[LIVE.me]||0)+d;if(AU.ctx&&SND.buf.flesh0)hitSnd(e,kind,strong);else sfx(kind==='e'||kind==='c'?'crit':'hit');e.hp-=d;e.flash=.12;e.hitK=1;e.aggro=10;e.ret=false;popNum(String(d),e.p.x+(Math.random()<.5?-1:1)*R(.55,.95),e.p.y+e.hgt+1.15,e.p.z,kind+(strong?' big':''));if(kind||strong)HITSTOP=Math.max(HITSTOP,strong?.075:.05);
   sparkFx(e.p.x,e.p.y+e.hgt*.55,e.p.z,kind==='e'?0x7dffa8:kind==='c'?0x8fd0ff:0xffc070,kind?16:8);if(kind){shake=Math.max(shake,.14);burstFx(e.p.x,e.p.y+e.hgt*.55,e.p.z,kind==='e'?0x7dffa8:0x8fd0ff,1.4);}
   if(!e.def.boss){const dx=e.p.x-P.x,dz=e.p.z-P.z,l=Math.hypot(dx,dz)||1,kb=strong?.55:kind?.32:.14;e.p.x+=dx/l*kb;e.p.z+=dz/l*kb;}if(e.hp<=0)killMob(e);}
 function killMobFx(e){
@@ -8228,15 +8228,15 @@ function mobApply(list,key){const seen=new Set();
       if(e.predT&&T<e.predT)e.hp=Math.min(e.hp,hp);else e.hp=hp;}
     if(ln!==e.lungeN){e.lungeN=ln;if(!e.dead){e.lunge=.35;beastSnd(e,'atk',.7);}}
     if((f&32)&&!e.enraged){e.enraged=true;e.mats.forEach(m=>{if(m.emissive&&!m.transparent)m.userData.enr=1;});}}
-  if(key)for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(!e.pvp&&!seen.has(e.nid))removeEnemy(e);}}
+  if(key)for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(!e.pvp&&!e.wb&&!seen.has(e.nid))removeEnemy(e);}}
 function mobGuestHit(e,d,kind,strong){if(e.dead)return;
   if(AU.ctx&&SND.buf.flesh0)hitSnd(e,kind,strong);else sfx(kind==='e'||kind==='c'?'crit':'hit');
   e.hp=Math.max(1,e.hp-d);e.predT=T+.6;e.flash=.12;e.hitK=1;
   popNum(String(d),e.p.x+(Math.random()<.5?-1:1)*R(.55,.95),e.p.y+e.hgt+1.15,e.p.z,kind+(strong?' big':''));if(kind||strong)HITSTOP=Math.max(HITSTOP,strong?.075:.05);
   sparkFx(e.p.x,e.p.y+e.hgt*.55,e.p.z,kind==='e'?0x7dffa8:kind==='c'?0x8fd0ff:0xffc070,kind?16:8);
-  liveSend({t:'mh',n:e.nid,d:Math.round(d),k:kind||'',s:strong?1:0});}
+  if(e.wb&&WB.loc&&WB.loc.D)WB.loc.D.hit('yo',d,C.L,C.name);liveSend({t:e.wb?'wbh':'mh',n:e.nid,d:Math.round(d),k:kind||'',s:strong?1:0});}
 function updateEnemiesGuest(dt){const k=1-Math.exp(-dt*10);
-  for(const e of enemies){if(e.pvp)continue;
+  for(const e of enemies){if(e.pvp)continue;if(e.wb){wbUpdate(e,dt);continue;}
     if(e.dead){e.deadT+=dt;const q=Math.min(1,e.deadT/.6);if(e.kind==='glb')oadMobDead(e,dt,q);else if(e.kind==='biped')poseHuman(e,{t:T,dead:smooth(0,1,q),lean:e.hunch||0});else if(e.kind==='snake')e.rig.scale.y=1-q*.6;else e.rig.rotation.z=smooth(0,1,q)*PI/2;
       if(e.deadT>1.4)e.rig.position.y-=dt*.8;if(e.deadT>3)e.g.visible=false;continue;}
     const p=e.p;if(e.tx==null){e.tx=p.x;e.tz=p.z;e.tr=e.g.rotation.y;}
@@ -8250,7 +8250,66 @@ function updateEnemiesGuest(dt){const k=1-Math.exp(-dt*10);
       if(b.lagV==null||v>b.lagV)b.lagV=v;else b.lagV=Math.max(v,b.lagV-dt*.7);b.fill.scale.x=Math.max(.001,v);b.lag.scale.x=Math.max(.001,b.lagV);b.scale.setScalar((e.def.boss?1.25:.78)*(tg?1.12:1));b.fr.material.color.setHex(tg?0xe0b25a:0x1a100a);b.fill.material.color.setHex(tg?0xff4a30:0xb8301e);}}}}
 
 /* ataques especiales de los jefes, avisados por el servidor: cada jugador ve la zona marcada y se daña si queda adentro */
-function mobTele(m){const e=mobByN(m.n);if(!e||e.dead&&m.ab!=='doom')return;const f=m.f||{},x=m.x,z=m.z,col=m.col||0xff3a1a,dur=m.dur||1,mult=m.m||1;
+/* ================= Dragón Dorado: jefe de mundo del evento. Lo mueve el servidor (live/src/dragon.js); el modelo, las
+   animaciones y los efectos están en vendor/dragon-dorado.js y se bajan recién cuando aparece. ================= */
+const WB={e:null,st:null,load:0,ph:1,left:0,zk:1};
+/* cámara de jefe: cerca del dragón la cámara se aleja para que entre en pantalla */
+function wbZoom(dt){if(WB.loc===undefined&&mode==='game')wbLocal();const e=WB.e,on=e&&!e.goneT&&enemies.includes(e)&&Math.hypot(P.x-e.p.x,P.z-e.p.z)<75,far=CAMM==='iso'?(innerHeight>innerWidth?2.7:3.7):3.2;WB.zk+=((on?far:1)-WB.zk)*Math.min(1,dt*1.5);return WB.zk;}
+/* prueba sin servidor: solo en copias de prueba (no en noxparaguay.com), con ?dragon=1 y jugando sin cuenta. Corre en el propio juego el mismo
+   código del servidor (vendor/dragon-prueba.js, armado por scripts/dragon-prueba.py) para pelear el dragón a solas */
+function wbLocal(){WB.loc=null;if(!/[?&]dragon=1/.test(location.search)||/(^|\.)noxparaguay\.com$/.test(location.hostname)||NET.mode==='online')return;
+  const sc=document.createElement('script');sc.src='vendor/dragon-prueba.js';sc.onload=()=>{const L=WB.loc={D:null,wait:0};let last=T;toast('Prueba del <em>Dragón Dorado</em>: salí por la puerta sur de Asunción');
+    setInterval(()=>{try{if(mode!=='game'||!Z||Z.id!=='asuncion'){last=T;return;}const dt=Math.min(.3,T-last);last=T;if(dt<=0)return;
+      if(!L.D){if(T<L.wait)return;L.D=new window.NoxDragonTest.Dragon({limit:1800});}const D=L.D;D.step(dt,[{uid:'yo',p:{x:P.x,z:P.z,d:P.dead?1:0}}]);
+      for(const o of D.out){if(o.t==='tele')mobTele(o);else if(o.t==='mk'){try{mobNetMsg(o);}catch(er){}}else wbMsg(o);}D.out=[];wbState(D.state());if(D.gone){L.D=null;L.wait=T+25;}}catch(er){}},60);};document.head.appendChild(sc);}
+const WBDEF={key:'dragondorado',name:'Dragón Dorado',lvl:100,boss:true,model:'dragon',scale:1,speed:3.1,aggro:60};
+const WBCLIP={d_fuego:'fuego',d_zarpa:'zarpazo',d_mord:'mordida',d_cola:'coletazo',d_carga:'embestida',d_lluvia:'lluvia',d_rugido:'rugido',d_llega:'aterrizaje'};
+function wbLoad(){if(window.makeDragon||WB.load)return;WB.load=1;const sc=document.createElement('script');sc.src='vendor/dragon-dorado.js';sc.onload=()=>{WB.load=2;if(WB.st)wbState(WB.st);};sc.onerror=()=>{WB.load=0;};document.head.appendChild(sc);}
+function wbGone(){const e=WB.e;WB.e=null;if(!e)return;if(P.target===e)P.target=null;if(enemies.includes(e)){removeEnemy(e);try{zoneG.remove(e.D.fx);disposeTree(e.D.fx);}catch(er){}}}
+function wbMake(n,x,z,ry){const D=makeDragon(THREE,{host:1,lite:LITE(),H:(a,b)=>H(a,b)});const g=new THREE.Group(),rig=new THREE.Group();g.add(rig);rig.add(D.g);D.g.rotation.y=-PI/2;
+  const st=mobStats(WBDEF,false);g.position.set(x,H(x,z),z);g.rotation.y=ry;zoneG.add(g);zoneG.add(D.fx);
+  const e={g,rig,D,kind:'dragon',mats:[],rad:6,hgt:13.5,type:'dragondorado',def:WBDEF,golden:false,elite:false,st,p:g.position,hx:x,hz:z,hp:st.hp,max:st.hp,dead:false,deadT:0,atkCD:0,lunge:0,flash:0,phase:0,wanderT:0,wx:x,wz:z,aggro:0,ret:false,stun:0,speed:3.1,respawn:1e9,spot:null,wb:true,nid:n,contrib:{},tx:x,tz:z,tr:ry};
+  e.bar=makeBar();e.label=addLabel(`<span class="lv" style="background:#ff5a46">??</span>Dragón Dorado <span class="bt">Jefe de mundo</span>`,'boss',()=>[e.p.x,e.p.y+e.hgt+.5,e.p.z],()=>!e.dead&&e.g.visible);
+  enemies.push(e);return e;}
+function wbState(m){WB.st=m;if(!Z||Z.id!=='asuncion'||mode!=='game')return;
+  if(!m.e){WB.st=null;if(WB.e&&!WB.e.dead)wbGone();else if(WB.e)WB.e.goneT=T+3;return;}
+  if(!window.makeDragon){wbLoad();return;}
+  let e=WB.e;if(e&&!enemies.includes(e)){WB.e=null;e=null;}
+  const [n,,x10,z10,r100,hp,max,f]=m.e,x=x10/10,z=z10/10;
+  if(!e){if(f&1)return;e=WB.e=wbMake(n,x,z,r100/100);e.hp=hp;if(m.age<2.4){e.D.play('aterrizaje');e.D.cur.t=Math.max(0,m.age);}/* recién llegado: baja volando */}
+  if(x!==e.tx||z!==e.tz)e.mvSp=Math.hypot(x-e.p.x,z-e.p.z)/MOB_LAG;e.tx=x;e.tz=z;e.tr=r100/100;e.max=max;
+  if(f&1){if(!e.dead)wbDie(e);}else if(e.predT&&T<e.predT)e.hp=Math.min(e.hp,hp);else e.hp=hp;
+  WB.ph=m.ph||1;WB.left=m.left||0;}
+function wbDie(e){e.hp=0;killMobFx(e);e.D.play('muerte');shake=Math.max(shake,.8);snd('thunder',{x:e.p.x,z:e.p.z,vol:.9,rate:.55,maxD:120});}
+function wbUpdate(e,dt){const D=e.D,p=e.p;
+  if(e.dead){e.deadT+=dt;D.update(dt);e.bar.visible=false;if(e.deadT>24||(e.goneT&&T>e.goneT&&e.deadT>12))wbGone();return;}
+  let gx=e.tx-p.x,gz=e.tz-p.z,gd=Math.hypot(gx,gz),mv=0;if(gd>14){p.x=e.tx;p.z=e.tz;gd=0;}
+  if(gd>1e-3&&dt>0){mv=Math.min(gd,Math.max(e.mvSp||0,gd/.6)*dt);p.x+=gx/gd*mv;p.z+=gz/gd*mv;}p.y=H(p.x,p.z);
+  const sp=e.aSp=(e.aSp||0)+((dt>0?mv/dt:0)-(e.aSp||0))*Math.min(1,dt*6),r0=e.g.rotation.y;e.g.rotation.y=lerpAngle(r0,e.tr,Math.min(1,dt*6));
+  const turning=Math.abs(Math.atan2(Math.sin(e.tr-r0),Math.cos(e.tr-r0)))>.12,cn=D.cur.name;
+  if(cn==='quieto'||cn==='caminar'||cn==='girar'){const want=sp>.5?'caminar':turning?'girar':'quieto';if(want!==cn)D.play(want);}
+  D.fxMat.uniforms.sc.value=renderer.domElement.height/(2*Math.tan(camera.fov*PI/360));
+  D.update(dt);e.g.visible=true;mobShadow(e,0);if(e.flash>0)e.flash-=dt;
+  {const b=e.bar,tg=P.target===e;b.visible=true;b.position.set(p.x,p.y+e.hgt+.25,p.z);b.quaternion.copy(camera.quaternion);const v=Math.max(0,e.hp/e.max);
+   if(b.lagV==null||v>b.lagV)b.lagV=v;else b.lagV=Math.max(v,b.lagV-dt*.7);b.fill.scale.x=Math.max(.001,v);b.lag.scale.x=Math.max(.001,b.lagV);b.scale.setScalar(tg?4.4:4);b.fr.material.color.setHex(tg?0xe0b25a:0x1a100a);b.fill.material.color.setHex(WB.ph>=3?0xff7a10:tg?0xff4a30:0xb8301e);}}
+/* el daño del dragón es un porcentaje de la vida máxima del jugador: así es peligroso para todos los niveles. Dentro de las murallas no pega */
+function wbHurt(e,pc){if(P.dead||!pc||(Z&&Z.safe))return;hurtPlayer(e,pc*DS.maxHP*(110+DS.def)/110/e.st.dmg);}
+function wbTele(m){const e=WB.e;if(!e||e.dead||e.nid!==m.n)return;const f=m.f||{},x=m.x,z=m.z,col=m.col||0xff3a0a,dur=m.dur||1,pc=+m.pc||0,D=e.D;
+  const go=()=>{if(e.dead||WB.e!==e)return;const clip=WBCLIP[m.ab];
+    if(clip){e.g.rotation.y=e.tr;D.play(clip);if(m.ab==='d_rugido'||m.ab==='d_lluvia'){shake=Math.max(shake,.4);snd('thunder',{x:e.p.x,z:e.p.z,vol:.8,rate:.6,maxD:120});return;}}
+    tele(x,z,f,dur,col);if(m.ab==='d_meteoro')D.meteor(x,z,dur,m.bz||0,0,f.r);
+    later(dur,()=>{if(WB.e!==e)return;
+      if(m.ab==='d_meteoro'||m.ab==='d_llega'||m.ab==='d_zarpa'||m.ab==='d_cola'){shake=Math.max(shake,m.ab==='d_meteoro'?.3:.6);snd('thunder',{x,z,vol:.6,rate:m.ab==='d_meteoro'?1.1:.7,maxD:80});}
+      if(e.dead)return;if(inTele(P.x,P.z,x,z,f))wbHurt(e,pc);
+      for(let k=1;k<(m.tk|0);k++)later(k*(m.ti||.45),()=>{if(e.dead||WB.e!==e)return;tele(x,z,f,m.ti||.45,col);if(inTele(P.x,P.z,x,z,f))wbHurt(e,pc);});
+      if(m.bz)for(let k=1;k<=Math.round(m.bz*2);k++)later(k*.5,()=>{if(WB.e===e&&inTele(P.x,P.z,x,z,f))wbHurt(e,+m.bpc||.08);});});};
+  if(m.d)later(m.d,go);else go();}
+function wbMsg(m){const t=m.t;
+  if(t==='wbs'){wbState(m);return;}
+  if(t==='wbp'){toast(m.ph>=3?'<em style="color:#ff7a3a">¡El Dragón Dorado está furioso!</em> Cae fuego con cada ataque':'<em style="color:#ffb04a">El Dragón Dorado ruge:</em> ahora hace llover oro ardiente');return;}
+  if(t==='wbk'){const top=(m.top||[]).slice(0,3).map((x,i)=>`${i+1}. ${esc(String(x.n).slice(0,24))}`).join(' · ');notice(`<b>¡Dragón Dorado derrotado!</b><br>${top}`,'big');chatAdd({ch:'s',m:'Mayor daño al Dragón Dorado: '+(m.top||[]).map((x,i)=>`${i+1}. ${String(x.n).slice(0,24)}`).join(', ')});return;}
+  if(t==='wbf'){toast('El Dragón Dorado levantó vuelo. Volverá.');return;}}
+function mobTele(m){if(m.ab&&m.ab.charCodeAt(0)===100&&m.ab[1]==='_'){wbTele(m);return;}const e=mobByN(m.n);if(!e||e.dead&&m.ab!=='doom')return;const f=m.f||{},x=m.x,z=m.z,col=m.col||0xff3a1a,dur=m.dur||1,mult=m.m||1;
   const go=()=>{if(m.ab!=='stampede'&&m.ab!=='poison')e.face=e.g.rotation.y;tele(x,z,f,dur,col);if(m.ab==='slam'||m.ab==='quake'||m.ab==='sweep'||m.ab==='doom')beastSnd(e,'aggro',1.1);
     later(dur,()=>{if(e.dead&&m.ab!=='doom')return;
       if(m.ab==='slam'||m.ab==='quake'||m.ab==='doom'){ringFx(x,z,0xff6a2a,f.r||f.r1||5,.5);burstFx(x,H(x,z)+.5,z,0xff8a3a,4);shake=Math.max(shake,.5);snd('thunder',{x,z,vol:.7,rate:.7,maxD:60});}
@@ -8279,9 +8338,10 @@ function mobNetMsg(m){const t=m.t;
   if(t==='mh'){if(MOBNET.role!=='host')return;const e=mobByN(m.n);if(!e||e.dead)return;const d=Math.max(0,Math.min(1e7,+m.d||0));
     e.contrib[m.from]=(e.contrib[m.from]||0)+d;e.hp-=d;e.flash=.12;e.hitK=1;e.aggro=10;e.ret=false;
     if(e.g.visible)popNum(String(d),e.p.x+R(-.6,.6),e.p.y+e.hgt+1,e.p.z,'oth');if(e.hp<=0)killMob(e);return;}
-  if(t==='mk'){const e=mobByN(m.n);if(!e)return;if(!e.dead){e.hp=0;killMobFx(e);}rewardKill(e,mobShare(e,m.c||{}));return;}
+  if(t==='mk'){const e=mobByN(m.n);if(!e)return;if(!e.dead){e.hp=0;if(e.wb)wbDie(e);else killMobFx(e);}rewardKill(e,mobShare(e,m.c||{}));return;}
   if(t==='pa'){const e=mobByN(m.n);if(e&&!P.dead&&mode==='game')hurtPlayer(e,+m.m||1);return;}}
 function liveMsg(m){const t=m.t;if(tradeMsg(m))return;if(t==='host'||t==='ms'||t==='mk'||t==='mh'||t==='mreq'||t==='mr'||t==='pa'||t==='tele'){mobNetMsg(m);return;}
+  if(t==='wbs'||t==='wbp'||t==='wbk'||t==='wbf'){wbMsg(m);return;}
   if(t==='raid'){raidGo(m);return;}
   if(t==='raidwin'){raidWin();return;}
   if(t==='sk'){try{remoteSkill(m);}catch(e){}return;}
@@ -8289,7 +8349,7 @@ function liveMsg(m){const t=m.t;if(tradeMsg(m))return;if(t==='host'||t==='ms'||t
   if(t==='duelinv'||t==='duelgo'||t==='room'||t==='php'||t==='ph'||t==='duelend'||t==='rooms'){duelMsg(m);return;}
   if(t==='w'){LIVE.me=m.you;liveClear();(m.list||[]).forEach(liveAdd);liveUI();return;}
   if(t==='j'){liveAdd(m);liveUI();return;}
-  if(t==='ann'){if(m.k==='adm'&&m.n)notice(`Bienvenido Admin <b>${esc(String(m.n).slice(0,24))}</b>`,'big');
+  if(t==='ann'){if(m.k==='wb'&&m.m){notice(`<span class="svTag">DRAGÓN</span> ${esc(String(m.m).slice(0,200))}`,'big sv');chatAdd({ch:'s',m:String(m.m).slice(0,200)});try{sfx('item');}catch(e){}return;}if(m.k==='adm'&&m.n)notice(`Bienvenido Admin <b>${esc(String(m.n).slice(0,24))}</b>`,'big');
     if(m.k==='sv'&&m.m){notice(`<span class="svTag">AVISO</span> <b>${esc(String(m.n||'Admin').slice(0,24))}</b>: ${esc(String(m.m).slice(0,200))}`,'big sv');chatAdd({ch:'s',m:`[Aviso] ${String(m.n||'Admin').slice(0,24)}: ${String(m.m).slice(0,200)}`});try{sfx('item');}catch(e){}}return;}
   if(t==='l'){liveRemove(m.id);liveUI();return;}
   if(t==='p'){const o=LIVE.others.get(m.id);if(!o)return;o.tx=m.x;o.tz=m.z;o.tr=m.ry;o.tmv=m.mv||0;if((m.ac|0)!==o.ac){o.ac=m.ac|0;o.P.swingT=0;o.P.lastAtk=T;}o.P.dead=!!m.d;const g=GESTK.includes(m.g)?m.g:null;if(g){if(!o.P.gest||o.P.gest.k!==g||o.P.gest.up!=null)o.P.gest={k:g,t:0};}else if(o.P.gest&&o.P.gest.up==null){if(o.P.gest.k==='descanso')o.P.gest.up=o.P.gest.t;else o.P.gest=null;}return;}
@@ -8405,6 +8465,7 @@ function chatSend(){const i=$('#chatIn');if(!i)return;let v=i.value.trim();if(!v
   if(!LIVE.on){chatAdd({ch:'s',m:'No hay conexión en vivo. Entrá con tu cuenta para usar el chat.'});return;}
   const md=v.match(/^\/(duelo|desafiar|duel)\s+(.+)$/i);if(md){liveSend({t:'duel',name:md[2].trim()});return;}
   const ms=v.match(/^\/sv\s+(.+)$/i);if(ms){liveSend({t:'sv',m:ms[1].trim()});return;}
+  const mdr=v.match(/^\/dragon(?:\s+(\S+))?$/i);if(mdr){const a=(mdr[1]||'').toLowerCase();liveSend(a==='fuera'||a==='off'?{t:'wbadm',op:'off'}:{t:'wbadm',op:'on',min:+a||30});return;}
   const mm=v.match(/^\/(inv|invitar)\s+(.+)$/i);if(mm){liveSend({t:'inv',name:mm[2].trim()});return;}
   let ch=LIVE.ch;const pre=v.match(/^\/(g|m|p)\s+(.*)$/i);if(pre){ch=pre[1].toLowerCase();v=pre[2];}
   if(ch==='p'&&!LIVE.party){chatAdd({ch:'s',m:'No estás en un grupo. Invitá a alguien desde el botón Grupo.'});return;}
@@ -8801,11 +8862,11 @@ function updCamera(dt){
   else if(CAMM!=='iso'&&mode==='game'){if(camOY){camOY=0;camera.clearViewOffset();}const py=H(P.x,P.z)+(HERO&&HERO.flyK?HERO.flyK*1.2:0),sy=Math.sin(CAM_YAW),cy=Math.cos(CAM_YAW),cp=Math.cos(CAM_PITCH),sp=Math.sin(CAM_PITCH);
     if(CAMM==='primera'){/* desde los ojos del personaje (hueso de la cabeza, con su balanceo al caminar) */let ey=py+1.62;try{if(HERO&&!HERO.headB){HERO.g.traverse(o=>{if(!HERO.headB&&o.isBone&&/^head$/i.test(o.name))HERO.headB=o;});if(!HERO.headB)HERO.headB=-1;}if(HERO&&HERO.headB&&HERO.headB!==-1){HERO.headB.getWorldPosition(_fpV);ey=_fpV.y+.07+.08*Math.min(1,P.mv||0);FPH=FPH||{x:0,z:0};{const hx=_fpV.x-P.x,hz=_fpV.z-P.z,hl=Math.hypot(hx,hz),k=hl>.45?.45/hl:1;FPH.x+=(hx*k-FPH.x)*Math.min(1,dt*10);FPH.z+=(hz*k-FPH.z)*Math.min(1,dt*10);}ey=Math.min(Math.max(ey,py+1.35),py+1.95);}}catch(e){}FPY=FPY==null||snapCam?ey:FPY+(ey-FPY)*Math.min(1,dt*14);
       {const fw=.3+.12*Math.min(1,P.mv||0),hx=FPH?FPH.x:0,hz=FPH?FPH.z:0;camera.position.set(P.x+hx-sy*fw,FPY,P.z+hz-cy*fw);}look.set(camera.position.x-sy*cp*10,camera.position.y-sp*10,camera.position.z-cy*cp*10);snapCam=false;}
-    else{/* tercera persona: detrás y apenas a la derecha del hombro, como en Fortnite */const d=3.6*CAMZ,rx=cy*.55,rz=-sy*.55;look.set(P.x+rx,py+1.55,P.z+rz);camT.set(look.x+sy*cp*d,look.y+sp*d,look.z+cy*cp*d);
+    else{/* tercera persona: detrás y apenas a la derecha del hombro, como en Fortnite */const d=3.6*CAMZ*(1+(wbZoom(dt)-1)*.7),rx=cy*.55,rz=-sy*.55;look.set(P.x+rx,py+1.55,P.z+rz);camT.set(look.x+sy*cp*d,look.y+sp*d,look.z+cy*cp*d);
       const gy=H(camT.x,camT.z)+.35;if(camT.y<gy)camT.y=gy;/* no se mete bajo el terreno */
       if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.00001,dt));}
     HOLE.uHole.value=0;if(shake>0){camera.position.x+=R(-1,1)*shake*.2;camera.position.y+=R(-1,1)*shake*.2;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
-  else{if(camOY){camOY=0;camera.clearViewOffset();}const port=innerHeight>innerWidth,k=(port?1.4:1)*CAMZ,hd=6.6*k,vh=10.2*k,py=H(P.x,P.z);camT.set(P.x+Math.sin(CAM_YAW)*hd,py+vh,P.z+Math.cos(CAM_YAW)*hd);
+  else{if(camOY){camOY=0;camera.clearViewOffset();}const port=innerHeight>innerWidth,k=(port?1.4:1)*CAMZ*wbZoom(dt),hd=6.6*k,vh=10.2*k,py=H(P.x,P.z);camT.set(P.x+Math.sin(CAM_YAW)*hd,py+vh,P.z+Math.cos(CAM_YAW)*hd);
     if(snapCam){camera.position.copy(camT);snapCam=false;}else camera.position.lerp(camT,1-Math.pow(.0005,dt));look.set(P.x,py+1,P.z);HOLE.uHole.value=1;if(shake>0){camera.position.x+=R(-1,1)*shake*.35;camera.position.y+=R(-1,1)*shake*.35;shake=Math.max(0,shake-dt*2.2);}camera.lookAt(look);}
   camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();HOLE.uPV.value.set(P.x,H(P.x,P.z)+1.1,P.z).applyMatrix4(camera.matrixWorldInverse);if(mode!=='game')HOLE.uHole.value=0;
   sky.position.copy(camera.position);const cx=mode==='game'?P.x:0,cz=mode==='game'?P.z:6;sun.position.set(cx+sunDir.x*90,sunDir.y*90,cz+sunDir.z*90);sun.target.position.set(cx,0,cz);
