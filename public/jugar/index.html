@@ -231,6 +231,24 @@ html.cur.dn :not(input):not(textarea):not(select),html.cur.dn{cursor:url(assets/
 .mk.m7{border:2px solid #ffe08a;border-radius:12px 3px 12px 3px;background:linear-gradient(100deg,rgba(60,36,6,.85),rgba(120,80,16,.85),rgba(60,36,6,.85));box-shadow:0 0 0 1px #2a1804,0 0 0 3px #b9822a,0 0 16px 2px rgba(255,205,90,.95)}
 .mk.m7::before,.mk.m7::after{content:"◆";position:absolute;top:50%;transform:translateY(-50%);color:#fff3c4;font-size:9px;text-shadow:0 0 6px #ffd24a}.mk.m7::before{left:4px}.mk.m7::after{right:4px}
 @media (prefers-reduced-motion:reduce){.ttz,.ttz *,.ttz::before,.ttz::after{animation:none!important}}
+/* Muro de Fundadores y Placa de la Apertura: vista de cerca */
+#pMuro.panel{left:0!important;right:0!important;top:0!important;bottom:0!important;padding:calc(var(--st,0px) + 10px) var(--sr,16px) calc(var(--sb,0px) + 10px) var(--sl,16px)!important;align-items:center!important;justify-content:center!important;background:rgba(8,5,3,.66)!important}
+#pMuro>.card{animation:none!important;width:min(900px,100%)!important;max-width:none!important;height:min(660px,100%)!important;max-height:100%!important;padding:0 20px 12px!important;display:flex;flex-direction:column;overflow:hidden;border:3px solid #c8953c!important;border-radius:14px!important;box-shadow:inset 0 0 0 1px #f6d892,0 24px 70px rgba(0,0,0,.7)!important;background:linear-gradient(180deg,#5c574f,#34312c)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+#pMuro>.card>.card-h{position:static!important;align-items:flex-start;margin:0 -20px 10px!important;padding:14px 20px 10px!important;background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom:0!important}
+#pMuro .card h2{font-size:clamp(19px,3.4vw,30px)!important;font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;background:linear-gradient(180deg,#fff0c0,#d9a441);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#pMuro .role{text-transform:none;letter-spacing:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:15px;color:#e8dcc0}
+#pMuro .mu-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+#pMuro .mu-bar .tabs{margin:0;flex:1 1 300px}
+#pMuro .mu-bar .tabs button{font-family:var(--display);font-size:12px;letter-spacing:.04em;white-space:nowrap}
+#pMuro #muQ{flex:1 1 180px;min-width:0;padding:9px 12px;border-radius:9px;border:1px solid rgba(246,216,146,.5);background:rgba(0,0,0,.22);color:var(--ink);font:600 14px var(--body)}
+#pMuro #muList{flex:1;min-height:120px;overflow:auto;-webkit-overflow-scrolling:touch;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 18px;align-content:start;padding-right:6px}
+#pMuro .mu-n{display:flex;align-items:baseline;gap:6px;padding:11px 0 9px;border-bottom:1px solid rgba(246,216,146,.2);min-width:0}
+#pMuro .mu-n i{font-style:normal;font-size:11px;color:rgba(232,201,138,.7);font-variant-numeric:tabular-nums}
+#pMuro .mu-n b{font-family:var(--display);font-weight:700;font-size:16px;color:#f6dc9a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pMuro .mu-n.top b{color:#ffe9a8;text-shadow:0 0 10px rgba(181,140,255,.7)}
+#pMuro .mu-n.me{background:linear-gradient(90deg,rgba(217,164,65,.28),transparent);border-bottom-color:#d9a441}#pMuro .mu-n.me b{color:#fff}
+#pMuro .mu-e{grid-column:1/-1;padding:26px 8px;text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:18px;color:#e8dcc0}
+#pMuro .foot{text-align:center;font-size:12px;color:rgba(239,233,220,.75);margin-top:8px;min-height:15px}
 </style>
 </head><body><title>NOX</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22glowI%22%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23ff9a30%22%20stop-opacity%3D%22.0%22%2F%3E%3Cstop%20offset%3D%22.66%22%20stop-color%3D%22%23ffb347%22%20stop-opacity%3D%22.45%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ff7a1a%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%3CradialGradient%20id%3D%22rayI%22%3E%3Cstop%20offset%3D%22.6%22%20stop-color%3D%22%23fff2c0%22%2F%3E%3Cstop%20offset%3D%22.8%22%20stop-color%3D%22%23f0b54a%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23c06a14%22%20stop-opacity%3D%22.1%22%2F%3E%3C%2FradialGradient%3E%0A%3CradialGradient%20id%3D%22corI%22%3E%3Cstop%20offset%3D%22.8%22%20stop-color%3D%22%23ffe6a0%22%2F%3E%3Cstop%20offset%3D%22.92%22%20stop-color%3D%22%23ffb540%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23e07a18%22%2F%3E%3C%2FradialGradient%3E%0A%3CradialGradient%20id%3D%22moonI%22%20cx%3D%22.42%22%20cy%3D%22.38%22%20r%3D%22.75%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%232a1a10%22%2F%3E%3Cstop%20offset%3D%22.7%22%20stop-color%3D%22%230e0805%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23030201%22%2F%3E%3C%2FradialGradient%3E%0A%3CradialGradient%20id%3D%22flareI%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%221%22%2F%3E%3Cstop%20offset%3D%22.35%22%20stop-color%3D%22%23fff2c8%22%20stop-opacity%3D%22.7%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ffb347%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%3ClinearGradient%20id%3D%22goldI%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff6dc%22%2F%3E%3Cstop%20offset%3D%22.3%22%20stop-color%3D%22%23f3d38a%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23b9822f%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%237a4c1a%22%2F%3E%3Cstop%20offset%3D%22.75%22%20stop-color%3D%22%23e6bd6a%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff0c4%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22bgI%22%20cx%3D%22.5%22%20cy%3D%22.42%22%20r%3D%22.78%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%232f3580%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%231a1d47%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230a0b22%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22url%28%23bgI%29%22%2F%3E%3Ccircle%20cx%3D%2270%22%20cy%3D%2290%22%20r%3D%222.4%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.8%22%2F%3E%3Ccircle%20cx%3D%22450%22%20cy%3D%2270%22%20r%3D%222%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.7%22%2F%3E%3Ccircle%20cx%3D%22440%22%20cy%3D%22430%22%20r%3D%222.6%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.75%22%2F%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%22420%22%20r%3D%222%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.6%22%2F%3E%3Ccircle%20cx%3D%22120%22%20cy%3D%22250%22%20r%3D%221.6%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.5%22%2F%3E%3Ccircle%20cx%3D%22400%22%20cy%3D%22250%22%20r%3D%221.4%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.45%22%2F%3E%3Ccircle%20cx%3D%22250%22%20cy%3D%22470%22%20r%3D%221.8%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.55%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%2240%22%20r%3D%221.5%22%20fill%3D%22%23f6d892%22%20opacity%3D%220.5%22%2F%3E%3Cg%3E%0A%20%20%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22225.0%22%20fill%3D%22url%28%23glowI%29%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M247.6%2C103.2%20L256.0%2C47.9%20L264.4%2C103.2ZM276.5%2C104.4%20L287.1%2C79.7%20L288.6%2C106.5ZM300.3%2C109.6%20L327.2%2C60.5%20L316.2%2C115.3ZM327.1%2C120.5%20L345.5%2C101.0%20L337.7%2C126.7ZM347.8%2C133.6%20L389.8%2C96.6%20L360.6%2C144.4ZM369.2%2C153.0%20L393.1%2C140.9%20L377.0%2C162.4ZM384.1%2C172.3%20L436.2%2C152.0%20L392.5%2C186.9ZM397.6%2C198.0%20L424.2%2C194.8%20L401.8%2C209.5ZM405.0%2C221.2%20L460.9%2C219.9%20L407.9%2C237.8ZM408.9%2C249.9%20L435.0%2C256.0%20L408.9%2C262.1ZM407.9%2C274.2%20L460.9%2C292.1%20L405.0%2C290.8ZM401.8%2C302.5%20L424.2%2C317.2%20L397.6%2C314.0ZM392.5%2C325.1%20L436.2%2C360.0%20L384.1%2C339.7ZM377.0%2C349.6%20L393.1%2C371.1%20L369.2%2C359.0ZM360.6%2C367.6%20L389.8%2C415.4%20L347.8%2C378.4ZM337.7%2C385.3%20L345.5%2C411.0%20L327.1%2C391.5ZM316.2%2C396.7%20L327.2%2C451.5%20L300.3%2C402.4ZM288.6%2C405.5%20L287.1%2C432.3%20L276.5%2C407.6ZM264.4%2C408.8%20L256.0%2C464.1%20L247.6%2C408.8ZM235.5%2C407.6%20L224.9%2C432.3%20L223.4%2C405.5ZM211.7%2C402.4%20L184.8%2C451.5%20L195.8%2C396.7ZM184.9%2C391.5%20L166.5%2C411.0%20L174.3%2C385.3ZM164.2%2C378.4%20L122.2%2C415.4%20L151.4%2C367.6ZM142.8%2C359.0%20L118.9%2C371.1%20L135.0%2C349.6ZM127.9%2C339.7%20L75.8%2C360.0%20L119.5%2C325.1ZM114.4%2C314.0%20L87.8%2C317.2%20L110.2%2C302.5ZM107.0%2C290.8%20L51.1%2C292.1%20L104.1%2C274.2ZM103.1%2C262.1%20L77.0%2C256.0%20L103.1%2C249.9ZM104.1%2C237.8%20L51.1%2C219.9%20L107.0%2C221.2ZM110.2%2C209.5%20L87.8%2C194.8%20L114.4%2C198.0ZM119.5%2C186.9%20L75.8%2C152.0%20L127.9%2C172.3ZM135.0%2C162.4%20L118.9%2C140.9%20L142.8%2C153.0ZM151.4%2C144.4%20L122.2%2C96.6%20L164.2%2C133.6ZM174.3%2C126.7%20L166.5%2C101.0%20L184.9%2C120.5ZM195.8%2C115.3%20L184.8%2C60.5%20L211.7%2C109.6ZM223.4%2C106.5%20L224.9%2C79.7%20L235.5%2C104.4Z%22%20fill%3D%22url%28%23rayI%29%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22150.0%22%20fill%3D%22url%28%23corI%29%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22139.5%22%20fill%3D%22none%22%20stroke%3D%22url%28%23goldI%29%22%20stroke-width%3D%2211.2%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22139.5%22%20fill%3D%22none%22%20stroke%3D%22%232a1406%22%20stroke-width%3D%221.6%22%20opacity%3D%22.8%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22129.0%22%20fill%3D%22url%28%23moonI%29%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M256.0%2C256.0%20L373.0%2C256.0%20M256.0%2C256.0%20L364.1%2C300.8%20M256.0%2C256.0%20L338.7%2C338.7%20M256.0%2C256.0%20L300.8%2C364.1%20M256.0%2C256.0%20L256.0%2C373.0%20M256.0%2C256.0%20L211.2%2C364.1%20M256.0%2C256.0%20L173.3%2C338.7%20M256.0%2C256.0%20L147.9%2C300.8%20M256.0%2C256.0%20L139.0%2C256.0%20M256.0%2C256.0%20L147.9%2C211.2%20M256.0%2C256.0%20L173.3%2C173.3%20M256.0%2C256.0%20L211.2%2C147.9%20M256.0%2C256.0%20L256.0%2C139.0%20M256.0%2C256.0%20L300.8%2C147.9%20M256.0%2C256.0%20L338.7%2C173.3%20M256.0%2C256.0%20L364.1%2C211.2%20M293.4%2C256.0%20L290.5%2C262.9%20L290.6%2C270.3%20L285.3%2C275.6%20L282.5%2C282.5%20L275.6%2C285.3%20L270.3%2C290.6%20L262.9%2C290.5%20L256.0%2C293.4%20L249.1%2C290.5%20L241.7%2C290.6%20L236.4%2C285.3%20L229.5%2C282.5%20L226.7%2C275.6%20L221.4%2C270.3%20L221.5%2C262.9%20L218.6%2C256.0%20L221.5%2C249.1%20L221.4%2C241.7%20L226.7%2C236.4%20L229.5%2C229.5%20L236.4%2C226.7%20L241.7%2C221.4%20L249.1%2C221.5%20L256.0%2C218.6%20L262.9%2C221.5%20L270.3%2C221.4%20L275.6%2C226.7%20L282.5%2C229.5%20L285.3%2C236.4%20L290.6%2C241.7%20L290.5%2C249.1%20L293.4%2C256.0%20M326.2%2C256.0%20L320.7%2C268.9%20L320.9%2C282.9%20L310.9%2C292.7%20L305.6%2C305.6%20L292.7%2C310.9%20L282.9%2C320.9%20L268.9%2C320.7%20L256.0%2C326.2%20L243.1%2C320.7%20L229.1%2C320.9%20L219.3%2C310.9%20L206.4%2C305.6%20L201.1%2C292.7%20L191.1%2C282.9%20L191.3%2C268.9%20L185.8%2C256.0%20L191.3%2C243.1%20L191.1%2C229.1%20L201.1%2C219.3%20L206.4%2C206.4%20L219.3%2C201.1%20L229.1%2C191.1%20L243.1%2C191.3%20L256.0%2C185.8%20L268.9%2C191.3%20L282.9%2C191.1%20L292.7%2C201.1%20L305.6%2C206.4%20L310.9%2C219.3%20L320.9%2C229.1%20L320.7%2C243.1%20L326.2%2C256.0%20M361.3%2C256.0%20L353.1%2C275.3%20L353.3%2C296.3%20L338.3%2C311.0%20L330.5%2C330.5%20L311.0%2C338.3%20L296.3%2C353.3%20L275.3%2C353.1%20L256.0%2C361.3%20L236.7%2C353.1%20L215.7%2C353.3%20L201.0%2C338.3%20L181.5%2C330.5%20L173.7%2C311.0%20L158.7%2C296.3%20L158.9%2C275.3%20L150.7%2C256.0%20L158.9%2C236.7%20L158.7%2C215.7%20L173.7%2C201.0%20L181.5%2C181.5%20L201.0%2C173.7%20L215.7%2C158.7%20L236.7%2C158.9%20L256.0%2C150.7%20L275.3%2C158.9%20L296.3%2C158.7%20L311.0%2C173.7%20L330.5%2C181.5%20L338.3%2C201.0%20L353.3%2C215.7%20L353.1%2C236.7%20L361.3%2C256.0%22%20fill%3D%22none%22%20stroke%3D%22%23e6b860%22%20stroke-width%3D%221.1%22%20opacity%3D%22.22%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22129.0%22%20fill%3D%22none%22%20stroke%3D%22%23ffe3a0%22%20stroke-width%3D%221.2%22%20opacity%3D%22.35%22%2F%3E%0A%20%20%3Cg%20transform%3D%22translate%28353.2%2C155.9%29%22%3E%0A%20%20%20%20%3Ccircle%20r%3D%2230.0%22%20fill%3D%22url%28%23flareI%29%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%2C-51.0%20L5.3%2C0%20L0%2C51.0%20L-5.3%2C0Z%20M-51.0%2C0%20L0%2C5.3%20L51.0%2C0%20L0%2C-5.3Z%22%20fill%3D%22%23fffaf0%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fg%3E%3C%2Fsvg%3E">
@@ -1243,6 +1261,12 @@ body.pad #joy{display:none!important}
   <div class="card-h"><h2>Historial de parches</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
   <div id="patchBody"></div>
 </div></div>
+<div class="panel" id="pMuro" hidden><div class="card wide">
+  <div class="card-h"><div><h2 id="muT">Muro de Fundadores</h2><div class="role" id="muS"></div></div><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
+  <div class="mu-bar"><div class="tabs" id="muTabs"></div><input id="muQ" type="search" placeholder="Buscar un nombre…" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="24" aria-label="Buscar un nombre"></div>
+  <div id="muList"></div>
+  <div class="foot" id="muF"></div>
+</div></div>
 <div class="panel" id="pRank" hidden><div class="card">
   <div class="card-h"><h2>Ranking</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
   <div id="rankBody"></div>
@@ -2185,7 +2209,7 @@ const QUESTS=[
 const NPCS={
  herrero:{name:'Don Ramón',role:'Herrero',pos:[-11.5,-9.2],greet:'¿Buscás algo que corte o que aguante golpes? Todo forjado acá mismo, con hierro de Ybycuí.'},
  boticaria:{name:'Ña Eusebia',role:'Pociones',pos:[10.6,-9.4],greet:"Mba'éichapa. Pociones frescas, hechas con yuyos del monte. Llevá bastantes antes de salir."},
- pai:{name:"Pa'i Antonio",role:'Técnicas y evolución',pos:[0,-16],greet:'Que Tupã te guíe. Te enseño técnicas nuevas cuando estés listo, y te pongo a prueba para evolucionar.'},
+ pai:{name:"Pa'i Antonio",role:'Técnicas y evolución',pos:[-6.3,-15.9],greet:'Que Tupã te guíe. Te enseño técnicas nuevas cuando estés listo, y te pongo a prueba para evolucionar.'},
  capitan:{name:'Capitán Cabañas',role:'Misiones',pos:[5,30],greet:'Las bestias del Kurupí no dan tregua. Necesito gente con coraje.'},
  chamana:{name:'Jarýi Kuña',role:'Caldero de Kerana',pos:[13,6.5],greet:'El caldero de Kerana da poder… o se traga todo. Vos elegís.'},
  baqueano:{name:'Baqueano Tito',role:'Viajes',pos:[-5,30],greet:'Conozco cada camino del reino. Decime adónde y te llevo, por unos guaraníes.'},
@@ -6092,35 +6116,74 @@ function addPetals(G,col){const N=160,geo=new THREE.BufferGeometry(),a=new Float
 const blobGeo=keep((()=>{const g=new THREE.PlaneGeometry(1,1);g.rotateX(-PI/2);return g;})()),blobMat=keep(new THREE.MeshBasicMaterial({map:blobTex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,fog:false}));
 function addBlob(parent,s){const b=new THREE.Mesh(blobGeo,blobMat);b.scale.set(s,1,s);b.position.y=.05;b.renderOrder=1;if(STUDIO.alphaOn)b.visible=false;parent.add(b);return b;}
 
-/* ===== Muro de Fundadores (plaza de Asunción) =====
-   Piedra con una placa de bronce que lista a los Fundadores de Oro (GET /api/nox/muro, nombres de cuentas con el Pack Fundador Oro, en orden de compra).
-   La placa se redibuja al entrar a Asunción y cada 5 minutos estando ahí. MURO_P = [x, z, giro] (mira al centro de la plaza). */
-const MURO_P=[-7.2,-12.2,.53],MURO={names:null,t:0,cv:null,tex:null,busy:false};
-function muroDraw(){const cv=MURO.cv,x=cv.getContext('2d'),W=cv.width,H=cv.height,n=MURO.names||[];
-  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3a2a1a');g.addColorStop(1,'#1e150d');x.fillStyle=g;x.fillRect(0,0,W,H);
-  x.strokeStyle='#d9a441';x.lineWidth=10;x.strokeRect(14,14,W-28,H-28);x.lineWidth=3;x.strokeRect(34,34,W-68,H-68);
-  x.textAlign='center';x.textBaseline='middle';x.fillStyle='#f4d58a';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=6;
-  x.font='700 64px Cinzel, Georgia, serif';x.fillText('MURO DE FUNDADORES',W/2,92);
-  x.font='italic 34px "Cormorant Garamond", Georgia, serif';x.fillStyle='#e8c98a';x.fillText(n.length?'Los Fundadores de Oro de NOX':'Todavía no hay Fundadores de Oro',W/2,146);
-  x.fillStyle='#d9a441';x.fillRect(W/2-170,176,340,3);
-  if(!n.length){x.font='600 40px Cinzel, Georgia, serif';x.fillStyle='#f4d58a';x.fillText('El primer nombre',W/2,H/2+40);x.fillText('puede ser el tuyo',W/2,H/2+92);
-    x.font='30px "Alegreya Sans", sans-serif';x.fillStyle='#e8c98a';x.fillText('Pack Fundador Oro · Tienda Noxis',W/2,H-90);}
-  else{const cols=n.length>24?3:n.length>8?2:1,rows=Math.ceil(n.length/cols),top=210,bot=H-60,lh=Math.min(56,(bot-top)/rows),fs=Math.max(18,Math.min(42,lh*.72)),cw=(W-120)/cols;
+/* ===== Muro de Fundadores y Placa de la Apertura (Asunción, frente a la catedral) =====
+   Muro: piedra grande con una placa que lista a los Fundadores de Oro (GET /api/nox/muro → names, cuentas con el Pack Fundador Oro, en orden de compra).
+   Placa de la Apertura: más chica, a la derecha, misma orientación; lista a los 10 primeros de la Carrera de Pioneros (→ placa, cuentas con el título t_primeros).
+   Las dos se redibujan al entrar a Asunción y cada 5 minutos. De cerca aparece el botón «Ver … de cerca» (muroNear) que abre el panel pMuro: pestañas, buscador y lista completa.
+   MURO_P / PLACA_P = [x, z, giro]. */
+const MURO_P=[0,-17,0],PLACA_P=[7.7,-15.9,0],MURO={names:null,placa:null,t:0,cv:null,tex:null,cv2:null,tex2:null,busy:false,tab:'muro',q:''};
+const MURO_MAX=30;
+function muroFit(x,t,w){t=String(t);if(x.measureText(t).width<=w)return t;while(t.length>3&&x.measureText(t+'…').width>w)t=t.slice(0,-1);return t+'…';}
+function muroDraw(){const cv=MURO.cv;if(!cv)return;const x=cv.getContext('2d'),W=cv.width,H=cv.height,all=MURO.names||[];
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#4a443c');g.addColorStop(1,'#26221d');x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.strokeStyle='#d9a441';x.lineWidth=12;x.strokeRect(12,12,W-24,H-24);x.strokeStyle='#f6d892';x.lineWidth=3;x.strokeRect(30,30,W-60,H-60);
+  x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=6;
+  const tg=x.createLinearGradient(0,60,0,120);tg.addColorStop(0,'#fff0c0');tg.addColorStop(1,'#d9a441');x.fillStyle=tg;x.font='700 66px Cinzel, Georgia, serif';x.fillText('MURO DE FUNDADORES',W/2,92);
+  x.fillStyle='rgba(246,216,146,.55)';x.fillRect(70,140,W-140,2);
+  if(!all.length){x.font='600 44px Cinzel, Georgia, serif';x.fillStyle='#f4d58a';x.fillText('El primer nombre',W/2,H/2);x.fillText('puede ser el tuyo',W/2,H/2+58);
+    x.font='30px "Alegreya Sans", sans-serif';x.fillStyle='#e8c98a';x.fillText('Pack Fundador Oro · Tienda Noxis',W/2,H-84);}
+  else{const more=all.length>MURO_MAX?all.length-(MURO_MAX-1):0,n=more?all.slice(0,MURO_MAX-1):all,cells=n.length+(more?1:0);
+    const cols=cells>16?3:cells>8?2:1,rows=Math.ceil(cells/cols),top=160,bot=H-48,lh=Math.min(58,(bot-top)/rows),fs=Math.max(24,Math.min(40,lh*.74)),cw=(W-120)/cols;
     x.font=`600 ${fs}px Cinzel, Georgia, serif`;x.fillStyle='#f6dc9a';
-    n.forEach((nm,i)=>{const c=Math.floor(i/rows),r=i%rows;let t=String(nm);while(x.measureText(t).width>cw-20&&t.length>3)t=t.slice(0,-1);if(t!==String(nm))t=t.slice(0,-1)+'…';x.fillText(t,60+cw*c+cw/2,top+lh*r+lh/2);});}
+    n.forEach((nm,i)=>{const c=i%cols,r=Math.floor(i/cols);x.fillText(muroFit(x,nm,cw-24),60+cw*c+cw/2,top+lh*r+lh/2);});
+    if(more){const i=n.length,c=i%cols,r=Math.floor(i/cols);x.font=`italic ${fs*.9}px "Cormorant Garamond", Georgia, serif`;x.fillStyle='#e8c98a';x.fillText('y '+more+' más…',60+cw*c+cw/2,top+lh*r+lh/2);}}
   x.shadowBlur=0;if(MURO.tex)MURO.tex.needsUpdate=true;}
+function placaDraw(){const cv=MURO.cv2;if(!cv)return;const x=cv.getContext('2d'),W=cv.width,H=cv.height,n=(MURO.placa||[]).slice(0,10);
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3c3846');g.addColorStop(1,'#1f1c28');x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.strokeStyle='#b58cff';x.lineWidth=10;x.strokeRect(9,9,W-18,H-18);x.strokeStyle='#f6d892';x.lineWidth=4;x.strokeRect(22,22,W-44,H-44);
+  x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=5;
+  x.fillStyle='#f6d892';x.font='700 46px Cinzel, Georgia, serif';x.fillText('PLACA DE LA APERTURA',W/2,74);
+  x.fillStyle='rgba(246,216,146,.55)';x.fillRect(56,112,W-112,2);
+  if(!n.length){x.font='italic 34px "Cormorant Garamond", Georgia, serif';x.fillStyle='#e8dcc0';x.fillText('Apertura del Reino · diciembre de 2026',W/2,172);
+    x.font='600 36px Cinzel, Georgia, serif';x.fillStyle='#f4d58a';x.fillText('Los 10 primeros',W/2,H/2+22);x.fillText('de la Carrera de Pioneros',W/2,H/2+70);
+    x.font='28px "Alegreya Sans", sans-serif';x.fillStyle='#cdbfe8';x.fillText('grabarán su nombre acá',W/2,H-78);}
+  else{const rows=Math.ceil(n.length/2),top=132,lh=Math.min(62,(H-50-top)/rows),fs=Math.min(36,lh*.66),cw=(W-90)/2;x.font=`600 ${fs}px Cinzel, Georgia, serif`;
+    n.forEach((nm,i)=>{const c=i<rows?0:1,r=i<rows?i:i-rows,cx=45+cw*c+cw/2,y=top+lh*r+lh/2;x.fillStyle=i<3?'#ffe9a8':'#f6dc9a';x.fillText(muroFit(x,(i+1)+'. '+nm,cw-20),cx,y);});}
+  x.shadowBlur=0;if(MURO.tex2)MURO.tex2.needsUpdate=true;}
 async function muroRefresh(force){if(MURO.busy||!MURO.cv)return;if(!force&&MURO.names&&Date.now()-MURO.t<300000)return;MURO.busy=true;
-  try{const r=await srvApi('GET','nox/muro');if(r&&Array.isArray(r.names)){MURO.names=r.names;MURO.t=Date.now();muroDraw();}}catch(e){}MURO.busy=false;}
-function muroBuild(G){const [px,pz,ry]=MURO_P,g=new THREE.Group();g.position.set(px,0,pz);g.rotation.y=ry;G.add(g);
-  const gold=mtl(0xd9a441,'gold');mk(BOX(4.3,.42,1.3),TM.stone,0,.21,0,g);mk(BOX(3.9,2.7,.62),TM.cstone,0,1.77,0,g);mk(BOX(4.3,.32,.95),TM.stone,0,3.28,0,g);
-  for(const s of[-1,1]){mk(BOX(.42,3.1,.8),TM.stone,s*2.0,1.97,0,g);mk(CONE(.2,.55,4),gold,s*2.0,3.75,0,g).rotation.y=PI/4;}
-  const cr=mk(CYL(.34,.42,.18,12),gold,0,3.53,0,g);const st=mk(CONE(.16,.42,5),gold,0,3.83,0,g);
-  if(!MURO.cv){MURO.cv=document.createElement('canvas');MURO.cv.width=1024;MURO.cv.height=640;MURO.tex=new THREE.CanvasTexture(MURO.cv);MURO.tex.encoding=THREE.sRGBEncoding;MURO.tex.anisotropy=8;muroDraw();}
-  const pm=new THREE.MeshStandardMaterial({map:MURO.tex,emissive:0xffffff,emissiveMap:MURO.tex,emissiveIntensity:.28,roughness:.55,metalness:.15});
-  const pl=new THREE.Mesh(new THREE.PlaneGeometry(3.4,2.125),pm);pl.position.set(0,1.8,.315);g.add(pl);
-  colliders.push({x:px,z:pz,r:2.3});
-  if(document.fonts&&document.fonts.load)Promise.all(['700 64px Cinzel','600 40px Cinzel','italic 34px "Cormorant Garamond"'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>muroDraw());muroRefresh(true);
+  try{const r=await srvApi('GET','nox/muro');if(r&&Array.isArray(r.names)){MURO.names=r.names;MURO.placa=Array.isArray(r.placa)?r.placa:[];MURO.t=Date.now();muroDraw();placaDraw();try{if(!$('#pMuro').hidden)muroRender();}catch(e){}}}catch(e){}MURO.busy=false;}
+function muroBuild(G){const gold=mtl(0xd9a441,'gold');
+  {const [px,pz,ry]=MURO_P,g=new THREE.Group();g.position.set(px,0,pz);g.rotation.y=ry;G.add(g);
+   mk(BOX(9.2,.3,2.3),TM.stone,0,.15,0,g);mk(BOX(8.4,.34,1.6),TM.stone,0,.47,0,g);mk(BOX(7.3,4.75,.72),TM.cstone,0,3.0,0,g);mk(BOX(8.5,.36,1.1),TM.stone,0,5.52,0,g);
+   for(const sx of[-1,1]){mk(BOX(.7,5.5,1.0),TM.stone,sx*3.95,3.39,0,g);mk(BOX(.94,.24,1.2),TM.stone,sx*3.95,6.2,0,g);mk(CONE(.5,.95,4),gold,sx*3.95,6.8,0,g).rotation.y=PI/4;}
+   if(!MURO.cv){MURO.cv=document.createElement('canvas');MURO.cv.width=1024;MURO.cv.height=640;MURO.tex=new THREE.CanvasTexture(MURO.cv);MURO.tex.encoding=THREE.sRGBEncoding;MURO.tex.anisotropy=8;muroDraw();}
+   const pm=new THREE.MeshStandardMaterial({map:MURO.tex,emissive:0xffffff,emissiveMap:MURO.tex,emissiveIntensity:.34,roughness:.55,metalness:.15});
+   mk(BOX(6.86,4.36,.1),gold,0,3.0,.37,g);const pl=new THREE.Mesh(new THREE.PlaneGeometry(6.6,4.125),pm);pl.position.set(0,3.0,.43);g.add(pl);
+   /* el sol de NOX arriba, como en el dibujo del evento */
+   try{const lt=new THREE.TextureLoader().load('../img/logo.webp');lt.encoding=THREE.sRGBEncoding;const lg=new THREE.Mesh(new THREE.PlaneGeometry(3.3,1.65),new THREE.MeshBasicMaterial({map:lt,transparent:true,alphaTest:.08,fog:false,side:THREE.DoubleSide}));lg.position.set(0,6.42,.1);g.add(lg);
+     const gl=glowSprite(0xffb347,3.4,.34);gl.position.set(0,6.5,-.1);g.add(gl);AMB.push(()=>{gl.material.opacity=.3+Math.sin(T*1.6)*.07;});}catch(e){}
+   colliders.push({x:px,z:pz,hw:4.7,hd:1.2});}
+  {const [px,pz,ry]=PLACA_P,g=new THREE.Group();g.position.set(px,0,pz);g.rotation.y=ry;G.add(g);
+   mk(BOX(3.9,.26,1.3),TM.stone,0,.13,0,g);mk(BOX(3.5,.3,.95),TM.stone,0,.41,0,g);mk(BOX(3.3,2.3,.5),TM.cstone,0,1.7,0,g);mk(BOX(3.6,.24,.75),TM.stone,0,2.96,0,g);
+   if(!MURO.cv2){MURO.cv2=document.createElement('canvas');MURO.cv2.width=768;MURO.cv2.height=480;MURO.tex2=new THREE.CanvasTexture(MURO.cv2);MURO.tex2.encoding=THREE.sRGBEncoding;MURO.tex2.anisotropy=8;placaDraw();}
+   const pm=new THREE.MeshStandardMaterial({map:MURO.tex2,emissive:0xffffff,emissiveMap:MURO.tex2,emissiveIntensity:.36,roughness:.55,metalness:.15});
+   const pl=new THREE.Mesh(new THREE.PlaneGeometry(3.0,1.875),pm);pl.position.set(0,1.7,.262);g.add(pl);
+   for(const sx of[-1,1])mk(CONE(.2,.42,4),gold,sx*1.6,3.29,0,g).rotation.y=PI/4;
+   colliders.push({x:px,z:pz,r:1.75});}
+  if(document.fonts&&document.fonts.load)Promise.all(['700 64px Cinzel','600 40px Cinzel','italic 34px "Cormorant Garamond"'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>{muroDraw();placaDraw();});muroRefresh(true);
   AMB.push(()=>{if(Z&&Z.id==='asuncion')muroRefresh(false);});}
+/* cerca del Muro o de la Placa: devuelve cuál (para el botón de contexto) */
+function muroNear(){if(!Z||Z.id!=='asuncion')return null;const a=Math.hypot(P.x-MURO_P[0],(P.z-(MURO_P[1]+2.2))*1.25),b=Math.hypot(P.x-PLACA_P[0]+.6,P.z-PLACA_P[1]-1.4);return b<3?'placa':a<6?'muro':null;}
+const muroEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='muQ'){MURO.q=e.target.value;muroRender();}});
+function muroOpen(tab){closeAll();MURO.tab=tab==='placa'?'placa':'muro';MURO.q='';const i=$('#muQ');if(i)i.value='';muroRender();showPanel('pMuro');muroRefresh(false);}
+function muroRender(){const pl=MURO.tab==='placa',all=(pl?MURO.placa:MURO.names)||[],q=MURO.q.trim().toLowerCase();
+  $('#muT').textContent=pl?'Placa de la Apertura':'Muro de Fundadores';$('#muS').textContent=pl?'Los 10 primeros de la Carrera de Pioneros · Apertura del Reino, diciembre de 2026':'Quienes sostuvieron el reino desde el principio · Pack Fundador Oro';
+  $('#muTabs').innerHTML=`<button class="${pl?'':'on'}" data-act="muTab" data-t="muro">Muro de Fundadores</button><button class="${pl?'on':''}" data-act="muTab" data-t="placa">Placa de la Apertura</button>`;
+  const rows=all.map((n,i)=>[i+1,String(n)]).filter(r=>!q||r[1].toLowerCase().includes(q));
+  const me=(()=>{try{return String(NET.account||'').toLowerCase();}catch(e){return '';}})();
+  $('#muList').innerHTML=rows.length?rows.map(r=>`<div class="mu-n${me&&r[1].toLowerCase()===me?' me':''}${pl&&r[0]<=3?' top':''}"><i>${r[0]}.</i><b>${muroEsc(r[1])}</b></div>`).join(''):`<div class="mu-e">${all.length?'Ningún nombre coincide con «'+muroEsc(MURO.q.trim())+'».':MURO.names===null?'No se pudo leer la lista. Probá de nuevo en un rato.':pl?'Todavía no hay nombres: los 10 primeros de la Carrera de Pioneros quedarán grabados acá cuando termine la Apertura del Reino.':'Todavía no hay Fundadores de Oro. El primer nombre puede ser el tuyo.'}</div>`;
+  $('#muF').textContent=all.length?(q?rows.length+' de '+all.length:(all.length>12?'Deslizá para ver todos los nombres · ':'')+all.length+(pl?(all.length===1?' pionero':' pioneros'):(all.length===1?' fundador':' fundadores'))):'';}
 
 const BUILD={
  ev_raid(G,V){/* guarida de Añaretã: plataforma de piedra sobre un mar de fuego, con pilares y braseros */
@@ -7297,7 +7360,7 @@ addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;co
   const wasd=WASD();if(wasd&&k===' '){e.preventDefault();if(!e.repeat)ACT.toggleAuto();}else if(k===' '||k==='j'){e.preventDefault();if(!atkHeld){atkHeld=true;attackPress();}}
   const SKK=wasd?{q:1,e:2,r:3}:{q:0,w:1,e:2,r:3};if(k in SKK)useSkill(SKK[k]);if(k==='1')usePot('hp');if(k==='2')usePot('mp');if(!wasd&&k==='a'&&!atkHeld){atkHeld=true;attackPress();setTimeout(()=>{if(!keys[' '])atkHeld=false;},150);}
   if(k==='i'||k==='v')ACT.openInv();if(k==='c')ACT.openChar();if(k==='m')ACT.openTravel();if(k==='h')ACT.toggleAuto();if(k==='l')ACT.openQuests();
-  if(k==='f'){const n=nearNpc();if(n)openNpc(n);}});
+  if(k==='f'){const n=nearNpc();if(n)openNpc(n);else{const mu=muroNear();if(mu)muroOpen(mu);}}});
 addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys[k]=false;if(k===' '||k==='j')atkHeld=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;atkHeld=false;});
 document.addEventListener('contextmenu',e=>e.preventDefault());
@@ -7457,10 +7520,10 @@ function sndSetVol(){if(!AU.ctx)return;const t=AU.ctx.currentTime;AU.mus.gain.se
 function bigNote(html,bad){let box=document.getElementById('bigNotes');if(!box){box=document.createElement('div');box.id='bigNotes';document.body.appendChild(box);}const t=document.createElement('div');t.className='bigNote'+(bad?' bad':'');t.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c2.6 0 4.3 1.6 4.8 4.4"/></svg><span>'+html+'</span>';box.appendChild(t);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>t.remove(),4000);}
 function toast(html){const t=document.createElement('div');t.className='toast';t.innerHTML=html;const box=$('#toasts');box.appendChild(t);while(box.children.length>4)box.firstChild.remove();setTimeout(()=>t.remove(),2800);}
 function nearNpc(){let b=null,bd=3.4;for(const n of npcs){const d=Math.hypot(n.x-P.x,n.z-P.z);if(d<bd){bd=d;b=n;}}return b;}
-const anyPanel=()=>['pChar','pMate','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});
+const anyPanel=()=>['pChar','pMate','pCfg','pRank','pMuro','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});
 function refreshPause(){paused=anyPanel();if(paused){atkHeld=false;for(const k in keys)keys[k]=false;endJoy({pointerId:joy.id});}}
 function showPanel(id){$('#'+id).hidden=false;refreshPause();try{tabsFor(id);}catch(e){}}
-function closeAll(){try{nxFaceBack();}catch(e){}try{if(TR.on&&!$('#pTrade').hidden){if(TR.stage==='open')liveSend({t:'tx'});if(TR.stage!=='commit')TR.on=false;}}catch(e){}/* cerrar el intercambio (Esc, la rueda, otro menú) lo cancela para los dos */['pChar','pMate','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap','partyBox','chatBox','wheel'].forEach(id=>{const e=$('#'+id);if(e)e.hidden=true;});VST.pin=null;VST.amt=null;GEM=null;CALD.sel=null;refreshPause();}
+function closeAll(){try{nxFaceBack();}catch(e){}try{if(TR.on&&!$('#pTrade').hidden){if(TR.stage==='open')liveSend({t:'tx'});if(TR.stage!=='commit')TR.on=false;}}catch(e){}/* cerrar el intercambio (Esc, la rueda, otro menú) lo cancela para los dos */['pChar','pMate','pCfg','pRank','pMuro','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap','partyBox','chatBox','wheel'].forEach(id=>{const e=$('#'+id);if(e)e.hidden=true;});VST.pin=null;VST.amt=null;GEM=null;CALD.sel=null;refreshPause();}
 
 function setupSkillButtons(){
   $('#bAtk').innerHTML=SKIC('atk_'+C.cls)+'Atacar';
@@ -7552,7 +7615,7 @@ function hud(){
   if(C.L>=50&&!C.evo&&C.evoQ&&countItem('quest','pluma')<5)tt+=`<br>Plumas de Guyra Pytã <b>${countItem('quest','pluma')} / 5</b>`;
   if($('#trK').textContent!==tk)$('#trK').textContent=tk;if($('#trT').innerHTML!==tt)$('#trT').innerHTML=tt;
   const t=P.target&&!P.target.dead&&!P.target.pvp?P.target:null;{const tf=hEl('tf');if(tf&&tf.hidden!==!t)tf.hidden=!t;}if(t){hT('tfN',t.golden?t.def.name+' Dorado':t.elite?t.def.name+' Élite':t.def.name);hT('tfL','Nv '+t.def.lvl);hS('tfF','width',hPct(t.hp/t.max));}
-  const n=nearNpc(),cx=hEl('ctx');if(n&&!paused){if(cx.hidden)cx.hidden=false;hT('ctx','Hablar con '+n.def.name);cx._npc=n;}else if(!cx.hidden)cx.hidden=true;
+  const n=nearNpc(),cx=hEl('ctx'),mu=n?null:muroNear();if(n&&!paused){if(cx.hidden)cx.hidden=false;hT('ctx','Hablar con '+n.def.name);cx._npc=n;cx._mu=null;}else if(mu&&!paused){if(cx.hidden)cx.hidden=false;hT('ctx',mu==='placa'?'Ver la Placa de cerca':'Ver el Muro de cerca');cx._npc=null;cx._mu=mu;}else if(!cx.hidden)cx.hidden=true;
 }
 
 /* inventario */
@@ -7902,7 +7965,8 @@ const ACT={
   openQuests(){if(mode!=='game')return;closeAll();$('#npcName').textContent='Misiones';$('#npcRole').textContent='Tu camino';$('#npcGreet').hidden=true;NPCV='quests';renderNpc();showPanel('pNpc');},
   toggleSound(){AU.on=!AU.on;try{localStorage.setItem('tsm-sonido',AU.on?'1':'0');}catch(e){}if(AU.on){auInit();if(AU.ctx)AU.ctx.resume();const d=SND.deck[SND.cur];if(d){const pp=d.el.play();if(pp&&pp.catch)pp.catch(()=>{});}}else if(AU.ctx){AU.ctx.suspend();SND.deck.forEach(d=>d&&d.el.pause());}soundIcon();toast(AU.on?'Sonido activado':'Sonido apagado');},
   toggleAuto(){if(mode!=='game')return;if(Z.safe&&!AUTO.on){toast('El modo automático funciona fuera de la ciudad');return;}AUTO.on=!AUTO.on;AUTO.ax=P.x;AUTO.az=P.z;if(!AUTO.on){P.attacking=false;P.target=null;P.pick=null;P.moveTo=null;}toast(AUTO.on?'Modo automático activado':'Modo automático desactivado');},
-  ctx(d,b){if(b._npc)openNpc(b._npc);},
+  ctx(d,b){if(b._npc)openNpc(b._npc);else if(b._mu)muroOpen(b._mu);},
+  muTab(d){MURO.tab=d.t==='placa'?'placa':'muro';muroRender();const l=$('#muList');if(l)l.scrollTop=0;},
   stat(d){const n=Math.min(+d.n,C.pts);if(n<1)return;C.st[d.s]+=n;C.pts-=n;recalc();renderChar();persist();},
   cell(d){const i=+d.i,it=C.inv[i];if(GEM){if(it&&gemOk(it,GEM.sub))applyGem(it);return;}if(!it)return;itemCard(it,{src:'inv',i});},
   eqslot(d){const it=C.eq[d.k];if(GEM){if(it&&gemOk(it,GEM.sub))applyGem(it);return;}if(!it)return;itemCard(it,{src:'eq',k:d.k});},
@@ -9192,7 +9256,7 @@ const PAD={on:false,prev:[],mv:false,nav:0,wsel:-1};
 function padOn(v){if(PAD.on===v)return;PAD.on=v;document.body.classList.toggle('pad',v);kbLabels();if(v)toast('Mando conectado');}
 addEventListener('gamepaddisconnected',()=>{const g=navigator.getGamepads?[...navigator.getGamepads()].find(x=>x&&x.connected):null;if(!g)padOn(false);});
 function padFocusables(root){return [...root.querySelectorAll('button:not([disabled]),[data-act],.slot,[data-k],input')].filter(el=>el.offsetParent!==null&&!el.closest('[hidden]'));}
-function padRoot(){const ids=['pItem','pMap','pChar','pMate','pCfg','pRank','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pVault','partyBox','chatBox'];for(const id of ids){const e=$('#'+id);if(e&&!e.hidden)return e;}return null;}
+function padRoot(){const ids=['pItem','pMap','pChar','pMate','pCfg','pRank','pMuro','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pVault','partyBox','chatBox'];for(const id of ids){const e=$('#'+id);if(e&&!e.hidden)return e;}return null;}
 function padMove(root,dx,dy){const els=padFocusables(root);if(!els.length)return;let cur=document.activeElement;if(!els.includes(cur)){els[0].focus();els[0].classList.add('pnav-f');return;}
   const r=cur.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let best=null,bs=1e9;
   for(const el of els){if(el===cur)continue;const q=el.getBoundingClientRect(),x=q.left+q.width/2-cx,y=q.top+q.height/2-cy;const along=x*dx+y*dy;if(along<=4)continue;const perp=Math.abs(x*dy-y*dx);const s=along+perp*2.2;if(s<bs){bs=s;best=el;}}

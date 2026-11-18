@@ -323,14 +323,16 @@ route('POST', 'nox/use', async ({ db, req, me }) => {
   return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
 }, { auth: true });
 
-// Muro de Fundadores: cuentas con el pack de Oro
+// Muro de Fundadores (cuentas con el pack de Oro) y Placa de la Apertura
 let MURO = { t: 0, data: null };
 route('GET', 'nox/muro', async ({ db }) => {
   if (!MURO.data || now() - MURO.t > 60000) {
     const rows = (await db.prepare(`SELECT u.name FROM noxis n JOIN users u ON u.id=n.uid WHERE json_extract(n.own,'$.fund3')>=1 ORDER BY n.upd LIMIT 500`).all()).results || [];
-    MURO = { t: now(), data: rows.map(r => r.name) };
+    // Placa de la Apertura: los 10 primeros de la Carrera de Pioneros (cuentas con el título t_primeros, en el orden en que se entregó)
+    const pl = (await db.prepare(`SELECT u.name FROM noxis n JOIN users u ON u.id=n.uid WHERE json_extract(n.own,'$.t_primeros')>=1 ORDER BY n.upd, n.uid LIMIT 10`).all()).results || [];
+    MURO = { t: now(), data: rows.map(r => r.name), placa: pl.map(r => r.name) };
   }
-  return json({ names: MURO.data });
+  return json({ names: MURO.data, placa: MURO.placa || [] });
 });
 
 /* juego */
