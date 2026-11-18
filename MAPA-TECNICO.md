@@ -676,4 +676,8 @@ Noxis es la moneda de pago (1 Noxis = 10 Gs). Solo compra cosméticos y servicio
 - Captura del dueño: en el casco Yaguareté-Abá (`helm:'jaguar'`, set 7) el pelo blanco atravesaba el domo y el domo bajaba hasta la nariz. Lo mismo en Y Jára (`bloodmoon`, set 8).
 - `forgeHelm`: para esos dos (`big`), con la línea de cejas conocida el centro `y0` se pone a la altura de las cejas (el borde del domo queda justo arriba de los ojos) sin achicar el radio; no usan `fit` (ese ajuste achica el domo al cráneo y el pelo largo queda afuera).
 - `helmHairCut(body,yW)` (se llama en `forgeApply` al poner esos cascos): quita de las mallas `slot==='hair'` los triángulos por encima de las cejas. Usa la posición con piel (`boneTransform`): el pelo viene de otro archivo y con `matrixWorld` solo quedaba 7 cm corrido.
-- Sin tocar: los demás cascos (en `raven`, set 3, el pelo también asoma un poco entre las piezas).
+- Segunda pasada, todos los sets y las cinco razas (18/11; SIN publicar):
+  - `helmBig(S,cls)`: lista de cascos de domo/gorro que usan el modo `big` (cortar pelo sobre las cejas + borde a la altura de las cejas): `jaguar`, `bloodmoon`, `mitre`, `starcrown` del Hechicero y `crown` de Hechicero/Mburuvicha/Arquera.
+  - `helmHairFit(body,at,h,U,top,brow,S)`: para el resto (vinchas, aros, diademas). Mide el pelo (sin barba) a la altura del aro y ensancha el grupo del casco (`scale.x/z`, tope 1.45, margen 1.04) para que lo rodee en vez de cortarlo. Si el pelo es corto no cambia nada (Caballero y Gladiador quedaron igual).
+  - `raven`: pico y gemas más arriba y adelante. `hood` y `sigilhood` (Hechicero sets 1 y 7): esfera más alta y adelantada, el pelo de la frente asomaba por el borde.
+  - Revisado con `/home/claude/h/helms.sh` (solo casco, parado, frente/costado/espalda). Sin revisar: en movimiento, con set completo, iconos, otros peinados y PNJ.
