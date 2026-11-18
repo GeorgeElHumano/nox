@@ -30,7 +30,7 @@ class Dragon {
   constructor(opts) {
     opts = opts || {}; this.n = DR.nid; this.x = DR.home[0]; this.z = DR.home[1]; this.ry = Math.PI; // mira hacia la puerta de la ciudad
     this.max = this.hp = mobStats(60, true) * 4; this.parts = new Map(); this.contrib = {}; this.names = {};
-    this.t = 0; this.limit = opts.limit || DR.limit; this.phase = 1; this.dead = false; this.deadT = 0; this.gone = false; this.fled = false;
+    this.t = 0; this.test = !!opts.test; this.limit = opts.limit || DR.limit; this.phase = 1; this.dead = false; this.deadT = 0; this.gone = false; this.fled = false;
     this.stun = 5.2; this.bcd = 7; this.atkCD = 0; this.rot = 0; this.dash = null; this.ln = 0; this.idle = 0; this.pend = []; this.out = [];
     this.tele('d_llega', { t: 'circle', r: 9 }, this.x, this.z, 1.9, 0, 0, { pc: .5 });
   }

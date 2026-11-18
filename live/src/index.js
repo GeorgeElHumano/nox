@@ -5,7 +5,7 @@
 import { Sim, RAID_KEY } from './sim.js';
 import { Dragon, dragonWindow, DR } from './dragon.js';
 import { ZONES } from './data.js';
-import { NX_ITEMS, NX_BY } from './noxis.js'; // copia de lib/noxis.js (scripts/noxis-sync.sh)
+import { NX_ITEMS, NX_BY, NX_ESC } from './noxis.js'; // copia de lib/noxis.js (scripts/noxis-sync.sh)
 import { alert, loginMark, peakMark, expireOrders, daySummary, summaryText, pyDay, tally, TRADE_ALERT_NX, nTxt } from './alerts.js'; // copia de lib/alerts.js (scripts/noxis-sync.sh)
 
 const enc = new TextEncoder();
@@ -24,7 +24,7 @@ async function minBuild() {
 const GESTOS = ['saludo', 'baile', 'risa', 'llanto', 'burla', 'celebracion', 'descanso'];
 // gestos de la tienda Noxis: solo los puede mostrar quien los compró (a.gx = máscara de bits según este orden)
 const GESTOS_NX = NX_ITEMS.filter(i => i.kind === 'gest').map(i => i.id);
-const CZ_SLOTS = ['title', 'frame', 'trail', 'pet_imp', 'pet_hada', 'pet_rudolf'];
+const CZ_SLOTS = ['title', 'frame', 'trail', 'pet_imp', 'pet_hada', 'pet_rudolf', 'mas', 'wing'];
 
 /* tareas programadas (wrangler.toml, [triggers]): cada 10 minutos vence pedidos y revisa que el servidor y la API respondan;
    a las 00:00 UTC (21:00 de Paraguay) manda el resumen del día. Todo termina en avisos al celular del administrador. */
@@ -165,11 +165,34 @@ export class World {
     if (now < w.start) { if (this.wbWarned !== w.start) { this.wbWarned = w.start; this.wbAll({ t: 'ann', k: 'wb', m: 'El Dragón Dorado se acerca a Asunción. Llega en ' + Math.max(1, Math.round((w.start - now) / 60000)) + ' minutos: preparate fuera de las murallas.' }); } return; }
     this.wbWin = w.start; this.wbSpawn({ limit: Math.max(60, (w.end - now) / 1000) });
   }
+  // premios del dragón: Escamas Doradas (1; 3 a los diez mejores; 5 al primero), título Cazador del Dragón, Matadragones al primero
+  // y 1 % de suerte para las alas. Todo se escribe en la base acá (el juego solo lo muestra). Con /dragon de prueba no se entrega nada.
+  async wbReward(D) {
+    const rank = Object.entries(D.contrib).sort((a, b) => b[1] - a[1]), total = rank.reduce((s, x) => s + x[1], 0) || 1, db = this.env.DB, t = Date.now();
+    const J = id => `'$."${id}"'`;
+    for (let i = 0; i < rank.length; i++) { const [uid, d] = rank[i]; if (i >= 10 && d < total * .001) continue; // casi no pegó: sin premio
+      const n = i === 0 ? 5 : i < 10 ? 3 : 1, x = this.byUid(uid), o = { t: 'wbr', rank: i + 1, np: rank.length, esc: n, pct: Math.round(d / total * 1000) / 10, chest: i < 10 ? 1 : 0 };
+      try {
+        if (D.test) { o.test = 1; o.tot = n; o.first = 1; o.mata = i === 0 ? 1 : 0; }
+        else {
+          await db.prepare("INSERT OR IGNORE INTO noxis(uid,bal,own,eq,upd) VALUES(?,0,'{}','{}',?)").bind(uid, t).run();
+          const own = JSON.parse((await db.prepare('SELECT own FROM noxis WHERE uid=?').bind(uid).first() || {}).own || '{}');
+          o.first = own.t_dragon ? 0 : 1; o.mata = i === 0 && !own.t_mata ? 1 : 0; o.alas = !own.alas_dragon && Math.random() < .01 ? 1 : 0;
+          const r = await db.prepare(`UPDATE noxis SET own=json_set(own,${J(NX_ESC)},COALESCE(json_extract(own,${J(NX_ESC)}),0)+?1,${J('t_dragon')},1${i === 0 ? ',' + J('t_mata') + ',1' : ''}${o.alas ? ',' + J('alas_dragon') + ',1' : ''}), upd=?2 WHERE uid=?3 RETURNING bal, json_extract(own,${J(NX_ESC)}) AS e`).bind(n, t, uid).first();
+          o.tot = r ? r.e | 0 : n;
+          await db.prepare('INSERT INTO noxlog(uid,d,bal,why,ref,t) VALUES(?,?,?,?,?,?)').bind(uid, 0, r ? r.bal : 0, 'dragon', `escamas+${n} puesto ${i + 1}${o.alas ? ' alas' : ''}`, t).run();
+          if (o.alas) this.wbAll({ t: 'ann', k: 'wb', m: '★ ' + (D.names[uid] || 'Un valiente') + ' obtuvo las Alas del Dragón Dorado. ¡Solo cae 1 de cada 100!' });
+        }
+        if (x) this.send(x.ws, o);
+      } catch {}
+    }
+  }
   wbStep(now, dt) {
     this.wbCheck(now); const D = this.wb; if (!D) return;
     const pl = this.inZone(DR.zone).filter(x => x.a.s);
     D.step(dt, pl.map(x => ({ uid: x.a.uid, p: x.a.p })));
     if (D.out.length) { for (const o of D.out) { this.wbZone(o);
+        if (o.t === 'wbk') this.wbReward(D).catch(() => {});
         if (o.t === 'wbk') this.wbAll({ t: 'ann', k: 'wb', m: '¡El Dragón Dorado fue derrotado por ' + o.np + ' valientes! Mayor daño: ' + ((o.top[0] || {}).n || '?') + '.' });
         if (o.t === 'wbf') this.wbAll({ t: 'ann', k: 'wb', m: 'El Dragón Dorado levantó vuelo: nadie pudo con él esta vez.' }); } D.out = []; }
     this.wbSnap -= dt; this.wbKey -= dt;
@@ -453,7 +476,7 @@ export class World {
       if (a.role !== 'admin') { this.send(ws, { t: 'sys', m: 'Solo los administradores pueden llamar al Dragón Dorado.' }); return; }
       if (m.op === 'off') { if (this.wb) { this.wb.gone = true; this.wbWin = 0; } this.send(ws, { t: 'sys', m: 'Dragón Dorado retirado.' }); return; }
       if (this.wb) { this.send(ws, { t: 'sys', m: 'El Dragón Dorado ya está en el campo.' }); return; }
-      this.wbWin = 0; this.wbSpawn({ limit: Math.max(60, Math.min(3600, (+m.min || 30) * 60)) }); return; }
+      this.wbWin = 0; this.wbSpawn({ limit: Math.max(60, Math.min(3600, (+m.min || 30) * 60)), test: m.op !== 'premios' }); return; }
     if (t === 'mreq') { const sim = a.zone && this.sims.get(a.zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: a.zone }); return; }
     if (t === 'raid') { this.startRaid(ws, a); return; }
     if (t === 'sk') { // poder usado: los demás del mapa lo ven

@@ -1,6 +1,6 @@
 // NOX · servidor (Cloudflare Pages Functions + D1)
 // Cuentas, guardado del juego en la nube, tienda Noxis (recargas por transferencia) y panel de administración.
-import { NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, nxFounderLevel, nxPackGrant } from '../../lib/noxis.js';
+import { NX_ESC, NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, nxFounderLevel, nxPackGrant } from '../../lib/noxis.js';
 import { IMPORTS } from '../../lib/imports.js';
 import { parseBankMail, BANK_FROM } from '../../lib/bankmail.js';
 import { GUIA, GUIA_REGLAS, resumen } from '../../lib/guia.js';
@@ -287,7 +287,18 @@ route('POST', 'nox/buy', async ({ db, req, me }) => {
   return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
 }, { auth: true });
 
-const NX_SLOT = { title: 'title', frame: 'frame', trail: 'trail', pet_imp: 'pet', pet_hada: 'pet', pet_rudolf: 'pet' };
+// canje por Escamas Doradas (premios del Dragón Dorado): una sola sentencia con la condición adentro, como las compras
+route('POST', 'nox/esc', async ({ db, req, me }) => {
+  const b = await body(req), it = NX_BY.get(String(b.id || ''));
+  if (!it || !it.esc) return fail('Eso no se canjea por Escamas.');
+  await noxRow(db, me.id);
+  const r = await db.prepare(`UPDATE noxis SET own=json_set(own,${jp(NX_ESC)},json_extract(own,${jp(NX_ESC)})-?1,${jp(it.id)},1), upd=?2 WHERE uid=?3 AND COALESCE(json_extract(own,${jp(NX_ESC)}),0)>=?1 AND json_extract(own,${jp(it.id)}) IS NULL RETURNING bal`).bind(it.esc, now(), me.id).first();
+  if (!r) { const n = await noxRow(db, me.id); return fail(n.own[it.id] ? 'Ya tenés ese premio.' : 'No te alcanzan las Escamas. Te faltan ' + (it.esc - (n.own[NX_ESC] | 0)) + '.', 402); }
+  await noxLog(db, me.id, 0, r.bal, 'escamas', it.id + ':-' + it.esc).run();
+  return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
+}, { auth: true });
+
+const NX_SLOT = { title: 'title', frame: 'frame', trail: 'trail', pet_imp: 'pet', pet_hada: 'pet', pet_rudolf: 'pet', mas: 'mas', wing: 'wing' };
 route('POST', 'nox/equip', async ({ db, req, me }) => {
   const b = await body(req), slot = String(b.slot || ''), kind = NX_SLOT[slot];
   if (!kind) return fail('Eso no se puede equipar.');
