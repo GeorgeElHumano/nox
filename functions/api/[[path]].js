@@ -4,6 +4,7 @@ import { NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, n
 import { IMPORTS } from '../../lib/imports.js';
 import { parseBankMail, BANK_FROM } from '../../lib/bankmail.js';
 import { GUIA, GUIA_REGLAS, resumen } from '../../lib/guia.js';
+import { ALERT_TYPES, ALERT_SCHEMA, alert, vapid, expireOrders as expireAndAlert, daySummary, summaryText, tally, pyDay } from '../../lib/alerts.js';
 
 const ADMIN_NAME = 'GEORGEELHUMANO';
 const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]{3,14}$/;
@@ -33,6 +34,7 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS orders_uid ON orders(uid)`,
   `CREATE INDEX IF NOT EXISTS deliv_uid ON deliveries(uid)`,
   `CREATE INDEX IF NOT EXISTS sess_uid ON sessions(uid)`,
+  ...ALERT_SCHEMA, // avisos al administrador y conexiones por día (lib/alerts.js)
 ];
 let ready = false;
 async function init(db) {
@@ -129,7 +131,7 @@ async function deliver(db, uid, oid, items, why) {
    1 a 99 Gs) y el aviso de transferencia se empareja por ese monto exacto. Un pedido sin pagar vence a las 48 horas. */
 const ORDER_HOURS = 48, IVA = 10;
 const RUC_RE = /^\d{5,9}-\d$/;
-const expireOrders = db => db.prepare("UPDATE orders SET status='vencido',decided=? WHERE status='pendiente' AND created<? AND code LIKE 'NOX-%'").bind(now(), now() - ORDER_HOURS * 3600e3).run();
+const expireOrders = db => expireAndAlert(db); // marca vencidos y avisa al administrador (lib/alerts.js)
 async function uniqueTotal(db, base) {
   const used = new Set(((await db.prepare("SELECT total FROM orders WHERE status='pendiente' AND total BETWEEN ? AND ?").bind(base + 1, base + 499).all()).results || []).map(r => r.total));
   for (let k = 0; k < 200; k++) { const x = 1 + rand(1)[0] % 99; if (!used.has(base + x)) return x; }
@@ -140,7 +142,10 @@ async function uniqueTotal(db, base) {
 async function settle(db, o, note, st) {
   const r = await db.prepare(`UPDATE orders SET status='pagado',decided=?,note=? WHERE id=? AND status IN (${st || "'pendiente'"})`).bind(now(), note, o.id).run();
   if (!r.meta.changes) return false;
-  await deliver(db, o.uid, o.id, JSON.parse(o.items), 'recarga ' + o.code);
+  const items = JSON.parse(o.items);
+  await deliver(db, o.uid, o.id, items, 'recarga ' + o.code);
+  const f = items.map(i => NX_PACK.get(i.id)).find(pk => pk && pk.f);
+  if (f) { const u = await db.prepare('SELECT name FROM users WHERE id=?').bind(o.uid).first(); await alert(db, 'fundador', '¡' + f.name + ' vendido!', `${u ? u.name : 'Un jugador'} ya es Fundador · ${gsTxt(o.total)} · ${o.code}`, { url: '/cuenta/#admin/orders' }); }
   return true;
 }
 
@@ -159,7 +164,7 @@ const route = (m, p, f, opt = {}) => routes.push({ m, re: new RegExp('^' + p.rep
 route('GET', 'ping', async () => json({ ok: true, t: now() }));
 route('GET', 'nox/catalog', async () => json({ items: NX_ITEMS, packs: NX_PACKS, gs: NOXIS_GS, founderEnd: NX_FOUNDER_END, pay: NX_PAY }));
 
-route('POST', 'register', async ({ db, req }) => {
+route('POST', 'register', async ({ db, req, bg }) => {
   const b = await body(req);
   const name = String(b.name || '').trim(), pw = String(b.password || '');
   if (!NAME_RE.test(name)) return fail('El usuario tiene que tener de 3 a 14 letras o números, sin espacios.');
@@ -175,6 +180,8 @@ route('POST', 'register', async ({ db, req }) => {
   const id = 'u' + hex(rand(8));
   await db.prepare('INSERT INTO users(id,name,nkey,pass,role,wa,created,lastlogin) VALUES(?,?,?,?,?,?,?,?)').bind(id, name, nkey, await hashPass(pw), role, cleanWa(b.wa), now(), now()).run();
   const token = await newSession(db, id);
+  const tot = await db.prepare('SELECT COUNT(*) n FROM users').first();
+  bg(alert(db, 'cuenta', 'Cuenta nueva: ' + name, `Ya son ${tot ? tot.n : '?'} cuentas en NOX${cleanWa(b.wa) ? ' · dejó su WhatsApp' : ''}`, { url: '/cuenta/#admin/users' }));
   return json({ token, user: { id, name, role, wa: cleanWa(b.wa), mustchange: false } });
 });
 
@@ -228,7 +235,7 @@ route('POST', 'reset-request', async ({ db, req }) => {
 });
 
 /* tienda */
-route('POST', 'orders', async ({ db, req, me }) => {
+route('POST', 'orders', async ({ db, req, me, bg }) => {
   const b = await body(req);
   await expireOrders(db);
   const nx = await noxRow(db, me.id);
@@ -251,6 +258,7 @@ route('POST', 'orders', async ({ db, req, me }) => {
   const total = price + iva + extra; items[0].iva = iva; items[0].extra = extra;
   let c; for (let k = 0; k < 5; k++) { c = code('NOX', 5); if (!(await db.prepare('SELECT 1 FROM orders WHERE code=?').bind(c).first())) break; }
   const r = await db.prepare("INSERT INTO orders(code,uid,items,total,status,created,fac) VALUES(?,?,?,?, 'pendiente', ?, ?)").bind(c, me.id, JSON.stringify(items), total, now(), fac ? JSON.stringify(fac) : null).run();
+  bg(alert(db, 'pedido', 'Pedido de pago · ' + me.name, `${items[0].name} · ${gsTxt(total)} · ${c}${fac ? ' · con factura' : ''}`, { url: '/cuenta/#admin/orders' }));
   return json({ order: { id: r.meta.last_row_id, code: c, items, total, status: 'pendiente', created: now(), fac, expires: now() + ORDER_HOURS * 3600e3 } });
 }, { auth: true });
 
@@ -366,10 +374,17 @@ route('DELETE', 'game/docs/:id', async ({ db, me, p }) => {
   return json({ ok: true });
 }, { auth: true });
 
-route('PUT', 'game/summary', async ({ db, req, me }) => {
+route('PUT', 'game/summary', async ({ db, req, me, bg }) => {
   const b = await body(req);
   const chars = (Array.isArray(b.chars) ? b.chars : []).slice(0, 5).map(c => ({ name: String(c.name || '').slice(0, 24), cls: String(c.cls || '').slice(0, 12), L: +c.L || 1, resets: +c.resets || 0, evo: !!c.evo }));
   const ckeys = ',' + chars.map(c => keyOf(c.name)).join(',') + ',';
+  // aviso: un personaje llegó al nivel 200 o hizo su primer reinicio (se compara con lo guardado antes)
+  const was = await db.prepare('SELECT chars FROM players WHERE uid=?').bind(me.id).first();
+  if (was) { let old = []; try { old = JSON.parse(was.chars || '[]'); } catch {}
+    for (const c of chars) { const o = old.find(x => keyOf(x.name) === keyOf(c.name)); if (!o) continue;
+      if (c.resets === 1 && (+o.resets || 0) === 0) bg(alert(db, 'nivel', '¡Primer reinicio! · ' + c.name, `${c.cls || 'Personaje'} de la cuenta ${me.name} hizo su primer reinicio.`, { url: '/cuenta/#admin/users', key: 'rs1:' + me.id + ':' + keyOf(c.name), every: 30 * 864e5 }));
+      else if (c.L >= 200 && (+o.L || 0) < 200 && c.resets === (+o.resets || 0)) bg(alert(db, 'nivel', '¡Nivel 200! · ' + c.name, `${c.cls || 'Personaje'} de ${me.name}${c.resets ? ' con ' + c.resets + ' reinicio' + (c.resets === 1 ? '' : 's') : ''} ya puede reiniciar.`, { url: '/cuenta/#admin/users', key: 'l200:' + me.id + ':' + keyOf(c.name) + ':' + c.resets, every: 30 * 864e5 })); }
+  }
   await db.prepare('INSERT INTO players(uid,chars,ckeys,upd) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET chars=excluded.chars,ckeys=excluded.ckeys,upd=excluded.upd').bind(me.id, JSON.stringify(chars), ckeys, now()).run();
   return json({ ok: true });
 }, { auth: true });
@@ -430,13 +445,13 @@ route('GET', 'game/guia', async ({ db, env, me }) => {
   return json({ left: Math.max(0, dia - await guiaUsed(db, me.id, guiaDay())), max: dia, on: !!env.ANTHROPIC_API_KEY });
 }, { auth: true });
 
-route('POST', 'game/guia', async ({ db, req, env, me }) => {
+route('POST', 'game/guia', async ({ db, req, env, me, bg }) => {
   const b = await body(req), q = guiaClean(b.q), { dia, tope } = guiaLim(env), day = guiaDay();
   if (q.length < 3) return fail('Escribí tu pregunta.');
   if (!env.ANTHROPIC_API_KEY) return json({ error: 'Arandu todavía no está conectado. Probá más tarde.', off: true }, 503);
   const n = await guiaTake(db, me.id, day, dia);
   if (!n) return json({ error: 'Ya hiciste tus ' + dia + ' preguntas de hoy. Volvé mañana.', left: 0, max: dia, limit: true }, 429);
-  if (!await guiaTake(db, '*', day, tope)) { await guiaBack(db, me.id, day); return json({ error: 'Arandu atendió a demasiada gente hoy. Volvé mañana.', left: dia - n + 1, max: dia, busy: true }, 429); }
+  if (!await guiaTake(db, '*', day, tope)) { await guiaBack(db, me.id, day); bg(alert(db, 'arandu', 'Arandu se quedó sin cupo', `Llegó a las ${tope} preguntas de hoy para todo el servidor. Vuelve a atender mañana (o subí GUIA_TOPE en Cloudflare).`, { url: '/cuenta/#admin', key: 'guiatope:' + day, every: 864e5 })); return json({ error: 'Arandu atendió a demasiada gente hoy. Volvé mañana.', left: dia - n + 1, max: dia, busy: true }, 429); }
   const undo = async () => { await guiaBack(db, me.id, day); await guiaBack(db, '*', day); };
   let ctx = 'Sin datos del personaje.';
   if (DOC_RE.test(String(b.id || '')) && b.id !== 'vault') {
@@ -455,13 +470,19 @@ route('POST', 'game/guia', async ({ db, req, env, me }) => {
       }),
     });
     j = await r.json();
-  } catch (e) { await undo(); return json({ error: 'Arandu no pudo responder. Probá de nuevo.' }, 502); }
+  } catch (e) { await undo(); bg(guiaFail(db, 'sin conexión con la IA')); return json({ error: 'Arandu no pudo responder. Probá de nuevo.' }, 502); }
   const a = r.ok && j && Array.isArray(j.content) ? j.content.filter(x => x && x.type === 'text').map(x => x.text).join(' ').replace(/[*#_`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 700) : '';
-  if (!a) { await undo(); console.log('guia', r.status, JSON.stringify(j).slice(0, 300)); return json({ error: 'Arandu no pudo responder. Probá de nuevo.' }, 502); }
+  if (!a) { await undo(); console.log('guia', r.status, JSON.stringify(j).slice(0, 300)); bg(guiaFail(db, 'la IA respondió ' + r.status + (j && j.error && j.error.message ? ': ' + String(j.error.message).slice(0, 90) : ''))); return json({ error: 'Arandu no pudo responder. Probá de nuevo.' }, 502); }
   const u = j.usage || {};
   await db.prepare('UPDATE guia SET tin=tin+?, tout=tout+?, tcache=tcache+? WHERE uid=? AND day=?').bind((+u.input_tokens || 0) + (+u.cache_creation_input_tokens || 0), +u.output_tokens || 0, +u.cache_read_input_tokens || 0, '*', day).run();
   return json({ a, left: Math.max(0, dia - n), max: dia });
 }, { auth: true });
+
+// 3 fallas de la IA en 15 minutos = aviso (como mucho uno por hora). Un 400 por crédito agotado o una clave vencida avisa igual.
+async function guiaFail(db, why) {
+  if (await tally(db, 'guiafail', 15 * 60e3) < 3 && !/credit|billing|api.key|authentication/i.test(why)) return;
+  await alert(db, 'arandu', 'Arandu está fallando', 'Las preguntas a la IA no salen: ' + why + '. Revisá el crédito y la clave ANTHROPIC_API_KEY.', { url: '/cuenta/#admin', key: 'guiafail', every: 3600e3 });
+}
 
 // gasto del guía por día (para el administrador): preguntas, tokens cobrados enteros, de salida y leídos de caché
 route('GET', 'admin/guia', async ({ db }) => {
@@ -543,7 +564,7 @@ route('POST', 'admin/orders/:id', async ({ db, req, p }) => {
    trae el secreto BANK_SECRET, el sobre viene de la casilla del dueño (BANK_FWD) y el remitente es el banco.
    Cada referencia del banco entra una sola vez. Si hay exactamente un pedido pendiente por ese monto, se paga solo;
    si no, el aviso queda "suelto" para que el administrador lo asigne o lo descarte. */
-route('POST', 'bank/mail', async ({ db, req, env }) => {
+route('POST', 'bank/mail', async ({ db, req, env, bg }) => {
   const sec = env.BANK_SECRET || '';
   if (sec.length < 16 || req.headers.get('x-nox-bank') !== sec) return fail('No autorizado.', 403);
   const u8 = new Uint8Array(await req.arrayBuffer()); if (u8.length > 300000) return fail('Demasiado grande.', 413);
@@ -561,10 +582,14 @@ route('POST', 'bank/mail', async ({ db, req, env }) => {
   if (!ins.meta.changes) return json({ ok: true, kind: 'repetido' });
   await expireOrders(db);
   const cand = (await db.prepare("SELECT * FROM orders WHERE status='pendiente' AND total=? AND code LIKE 'NOX-%'").bind(p.amt).all()).results || [];
-  if (cand.length !== 1) return json({ ok: true, kind: 'suelto' });
+  const loose = why => { bg(alert(db, 'suelto', 'Transferencia sin pedido', `${p.payer || 'Alguien'} mandó ${gsTxt(p.amt)} (${p.bank || 'otro banco'}) · ${why}. Asignala en Banco.`, { url: '/cuenta/#admin/bank' })); return json({ ok: true, kind: 'suelto' }); };
+  if (cand.length !== 1) return loose(cand.length ? 'hay ' + cand.length + ' pedidos por ese monto' : 'ningún pedido pendiente tiene ese monto');
   const o = cand[0];
-  if (!(await settle(db, o, ('Automático · ' + p.payer + ' · ' + p.bank + ' · ref ' + p.ref).slice(0, 300)))) return json({ ok: true, kind: 'suelto' });
+  if (!(await settle(db, o, ('Automático · ' + p.payer + ' · ' + p.bank + ' · ref ' + p.ref).slice(0, 300)))) return loose('el pedido ya estaba resuelto');
   await db.prepare("UPDATE bankin SET oid=?, st='auto' WHERE ref=?").bind(o.id, p.ref).run();
+  const u = await db.prepare('SELECT name FROM users WHERE id=?').bind(o.uid).first();
+  let it = ''; try { it = JSON.parse(o.items).map(i => i.name).join(', '); } catch {}
+  bg(alert(db, 'auto', 'Pago acreditado · ' + (u ? u.name : o.code), `${it} · ${gsTxt(p.amt)} de ${p.payer || 'transferencia'} · ${o.code}`, { url: '/cuenta/#admin/bank' }));
   return json({ ok: true, kind: 'pagado', code: o.code });
 });
 
@@ -648,6 +673,52 @@ route('GET', 'admin/nox/:uid', async ({ db, p }) => {
   return json({ ...noxPub(n), log });
 }, { admin: true });
 
+/* ---------- avisos al celular del administrador (lib/alerts.js) ----------
+   El panel pide la clave pública, el navegador crea la suscripción y la manda acá. Cada dispositivo elige qué avisos quiere. */
+const cleanPrefs = x => { const o = {}; for (const t of ALERT_TYPES) o[t.id] = !(x && x[t.id] === false); return o; };
+route('GET', 'admin/push', async ({ db, me, url }) => {
+  const ep = url.searchParams.get('ep') || '';
+  const mine = ep ? await db.prepare('SELECT prefs,last FROM pushsub WHERE ep=?').bind(ep).first() : null;
+  const n = await db.prepare('SELECT COUNT(*) n FROM pushsub WHERE uid=?').bind(me.id).first();
+  return json({ key: (await vapid(db)).pub, types: ALERT_TYPES, sub: mine ? { prefs: cleanPrefs(JSON.parse(mine.prefs || '{}')), last: mine.last } : null, devices: n ? n.n : 0 });
+}, { admin: true });
+route('POST', 'admin/push', async ({ db, req, me }) => {
+  const b = await body(req), sub = b.sub || {}, ep = String(sub.endpoint || ''), k = sub.keys || {};
+  if (!/^https:\/\/[^\s]{10,800}$/.test(ep) || !/^[A-Za-z0-9_-]{80,100}$/.test(String(k.p256dh || '')) || !/^[A-Za-z0-9_-]{16,30}$/.test(String(k.auth || ''))) return fail('Suscripción no válida.');
+  const prefs = JSON.stringify(cleanPrefs(b.prefs));
+  await db.prepare('INSERT INTO pushsub(ep,uid,p256,auth,prefs,ua,t,fails) VALUES(?,?,?,?,?,?,?,0) ON CONFLICT(ep) DO UPDATE SET uid=excluded.uid,p256=excluded.p256,auth=excluded.auth,prefs=CASE WHEN ? THEN excluded.prefs ELSE pushsub.prefs END,ua=excluded.ua,fails=0')
+    .bind(ep, me.id, k.p256dh, k.auth, prefs, (req.headers.get('user-agent') || '').slice(0, 160), now(), b.prefs ? 1 : 0).run();
+  return json({ ok: true });
+}, { admin: true });
+route('POST', 'admin/push/prefs', async ({ db, req }) => {
+  const b = await body(req);
+  const r = await db.prepare('UPDATE pushsub SET prefs=? WHERE ep=?').bind(JSON.stringify(cleanPrefs(b.prefs)), String(b.ep || '')).run();
+  if (!r.meta.changes) return fail('Este dispositivo no tiene los avisos activados.', 404);
+  return json({ ok: true });
+}, { admin: true });
+route('POST', 'admin/push/off', async ({ db, req }) => { const b = await body(req); await db.prepare('DELETE FROM pushsub WHERE ep=?').bind(String(b.ep || '')).run(); return json({ ok: true }); }, { admin: true });
+route('POST', 'admin/push/test', async ({ db, req }) => {
+  const b = await body(req), t = ALERT_TYPES.find(x => x.id === b.type);
+  if (t && t.id === 'resumen') { const s = await daySummary(db); return json({ sent: await alert(db, 'resumen', 'NOX · resumen de hoy (prueba)', summaryText(s), { url: '/cuenta/#admin/online' }) }); }
+  return json({ sent: await alert(db, t ? t.id : 'pedido', 'Prueba · ' + (t ? t.name : 'avisos de NOX'), 'Si ves esto, los avisos funcionan en este dispositivo.', { url: '/cuenta/#admin/alerts' }) });
+}, { admin: true });
+route('GET', 'admin/alerts', async ({ db }) => {
+  const rows = (await db.prepare('SELECT type,title,body,t,sent FROM alertlog ORDER BY id DESC LIMIT 60').all()).results || [];
+  return json({ rows });
+}, { admin: true });
+
+/* jugadores en línea: los conectados ahora salen de /live/online; acá van las entradas por día y los picos */
+route('GET', 'admin/online', async ({ db }) => {
+  const today = pyDay(), d30 = pyDay(now() - 29 * 864e5), d7 = pyDay(now() - 6 * 864e5);
+  const days = (await db.prepare('SELECT day, COUNT(*) n FROM logins WHERE day>=? GROUP BY day ORDER BY day').bind(d30).all()).results || [];
+  const peaks = (await db.prepare('SELECT day, n FROM onlinepk WHERE day>=? ORDER BY day').bind(d30).all()).results || [];
+  const wk = await db.prepare('SELECT COUNT(DISTINCT uid) n FROM logins WHERE day>=?').bind(d7).first();
+  const mo = await db.prepare('SELECT COUNT(DISTINCT uid) n FROM logins WHERE day>=?').bind(d30).first();
+  const rec = await db.prepare("SELECT v,t FROM pushkv WHERE k='peak'").first();
+  const recent = (await db.prepare('SELECT l.uid, l.n, l.t, u.name FROM logins l JOIN users u ON u.id=l.uid WHERE l.day=? ORDER BY l.t DESC LIMIT 40').bind(today).all()).results || [];
+  return json({ today, days, peaks, week: wk ? wk.n : 0, month: mo ? mo.n : 0, record: rec ? { n: +rec.v || 0, t: rec.t } : { n: 0, t: 0 }, recent });
+}, { admin: true });
+
 /* parche mínimo para jugar en línea: lo dice public/jugar/build.json ("min"). El juego manda su versión en x-nox-build;
    si es más vieja (o no la manda, como las versiones de antes), las rutas del juego responden 426 y el juego pide actualizar. */
 let BUILD_CACHE = { t: 0, min: '' };
@@ -659,6 +730,7 @@ async function minBuild(env, url) {
 }
 export async function onRequest(ctx) {
   const { request: req, env, params } = ctx;
+  const bg = p => { try { ctx.waitUntil(Promise.resolve(p).catch(() => {})); } catch { Promise.resolve(p).catch(() => {}); } }; // tareas que siguen después de responder (avisos)
   const db = env.DB;
   if (!db) return fail('Falta conectar la base de datos (binding DB).', 500);
   await init(db);
@@ -684,7 +756,7 @@ export async function onRequest(ctx) {
         if (cur && cur.gs !== gs) return json({ error: 'Abriste NOX en otro dispositivo.', other: true }, 409);
       }
     }
-    try { return await r.f({ db, req, env, url, me, p: m.groups || {} }); }
+    try { return await r.f({ db, req, env, url, me, bg, p: m.groups || {} }); }
     catch (e) { return fail('Error del servidor: ' + (e && e.message || e), 500); }
   }
   return fail('No encontrado.', 404);

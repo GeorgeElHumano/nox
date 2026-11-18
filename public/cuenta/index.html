@@ -7,6 +7,11 @@
 <meta name="theme-color" content="#0d0a09">
 <link rel="icon" type="image/png" href="../img/icon-256.png">
 <link rel="apple-touch-icon" href="../img/icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NOX Admin">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
@@ -142,6 +147,28 @@ table{border-collapse:collapse;width:100%;font-size:.95rem}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-weight:500;font-size:.85rem}
 .tablewrap{overflow-x:auto}
+/* en línea y avisos */
+.live{display:inline-flex;align-items:center;gap:8px}
+.live::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 60%,transparent);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.live::before{animation:none}}
+.names{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.names span{background:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.88rem}
+.bars.two i.pk{background:var(--earth)}
+.legend{display:flex;gap:14px;font-size:.8rem;color:var(--muted);margin-top:8px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-left:6px;vertical-align:1px}
+.tgroup{display:grid;gap:2px;margin-top:12px}
+.tgroup h4{margin:10px 0 4px;font:700 .78rem/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.tog input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--ink-3);border:1px solid var(--line);position:relative;cursor:pointer;transition:background .2s}
+.tog input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.tog input:checked{background:color-mix(in srgb,var(--gold) 35%,var(--ink-3));border-color:var(--gold)}
+.tog input:checked::after{transform:translateX(18px);background:var(--gold-hi)}
+.alog{display:grid;grid-template-columns:1fr;gap:3px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--ink-2)}
+.alog .t{color:var(--muted);font-size:.82rem;white-space:nowrap}
+.alog b{display:block}
+.alog p{color:var(--muted);font-size:.92rem}
 footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);font-size:.85rem}
 </style>
 </head>
@@ -245,7 +272,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
   <!-- administración -->
   <section id="v-admin" hidden>
     <div class="view-head"><span class="eyebrow">Solo administrador</span><h1>Administración</h1>
-      <div class="actions"><div class="seg" id="admSeg"><button type="button" data-a="stats" class="on">Resumen</button><button type="button" data-a="orders">Pedidos</button><button type="button" data-a="bank">Banco</button><button type="button" data-a="resets">Contraseñas</button><button type="button" data-a="users">Jugadores</button></div><button class="btn btn-line btn-sm" type="button" id="notifBtn">Activar avisos</button><span class="muted" id="admUpd" style="font-size:.85rem"></span></div>
+      <div class="actions"><div class="seg" id="admSeg"><button type="button" data-a="stats" class="on">Resumen</button><button type="button" data-a="online">En línea</button><button type="button" data-a="orders">Pedidos</button><button type="button" data-a="bank">Banco</button><button type="button" data-a="resets">Contraseñas</button><button type="button" data-a="users">Jugadores</button><button type="button" data-a="alerts">Avisos<span class="dot" id="pushDot" hidden></span></button></div><span class="muted" id="admUpd" style="font-size:.85rem"></span></div>
     </div>
     <div id="a-stats">
       <div class="stats" id="admStats"><div class="empty">Cargando…</div></div>
@@ -253,6 +280,15 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
     <div id="a-orders">
       <div class="chips" id="ordSt" style="margin-bottom:14px"></div>
       <div class="list" id="admOrders"></div>
+    </div>
+    <div id="a-online" hidden>
+      <div class="stats" id="admOnline"><div class="empty">Cargando…</div></div>
+    </div>
+    <div id="a-alerts" hidden>
+      <div class="panel" id="pushBox" style="margin-bottom:14px"></div>
+      <div class="panel" id="pushTypes" style="margin-bottom:14px" hidden></div>
+      <h3 style="margin:22px 0 10px">Últimos avisos</h3>
+      <div class="list" id="pushLog"></div>
     </div>
     <div id="a-bank" hidden><p class="muted" id="bankInfo" style="font-size:.92rem"></p><div class="list" id="admBank"></div></div>
     <div id="a-resets" hidden><div class="list" id="admResets"></div></div>
@@ -275,7 +311,8 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const gs=n=>'₲ '+Math.round(n).toLocaleString('es-PY');
 const when=t=>t?new Date(t).toLocaleString('es-PY',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-const S={tok:'',me:null,cat:null,nx:null,cfm:'',fac:{on:false,ruc:'',rs:''},authMode:'in',admTab:'stats',ordSt:'pendiente',admLast:0,admCount:0,lastOrder:null};
+const ADM_TABS=['stats','online','orders','bank','resets','users','alerts'];
+const S={app:/[?&]app=1/.test(location.search)||matchMedia('(display-mode: standalone)').matches||navigator.standalone===true,onT:0,pushOn:false,pushInfo:null,tok:'',me:null,cat:null,nx:null,cfm:'',fac:{on:false,ruc:'',rs:''},authMode:'in',admTab:'stats',ordSt:'pendiente',admLast:0,admCount:0,lastOrder:null};
 try{S.tok=localStorage.getItem('nox-token')||'';localStorage.removeItem('nox-cart');}catch(e){}
 function setTok(t){S.tok=t||'';try{t?localStorage.setItem('nox-token',t):localStorage.removeItem('nox-token');}catch(e){}}
 async function api(m,p,b){const r=await fetch('/api/'+p,{method:m,headers:{'content-type':'application/json',...(S.tok?{authorization:'Bearer '+S.tok}:{})},body:b!==undefined?JSON.stringify(b):undefined});
@@ -294,7 +331,7 @@ function renderWho(){const w=$('#who');
 /* ---------- vistas ---------- */
 const NEEDS={pedidos:1,cuenta:1,admin:1,pedido:1};
 let afterLogin='tienda';
-async function route(){let v=(location.hash||'#tienda').slice(1);if(!['entrar','tienda','pedidos','cuenta','admin','pedido'].includes(v))v='tienda';
+async function route(){let v=(location.hash||(S.app&&S.me&&S.me.user.role==='admin'?'#admin':'#tienda')).slice(1);const sub=v.split('/')[1];v=v.split('/')[0];if(sub&&ADM_TABS.includes(sub))S.admTab=sub;if(!['entrar','tienda','pedidos','cuenta','admin','pedido'].includes(v))v='tienda';
   if(NEEDS[v]&&!S.me){afterLogin=v;v='entrar';}
   if(v==='admin'&&S.me.user.role!=='admin')v='cuenta';
   if(v==='pedido'&&!S.lastOrder)v='pedidos';
@@ -371,11 +408,69 @@ $('#waForm').addEventListener('submit',async e=>{e.preventDefault();try{await ap
 $('#logout').onclick=async()=>{try{await api('POST','logout');}catch(e){}setTok('');S.me=null;renderWho();location.hash='#tienda';};
 
 /* ---------- administración ---------- */
-$('#admSeg').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;S.admTab=b.dataset.a;renderAdmin();});
-function renderAdmin(){$$('#admSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===S.admTab));['stats','orders','bank','resets','users'].forEach(k=>$('#a-'+k).hidden=k!==S.admTab);
-  $('#notifBtn').hidden=!('Notification' in window)||Notification.permission==='granted';
+$('#admSeg').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;S.admTab=b.dataset.a;history.replaceState(null,'','#admin/'+S.admTab);renderAdmin();});
+function renderAdmin(){$$('#admSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===S.admTab));ADM_TABS.forEach(k=>$('#a-'+k).hidden=k!==S.admTab);
+  clearInterval(S.onT);if(S.admTab==='online'){admOnline();S.onT=setInterval(()=>{if(!$('#v-admin').hidden&&S.admTab==='online'&&!document.hidden)admOnline(true);},20000);}
+  if(S.admTab==='alerts')admAlerts();
   if(S.admTab==='stats')admStats();if(S.admTab==='orders')admOrders();if(S.admTab==='bank')admBank();if(S.admTab==='resets')admResets();if(S.admTab==='users')admUsers();}
-$('#notifBtn').onclick=async()=>{try{const p=await Notification.requestPermission();if(p==='granted'){toast('Avisos activados en este dispositivo');$('#notifBtn').hidden=true;}else toast('El navegador no permitió los avisos');}catch(e){toast('Este navegador no permite avisos');}};
+
+/* ---------- en línea: conectados ahora (servidor en vivo), entradas por día y picos ---------- */
+async function admOnline(quiet){const box=$('#admOnline');if(!quiet)box.innerHTML='<div class="empty">Cargando…</div>';
+  const n=x=>Number(x||0).toLocaleString('es-PY');
+  let live=null;try{const r=await fetch('/live/online',{cache:'no-store'});if(r.ok)live=await r.json();}catch(e){}
+  try{const r=await api('GET','admin/online');
+    const byDay=new Map(r.days.map(x=>[x.day,+x.n])),pk=new Map(r.peaks.map(x=>[x.day,+x.n]));
+    const dayList=[];for(let i=29;i>=0;i--)dayList.push(new Date(Date.now()-3*3600e3-i*864e5).toISOString().slice(0,10));
+    const mx=Math.max(1,...dayList.map(d=>Math.max(byDay.get(d)||0,pk.get(d)||0)));
+    const lbl=d=>new Date(d+'T12:00:00').toLocaleDateString('es-PY',{weekday:'short',day:'numeric',month:'short'});
+    const bars=dayList.map(d=>`<span style="flex:1;display:flex;gap:1px;align-items:flex-end;height:100%" title="${lbl(d)}: ${byDay.get(d)||0} entraron · pico ${pk.get(d)||0}"><i style="height:${Math.max(3,Math.round((byDay.get(d)||0)/mx*100))}%"></i><i class="pk" style="height:${Math.max(3,Math.round((pk.get(d)||0)/mx*100))}%"></i></span>`).join('');
+    const week=dayList.slice(-7).map(d=>`<div><b>${n(byDay.get(d))}</b><span>${lbl(d)} · pico ${n(pk.get(d))}</span></div>`).join('');
+    box.innerHTML=`
+      <div class="stat"><div class="k"><span class="live">Conectados ahora</span></div><div class="v">${live?n(live.n):'—'}</div><div class="s">${live?(live.n?'Se actualiza solo cada 20 segundos':'Nadie jugando en este momento'):'No se pudo consultar el servidor en vivo'}</div>${live&&live.names&&live.names.length?`<div class="names">${live.names.slice(0,40).map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}</div>
+      <div class="stat"><div class="k">Entraron hoy</div><div class="v">${n(byDay.get(r.today))}</div><div class="s">Cuentas distintas · pico de hoy: ${n(pk.get(r.today))} a la vez</div></div>
+      <div class="stat"><div class="k">Esta semana (7 días)</div><div class="v">${n(r.week)}</div><div class="s">Cuentas distintas · ${n(r.month)} en 30 días</div></div>
+      <div class="stat"><div class="k">Récord a la vez</div><div class="v">${n(r.record.n)}</div><div class="s">${r.record.t?'Desde el '+new Date(r.record.t).toLocaleString('es-PY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Todavía sin récord'}</div></div>
+      <div class="stat wide"><div class="k">Últimos 30 días</div><div class="bars two" style="gap:4px">${bars}</div><div class="legend"><span><b style="background:var(--gold)"></b>Entraron (cuentas distintas)</span><span><b style="background:var(--earth)"></b>Pico a la vez</span></div></div>
+      <div class="stat wide"><div class="k">Día por día (última semana)</div><div class="plats">${week}</div></div>
+      <div class="stat wide"><div class="k">Quiénes entraron hoy</div>${r.recent.length?`<div class="tablewrap"><table><thead><tr><th>Cuenta</th><th>Última entrada</th><th>Veces</th></tr></thead><tbody>${r.recent.map(x=>`<tr><td>${esc(x.name)}</td><td>${new Date(x.t).toLocaleTimeString('es-PY',{hour:'2-digit',minute:'2-digit'})}</td><td>${n(x.n)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="s" style="margin-top:8px">Todavía nadie hoy.</p>'}</div>
+      <p class="muted" style="grid-column:1/-1;font-size:.85rem">Las entradas se cuentan desde que se publicó esta función: los días anteriores no tienen datos.</p>`;
+  }catch(e){if(!quiet)box.innerHTML='<div class="empty">'+esc(e.message||'No se pudo cargar.')+'</div>';}}
+
+/* ---------- avisos al celular (push) ---------- */
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isApp=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const pushOk=()=>!!navigator.serviceWorker&&'PushManager' in window&&'Notification' in window;
+const u8=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0));};
+async function pushSub(){if(!pushOk())return null;const reg=await navigator.serviceWorker.getRegistration('/cuenta/');return reg?await reg.pushManager.getSubscription():null;}
+async function admAlerts(){const box=$('#pushBox'),tb=$('#pushTypes');box.innerHTML='<div class="empty">Cargando…</div>';tb.hidden=true;
+  let sub=null;try{sub=await pushSub();}catch(e){}
+  let info;try{info=await api('GET','admin/push'+(sub?'?ep='+encodeURIComponent(sub.endpoint):''));}catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>';return;}
+  S.pushInfo=info;const on=!!(sub&&info.sub&&Notification.permission==='granted');S.pushOn=on;$('#pushDot').hidden=!on;
+  const dev=info.devices?`<p class="muted" style="font-size:.9rem;margin-top:8px">Dispositivos con avisos: ${info.devices}.</p>`:'';
+  if(on){box.innerHTML=`<span class="eyebrow">Activados en este dispositivo</span><h2 style="margin-top:6px">Te avisamos al instante</h2><p class="muted" style="margin-top:6px">Elegí abajo qué avisos querés recibir acá. Llegan aunque la app esté cerrada.</p>
+      <div class="actions" style="margin-top:14px"><button class="btn btn-gold btn-sm" type="button" data-push="test">Mandar aviso de prueba</button><button class="btn btn-line btn-sm" type="button" data-push="sum">Probar resumen del día</button><button class="btn btn-no btn-sm" type="button" data-push="off">Desactivar acá</button></div>${dev}`;
+    const gr={};info.types.forEach(t=>(gr[t.g]=gr[t.g]||[]).push(t));
+    tb.innerHTML=`<h3>Qué avisos querés</h3><div class="tgroup">${Object.entries(gr).map(([g,l])=>`<h4>${esc(g)}</h4>`+l.map(t=>`<label class="tog"><span>${esc(t.name)}</span><input type="checkbox" data-pt="${t.id}" ${info.sub.prefs[t.id]!==false?'checked':''}></label>`).join('')).join('')}</div>`;tb.hidden=false;}
+  else if(!pushOk()&&isIOS&&!isApp()){box.innerHTML=`<span class="eyebrow">Paso previo en iPhone</span><h2 style="margin-top:6px">Agregá NOX Admin a tu inicio</h2><p class="muted" style="margin-top:6px">En iPhone los avisos solo funcionan desde la app agregada a la pantalla de inicio (iOS 16.4 o más).</p>
+      <ol class="steps" style="margin-top:14px"><li><span>Tocá el botón <b>Compartir</b> de Safari (el cuadrado con la flecha).</span></li><li><span>Elegí <b>Agregar a inicio</b> y después <b>Agregar</b>.</span></li><li><span>Abrí <b>NOX Admin</b> desde el inicio, entrá a <b>Avisos</b> y tocá <b>Activar avisos</b>.</span></li></ol>${dev}`;}
+  else if(!pushOk()){box.innerHTML=`<h2>Este navegador no recibe avisos</h2><p class="muted" style="margin-top:6px">Probá con Chrome, Edge o Safari actualizados.</p>${dev}`;}
+  else if(Notification.permission==='denied'){box.innerHTML=`<h2>Los avisos están bloqueados</h2><p class="muted" style="margin-top:6px">${isIOS?'Abrí Ajustes → Notificaciones → NOX Admin y activá “Permitir notificaciones”. Después volvé acá.':'Permitilos desde el candado de la barra de direcciones y recargá la página.'}</p>${dev}`;}
+  else{box.innerHTML=`<span class="eyebrow">Avisos al celular</span><h2 style="margin-top:6px">Enterate al instante</h2><p class="muted" style="margin-top:6px">Pedidos, pagos, cuentas nuevas, récords y problemas del servidor, aunque la app esté cerrada.</p><div class="actions" style="margin-top:14px"><button class="btn btn-gold" type="button" data-push="on">Activar avisos</button></div>${dev}`;}
+  admAlertLog();}
+async function admAlertLog(){const box=$('#pushLog');try{const r=await api('GET','admin/alerts');const TN=new Map((S.pushInfo?S.pushInfo.types:[]).map(t=>[t.id,t.name]));
+  box.innerHTML=r.rows.length?r.rows.map(x=>`<div class="alog"><span class="t">${when(x.t)}</span><div><b>${esc(x.title)}</b></div><p>${esc(x.body)}</p><p style="font-size:.8rem">${esc(TN.get(x.type)||x.type)} · ${x.sent?'llegó a '+x.sent+' dispositivo'+(x.sent===1?'':'s'):'sin dispositivos que lo reciban'}</p></div>`).join(''):'<div class="empty">Todavía no hubo avisos.</div>';}catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>';}}
+$('#pushBox').addEventListener('click',async e=>{const b=e.target.closest('[data-push]');if(!b)return;const a=b.dataset.push;b.disabled=true;
+  try{if(a==='on'){const p=await Notification.requestPermission();if(p!=='granted'){toast('No se permitieron los avisos');admAlerts();return;}
+      const reg=await navigator.serviceWorker.register('/cuenta/sw.js',{scope:'/cuenta/'});await navigator.serviceWorker.ready;
+      let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(S.pushInfo.key)});
+      await api('POST','admin/push',{sub:sub.toJSON()});toast('Avisos activados en este dispositivo');admAlerts();}
+    if(a==='test'||a==='sum'){const r=await api('POST','admin/push/test',a==='sum'?{type:'resumen'}:{});toast(r.sent?'Aviso enviado: debería llegarte en unos segundos':'No llegó a ningún dispositivo. Desactivá y volvé a activar.');setTimeout(admAlertLog,1500);}
+    if(a==='off'){const sub=await pushSub();if(sub){await api('POST','admin/push/off',{ep:sub.endpoint});await sub.unsubscribe();}toast('Avisos desactivados en este dispositivo');admAlerts();}
+  }catch(err){toast(err.message||'No se pudo');}finally{b.disabled=false;}});
+$('#pushTypes').addEventListener('change',async e=>{const c=e.target.closest('[data-pt]');if(!c)return;const prefs={};$$('#pushTypes [data-pt]').forEach(x=>prefs[x.dataset.pt]=x.checked);
+  try{const sub=await pushSub();await api('POST','admin/push/prefs',{ep:sub.endpoint,prefs});toast(c.checked?'Vas a recibir ese aviso':'Ese aviso ya no te llega acá');}catch(err){c.checked=!c.checked;toast(err.message||'No se pudo guardar');}});
+// al tocar una notificación con la app abierta, el service worker pide ir a esa pestaña
+if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.nav){const h=new URL(e.data.nav).hash;if(h){location.hash=h;route();}}});
 async function admStats(){const box=$('#admStats');box.innerHTML='<div class="empty">Cargando…</div>';
   try{const r=await api('GET','admin/stats');const U=r.users,D=r.downloads,G=r.github||{};const n=x=>Number(x||0).toLocaleString('es-PY');
     const PN={android:'Android',windows:'Windows',mac:'Mac (Apple)',macIntel:'Mac (Intel)',ios:'iPhone / iPad',web:'Navegador'};
@@ -439,12 +534,13 @@ $('#admUsers').addEventListener('click',async e=>{const p=e.target.closest('[dat
 async function admPoll(){if(!S.me||S.me.user.role!=='admin')return;try{const r=await api('GET','admin/pending');const n=r.orders+r.resets+(r.bank||0);const bd=$('#admBadge');bd.hidden=!n;bd.textContent=n;
     $('#admUpd').textContent='Actualizado '+new Date().toLocaleTimeString('es-PY',{hour:'2-digit',minute:'2-digit'});
     if(S.admLast&&r.latest>S.admLast&&n){const m=`${r.orders} pedido${r.orders===1?'':'s'} y ${r.resets} contraseña${r.resets===1?'':'s'} por revisar`;toast('Administración: '+m);
-      try{if('Notification' in window&&Notification.permission==='granted')new Notification('NOX · administración',{body:m,icon:'../img/icon-192.png'});}catch(e){}
+      try{if(!S.pushOn&&'Notification' in window&&Notification.permission==='granted')new Notification('NOX · administración',{body:m,icon:'../img/icon-192.png'});}catch(e){}
       if(!$('#v-admin').hidden)renderAdmin();}
     S.admLast=Math.max(S.admLast,r.latest||0);document.title=(n?'('+n+') ':'')+'NOX · Tienda Noxis y cuenta';}catch(e){}}
 let pollT=0;function startAdminPoll(){clearInterval(pollT);if(S.me&&S.me.user.role==='admin'){admPoll();pollT=setInterval(admPoll,30000);}}
 
-(async()=>{await loadMe();renderWho();startAdminPoll();route();})();
+(async()=>{await loadMe();renderWho();startAdminPoll();route();
+  if(S.me&&S.me.user.role==='admin'){try{const sub=await pushSub();S.pushOn=!!(sub&&Notification.permission==='granted');$('#pushDot').hidden=!S.pushOn;}catch(e){}}})();
 </script>
 <script>/* ojito para ver la contraseña: se agrega solo a cada campo de contraseña */
 (function(){const P='<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',S=a=>'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P+(a?'':'<path d="M3 3l18 18"/>')+'</svg>';

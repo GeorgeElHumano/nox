@@ -1,14 +1,10 @@
 {
- "build": "202611131943",
- "min": "202611131943",
- "title": "Sets de nivel 133 y 177",
+ "build": "202611161629",
+ "min": "202611161629",
+ "title": "Menús que se deslizan bien",
  "notes": [
-  "Dos sets nuevos para cada raza, los más fuertes del juego: nivel 133 y nivel 177, con piezas, armas, brillos y efectos nuevos.",
-  "Caballero: Tupã Ryapu y Ára Jára. Hechicero: Yvytu Ñe'ẽ y Mbyja Pytũ. Arquera: Mainumby Ruvicha e Ysyry Mimbi. Gladiador: Mbói Hovy e Ita Vera. Mburuvicha: Yaguareté-Abá e Y Jára.",
-  "El set de nivel 133 cae en los Saltos del Mbocaruzú y el de 177 en Salto Cristal, también en versión Excelente.",
-  "Sus versiones épicas caen solo en Cerro León y llevan una corona de luz violeta.",
-  "Los íconos de guantes ahora se ven grandes en todos los sets.",
-  "El set 7 de la Arquera se llama ahora «del Arapy» para no repetir nombre con el Caballero.",
-  "Arandu ya sabe dónde se consigue cada set nuevo."
+  "Todos los menús entran en la pantalla: ya se llega hasta el final de la lista (mapa y spots en PC, bolsa, ficha, tienda, misiones, ajustes y baúl).",
+  "Celular: la cabecera con la X queda pegada arriba, sin franja por donde pasaba el contenido.",
+  "Bolsa y baúl en el celular: deslizá el dedo sobre los objetos para recorrerlos. Para mover un objeto, mantenelo apretado un instante (se marca en dorado) o arrastralo de costado."
  ]
 }

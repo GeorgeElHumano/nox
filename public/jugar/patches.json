@@ -1,5 +1,41 @@
 [
  {
+  "build": "202611161629",
+  "title": "Menús que se deslizan bien",
+  "notes": [
+   "Todos los menús entran en la pantalla: ya se llega hasta el final de la lista (mapa y spots en PC, bolsa, ficha, tienda, misiones, ajustes y baúl).",
+   "Celular: la cabecera con la X queda pegada arriba, sin franja por donde pasaba el contenido.",
+   "Bolsa y baúl en el celular: deslizá el dedo sobre los objetos para recorrerlos. Para mover un objeto, mantenelo apretado un instante (se marca en dorado) o arrastralo de costado."
+  ]
+ },
+ {
+  "build": "202611161320",
+  "title": "Nombres de armas y escudos",
+  "notes": [
+   "Las armas y los escudos de los sets de nivel 133 y 177 ya muestran su nombre (antes decían «undefined»)"
+  ]
+ },
+ {
+  "build": "202611161256",
+  "title": "Rendimiento: el juego corre más fluido en celulares",
+  "notes": [
+   "Cuatro niveles de gráficos: Lite, Media, Alta y Ultra (Ajustes → Gráficos)",
+   "Alta ahora pesa mucho menos en celulares y se ve igual de bien",
+   "En automático el celular arranca en Media y sube solo a Alta si le sobra potencia",
+   "Asunción más fluida: los PNJ y la gente del ambiente consumen menos",
+   "El HUD y el minimapa usan menos batería"
+  ]
+ },
+ {
+  "build": "202611141634",
+  "title": "El aviso En vivo ya no tapa nada",
+  "notes": [
+   "El aviso «En vivo» queda siempre arriba de todo, en su propia franja",
+   "El nombre y la barra de los jefes, los avisos, la tarjeta de vida y el minimapa quedan debajo y ya no se pisan con él",
+   "Arreglado en PC y en celulares, de pie y acostados"
+  ]
+ },
+ {
   "build": "202611131943",
   "title": "Sets de nivel 133 y 177",
   "notes": [

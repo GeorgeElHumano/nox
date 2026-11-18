@@ -1,0 +1,16 @@
+{
+ "name": "NOX · Cuenta y administración",
+ "short_name": "NOX Admin",
+ "id": "/cuenta/",
+ "start_url": "/cuenta/?app=1",
+ "scope": "/cuenta/",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#0d0a09",
+ "theme_color": "#0d0a09",
+ "icons": [
+  { "src": "/img/nox-icon-192.png", "sizes": "192x192", "type": "image/png" },
+  { "src": "/img/nox-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+  { "src": "/img/nox-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+ ]
+}

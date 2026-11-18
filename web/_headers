@@ -11,3 +11,9 @@
   Cache-Control: no-cache
 /jugar/cache.json
   Cache-Control: no-store
+# Avisos del panel de administración: el service worker y el manifiesto se revisan siempre
+/cuenta/sw.js
+  Cache-Control: no-cache
+/cuenta/manifest.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: no-cache
