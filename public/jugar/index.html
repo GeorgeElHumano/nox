@@ -2243,13 +2243,16 @@ const petsOn=()=>C&&C.pets?PETK.filter(k=>C.pets[k]):[];
 const newPet=()=>({u:++UID,k:'pet',sub:pick(['imp','hada','rudolf']),n:1});
 function itemName(it){
   if(it.k==='pet')return PETS[it.sub].n;  if(it.k==='gem')return GEMS[it.sub].name;if(it.k==='pot')return POTS[it.sub].name;if(it.k==='scroll')return SCROLLS[it.sub].name;if(it.k==='quest')return QITEMS[it.sub].name;if(it.k==='mat')return MATS[it.sub]?MATS[it.sub].name:'Trofeo';
-  let n;if(it.uq&&UNIQ[it.uq])return(it.myth?'Mítico ':it.epic?'Épico ':'')+UNIQ[it.uq].n+(it.lv?' +'+it.lv:'');if(it.k==='weapon')n=WNAME[it.c][it.t]||(({hechicero:'Bastón',mburuvicha:'Cetro',arquera:'Arco'})[it.c]||'Espada')+' '+(SETN[it.c][it.t]||'');else if(it.k==='shield')n=SHNAME[it.t]||'Escudo '+(SETN.caballero[it.t]||'');else if(it.k==='wings')n=((it.g||1)>=3?WINGN3:(it.g||1)>=2?WINGN2:WINGN)[it.c];else n=SLOTN[it.c][it.k]+' '+SETN[it.c][it.t];
+  let n;if(it.uq&&UNIQ[it.uq])return(it.anc==='nox'?'NOX · ':it.myth?'Mítico ':it.epic?'Épico ':'')+UNIQ[it.uq].n+(it.lv?' +'+it.lv:'');if(it.k==='weapon')n=WNAME[it.c][it.t]||(({hechicero:'Bastón',mburuvicha:'Cetro',arquera:'Arco'})[it.c]||'Espada')+' '+(SETN[it.c][it.t]||'');else if(it.k==='shield')n=SHNAME[it.t]||'Escudo '+(SETN.caballero[it.t]||'');else if(it.k==='wings')n=((it.g||1)>=3?WINGN3:(it.g||1)>=2?WINGN2:WINGN)[it.c];else n=SLOTN[it.c][it.k]+' '+SETN[it.c][it.t];
   return(it.myth?'Mítico ':it.epic?'Épico ':it.anc?ANCS[it.anc].n+' · ':it.ex&&it.ex.length?'Excelente ':'')+n+(it.lv?' +'+it.lv:'');
 }
 function itemQ(it){if(!isEq(it))return 0;if(it.ex&&it.ex.length)return 3;if(it.lv>=7)return 2;if(it.lv>=4||it.luck||it.op)return 1;return 0;}
 const QCOL=['var(--q0)','var(--q1)','var(--q2)','var(--q3)'],QHEX=[0xefe9dc,0x7cb8ff,0xffcf57,0x63e08a];
 const RAR={normal:{n:'Común',c:'#efe9dc',h:0xefe9dc},opt:{n:'Con opciones',c:'#6ab8ff',h:0x4aa0ff},exc:{n:'Excelente',c:'#5cf08a',h:0x2dff6a},anc:{n:'Antiguo',c:'#ffc94a',h:0xffb02a},epic:{n:'Épico',c:'#c98cff',h:0xa452ff},uniq:{n:'Único',c:'#ff9a3c',h:0xff7a1a},myth:{n:'Mítico',c:'#ff4a6e',h:0xff2a52}};
-const ANCS={humaita:{n:'Humaitá',b:[[2,'Daño +6%'],[3,'Crítico +4%'],[4,'Daño +10%'],[5,'Velocidad de ataque +8%']]},cerrocora:{n:'Cerro Corá',b:[[2,'Defensa +8%'],[3,'Vida máxima +8%'],[4,'Defensa +12%'],[5,'Daño recibido −6%']]}};
+const ANCS={humaita:{n:'Humaitá',b:[[2,'Daño +6%'],[3,'Crítico +4%'],[4,'Daño +10%'],[5,'Velocidad de ataque +8%']]},cerrocora:{n:'Cerro Corá',b:[[2,'Defensa +8%'],[3,'Vida máxima +8%'],[4,'Defensa +12%'],[5,'Daño recibido −6%']]},
+ /* NOX: el conjunto de mayor rango. Solo lo forman las piezas únicas míticas y las reliquias de los jefes del Cerro Tres Kandú */
+ nox:{n:'NOX',b:[[2,'Daño +8%'],[3,'Defensa +10% y vida máxima +8%'],[4,'Daño +12% y crítico +5%'],[5,'Velocidad de ataque +10% y daño recibido −8%']]}};
+const ANCK=['humaita','cerrocora'];/* los antiguos que salen al azar; NOX no */
 function itemR(it){if(!isEq(it))return 'normal';if(it.myth)return 'myth';if(it.epic)return 'epic';if(it.uq)return 'uniq';if(it.anc)return 'anc';if(it.ex&&it.ex.length)return 'exc';if(it.luck||it.op)return 'opt';return 'normal';}
 function itemColor(it){if(it.k==='pet')return PETS[it.sub].col;if(it.k==='gem')return GEMS[it.sub].col;if(it.k==='mat')return MATS[it.sub]&&MATS[it.sub].rare?'#ffb04a':'#e8d8b8';if(it.k==='quest')return 'var(--q2)';if(it.k==='pot')return POTS[it.sub].kind==='hp'?'#ff8a7a':'#8ec2ff';const r=itemR(it);if(r==='normal')return QCOL[itemQ(it)];return RAR[r].c;}
 function iconOf(it){return it.k==='weapon'?'weapon_'+it.c:it.k==='pet'?'pet':it.k;}
@@ -2301,8 +2304,8 @@ function recalc(){
   else if(cls==='mburuvicha'){maxHP=55+s.vit*2.4+L*2.6;maxMP=25+s.ene*1.4+L*1.2;min=s.ene/7+s.fue/16+wmin;max=s.ene/4.5+s.fue/10+wmax;def=s.agi/4;}
   else if(cls==='hechicero'){maxHP=40+s.vit*2+L*2;maxMP=40+s.ene*2+L*2;min=s.ene/8+wmin;max=s.ene/4+wmax;def=s.agi/4+s.fue/12;}
   else{maxHP=50+s.vit*2+L*2.5;maxMP=20+s.ene*1.5+L*1.5;min=s.fue/14+s.agi/7+wmin;max=s.fue/8+s.agi/4+wmax;def=s.agi/10;}
-  const ah=anc.humaita||0,ac=anc.cerrocora||0;let ancDmg=1,ancCrit=0,ancSpd=1,ancDr=0;if(ah>=2)ancDmg*=1.06;if(ah>=3)ancCrit=.04;if(ah>=4)ancDmg*=1.1;if(ah>=5)ancSpd=1.08;
-  def+=defArm+wingDef;if(ex.defr)def*=1+.1*ex.defr;if(ac>=2)def*=1.08;if(ac>=3)maxHP*=1.08;if(ac>=4)def*=1.12;if(ac>=5)ancDr=.06;
+  const ah=anc.humaita||0,ac=anc.cerrocora||0,an=anc.nox||0;let ancDmg=1,ancCrit=0,ancSpd=1,ancDr=0;if(an>=2)ancDmg*=1.08;if(an>=4){ancDmg*=1.12;ancCrit+=.05;}if(an>=5){ancSpd*=1.1;ancDr+=.08;}if(ah>=2)ancDmg*=1.06;if(ah>=3)ancCrit+=.04;if(ah>=4)ancDmg*=1.1;if(ah>=5)ancSpd*=1.08;
+  def+=defArm+wingDef;if(ex.defr)def*=1+.1*ex.defr;if(ac>=2)def*=1.08;if(ac>=3)maxHP*=1.08;if(ac>=4)def*=1.12;if(ac>=5)ancDr+=.06;if(an>=3){def*=1.1;maxHP*=1.08;}
   const set=setOK&&setT>=0;if(set){def*=1.1;if(setLv>=10)def*=1.05;}
   if(ex.hp)maxHP*=1+.04*ex.hp;if(ex.mp)maxMP*=1+.04*ex.mp;
   if(P.buffs.vida>0)maxHP*=1.25;if(P.buffs.def>0)def+=10+s.ene/6;
@@ -3368,6 +3371,9 @@ const LOOTCH={mat:.22,rare:.025,uq:.006,uqe:.0008};
 /* reliquias del Cerro Tres Kandú: un arma mítica del último set con el nombre de cada jefe; solo la deja ese jefe */
 const RELIQ={kurupirv:['Furia del Kurupí','Guarda la fuerza del señor del monte.'],aoaorv:['Embestida del Ao Ao','Nadie queda en pie cuando arremete la manada.'],monairv:['Colmillo del Moñái','Todavía gotea veneno.'],jasyjatererv:['Bastón de oro del Jasy Jateré','El que lo empuña manda sobre la siesta.'],anabossrv:['Ira de Añá','Arde sin quemar la mano de su dueño.'],yaguaretabarv:['Garra del Yaguareté-Abá','El chamán que se volvió fiera la afiló con su propia sangre.'],yjararv:['Corriente del Y Jára','El agua de todos los saltos corre por su filo.'],taurv:['Legado de Tau','El arma del padre de los siete. No hay otra más fuerte en el reino.']};
 for(const id in RELIQ)UNIQ['reliq_'+id]={k:'weapon',n:RELIQ[id][0],d:RELIQ[id][1],mob:id,t:9,reliq:1};
+/* piezas del conjunto NOX: una por jefe, repartidas para que se puedan juntar las cinco partes de la armadura (más la reliquia, seis). El Gladiador no usa casco: recibe la pieza alternativa */
+const NOXP={kurupirv:['pants','Calzas del Kurupí'],aoaorv:['boots','Botas del Ao Ao'],monairv:['gloves','Guanteletes del Moñái'],jasyjatererv:['helm','Corona de la Siesta','gloves','Brazales de la Siesta'],anabossrv:['armor','Coraza de Añá'],yaguaretabarv:['gloves','Zarpas del Yaguareté-Abá'],yjararv:['armor','Coraza del Y Jára'],taurv:['helm','Corona de Tau','armor','Coraza de Tau']};
+for(const id in NOXP){const q=NOXP[id];UNIQ['nox_'+id]={k:q[0],n:q[1],d:'Pieza del conjunto NOX, el de mayor rango del reino.',mob:id,t:9};if(q[2])UNIQ['nox_'+id+'_g']={k:q[2],n:q[3],d:'Pieza del conjunto NOX, el de mayor rango del reino.',mob:id,t:9};};
 const OAD_BEAST={aguara:{f:'b_aguara',len:1.95,ts:{walk:1.4,run:1.15}},luison:{f:'b_luison',len:2.2,ts:{walk:1.4,run:1.15},eye:0xff2a12},
  taitetu:{f:'b_taitetu',len:1.3,ts:{walk:.7,run:.85}},jaguarete:{f:'b_jaguarete',len:2.35,ts:{walk:1.9,run:3.2}},
  teju:{f:'b_teju',len:3.1,ts:{walk:1.3,run:1.5},eye:0xff3a1a},aoao:{f:'b_aoao',len:2.7,ts:{walk:1.1,run:1.05},eye:0xff2a12,horns:1},
@@ -7103,7 +7109,7 @@ function rewardKill0(e,S){if(!S||(!S.xp&&!S.quest&&!S.top))return;
   /* pieza única de la bestia (la de su versión común), pero del set t; opcionalmente mítica */
   const uniqOf=(t,myth)=>{const D=LOOTDEF[e.def.base||e.type];if(!D||!D[2])return rollEquip(L,0,myth?0:1,0,t,myth);const U=UNIQ[D[2][0]];const it=newEquip(C.cls,U.k,t,myth?{lv:RI(6,9),luck:true,op:3,ex:randomEx(U.k,3),myth:true}:{lv:RI(3,6),luck:true,op:RI(1,2),ex:randomEx(U.k,2)});it.uq=D[2][0];return it;};
   if(ztk){/* Cerro Tres Kandú: cada jefe deja una pieza mítica del último set; a veces su pieza única mítica y, más raro, su reliquia */
-    if(boss){rare(rollEquip(L,0,0,0,9,true));if(Math.random()<.3)rare(uniqOf(9,true));if(Math.random()<.12&&UNIQ['reliq_'+e.type]){const it=newEquip(C.cls,'weapon',9,{lv:RI(7,9),luck:true,op:3,ex:randomEx('weapon',3),myth:true});it.uq='reliq_'+e.type;rare(it);}}
+    if(boss){rare(rollEquip(L,0,0,0,9,true));if(Math.random()<.3&&UNIQ['nox_'+e.type]){const id='nox_'+e.type+(C.cls==='gladiador'&&UNIQ['nox_'+e.type+'_g']?'_g':''),U=UNIQ[id];const it=newEquip(C.cls,U.k,9,{lv:RI(6,9),luck:true,op:3,ex:randomEx(U.k,3),myth:true,anc:'nox'});it.uq=id;rare(it);}if(Math.random()<.12&&UNIQ['reliq_'+e.type]){const it=newEquip(C.cls,'weapon',9,{lv:RI(7,9),luck:true,op:3,ex:randomEx('weapon',3),myth:true,anc:'nox'});it.uq='reliq_'+e.type;rare(it);}}
   }else if(zgu){/* Saltos del Guairá: míticos y únicos de los sets 133 y 177, y antiguos, únicos y épicos del último set */
     if(Math.random()<(boss?1:gold?.4:eli?.25:.05)){const r=Math.random(),t78=Math.random()<.3?7:8;rare(r<.3?uniqOf(t78):r<.5?rollEquip(L,0,0,0,t78,true):r<.75?(()=>{let it;for(let i=0;i<8;i++){it=rollEquip(L,0,0,1,9);if(it.anc)break;}return it;})():r<.9?uniqOf(9):rollEquip(L,0,1,0,9));}
   }else if(zym){/* Cerro León: épicos de los sets 133 y 177 (rarísimos) y, aparte, el último set en versión común o Excelente */
@@ -7118,7 +7124,7 @@ function rollEquip(L,exCh,epCh,anCh,tFix,myth){
   const k=pick(ks),t=tFix!=null?tFix:L<12?0:L<24?1:L<38?2:L<52?3:L<70?4:L<88?5:6;const lv=RI(0,Math.min(4,Math.floor(L/14)));
   if(myth)return newEquip(cls,k,t,{lv:RI(6,9),luck:true,op:3,ex:randomEx(k,3),myth:true});
   if(Math.random()<(epCh||0))return newEquip(cls,k,t,{lv:Math.min(9,lv+RI(3,5)),luck:true,op:RI(2,3),ex:randomEx(k,RI(2,3)),epic:true});
-  if(k!=='weapon'&&k!=='shield'&&Math.random()<(anCh||0))return newEquip(cls,k,t,{lv:lv+RI(1,3),luck:Math.random()<.4,op:RI(1,2),anc:pick(Object.keys(ANCS))});
+  if(k!=='weapon'&&k!=='shield'&&Math.random()<(anCh||0))return newEquip(cls,k,t,{lv:lv+RI(1,3),luck:Math.random()<.4,op:RI(1,2),anc:pick(ANCK)});
   const ex=Math.random()<exCh?randomEx(k,Math.random()<.3?2:1):[];
   return newEquip(cls,k,t,{lv,luck:Math.random()<.2,op:Math.random()<.15?1:0,ex});
 }
@@ -7616,7 +7622,7 @@ function evTick(dt){const E=EV;if(!E||!Z.event||P.dead)return;E.t+=dt;
     for(const e of evAlive())if(Math.hypot(e.p.x,e.p.z)>E.floorR+.6){e.hp=0;killMob(e);}
     if(Math.hypot(P.x,P.z)>E.floorR+.3){P.hp-=DS.maxHP*.2*dt;P.lastHurt=T;if(Math.random()<dt*8)parts(P.x,H(P.x,P.z)+.3,P.z,{n:3,col:0xff6a1a,spd:1.5,up:2,grav:-1,life:.6,size:.25});if(P.hp<=0){P.hp=0;die();return;}}
     const n=E.total-E.kills;evHud('Arena de Añá',`Rivales: <em>${n}</em> / ${E.total} · ${mmss(left)}${Math.hypot(P.x,P.z)>E.floorR?' · <em style="color:#ff7a5a">¡Estás en la lava!</em>':''}`);
-    if(E.kills>=E.total){const ks=['helm','armor','pants','gloves','boots'],it=newEquip(C.cls,pick(ks),evTier(),{lv:RI(3,6),luck:true,op:RI(1,2),anc:pick(Object.keys(ANCS))});evGive(it);const g=Math.round(C.L*2500/10)*10;C.gold+=g;gainXP(Math.round(xpNeed(C.L)*.3));
+    if(E.kills>=E.total){const ks=['helm','armor','pants','gloves','boots'],it=newEquip(C.cls,pick(ks),evTier(),{lv:RI(3,6),luck:true,op:RI(1,2),anc:pick(ANCK)});evGive(it);const g=Math.round(C.L*2500/10)*10;C.gold+=g;gainXP(Math.round(xpNeed(C.L)*.3));
       evFinish(true,`Ganaste ${itemName(it)} y ₲ ${fmt(g)}`);persist();}
     else if(left<=0)evFinish(false,'Se acabó el tiempo: la arena te expulsa.');return;}
   /* Fortaleza de Tuguy */
@@ -7630,7 +7636,7 @@ function evTick(dt){const E=EV;if(!E||!Z.event||P.dead)return;E.t+=dt;
       E.spear=glowSprite(0xffd76a,1.2,.95);scene.add(E.spear);}}
   if(E.phase==='p3'){if(E.spear)E.spear.position.set(P.x,H(P.x,P.z)+2.9+Math.sin(T*3)*.1,P.z);evHud('Fortaleza de Tuguy',`Llevá el Arma de Tupã al altar · ${mmss(left)}`);
     if(Math.hypot(P.x,P.z+36)<3.6){if(Z.evAltar){Z.evAltar.on=1;ringFx(0,-36,0xffd76a,5,1);}takeItem('quest','arma_tupa',1);if(E.spear){scene.remove(E.spear);E.spear=null;}const g=Math.round(C.L*3500/10)*10;C.gold+=g;gainXP(Math.round(xpNeed(C.L)*.35));
-      const gems=[pick(['tupa','jasy']),pick(['tupa','jasy','yvy','kerana'])];gems.forEach(x=>evGive(stackItem('gem',x,1)));let extra='';if(Math.random()<.4){const ks=['helm','armor','pants','gloves','boots'],it=newEquip(C.cls,pick(ks),evTier(),{lv:RI(2,5),luck:true,op:RI(1,2),anc:pick(Object.keys(ANCS))});evGive(it);extra=` y ${itemName(it)}`;}
+      const gems=[pick(['tupa','jasy']),pick(['tupa','jasy','yvy','kerana'])];gems.forEach(x=>evGive(stackItem('gem',x,1)));let extra='';if(Math.random()<.4){const ks=['helm','armor','pants','gloves','boots'],it=newEquip(C.cls,pick(ks),evTier(),{lv:RI(2,5),luck:true,op:RI(1,2),anc:pick(ANCK)});evGive(it);extra=` y ${itemName(it)}`;}
       evFinish(true,`El Arcángel te premia: ₲ ${fmt(g)}, 2 gemas${extra}`);persist();}}
   if(left<=0&&E.phase!=='end'){if(E.spear){scene.remove(E.spear);E.spear=null;}takeItem('quest','arma_tupa',1);evFinish(false,'Se acabó el tiempo: la fortaleza se cierra.');}}
 /* (16/11) el HUD escribe en la página solo lo que cambió: cada escritura obliga al navegador a recalcular estilos (medido: 1,5-2,6 ms por cuadro en un iPhone 12) */
@@ -7691,7 +7697,7 @@ function itemCard(it,ctx,tip){if(!tip)ICTX=ctx;const L=[];const iu=iconURL(it);i
   if(it.op)L.push(`<div class="it-l op">Opción adicional +${it.op*4} ${it.k==='weapon'?'de daño':'de defensa'}</div>`);
   if(it.myth)L.push(`<p class="it-d" style="color:#ff4a6e">${MYTHTXT}</p>`);
   (it.ex||[]).forEach(o=>L.push(`<div class="it-l ex">${EXN[o]}</div>`));if(it.epic)L.push(`<div class="it-l ep">Épico: daño y defensa base +20%</div>`);
-  if(it.anc){const A=ANCS[it.anc],have=ctx&&ctx.src==='mate'?mateAnc(it.anc):(DS&&DS.anc&&DS.anc[it.anc])||0;L.push(`<div class="it-l an">Conjunto antiguo de ${A.n} (${have} puesto${have===1?'':'s'})</div>`);A.b.forEach(([n,t])=>L.push(`<div class="it-l an ${have>=n?'':'off'}">${n} piezas: ${t}</div>`));}
+  if(it.anc){const A=ANCS[it.anc],have=ctx&&ctx.src==='mate'?mateAnc(it.anc):(DS&&DS.anc&&DS.anc[it.anc])||0;L.push(`<div class="it-l an">${it.anc==='nox'?'Conjunto NOX':'Conjunto antiguo de '+A.n} (${have} puesto${have===1?'':'s'})</div>`);A.b.forEach(([n,t])=>L.push(`<div class="it-l an ${have>=n?'':'off'}">${n} piezas: ${t}</div>`));}
   if(isEq(it)&&!(ctx&&ctx.src==='mate')){const r=reqOf(it);const own=C.cls===it.c;L.push(`<div class="it-l req ${own?'':'bad'}">Clase: ${CLASSES[it.c].name}</div><div class="it-l req ${C.L<r.lvl?'bad':''}">Nivel ${r.lvl}</div>`);if(r.stat)L.push(`<div class="it-l req ${C.st[r.main]<r.stat?'bad':''}">${STATN[r.main]} ${r.stat}</div>`);}
   const sp=sellPrice(it);if(sp)L.push(`<div class="it-l req">Valor de venta: ₲ ${fmt(sp)}</div>`);
   if(tip)return L.filter(x=>!/^<img/.test(x)).join('');
