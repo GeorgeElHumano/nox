@@ -1,10 +1,10 @@
 {
- "build": "202611161629",
- "min": "202611161629",
- "title": "Menús que se deslizan bien",
+ "build": "202611181710",
+ "min": "202611181710",
+ "title": "Cascos sin pelo atravesado",
  "notes": [
-  "Todos los menús entran en la pantalla: ya se llega hasta el final de la lista (mapa y spots en PC, bolsa, ficha, tienda, misiones, ajustes y baúl).",
-  "Celular: la cabecera con la X queda pegada arriba, sin franja por donde pasaba el contenido.",
-  "Bolsa y baúl en el celular: deslizá el dedo sobre los objetos para recorrerlos. Para mover un objeto, mantenelo apretado un instante (se marca en dorado) o arrastralo de costado."
+  "El pelo ya no atraviesa los cascos en ningún set de ninguna raza.",
+  "Mburuvicha: los cascos Yaguareté-Abá e Y Jára quedan sobre las cejas y las vinchas rodean el pelo.",
+  "Hechicero: capuchas más altas, mitra y corona de estrellas bien apoyadas."
  ]
 }

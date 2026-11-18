@@ -672,11 +672,11 @@ Noxis es la moneda de pago (1 Noxis = 10 Gs). Solo compra cosméticos y servicio
 - Franja reservada: con el aviso visible, `body` redefine `--st` = borde seguro + 24 px (`body.lvOn` y `body:has(#hud:not([hidden]) #liveSt:not([hidden]))`). Todo lo anclado arriba con `--st` (tarjeta de vida `.hud-l`, minimapa, `#tf`, `#toasts`, `#evHud`, `#duelHud`, `#bigNotes`, invitaciones) baja 24 px solo. `liveUI` pone/saca `lvOn`; `showSelect` la saca.
 - Medido (puppeteer, jefe falso en `P.target` y avisos en `#toasts`) en 1280×720, 844×390, 390×844, 667×375 y 375×667: el aviso no choca con nada.
 
-## Cascos de domo del Mburuvicha (18/11; SIN publicar)
+## Cascos sin pelo atravesado (18/11; publicado en el parche 202611181710, con fotos de sets de Mburuvicha, Hechicero y Arquera en la web)
 - Captura del dueño: en el casco Yaguareté-Abá (`helm:'jaguar'`, set 7) el pelo blanco atravesaba el domo y el domo bajaba hasta la nariz. Lo mismo en Y Jára (`bloodmoon`, set 8).
 - `forgeHelm`: para esos dos (`big`), con la línea de cejas conocida el centro `y0` se pone a la altura de las cejas (el borde del domo queda justo arriba de los ojos) sin achicar el radio; no usan `fit` (ese ajuste achica el domo al cráneo y el pelo largo queda afuera).
 - `helmHairCut(body,yW)` (se llama en `forgeApply` al poner esos cascos): quita de las mallas `slot==='hair'` los triángulos por encima de las cejas. Usa la posición con piel (`boneTransform`): el pelo viene de otro archivo y con `matrixWorld` solo quedaba 7 cm corrido.
-- Segunda pasada, todos los sets y las cinco razas (18/11; SIN publicar):
+- Segunda pasada, todos los sets y las cinco razas (18/11):
   - `helmBig(S,cls)`: lista de cascos de domo/gorro que usan el modo `big` (cortar pelo sobre las cejas + borde a la altura de las cejas): `jaguar`, `bloodmoon`, `mitre`, `starcrown` del Hechicero y `crown` de Hechicero/Mburuvicha/Arquera.
   - `helmHairFit(body,at,h,U,top,brow,S)`: para el resto (vinchas, aros, diademas). Mide el pelo (sin barba) a la altura del aro y ensancha el grupo del casco (`scale.x/z`, tope 1.45, margen 1.04) para que lo rodee en vez de cortarlo. Si el pelo es corto no cambia nada (Caballero y Gladiador quedaron igual).
   - `raven`: pico y gemas más arriba y adelante. `hood` y `sigilhood` (Hechicero sets 1 y 7): esfera más alta y adelantada, el pelo de la frente asomaba por el borde.
