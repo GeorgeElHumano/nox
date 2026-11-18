@@ -32,7 +32,7 @@ export class Sim {
     let hp = mobStats(lvl, boss, o.golden); if (elite) hp = Math.round(hp * 3.2); if (o.hpMul) hp = Math.round(hp * o.hpMul);
     const m = { n: ++this.nid, type, x, z, ry: Math.random() * TAU, hp, max: hp, dead: false, deadT: 0, golden: !!o.golden, elite, summon: !!o.summon, spot: o.spot || null,
       hx: x, hz: z, cx: x, cz: z, aggro: o.aggro || 0, atkCD: R(0, 1), wx: x, wz: z, wanderT: R(0, 3), ret: false, contrib: {}, ln: 0, boss, lvl, lvlO: o.lvl || 0,
-      speed: def.sp, ag: o.ag || def.ag, respawn: o.respawn || (boss ? 150 : o.golden ? 6 : 12), bcd: 3, rot: 0, stun: 0, dash: null, enraged: false, born: 0 };
+      speed: def.sp, ag: o.ag || def.ag, respawn: o.respawn || def.rsp || (boss ? 150 : o.golden ? 6 : 12), bcd: 3, rot: 0, stun: 0, dash: null, enraged: false, born: 0 };
     this.mobs.push(m); return m;
   }
   spawnZone() {
@@ -70,7 +70,7 @@ export class Sim {
     for (let i = this.pend.length - 1; i >= 0; i--) if (this.pend[i].at <= this.t) { const p = this.pend.splice(i, 1)[0]; try { p.fn(); } catch (e) {} }
     const alive = players.filter(p => p.p && !p.p.d);
     // invasión dorada cada 4 minutos cerca de alguien
-    if (!this.raid && alive.length) { this.goldT -= dt; if (this.goldT <= 0) { this.goldT = 240; const sp = (this.Z.spots || [])[0]; if (sp) { const p = alive[Math.floor(Math.random() * alive.length)].p; const a = Math.random() * TAU, r = R(18, 35); let x = Math.max(-108, Math.min(108, p.x + Math.cos(a) * r)), z = Math.max(-108, Math.min(108, p.z + Math.sin(a) * r)); if (inLake(this.Z, x, z, 3)) { x = this.Z.spawn[0] + 20; z = this.Z.spawn[1] + 20; } this.add(sp.m, x, z, { golden: true }); this.emit({ t: 'sys', m: '¡Invasión dorada! Apareció un ' + MOBS[sp.m].n + ' Dorado cerca' }); } } }
+    if (!this.raid && alive.length) { this.goldT -= dt; if (this.goldT <= 0) { this.goldT = 240; const sp = (this.Z.spots || [])[0]; if (sp && !MOBS[sp.m].boss) { const p = alive[Math.floor(Math.random() * alive.length)].p; const a = Math.random() * TAU, r = R(18, 35); let x = Math.max(-108, Math.min(108, p.x + Math.cos(a) * r)), z = Math.max(-108, Math.min(108, p.z + Math.sin(a) * r)); if (inLake(this.Z, x, z, 3)) { x = this.Z.spawn[0] + 20; z = this.Z.spawn[1] + 20; } this.add(sp.m, x, z, { golden: true }); this.emit({ t: 'sys', m: '¡Invasión dorada! Apareció un ' + MOBS[sp.m].n + ' Dorado cerca' }); } } }
     // la sala de Añaretã se consume si tardan demasiado
     if (this.raid && this.raidStart && this.t - this.raidStart > RAID_TIME) { this.doomT = (this.doomT || 0) - dt; if (this.doomT <= 0) { this.doomT = 3; const b = this.mobs.find(m => m.raidBoss && !m.dead); if (b) this.tele(b, 'doom', { t: 'circle', r: 60 }, b.x, b.z, 2, 8); } }
 
@@ -80,7 +80,7 @@ export class Sim {
         m.deadT += dt;
         if (m.deadT > m.respawn) {
           if (m.golden || m.summon || m.raidBoss) { this.mobs.splice(i, 1); continue; }
-          const q = m.boss ? [this.Z.boss ? this.Z.boss[1] : m.cx, this.Z.boss ? this.Z.boss[2] : m.cz] : m.spot ? spotPoint(this.Z, m.spot) : [m.cx, m.cz];
+          const q = m.spot ? (m.boss ? [m.spot.x, m.spot.z] : spotPoint(this.Z, m.spot)) : m.boss ? [this.Z.boss ? this.Z.boss[1] : m.cx, this.Z.boss ? this.Z.boss[2] : m.cz] : [m.cx, m.cz];
           Object.assign(m, { x: q[0], z: q[1], hx: q[0], hz: q[1], hp: m.max, dead: false, deadT: 0, aggro: 0, ret: false, contrib: {}, add1: 0, add2: 0, enraged: false, speed: MOBS[m.type].sp, born: this.t, stun: 0, dash: null });
           if (m.boss) this.emit({ t: 'sys', m: MOBS[m.type].n + ' volvió a aparecer' });
         }

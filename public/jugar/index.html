@@ -2038,6 +2038,16 @@ const YMAG=[['aguara',210],['taitetu',220],['jaguarete',230],['luison',240],['es
 const YMAG_K={dmg:2.5,df:2.3,xp:2};/* medido con AUTO 2 min y pociones: sin reinicios 0 cazas; con 5, de 5 a 12 en los spots 210-250; el de 300 pide 8 o más */
 YMAG.forEach(([b,lvl])=>{const d=MOBS[b];MOBS[b+'ym']=Object.assign({},d,{name:d.name+' Ymaguare',lvl,base:b,k:YMAG_K,scale:+(d.scale*1.22).toFixed(2),speed:+(d.speed+.4).toFixed(1),aggro:13,
   ficha:`${d.name} Ymaguare («de antes»): la misma bestia que se conoce en el resto del reino, pero antigua. Vive en Cerro León, en lo hondo del Chaco; es más grande, pega mucho más fuerte y tiene el cuero tan duro que las armas comunes casi no le entran. Solo los héroes que renacieron varias veces le hacen frente.`});});
+/* Saltos del Guairá (10 reinicios): las 18 bestias que no están en Cerro León, una por spot */
+const YPYK=[['alma',304],['kaajary',308],['ypo',312],['yaguaru',316],['pora',320],['tejuguasu',324],['kuarahyjara',328],['soldado',332],['siervo',336],['guardian',340],['ypora',344],['jaguahu',348],['mboihovy',352],['tejuhu',356],['ypovera',360],['yaguaruvera',364],['mboiitavera',368],['itajara',372]];
+const YPYK_K={dmg:6,df:3,xp:3};
+YPYK.forEach(([b,lvl])=>{const d=MOBS[b];MOBS[b+'yk']=Object.assign({},d,{name:d.name+' Ypykue',lvl,base:b,k:YPYK_K,scale:+(d.scale*1.28).toFixed(2),speed:+(d.speed+.5).toFixed(1),aggro:14,
+  ficha:`${d.name} Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.`});});
+/* Cerro Tres Kandú (20 reinicios): los ocho jefes del reino, cada uno en su guarida */
+const RUVI=[['kurupi',400],['aoao',410],['monai',420],['jasyjatere',430],['anaboss',440],['yaguaretaba',450],['yjara',460],['tau',470]];
+const RUVI_K={dmg:8,df:3.4,xp:4};
+RUVI.forEach(([b,lvl])=>{const d=MOBS[b];MOBS[b+'rv']=Object.assign({},d,{name:d.name+' Ruvicha',lvl,base:b,k:RUVI_K,rsp:600,scale:+(d.scale*1.15).toFixed(2),speed:+(d.speed+.4).toFixed(1),aggro:16,
+  ficha:`${d.name} Ruvicha («el jefe»): ${d.name} en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.`});});
 const mobBase=t=>(MOBS[t]&&MOBS[t].base)||t;
 function mobStats(def,golden){const L=def.lvl;let hp=15+L*10+L*L*.55,dmg=4+L*1.15,df=L*.55,xp=Math.pow(L,1.4)*8;
   if(def.k){dmg*=def.k.dmg||1;df*=def.k.df||1;xp*=def.k.xp||1;}
@@ -2105,7 +2115,7 @@ const ZONES={
    sky:{hor:0xd0f0ea,mid:0x9ad8d0,top:0x2a8ab0,sun:[-.35,.75,.5],sunCol:0xfff8e8,sunI:1.8,hemiS:0xe0fff8,hemiG:0x2a4a2a,hemiI:.9,fog:[32,150],exp:1.05}},
  /* último mapa: el macizo de Cerro León, en el Parque Nacional Defensores del Chaco. Las bestias del reino, ya viejas, se juntan acá.
     Se entra desde el nivel 30 (pedido del dueño: después de reiniciar se vuelve pronto), pero va último en la lista. rst = reinicios recomendados (aviso al entrar); hills = [x,z,radio,alto] lomas del macizo */
- cerroleon:{name:'Cerro León',sub:'Defensores del Chaco, Alto Paraguay',lvl:30,rst:5,cost:800000,spawn:[0,4],portals:[[0,-5,'saltocristal']],flat:9,amp:3.2,
+ cerroleon:{name:'Cerro León',sub:'Defensores del Chaco, Alto Paraguay',lvl:30,rst:5,cost:800000,spawn:[0,4],portals:[[0,-5,'saltocristal'],[-40,70,'saltosguaira']],flat:9,amp:3.2,
    hills:[[70,-72,34,13],[-74,70,30,10],[84,84,24,8],[-4,-40,15,3.5]],
    spots:[{n:'Cañadón de los Aguara',m:'aguaraym',x:-30,z:34,r:10,c:5,deco:'bones'},{n:'Aguada de los Taitetu',m:'taitetuym',x:32,z:36,r:10,c:5,deco:'mud'},
      {n:'Quebrachal del Jaguareté',m:'jaguareteym',x:64,z:4,r:10,c:5,deco:'rocks'},{n:'Hondonada de los Luisones',m:'luisonym',x:-66,z:8,r:10,c:5,deco:'bones'},
@@ -2114,9 +2124,34 @@ const ZONES={
      {n:'Quemazón del Mbói Tata',m:'mboijaguaym',x:-76,z:-70,r:10,c:5,deco:'sand'},{n:'Falda del Cerro León',m:'malavisionym',x:22,z:-80,r:10,c:5,deco:'graves'}],
    clouds:.3,
    ground:{a:0xa8683e,b:0x84502e,g:0x7a7a38,g2:0x5a5a2a,grass:.35},
-   sky:{hor:0xf0d2a4,mid:0xdcb494,top:0x54689e,sun:[-.55,.42,-.6],sunCol:0xffdcb0,sunI:1.9,hemiS:0xe8dccc,hemiG:0x6a4a30,hemiI:.85,fog:[44,175],exp:.98}}
+   sky:{hor:0xf0d2a4,mid:0xdcb494,top:0x54689e,sun:[-.55,.42,-.6],sunCol:0xffdcb0,sunI:1.9,hemiS:0xe8dccc,hemiG:0x6a4a30,hemiI:.85,fog:[44,175],exp:.98}},
+ /* Saltos del Guairá: las Siete Caídas que quedaron bajo el agua de Itaipú en 1982; acá vuelven a rugir. Herradura de siete saltos sobre un pozo hondo */
+ saltosguaira:{name:'Saltos del Guairá',sub:'Canindeyú, las Siete Caídas',lvl:30,rst:10,cost:1500000,spawn:[0,4],portals:[[0,-5,'cerroleon'],[-40,70,'treskandu']],flat:10,amp:3.6,lake:[0,-62,28],lakeCol:0x2a6a6e,
+   falls7:{cx:0,cz:-62,r:29.5,n:7},
+   spots:[{n:'Orilla de las Almas',m:'almayk',x:36,z:18,r:9,c:3,deco:'graves'},{n:"Monte de Ka'a Jarýi",m:'kaajaryyk',x:-56,z:20,r:9,c:3,deco:'nest'},
+     {n:'Remanso del Ypo',m:'ypoyk',x:-44,z:-14,r:9,c:3,deco:'mud'},{n:'Barranca del Yaguarú',m:'yaguaruyk',x:44,z:-18,r:9,c:3,deco:'bones'},
+     {n:'Senda del Póra',m:'porayk',x:-14,z:48,r:9,c:3,deco:'graves'},{n:'Laja del Teju Guasu',m:'tejuguasuyk',x:26,z:50,r:9,c:3,deco:'rocks'},
+     {n:'Claro del Kuarahy Jára',m:'kuarahyjarayk',x:72,z:12,r:9,c:3,deco:'sand'},{n:'Trinchera hundida',m:'soldadoyk',x:-92,z:16,r:9,c:3,deco:'graves'},
+     {n:'Altar de los Siervos',m:'siervoyk',x:66,z:46,r:9,c:3,deco:'rocks'},{n:'Puerta de Kerana',m:'guardianyk',x:-84,z:50,r:9,c:3,deco:'rocks'},
+     {n:'Pozo del Yporã',m:'yporayk',x:-80,z:-18,r:9,c:3,deco:'mud'},{n:'Sombra del Jaguarete Hũ',m:'jaguahuyk',x:84,z:-22,r:9,c:3,deco:'bones'},
+     {n:'Nido del Mbói Hovy',m:'mboihovyyk',x:-70,z:-52,r:9,c:3,deco:'nest'},{n:'Peñón del Teju Hũ',m:'tejuhuyk',x:72,z:-54,r:9,c:3,deco:'rocks'},
+     {n:'Bruma del Ypo Vera',m:'ypoverayk',x:-10,z:88,r:9,c:3,deco:'mud'},{n:'Vado del Yaguarú Vera',m:'yaguaruverayk',x:34,z:84,r:9,c:3,deco:'bones'},
+     {n:'Cueva del Mbói Itavera',m:'mboiitaverayk',x:78,z:80,r:9,c:3,deco:'nest'},{n:'Piedra del Ita Jára',m:'itajarayk',x:-80,z:84,r:9,c:3,deco:'rocks'}],
+   clouds:.75,
+   ground:{a:0x6a4630,b:0x4a3222,g:0x3f7030,g2:0x2a5226,grass:.9},
+   sky:{hor:0xf0c890,mid:0x7aa6b4,top:0x1e4a70,sun:[-.5,.34,-.62],sunCol:0xffd8a0,sunI:1.85,hemiS:0xd8ecf0,hemiG:0x3a4a2a,hemiI:.85,fog:[40,165],exp:1.0}},
+ /* Cerro Tres Kandú: el punto más alto del país (842 m). Cumbre de piedra entre las nubes, con tres jorobas al norte y las guaridas de los jefes en ronda */
+ treskandu:{name:'Cerro Tres Kandú',sub:'Guairá, el techo del Paraguay',lvl:30,rst:20,cost:3000000,spawn:[0,4],portals:[[0,-5,'saltosguaira']],flat:10,amp:4.2,
+   hills:[[-78,-84,38,15],[0,-104,40,20],[78,-84,38,15],[-104,40,30,9],[104,40,30,9]],
+   spots:[{n:'Guarida del Kurupí',m:'kurupirv',x:-45,z:45,r:6,c:1,deco:'lair'},{n:'Corral del Ao Ao',m:'aoaorv',x:45,z:45,r:6,c:1,deco:'lair'},
+     {n:'Cueva del Moñái',m:'monairv',x:-66,z:0,r:6,c:1,deco:'lair'},{n:'Siesta del Jasy Jateré',m:'jasyjatererv',x:66,z:0,r:6,c:1,deco:'lair'},
+     {n:'Brasero de Añá',m:'anabossrv',x:-45,z:-45,r:6,c:1,deco:'lair'},{n:'Peña del Yaguareté-Abá',m:'yaguaretabarv',x:45,z:-45,r:6,c:1,deco:'lair'},
+     {n:'Manantial del Y Jára',m:'yjararv',x:0,z:66,r:6,c:1,deco:'lair'},{n:'Trono de Tau',m:'taurv',x:0,z:-70,r:6,c:1,deco:'lair'}],
+   clouds:.85,
+   ground:{a:0x625a58,b:0x403a3c,g:0x56603a,g2:0x3a442c,grass:.5},
+   sky:{hor:0xa894a8,mid:0x5c5484,top:0x16183a,sun:[-.5,.4,-.55],sunCol:0xffe0d0,sunI:1.5,hemiS:0xd4d4f0,hemiG:0x3c3a48,hemiI:1.15,fog:[44,170],exp:1.05}}
 };
-const ZORDER=['asuncion','campos','ruinas','chaco','esteros','ybytyruzu','monday','mbaracayu','cerrocora','bahianegra','mbocaruzu','saltocristal','cerroleon'];
+const ZORDER=['asuncion','campos','ruinas','chaco','esteros','ybytyruzu','monday','mbaracayu','cerrocora','bahianegra','mbocaruzu','saltocristal','cerroleon','saltosguaira','treskandu'];
 for(const id in ZONES){const z=ZONES[id];if(z.spots)z.spots.forEach(sp=>{sp.c=Math.round(sp.c*1.45);sp.r=Math.round(sp.r*1.12);});}
 for(const id in ZONES){const z=ZONES[id];if(z.spots){const m={};z.spots.forEach(sp=>m[sp.m]=(m[sp.m]||0)+sp.c);z.mobs=Object.entries(m);}}
 const spotOf=mob=>{for(const id of ZORDER){const z=ZONES[id];const sp=(z.spots||[]).find(x=>x.m===mob);if(sp)return sp.n;if(z.boss&&z.boss[0]===mob)return z.boss[3];}return '';};
@@ -3365,7 +3400,9 @@ function oadGLB(n){if(!OAD.glb[n]){OAD.pend=(OAD.pend||0)+1;OAD.glb[n]=oadFetch(
 /* lo que no hace falta para empezar a jugar (gente y animales del ambiente) se pide cuando terminó lo principal */
 function oadLater(list,cb){const t0=performance.now();const go=()=>{if((OAD.pend||0)>0&&performance.now()-t0<8000){setTimeout(go,300);return;}oadNeed(list,cb);};setTimeout(go,300);}
 function oadHave(list){return OAD.on&&!OAD.failed&&list.every(n=>OAD.ok[n]);}
-function oadNeed(list,cb){if(!OAD.on||OAD.failed)return;Promise.all(list.map(oadGLB)).then(()=>{if(!OAD.failed&&cb)cb();}).catch(()=>{});}
+/* un mismo pedido (mismos archivos, misma función con nombre) se anota una sola vez: antes cada mob que esperaba su modelo anotaba otro aviso en cada pasada de oadUpgradeMobs, y en un mapa con muchas bestias distintas los avisos se multiplicaban hasta colgar la carga y llenar la memoria */
+const OADN=new Set();
+function oadNeed(list,cb){if(!OAD.on||OAD.failed)return;const k=cb&&cb.name?list.join('|')+'#'+cb.name:null;if(k){if(OADN.has(k))return;OADN.add(k);}Promise.all(list.map(oadGLB)).then(()=>{if(k)OADN.delete(k);if(!OAD.failed&&cb)cb();}).catch(()=>{if(k)OADN.delete(k);});}
 OAD.users={};OAD.bad={};
 function oadTex(id,m){if(!id||OAD.bad[id])return null;if(!OAD.tex[id]){const t=OAD_TL.load(OAD.base+'t/'+id+'.webp',undefined,undefined,()=>{OAD.bad[id]=1;(OAD.users[id]||[]).forEach(x=>{x.map=null;x.needsUpdate=true;});OAD.users[id]=[];});t.encoding=THREE.sRGBEncoding;t.anisotropy=4;keep(t);OAD.tex[id]=t;}
   if(m&&!OAD.bad[id]){const u=OAD.users[id]||(OAD.users[id]=[]);if(u.length<400)u.push(m);}return OAD.tex[id];}
@@ -5400,7 +5437,7 @@ const LIFE_POP={
  esteros:{crit:[['zebu',4,[[20,10]]]],fly:[['crow',5,0,0,40,18]]},
  ruinas:{crit:[['goat',5,[[25,10]]],['rabbit',5,[[-20,20],[10,-20]]]],fly:[['crow',6,0,-10,28,22],['crow',4,-30,20,18,16]]},
  chaco:{crit:[['goat',7,[[-20,25],[35,-10]]],['zebu',4,[[10,40]]]],fly:[['hawk',1,0,0,34,26],['hawk',1,-30,-30,22,30]]},
- ybytyruzu:{crit:[['rabbit',5,[[-10,20],[20,-15]]]],fly:[['hawk',2,0,0,36,30]]},monday:{fly:[['crow',5,0,0,34,22]]},mbaracayu:{fly:[['crow',6,0,0,30,20]]},cerrocora:{fly:[['crow',8,0,0,34,26]]},bahianegra:{fly:[['crow',6,0,0,40,18]]},mbocaruzu:{fly:[['hawk',2,0,0,36,26],['crow',4,0,0,30,20]]},saltocristal:{fly:[['hawk',2,0,0,30,28],['crow',4,0,0,34,22]]},cerroleon:{fly:[['hawk',2,0,0,36,30],['crow',6,60,-60,28,26]]}};
+ ybytyruzu:{crit:[['rabbit',5,[[-10,20],[20,-15]]]],fly:[['hawk',2,0,0,36,30]]},monday:{fly:[['crow',5,0,0,34,22]]},mbaracayu:{fly:[['crow',6,0,0,30,20]]},cerrocora:{fly:[['crow',8,0,0,34,26]]},bahianegra:{fly:[['crow',6,0,0,40,18]]},mbocaruzu:{fly:[['hawk',2,0,0,36,26],['crow',4,0,0,30,20]]},saltocristal:{fly:[['hawk',2,0,0,30,28],['crow',4,0,0,34,22]]},cerroleon:{fly:[['hawk',2,0,0,36,30],['crow',6,60,-60,28,26]]},saltosguaira:{fly:[['crow',5,0,-40,34,24]]},treskandu:{fly:[['crow',8,0,-60,40,30],['hawk',2,0,0,40,34]]}};
 let LIFE=[];
 function lifeFiles(id){const P0=LIFE_POP[id];if(!P0)return [];const s=new Set(['anims']);(P0.crit||[]).forEach(c=>s.add(AMBK[c[0]].f));(P0.fly||[]).forEach(c=>s.add(AMBK[c[0]].f));
   if(P0.vill)VILL.forEach(v=>{s.add('body_'+v.body);v.props.forEach(p=>s.add('p_'+p));});if(P0.guards)['body_m_tunic','p_head_m','p_kh2','p_ks1','p_kd2'].forEach(f=>s.add(f));return [...s];}
@@ -5452,7 +5489,7 @@ const CLOUD={off:{value:new THREE.Vector2()},amt:{value:.42}};
 const AMBS={beds:null,zone:'',next:0,hammer:0};
 const AMBPROF={asuncion:{wind:0,crowd:0,cic:0,marsh:0,birds:.2,crows:.03,frogs:0,moo:0,hawk:0,dog:0},campos:{wind:0,crowd:0,cic:.025,marsh:0,birds:.18,crows:.06,frogs:0,moo:0,hawk:0,dog:0},
  esteros:{wind:0,crowd:0,cic:.015,marsh:.04,birds:.08,crows:.04,frogs:1.1,moo:0,hawk:0,dog:0},ruinas:{wind:0,crowd:0,cic:.01,marsh:0,birds:.03,crows:.2,frogs:0,moo:0,hawk:0,dog:0},
- chaco:{wind:0,crowd:0,cic:.07,marsh:0,birds:.05,crows:0,frogs:0,moo:0,hawk:.05,dog:0},cerroleon:{wind:0,crowd:0,cic:.06,marsh:0,birds:.03,crows:.08,frogs:0,moo:0,hawk:.07,dog:0}};
+ chaco:{wind:0,crowd:0,cic:.07,marsh:0,birds:.05,crows:0,frogs:0,moo:0,hawk:.05,dog:0},cerroleon:{wind:0,crowd:0,cic:.06,marsh:0,birds:.03,crows:.08,frogs:0,moo:0,hawk:.07,dog:0},saltosguaira:{wind:0,crowd:0,cic:.03,marsh:0,birds:.08,crows:.03,frogs:.04,moo:0,hawk:0,dog:0},treskandu:{wind:0,crowd:0,cic:0,marsh:0,birds:0,crows:.1,frogs:0,moo:0,hawk:.05,dog:0}};
 function ambBeds(){const c=AU.ctx;if(AMBS.beds||!c)return;const n=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
   const out=c.createGain();out.gain.value=1;out.connect(AU.amb||AU.master);const mk=(type,f,q)=>{const s=c.createBufferSource();s.buffer=n;s.loop=true;s.playbackRate.value=R(.9,1.1);const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const g=c.createGain();g.gain.value=0;s.connect(fl);fl.connect(g);g.connect(out);s.start();return{g,fl};};
   const B={wind:mk('lowpass',380,.7),crowd:mk('bandpass',520,1.4),marsh:mk('lowpass',900,.5),cic:mk('bandpass',5400,9)};
@@ -5519,7 +5556,7 @@ const DMAP={asuncion:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['ftree']
  bahianegra:{lapacho:'lapacho',tajy:'tajy',palm:['fanpalm'],tree:['willow','dead','willow'],grass:['grass','reeds','grass2'],flower:['brom'],reed:['cattail','papyrus','reedg','cattail'],rock:['rockm'],skull:['bull']},
  mbocaruzu:{lapacho:'lapacho',tajy:'tajy',palm:['palm'],tree:['ftree','oak','ftree'],grass:['grass','grass2','grassf'],flower:['brom','flower'],reed:['cattail','reeds'],rock:['rockm','rock','rocksav'],skull:['bull']},
  saltocristal:{lapacho:'lapacho',tajy:'tajy',palm:['palm','fanpalm'],tree:['ftree','willow','ftree'],grass:['grass2','grassf','grass'],flower:['brom','flower'],reed:['papyrus','cattail','reedg'],rock:['rockm','rock'],skull:['bull']}};
-DMAP.cerroleon=DMAP.chaco;
+DMAP.cerroleon=DMAP.chaco;DMAP.saltosguaira=DMAP.monday;DMAP.treskandu=DMAP.cerrocora;
 /* utilería y plantas extra por zona: [id,cantidad,cx,cz,radio,escala min,max] y ubicaciones fijas [id,x,z,rot,escala] */
 const DECZ={
  asuncion:{scatter:[['bush',14,0,8,30,.8,1.2],['rocks',10,0,8,34,.8,1.4]],
@@ -5542,6 +5579,9 @@ const DECZ={
 const DCOLS={lapacho:[0xffffff,0xf0d0e0,0xffe0ee],tajy:[0xffffff,0xfff0c0]};
 DECZ.cerroleon={scatter:[['rockdm',34,0,0,96,.7,1.5],['rockd',40,0,0,96,.6,1.3],['rocks',40,0,0,96,1,2.2],['dry',50,0,0,92,.7,1.3],['drysm',40,0,0,92,.8,1.3],['dead',22,0,0,92,.8,1.4],['bull',18,0,0,90,.9,1.3],['savanna',150,0,0,92,.8,1.3]],
   fixed:[['camp',10,14,0,1],['bull',-6,12,2,1.2],['cartb',14,10,1.3,1]]};
+/* los dos mapas nuevos usan piezas que ya bajan con Monday y Cerro Corá: no suman archivos */
+DECZ.saltosguaira={scatter:[['bush',40,0,0,96,.8,1.4],['bush2',26,0,0,96,.8,1.3],['brom',34,0,0,90,.8,1.4],['rockm',30,0,-50,60,.9,1.9],['grassf',90,0,0,96,.8,1.2]],fixed:[]};
+DECZ.treskandu={scatter:[['rocksav',30,0,0,96,.9,1.8],['rockm',34,0,0,96,.9,2],['dead',22,0,0,94,.8,1.3],['bush',16,0,0,92,.7,1.1],['grass2',90,0,0,94,.8,1.2]],fixed:[]};
 function decZone(id,G){if(!OAD.on||OAD.failed||!DECZ[id])return;const files=decFiles(id);if(!oadHave(files)){oadNeed(files,()=>{if(Z&&Z.id===id&&zoneG===G&&!G.userData.decor)decUpgrade(id,G);});return;}decUpgrade(id,G);}
 function decUpgrade(id,G){G.userData.decor=true;const M=DMAP[id]||{},low=Q.level==='bajo'?(IS_MOB?.35:.45):Q.level==='medio'?.8:1;
   if(!DREC.on){const rm=[];G.children.forEach(o=>{if(o.isInstancedMesh&&TREE_KEYS.includes(o.userData.vkey))rm.push(o);});rm.forEach(o=>{G.remove(o);if(!o.geometry.userData.keep)o.geometry.dispose();o.dispose&&o.dispose();});}
@@ -5841,7 +5881,7 @@ function H(x,z){
 /* escalones de roca de los saltos (Mbocaruzú, Salto Cristal): cada escalón sube hh detrás de su borde, que se curva en herradura */
 function tierZ(T,st,x){const dx=x-T.cx;return st[0]+T.curve*dx*dx;}
 function tierUp(T,x,z){let up=0;for(const st of T.steps){if(!st[1])continue;const k=1-smooth(st[2]/2,st[2]/2+T.side,Math.abs(x-T.cx));if(k<=0)continue;up+=st[1]*k*(1-smooth(-.9,.9,z-tierZ(T,st,x)));}return up;}
-const LAKE_Y=-1.1,BLIM=108.5,MAPR=120,BORDERK={asuncion:.9,campos:1.25,ruinas:1,chaco:.75,esteros:.5,cerroleon:1.3};
+const LAKE_Y=-1.1,BLIM=108.5,MAPR=120,BORDERK={asuncion:.9,campos:1.25,ruinas:1,chaco:.75,esteros:.5,cerroleon:1.3,treskandu:1.3};
 function edgeD(x,z){return Math.pow(Math.pow(Math.abs(x),4)+Math.pow(Math.abs(z),4),.25)+Math.sin(x*.07)*3.5+Math.cos(z*.06)*3.5;}
 function collide(o,rad){
   for(const c of colliders){
@@ -6010,7 +6050,7 @@ function grassField(V,n,cols,test){let c=0;for(let t=0;t<n*4&&c<n;t++){const x=(
 const TERR={real:{value:0},tG:{value:null},tD:{value:null},palG:{value:new THREE.Color()},palD:{value:new THREE.Color()},gain:{value:1},ts:{value:1},bb:{value:0},mat:null};
 const ZTEX={asuncion:{g:'g_asu',d:'d_red2',n:'n_grass',k:1.08,b:.08},campos:{g:'g_campos',d:'d_red',n:'n_grass',k:1.08,b:.3},esteros:{g:'g_sudd',d:'d_mud',n:'n_sudd',k:1.05},ruinas:{g:'g_steppe',d:'d_red2',n:'n_steppe',k:1.04},chaco:{g:'g_sav',d:'d_sand',n:'n_gd',k:1.05},
  /* las otras cinco tierras también con suelo de verdad (antes eran color liso) */
- ybytyruzu:{g:'g_campos',d:'d_red',n:'n_grass',k:1.0,b:.15},monday:{g:'g_asu',d:'d_red2',n:'n_grass',k:1.04,b:.12},mbaracayu:{g:'g_campos',d:'d_mud',n:'n_grass',k:.96,b:.1},cerrocora:{g:'g_steppe',d:'d_red2',n:'n_steppe',k:1.02},bahianegra:{g:'g_sudd',d:'d_mud',n:'n_sudd',k:1.0},mbocaruzu:{g:'g_campos',d:'d_red',n:'n_grass',k:1.0,b:.12},saltocristal:{g:'g_asu',d:'d_mud',n:'n_grass',k:.98,b:.1},cerroleon:{g:'g_sav',d:'d_sand',n:'n_gd',k:1.0}};
+ ybytyruzu:{g:'g_campos',d:'d_red',n:'n_grass',k:1.0,b:.15},monday:{g:'g_asu',d:'d_red2',n:'n_grass',k:1.04,b:.12},mbaracayu:{g:'g_campos',d:'d_mud',n:'n_grass',k:.96,b:.1},cerrocora:{g:'g_steppe',d:'d_red2',n:'n_steppe',k:1.02},bahianegra:{g:'g_sudd',d:'d_mud',n:'n_sudd',k:1.0},mbocaruzu:{g:'g_campos',d:'d_red',n:'n_grass',k:1.0,b:.12},saltocristal:{g:'g_asu',d:'d_mud',n:'n_grass',k:.98,b:.1},cerroleon:{g:'g_sav',d:'d_sand',n:'n_gd',k:1.0},saltosguaira:{g:'g_asu',d:'d_red2',n:'n_grass',k:1.0,b:.12},treskandu:{g:'g_steppe',d:'d_mud',n:'n_steppe',k:.95}};
 const TRP={},TRL=new THREE.TextureLoader();
 function trP(id,lin){if(!TRP[id])TRP[id]=new Promise(res=>{const t=TRL.load(OAD.base+'tr/'+id+'.webp',()=>res(t),undefined,()=>res(null));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=lin?THREE.LinearEncoding:THREE.sRGBEncoding;t.anisotropy=8;keep(t);});return TRP[id];}
 let TMREAL=false;
@@ -6412,6 +6452,28 @@ const BUILD={
   grassField(V,1600,[0xb89a50,0x9a8240,0xc8a860]);
   addMotes(G,0xffd8a0,160);
  },
+ saltosguaira(G,V){/* Saltos del Guairá: herradura de siete saltos que caen a un pozo hondo, bruma por todos lados, peñascos mojados y selva alta */
+  addFalls7(G,Z.falls7);const L=Z.lake;
+  for(let i=0;i<90;i++){const a=srnd()*TAU,r=L[2]+1.5+srnd()*9,x=L[0]+Math.cos(a)*r*1.05,z=L[1]+Math.sin(a)*r;if(nearSpecial(x,z,7))continue;addRock(V,x,z,.8+srnd()*2.2,pick2([0x4a443e,0x5a5048,0x3e3a36]));}
+  for(let i=0;i<160;i++){const a=srnd()*PI,r=L[2]-2+srnd()*5,x=L[0]+Math.cos(a)*r,z=L[1]+Math.sin(a)*r;vput(V,'reed',x,H(x,z)+.6,z,(srnd()-.5)*.3,0,(srnd()-.5)*.3,1,.6+srnd()*.8,1);}
+  scatter(110,8,(x,z)=>addPalm(V,x,z,5+srnd()*3.5,srnd()<.25));
+  scatter(90,8,(x,z)=>addTree(V,x,z,pick2([0x2a5f2a,0x347230,0x245224]),4.5+srnd()*3,.6));
+  scatter(40,9,(x,z)=>addRock(V,x,z,.5+srnd()*1.4,0x5a5048));
+  grassField(V,3000,[0x4f8a34,0x5f9a3a,0x3f7a2a]);
+  addMotes(G,0xe8f8ff,260,true);
+ },
+ treskandu(G,V){/* Cerro Tres Kandú: cumbre pelada entre nubes, tres jorobas de piedra al norte, menhires y braseros marcando cada guarida */
+  const MEN=mat(0x56525c,{roughness:.95});
+  for(const sp of Z.spots){const n=7;for(let i=0;i<n;i++){const a=i/n*TAU+srnd()*.2,r=sp.r+3.2,x=sp.x+Math.cos(a)*r,z=sp.z+Math.sin(a)*r;if(blocked(x,z,1))continue;const h=2.6+srnd()*2.4,y=H(x,z);
+      const st=mk(BOX(.9+srnd()*.5,h,.6+srnd()*.3),MEN,x,y+h/2-.2,z,G);st.rotation.set((srnd()-.5)*.16,srnd()*TAU,(srnd()-.5)*.16);st.castShadow=true;colliders.push({x,z,r:.7});}
+    for(const sd of[-1,1]){const a=Math.atan2(-sp.z,-sp.x)+sd*.55,x=sp.x+Math.cos(a)*(sp.r+1.6),z=sp.z+Math.sin(a)*(sp.r+1.6);addFire(G,x,H(x,z)+.2,z,sp.m==='taurv'?0x9a4aff:0xff5a2a,2.2);}}
+  for(const q of Z.hills)for(let i=0;i<Math.round(q[2]*1.1);i++){const a=srnd()*TAU,r=Math.sqrt(srnd())*q[2]*.9,x=q[0]+Math.cos(a)*r,z=q[1]+Math.sin(a)*r;if(Math.max(Math.abs(x),Math.abs(z))>104||nearSpecial(x,z,7)||blocked(x,z,1))continue;addRock(V,x,z,1.2+srnd()*2.8,pick2([0x4a4248,0x5a5056,0x3a343a]));}
+  scatter(36,10,(x,z)=>addTree(V,x,z,pick2([0x3a4a2a,0x2f3f24]),3+srnd()*2,.34));
+  scatter(120,7,(x,z)=>addRock(V,x,z,.5+srnd()*1.8,pick2([0x5a5258,0x4a444a])));
+  scatter(30,10,(x,z)=>vput(V,'skull',x,H(x,z)+.12,z,0,srnd()*3,0,1,1,1));
+  grassField(V,1500,[0x6a6a44,0x545a34,0x7a7450]);
+  addMotes(G,0xff9a7a,220);
+ },
  bahianegra(G,V){/* pantanal oscuro de Kerana */
   scatter(70,8,(x,z)=>addTree(V,x,z,0x2a3a22,3+srnd()*3,.4),(x,z)=>H(x,z)>WATER_Y+.2);
   scatter(40,8,(x,z)=>addPalm(V,x,z,4+srnd()*3,true),(x,z)=>H(x,z)>WATER_Y+.15);
@@ -6432,6 +6494,21 @@ function addFalls(G,x,z,w,h){/* salto de agua: cortina que corre, espuma y bruma
   const sheet=new THREE.Mesh(new THREE.PlaneGeometry(w,h+1.2,1,1),m);sheet.position.set(x,y+h/2+.2,z-.3);G.add(sheet);
   const mist=[];for(let i=0;i<10;i++){const sp=glowSprite(0xeaf6ff,4+Math.random()*3,.25);sp.position.set(x+(Math.random()-.5)*w,y+.8+Math.random()*1.5,z+.8+Math.random()*2);G.add(sp);mist.push(sp);}
   AMB.push(()=>{t.offset.y=(T*1.6)%1;mist.forEach((sp,i)=>{sp.material.opacity=.18+.1*Math.sin(T*1.3+i);});});}
+/* siete saltos en herradura mirando al centro del pozo (Saltos del Guairá) */
+function addFalls7(G,F){fallTex.wrapS=fallTex.wrapT=THREE.RepeatWrapping;const sheets=[],mist=[];
+  /* pared continua de basalto en capas siguiendo la media luna norte del pozo; los siete saltos caen por sus bocas */
+  const wall=new MSM({map:strataTex,color:0xa89c90,roughness:.95}),rockM=new MSM({color:0x6e665e,roughness:.95,flatShading:true}),dod=gcc('dodeR',()=>new THREE.DodecahedronGeometry(1,0));
+  const R2=F.r+3.6,N=46,hOf=a=>11+3.2*Math.sin(a*5.1)+2.2*Math.sin(a*11.3+1)+(Math.abs(a-PI*1.5)<.24?4.5:0);
+  for(let i=0;i<=N;i++){const a=PI*.97+i/N*PI*1.06,x=F.cx+Math.cos(a)*R2,z=F.cz+Math.sin(a)*R2,h=hOf(a)*(i<3||i>N-3?.55+.15*Math.min(i,N-i):1);
+    const b=new THREE.Mesh(new THREE.BoxGeometry(2.9+Math.random()*.5,h+2,6.4+Math.random()*1.6),wall);b.position.set(x,LAKE_Y+h/2-1,z);b.rotation.y=Math.atan2(F.cx-x,F.cz-z)+(Math.random()-.5)*.08;b.castShadow=b.receiveShadow=true;G.add(b);
+    colliders.push({x,z,r:3.4});
+    for(let k=0;k<2;k++){const sc=.9+Math.random()*1.5,rr=R2+(Math.random()-.5)*5;const r=new THREE.Mesh(dod,rockM);r.scale.set(sc*1.5,sc*.9,sc);r.position.set(F.cx+Math.cos(a+.02*k)*rr,LAKE_Y+h*(k?.98:.15+Math.random()*.6),F.cz+Math.sin(a+.02*k)*rr);r.rotation.set(Math.random()*3,Math.random()*3,0);r.castShadow=true;G.add(r);}}
+  for(let i=0;i<F.n;i++){const a=PI+(i+.5)/F.n*PI,x=F.cx+Math.cos(a)*F.r,z=F.cz+Math.sin(a)*F.r,w=8.6,h=hOf(a)-.2;
+    const g=new THREE.Group();g.position.set(x,LAKE_Y,z);g.rotation.y=Math.atan2(F.cx-x,F.cz-z);G.add(g);
+    const t=fallTex.clone();t.needsUpdate=true;t.repeat.set(2,1.5);const m=new THREE.MeshBasicMaterial({map:t,color:0xdff4ff,transparent:true,opacity:.9,depthWrite:false,side:THREE.DoubleSide});
+    const sh=new THREE.Mesh(new THREE.PlaneGeometry(w,h+1,1,1),m);sh.position.set(0,h/2,.25);g.add(sh);sheets.push(t);
+    for(let k=0;k<5;k++){const sp=glowSprite(0xeaf6ff,5+Math.random()*4,.25);sp.position.set((Math.random()-.5)*w,.9+Math.random()*2.4,1.4+Math.random()*3);g.add(sp);mist.push(sp);}}
+  AMB.push(()=>{const o=(T*1.5)%1;sheets.forEach(t=>t.offset.y=o);mist.forEach((sp,i)=>{sp.material.opacity=.18+.1*Math.sin(T*1.3+i);});});}
 /* arenisca en capas (Salto Cristal, Mbocaruzú) */
 const strataTex=canvasTex(256,(x,s)=>{let y=0;while(y<s){const h=4+Math.random()*18,v=150+Math.random()*90|0;x.fillStyle=`rgb(${v},${v*.93|0},${v*.85|0})`;x.fillRect(0,y,s,h);x.fillStyle='rgba(40,25,15,.35)';x.fillRect(0,y+h-1.5,s,1.5);y+=h;}
   for(let i=0;i<900;i++){x.fillStyle=`rgba(${Math.random()<.5?'255,240,220':'40,25,15'},${.05+Math.random()*.12})`;x.fillRect(Math.random()*s,Math.random()*s,2+Math.random()*10,1+Math.random()*2);}});
@@ -6629,7 +6706,7 @@ function randSpot(minR,maxR){for(let t=0;t<80;t++){const a=Math.random()*TAU,r=R
 function banner(){$('#zoneS').textContent=Z.sub;$('#zoneB').textContent=Z.name;$('#zoneE').textContent=Z.event?'Evento':Z.safe?'Zona segura':Z.rst?`Recomendado: ${Z.rst} reinicios o más`:'Nivel recomendado '+Z.lvl+'+';const z=$('#zone');z.classList.remove('show');void z.offsetWidth;z.classList.add('show');$('#mmZ').textContent=Z.name;if(Z.rst&&C&&(C.resets||0)<Z.rst)setTimeout(()=>toast(`<em style="color:var(--bad)">Cuidado:</em> las bestias de ${esc(Z.name)} son para héroes con ${Z.rst} reinicios o más`),1800);}
 let fading=false;
 /* pantalla de carga entre mapas: foto del destino, nombre y barra; se va cuando bajó lo necesario (mín. 1,2 s, máx. 12 s) */
-const ZLOAD_IMG=new Set(['asuncion','campos','ruinas','chaco','esteros','ybytyruzu','monday','mbaracayu','cerrocora','bahianegra','mbocaruzu','saltocristal','cerroleon','ev_ana','ev_raid','ev_duel','ev_tuguy']);
+const ZLOAD_IMG=new Set(['asuncion','campos','ruinas','chaco','esteros','ybytyruzu','monday','mbaracayu','cerrocora','bahianegra','mbocaruzu','saltocristal','cerroleon','saltosguaira','treskandu','ev_ana','ev_raid','ev_duel','ev_tuguy']);
 function zloadShow(id){const z=ZONES[id]||{};let el=document.getElementById('zload');if(!el){el=document.createElement('div');el.id='zload';el.innerHTML='<div class="zl-img"></div><div class="zl-in"><small id="zlK">Viajando a</small><b id="zlN"></b><span id="zlS"></span><div class="zl-bar"><i id="zlB"></i></div></div>';document.body.appendChild(el);}
   el.querySelector('.zl-img').style.backgroundImage=ZLOAD_IMG.has(id)?`url(assets/ui/zona_${id}.webp)`:'none';$('#zlN').textContent=z.name||'';$('#zlS').textContent=z.sub||'';$('#zlB').style.width='8%';el.classList.remove('out');el.hidden=false;void el.offsetWidth;el.classList.add('on');return el;}
 function travel(id,pos){if(fading)return;fading=true;if(!snd('mu_teleport',{vol:.7,jit:0}))sfx('portal');const el=zloadShow(id),t0=performance.now();
@@ -6656,7 +6733,7 @@ function makeBar(){const b=new THREE.Group();const bm=c=>new THREE.MeshBasicMate
   fr.renderOrder=10;bg.renderOrder=11;lag.renderOrder=12;f.renderOrder=13;b.add(fr,bg,lag,f);b.fill=f;b.lag=lag;b.fr=fr;b.lagV=1;b.hold=0;b.visible=false;zoneG.add(b);return b;}
 function makeEnemy(type,x,z,golden,spot,over){
   const def=over?Object.assign({},MOBS[type],over):MOBS[type],m=buildMob(def,golden),st=mobStats(def,golden);const elite=!def.boss&&!golden&&!over&&!!spot&&Math.random()<.05;if(elite){st.hp=Math.round(st.hp*3.2);st.dmg*=1.45;st.xp=Math.round(st.xp*3.5);}m.g.traverse(o=>{if(o.isMesh&&o.material&&!o.material.transparent&&o.material.isMeshStandardMaterial)rimify(o.material,1.2);});
-  const e=Object.assign(m,{type,def,golden,st,p:m.g.position,hx:x,hz:z,hp:st.hp,max:st.hp,dead:false,deadT:0,atkCD:R(0,1),lunge:0,flash:0,phase:R(0,6),wanderT:R(0,3),wx:x,wz:z,aggro:0,ret:false,slamCD:5,stun:0,speed:def.speed,respawn:def.boss?150:golden?6:12,spot:spot||null});
+  const e=Object.assign(m,{type,def,golden,st,p:m.g.position,hx:x,hz:z,hp:st.hp,max:st.hp,dead:false,deadT:0,atkCD:R(0,1),lunge:0,flash:0,phase:R(0,6),wanderT:R(0,3),wx:x,wz:z,aggro:0,ret:false,slamCD:5,stun:0,speed:def.speed,respawn:def.rsp||(def.boss?150:golden?6:12),spot:spot||null});
   e.elite=elite;const scl=def.scale*(golden?1.15:elite?1.22:1);m.g.scale.setScalar(scl);e.rad=m.rad*scl;e.hgt=m.hgt*scl;
   if(elite){const rs=Math.min(m.rad*3.4,2.6/scl);const rg=new THREE.Mesh(new THREE.PlaneGeometry(rs,rs),new THREE.MeshBasicMaterial({map:sfxTex('runes'),color:0xff2a4a,transparent:true,opacity:.75,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));rg.rotation.x=-PI/2;rg.position.y=.08;rg.onBeforeRender=()=>{rg.rotation.z=T*.9;rg.material.opacity=e.dead?0:.32+.14*Math.sin(T*3);};m.g.add(rg);const gl=glowSprite(0xff2a4a,Math.min(m.hgt*1.6,2.4/scl),.16);gl.position.y=m.hgt*.55;m.g.add(gl);e.eliteFx=[rg,gl];}
   m.g.position.set(x,H(x,z),z);m.g.rotation.y=Math.random()*TAU;m.g.traverse(o=>{if(o.isMesh)o.castShadow=true;});charBake(m);try{mobBake(m);}catch(er){console.error(er);}addBlob(m.g,m.rad*2.7);zoneG.add(m.g);
@@ -6666,7 +6743,7 @@ function makeEnemy(type,x,z,golden,spot,over){
   e.nid=++MOBNET.nid;e.contrib={};enemies.push(e);return e;
 }
 function respawnEnemy(e){
-  const s=e.def.boss?[Z.boss[1],Z.boss[2]]:e.spot?spotPoint(e.spot):randSpot(14,95);e.hx=s[0];e.hz=s[1];e.born=T;if(!e.spot){e.cx=s[0];e.cz=s[1];}e.p.set(s[0],H(s[0],s[1]),s[1]);
+  const s=e.spot?(e.def.boss?[e.spot.x,e.spot.z]:spotPoint(e.spot)):e.def.boss&&Z.boss?[Z.boss[1],Z.boss[2]]:randSpot(14,95);e.hx=s[0];e.hz=s[1];e.born=T;if(!e.spot){e.cx=s[0];e.cz=s[1];}e.p.set(s[0],H(s[0],s[1]),s[1]);
   e.contrib={};e.hp=e.max;e.dead=false;e.deadT=0;e.aggro=0;e.ret=false;e.add1=e.add2=0;e.enraged=false;e.speed=e.def.speed;e.sinkY=0;e.dash=null;e.bcd=3;e.g.visible=true;e.rig.rotation.set(0,0,0);e.rig.position.set(0,0,0);e.rig.scale.set(1,1,1);e.deadK=0;if(e.dk0){for(const [o,r,pp] of e.dk0){o.rotation.copy(r);o.position.copy(pp);}}
   if(e.def.boss)toast(`<em style="color:var(--bad)">${esc(e.def.name)}</em> volvió a aparecer en ${esc(Z.name)}`);
 }
@@ -6780,6 +6857,8 @@ const BOSSK={
  yaguaretaba:{list:['charge','lash','charge','stampede','quake'],adds:'jaguahu',col:0xffb03a,enrage:true},
  yjara:{list:['slam','quake','sweep','charge','poison','quake'],adds:'ypovera',col:0x6affe8,enrage:true}
 };
+/* los jefes Ruvicha del Tres Kandú pelean como su jefe de origen, pero llaman a bestias Ypykue (o Ymaguare) */
+RUVI.forEach(([b])=>{const K=BOSSK[b];if(K)BOSSK[b+'rv']=Object.assign({},K,{adds:K.adds?(MOBS[K.adds+'yk']?K.adds+'yk':MOBS[K.adds+'ym']?K.adds+'ym':K.adds):null});});
 function bossAI(e,dt,d){const K=BOSSK[e.type];if(!K){e.slamCD-=dt;if(e.slamCD<=0&&d<9){e.slamCD=R(6,8);bossSlam(e);}return;}
   const f=e.hp/e.max;
   if(K.adds&&!e.add1&&f<.65){e.add1=1;bossAdds(e,K.adds,3);}
@@ -6993,10 +7072,10 @@ function rewardKill0(e,S){if(!S||(!S.xp&&!S.quest&&!S.top))return;
     const ep=!e.def.base&&Math.random()<chm(.04,LOOTCH.uqe);if(!e.def.base&&(ep||Math.random()<chm(.25,LOOTCH.uq))){const U=UNIQ[D[2][0]],k=U.k,s=scat();
       const it=ep?newEquip(C.cls,k,U.t,{lv:RI(5,8),luck:true,op:RI(2,3),ex:randomEx(k,RI(2,3)),epic:true}):newEquip(C.cls,k,U.t,{lv:RI(2,5),luck:Math.random()<.6,op:RI(1,2),ex:randomEx(k,RI(1,2))});it.uq=D[2][0];dropAt(s[0],s[1],{item:it});
       toast(`<em style="color:${ep?'#c98cff':'#ff9a3c'}">¡${esc(itemName(it))}!</em>`);}}}
-  const zt=Z&&Z.id==='mbocaruzu'?7:Z&&Z.id==='saltocristal'?8:null,zym=Z&&Z.id==='cerroleon';
+  const zt=Z&&Z.id==='mbocaruzu'?7:Z&&Z.id==='saltocristal'?8:null,zym=Z&&!!Z.rst,zgu=Z&&Z.id==='saltosguaira',ztk=Z&&Z.id==='treskandu';
   /* Cerro León: solo épicos de los sets nuevos (133 en los spots 210-250, 177 en los de 260-300), rarísimos */
-  const itemN=zym?(Math.random()<(boss?1:gold?.15:eli?.08:.015)?1:0):boss?2:gold?1:eli?(Math.random()<.55?1:0):Math.random()<(e.def.k?.16:.09)?1:0;
-  for(let i=0;i<itemN;i++){const s=scat();const it=zym?rollEquip(L,0,1,0,L<=250?7:8):zt!=null?rollEquip(L,boss?1:gold?.3:eli?.3:.06,0,boss?.3:gold?.15:eli?.12:.03,zt):rollEquip(L,boss?1:gold?.3:eli?.25:.025,boss?.22:gold?.05:eli?.04:.004,boss?.3:gold?.15:eli?.12:.03);
+  const itemN=ztk&&boss?(Math.random()<.35?2:1):zym?(Math.random()<(boss?1:zgu?(gold?.22:eli?.12:.025):gold?.15:eli?.08:.015)?1:0):boss?2:gold?1:eli?(Math.random()<.55?1:0):Math.random()<(e.def.k?.16:.09)?1:0;
+  for(let i=0;i<itemN;i++){const s=scat();const it=zym?rollEquip(L,0,1,0,ztk?8:zgu?(Math.random()<.3?7:8):L<=250?7:8):zt!=null?rollEquip(L,boss?1:gold?.3:eli?.3:.06,0,boss?.3:gold?.15:eli?.12:.03,zt):rollEquip(L,boss?1:gold?.3:eli?.25:.025,boss?.22:gold?.05:eli?.04:.004,boss?.3:gold?.15:eli?.12:.03);
     dropAt(s[0],s[1],{item:it});if(it.epic&&it.t>=7){toast(`<em style="color:#c98cff">¡Cayó ${esc(itemName(it))}!</em>`);if(!snd('mu_rare',{vol:.9,jit:0,min:.3}))sfx('rare');}}
   if(C.evoQ&&C.L>=50&&(Z.id==='chaco'||Z.id==='esteros')&&countItem('quest','pluma')<5&&Math.random()<(boss?.5:.02)){/* prueba de evolución: 2 % por bestia y 50 % por jefe (antes 8 % y 100 %) */const s=scat();dropAt(s[0],s[1],{item:stackItem('quest','pluma',1)});}
 }
@@ -7142,7 +7221,7 @@ function updatePlayer(dt){
 }
 function goPortal(p){const z=ZONES[p.dest];if(C.L<z.lvl){toast(`Necesitás nivel ${z.lvl} para entrar a ${esc(z.name)}`);return;}
   /* aparecés junto al portal que vuelve a la región de donde venís */const back=z.portals.find(q=>q[2]===Z.id);let pos;if(back){const dx=z.spawn[0]-back[0],dz=z.spawn[1]-back[1],l=Math.hypot(dx,dz)||1;pos=[back[0]+dx/l*4,back[1]+dz/l*4];}travel(p.dest,pos);}
-function spawnGolden(){if(!Z.mobs)return;const t=Z.mobs[0][0];const a=Math.random()*TAU,r=R(18,35);let x=clamp(P.x+Math.cos(a)*r,-108,108),z=clamp(P.z+Math.sin(a)*r,-108,108);if(blocked(x,z,1.2)||(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]+3)){x=Z.spawn[0]+20;z=Z.spawn[1]+20;}
+function spawnGolden(){if(!Z.mobs)return;const t=Z.mobs[0][0];if(MOBS[t].boss)return;/* en el Tres Kandú no hay invasión dorada: los spots son de jefes */const a=Math.random()*TAU,r=R(18,35);let x=clamp(P.x+Math.cos(a)*r,-108,108),z=clamp(P.z+Math.sin(a)*r,-108,108);if(blocked(x,z,1.2)||(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]+3)){x=Z.spawn[0]+20;z=Z.spawn[1]+20;}
   makeEnemy(t,x,z,true);toast(`<em style="color:var(--gold)">¡Invasión dorada!</em> Apareció un ${esc(MOBS[t].name)} Dorado cerca tuyo`);}
 function updateAuto(dt){if(!AUTO.on||P.dead||Z.safe)return;
   {/* la arquera prefiere su curación; la poción queda para cuando no la tiene lista */const heal=C.cls==='arquera'&&C.skills.includes('curar')&&!(P.cd.curar>0)&&P.mp>=SKILLS.curar.mp;
@@ -7397,11 +7476,11 @@ function hitSnd(e,kind,strong){const B=BSND[e.def.key]||{},x=e.p.x,z=e.p.z;const
   if(HITSRC==='melee'||HITSRC==='arrow')snd(['flesh0','flesh1','flesh2','flesh3','flesh4','flesh5'],{x,z,vol:big?1:.8,rate:big?.85:1,key:'flesh'});
   if(B.armor||big&&HITSRC==='melee')snd(['metal0','metal1','metal2','metal3'],{x,z,vol:B.armor?.75:.5,rate:big?.9:1.05,key:'metal'});
   if(Math.random()<.4||big)beastSnd(e,'hurt',.75);}
-function stepSurface(){if(!Z)return 'grass';if(Z.id==='chaco'||Z.id==='cerroleon')return 'sand';if(Z.id==='esteros')return Math.random()<.45?'water':'grass';if(Z.id==='cerrocora'||Z.id==='bahianegra')return 'dirt';if(Z.id==='asuncion')return Math.hypot(P.x,P.z-8)<21||Math.abs(P.x)<2.6&&P.z>8?'gravel':'grass';if(Z.id==='ruinas')return Math.random()<.4?'rock':'grass';return 'grass';}
+function stepSurface(){if(!Z)return 'grass';if(Z.id==='chaco'||Z.id==='cerroleon')return 'sand';if(Z.id==='esteros')return Math.random()<.45?'water':'grass';if(Z.id==='cerrocora'||Z.id==='bahianegra'||Z.id==='treskandu')return 'dirt';if(Z.id==='asuncion')return Math.hypot(P.x,P.z-8)<21||Math.abs(P.x)<2.6&&P.z>8?'gravel':'grass';if(Z.id==='ruinas')return Math.random()<.4?'rock':'grass';return 'grass';}
 function stepTick(dt){if(!AU.ctx||mode!=='game'||P.dead)return;const mv=P.mv||0;if(mv<.08){SND.stepT=0;return;}SND.stepT-=dt*(mv>.55?1.55:1.05);if(SND.stepT>0)return;SND.stepT=.5;const s=stepSurface();snd(['fs_'+s+'1','fs_'+s+'2','fs_'+s+'3','fs_'+s+'4'],{vol:.32*(mv>.55?1.15:.85),key:'step',min:.15,jit:.08});}
 /* música: dos bandejas con fundido */
 /* cada tierra con su tema (música de 0 A.D., CC BY-SA 3.0) */
-const MUSZ={ev_ana:'boss',ev_tuguy:'boss',ev_raid:'raid',ev_duel:'duelo',asuncion:'asuncion',campos:'campos',esteros:'esteros',ruinas:'ruinas',chaco:'chaco',ybytyruzu:'campos2',monday:'monday',mbaracayu:'mbaracayu',cerrocora:'cerrocora',bahianegra:'bahianegra',mbocaruzu:'monday',saltocristal:'mbaracayu',cerroleon:'chaco'};
+const MUSZ={ev_ana:'boss',ev_tuguy:'boss',ev_raid:'raid',ev_duel:'duelo',asuncion:'asuncion',campos:'campos',esteros:'esteros',ruinas:'ruinas',chaco:'chaco',ybytyruzu:'campos2',monday:'monday',mbaracayu:'mbaracayu',cerrocora:'cerrocora',bahianegra:'bahianegra',mbocaruzu:'monday',saltocristal:'mbaracayu',cerroleon:'chaco',saltosguaira:'monday',treskandu:'boss'};
 function musDeck(i){if(SND.deck[i])return SND.deck[i];const el=new Audio();el.crossOrigin='anonymous';el.preload='auto';el.loop=true;const g=AU.ctx.createGain();g.gain.value=0;
   try{const src=AU.ctx.createMediaElementSource(el);src.connect(g);g.connect(AU.track||AU.mus);}catch(e){}el.addEventListener('error',()=>{if(SND.deck[i]&&SND.deck[i].el===el)SND.musFail=true;});SND.deck[i]={el,g};return SND.deck[i];}
 function musUnlock(){if(SND.unlocked||!AU.ctx)return;SND.unlocked=true;for(let i=0;i<2;i++){const d=musDeck(i);d.el.muted=true;const p=d.el.play();if(p&&p.catch)p.catch(()=>{});d.el.pause();d.el.muted=false;}}
@@ -7411,7 +7490,7 @@ function musPlay(name){if(!AU.ctx||SND.musFail||name===SND.track)return;SND.trac
 function musWant(){if(mode==='select')return 'title';if(!Z)return '';const boss=enemies.some(e=>e.def.boss&&!e.dead&&(e.aggro>0||Math.hypot(e.p.x-P.x,e.p.z-P.z)<16)&&Math.hypot(e.p.x-P.x,e.p.z-P.z)<40);if(boss)return 'boss';
   if(Z.id==='campos')return (SND.camposAlt?'campos2':'campos');return MUSZ[Z.id]||'campos';}
 /* ambientes en bucle */
-const BEDZ={ev_ana:{amb_hell:.42},ev_raid:{amb_cave:.55},ev_tuguy:{amb_wind:.35,amb_hell:.18},ybytyruzu:{amb_temperate:.45,amb_wind:.3},monday:{amb_waterfall:.5,amb_river:.35,amb_tropical:.3},mbaracayu:{amb_tropical:.7},cerrocora:{amb_wind:.55},bahianegra:{amb_tropical:.45,amb_wind:.25},mbocaruzu:{amb_waterfall:.55,amb_river:.4,amb_tropical:.35},saltocristal:{amb_waterfall:.7,amb_river:.3,amb_tropical:.45},asuncion:{amb_trade:.42,amb_temperate:.26},campos:{amb_temperate:.55,amb_wind:.08},esteros:{amb_tropical:.62},ruinas:{amb_wind:.42,amb_temperate:.14},chaco:{amb_wind:.5},cerroleon:{amb_wind:.62}};
+const BEDZ={ev_ana:{amb_hell:.42},ev_raid:{amb_cave:.55},ev_tuguy:{amb_wind:.35,amb_hell:.18},ybytyruzu:{amb_temperate:.45,amb_wind:.3},monday:{amb_waterfall:.5,amb_river:.35,amb_tropical:.3},mbaracayu:{amb_tropical:.7},cerrocora:{amb_wind:.55},bahianegra:{amb_tropical:.45,amb_wind:.25},mbocaruzu:{amb_waterfall:.55,amb_river:.4,amb_tropical:.35},saltocristal:{amb_waterfall:.7,amb_river:.3,amb_tropical:.45},asuncion:{amb_trade:.42,amb_temperate:.26},campos:{amb_temperate:.55,amb_wind:.08},esteros:{amb_tropical:.62},ruinas:{amb_wind:.42,amb_temperate:.14},chaco:{amb_wind:.5},cerroleon:{amb_wind:.62},saltosguaira:{amb_waterfall:.75,amb_river:.4,amb_tropical:.2},treskandu:{amb_wind:.7}};
 function bedSet(id){if(!AU.ctx)return;const W=BEDZ[id]||{},t=AU.ctx.currentTime;for(const n in SND.bed){if(!(n in W)){const b=SND.bed[n];b.pending=false;if(b.g){b.g.gain.setTargetAtTime(0,t,.8);setTimeout(()=>{try{b.s.stop();}catch(e){}},3500);}delete SND.bed[n];}}
   for(const n in W){if(SND.bed[n]){if(SND.bed[n].g)SND.bed[n].g.gain.setTargetAtTime(W[n],t,.8);continue;}SND.bed[n]={pending:true,g:null,s:null};sndLoad(n).then(b=>{const B=SND.bed[n];if(!b||!B||!B.pending||!AU.ctx)return;const c=AU.ctx,s=c.createBufferSource();s.buffer=b;s.loop=true;const g=c.createGain();g.gain.value=0;s.connect(g);g.connect(AU.amb||AU.sfx);s.start();g.gain.setTargetAtTime((BEDZ[Z&&Z.id]||{})[n]||0,c.currentTime,1);B.pending=false;B.g=g;B.s=s;});}
   for(const k in SND.buf)if(/^amb_/.test(k)&&!(k in W)){delete SND.buf[k];delete SND.load[k];}}
@@ -8983,7 +9062,7 @@ addEventListener('resize',()=>{if(HC.on)camOY=1;});
 const MAPV={v:'zone',tab:'zonas',sel:null,t:0};
 const PYO=[[-62.65,-22.23],[-62.28,-21.0],[-62.2,-20.55],[-61.9,-19.98],[-61.5,-19.65],[-60.5,-19.3],[-59.3,-19.3],[-58.4,-19.6],[-58.16,-20.16],[-57.9,-20.9],[-57.85,-21.6],[-57.95,-22.1],[-57.3,-22.2],[-56.6,-22.25],[-56.0,-22.1],[-55.7,-22.55],[-55.55,-23.3],[-55.4,-23.95],[-54.6,-24.0],[-54.3,-24.1],[-54.55,-25.0],[-54.6,-25.6],[-54.75,-26.5],[-55.4,-27.1],[-55.9,-27.4],[-56.6,-27.5],[-57.3,-27.45],[-58.0,-27.3],[-58.62,-27.28],[-58.45,-26.8],[-58.0,-26.2],[-57.6,-25.5],[-57.65,-25.3],[-58.1,-24.9],[-58.9,-24.4],[-59.7,-23.9],[-60.5,-23.5],[-61.5,-23.0],[-62.65,-22.23]];
 const PYR=[[-58.16,-20.16],[-57.9,-20.9],[-57.85,-21.6],[-57.95,-22.1],[-57.75,-22.9],[-57.85,-23.8],[-57.65,-25.3],[-57.6,-25.5],[-58.0,-26.2],[-58.45,-26.8],[-58.62,-27.28]];
-const PYP={asuncion:[-57.63,-25.28],campos:[-56.95,-25.42],ruinas:[-55.7,-27.12],chaco:[-60.6,-21.4],esteros:[-58.0,-26.9],ybytyruzu:[-56.3,-25.9],monday:[-54.75,-25.6],mbaracayu:[-55.3,-24.15],cerrocora:[-56.05,-22.65],bahianegra:[-58.17,-20.22],mbocaruzu:[-56.95,-26.12],saltocristal:[-56.72,-25.98],cerroleon:[-60.5,-20.2]};
+const PYP={asuncion:[-57.63,-25.28],campos:[-56.95,-25.42],ruinas:[-55.7,-27.12],chaco:[-60.6,-21.4],esteros:[-58.0,-26.9],ybytyruzu:[-56.3,-25.9],monday:[-54.75,-25.6],mbaracayu:[-55.3,-24.15],cerrocora:[-56.05,-22.65],bahianegra:[-58.17,-20.22],mbocaruzu:[-56.95,-26.12],saltocristal:[-56.72,-25.98],cerroleon:[-60.5,-20.2],saltosguaira:[-54.3,-24.06],treskandu:[-56.2,-25.93]};
 const PYL={asuncion:[-.45,.05,'end'],campos:[.42,-.42,'start'],ruinas:[.42,.1,'start'],chaco:[.45,0,'start'],esteros:[-.45,.12,'end'],ybytyruzu:[0,.62,'middle'],monday:[.45,0,'start'],mbaracayu:[.45,-.1,'start'],cerrocora:[.45,0,'start'],bahianegra:[.45,0,'start'],mbocaruzu:[-.45,.12,'end'],saltocristal:[.45,-.05,'start'],cerroleon:[-.45,0,'end']};
 function openMap(v){if(mode!=='game')return;closeAll();MAPV.v=v||'zone';if(!MAPV.sel||!ZONES[MAPV.sel])MAPV.sel=ZORDER.includes(Z.id)?Z.id:'asuncion';renderMap();showPanel('pMap');mapLoop();}
 function mapLoop(){clearTimeout(MAPV.t);if($('#pMap').hidden)return;if(MAPV.v==='zone'){const cv=$('#mpCv');if(cv)drawBigMap(cv,cv.getContext('2d'),cv._sz);}MAPV.t=setTimeout(mapLoop,150);}

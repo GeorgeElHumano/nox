@@ -4,6 +4,20 @@ Cómo está armado el juego y la web, para no tener que volver a analizarlo. Se 
 
 Última actualización: 16 de noviembre de 2026 (parche 202611161256 publicado: rendimiento en celulares, cuatro niveles de gráficos, PNJ y HUD livianos, prueba de rendimiento v2). Antes: 13 de noviembre de 2026 (parche 202611131943: sets 133 y 177 publicados). Antes: 12 de noviembre de 2026 (parche 202611121914 publicado: bastón de Arandu derecho al costado, metales dorados de su set y arreglo del 502 de la IA). Último parche publicado: 202611161320 (nombres de armas y escudos de los sets 133 y 177; antes 202611161256, rendimiento).
 
+## Mapas de 10 y 20 reinicios: Saltos del Guairá y Cerro Tres Kandú (18/11; rama `mapas-reinicios`, SIN publicar)
+- Pedido del dueño: dos mapas más "en los lugares más épicos del Paraguay": uno con spots de las bestias que no están en Cerro León (10 reinicios) y otro con spots de jefes (20 reinicios), manteniendo la dificultad.
+- **Bestias Ypykue** (`YPYK`, junto a `YMAG`): las 18 que faltaban (`alma`…`itajara`), id `<base>yk`, niveles 304 a 372 de 4 en 4, `YPYK_K={dmg:6,df:3,xp:3}`, escala ×1,28, velocidad +0,5, `aggro:14`.
+- **Jefes Ruvicha** (`RUVI`): `kurupi` 400, `aoao` 410, `monai` 420, `jasyjatere` 430, `anaboss` 440, `yaguaretaba` 450, `yjara` 460, `tau` 470; id `<base>rv`, `RUVI_K={dmg:8,df:3.4,xp:4}`, `rsp:600` (reaparecen a los 10 min; `def.rsp` lo leen el cliente y `live/src/sim.js`), escala ×1,15. `BOSSK[<base>rv]` copia las habilidades del jefe de origen y cambia las criaturas que llama por su versión `yk` (o `ym`).
+- **Jefes en spots**: un spot puede tener un mob con `boss:true` (`c:1`). Reaparecen en el centro de su spot (`respawnEnemy` y `sim.js`). Sin invasión dorada si el primer spot es de jefe (`spawnGolden` y `goldT` del servidor).
+- **Zona `saltosguaira`** (Saltos del Guairá, Canindeyú): `rst:10`, `lvl:30`, ₲ 1.500.000, portal desde `cerroleon` en [-40,70]. Pozo `lake:[0,-62,28]` y `falls7` → `addFalls7`: pared continua de roca en capas en media luna con siete saltos. 18 spots de 3. Usa las piezas de Monday (`DMAP`, `ZTEX`, música `monday`): no baja archivos nuevos.
+- **Zona `treskandu`** (Cerro Tres Kandú, Guairá): `rst:20`, `lvl:30`, ₲ 3.000.000, portal desde `saltosguaira`. Tres jorobas al norte (`hills`), 8 spots de jefe en ronda (radio ~65) con menhires y braseros (violeta en el de Tau). Piezas de Cerro Corá, música `boss`.
+- Tablas tocadas: `ZORDER`, `LIFE_POP`, `AMBPROF`, `DMAP`, `DECZ`, `BORDERK`, `ZTEX`, `MUSZ`, `BEDZ`, `stepSurface`, `ZLOAD_IMG`, `PYP`, `BUILD`, `live/src/data.js` (lo regenera `gendata.mjs`, script fuera del repo: copia las variantes desde `YPYK`/`RUVI` y las zonas desde `ZONES`).
+- **Botín**: `zym` ahora es "zona con `rst`". Guairá: épico 2,5 % común, 12 % élite, 22 % dorada (30 % set 7, 70 % set 8). Tres Kandú: cada jefe deja 1 épico del set 8 (35 % de las veces, 2).
+- **Dureza** (fórmulas reales, Caballero 200 con 50/20/30 y set 177 +9, solo golpe básico): Guairá con 10 reinicios 47 s por bestia en el primer spot y 136 s en el último, recibe 4 a 5 % de la vida por golpe; con 5 reinicios 146 s y el último no se puede; sin reinicios no les hace daño. Tres Kandú con 20 reinicios: 7 min el Kurupí y 18 min Tau a golpe básico y solo; con 15, Tau casi no recibe daño; con 10 no se puede.
+- **Arreglo de carga (`oadNeed`)**: los pedidos repetidos (mismos archivos y misma función con nombre) se anotan una sola vez (`OADN`). Antes cada mob sin modelo volvía a pedir aviso en cada pasada de `oadUpgradeMobs`; con 18 tipos la memoria llegaba a 2,5 GB y la carga se colgaba. Con el arreglo, el Guairá completo queda en ~180 MB. Sirve a todos los mapas.
+- Fotos `assets/ui/zona_*.webp` y `top_*.webp` de las dos zonas.
+- **Falta al publicar**: web (`ZK`, `PINS`, `LBLPOS`/`LP`, textos "quince tierras", `z_*.webp`, `sync.sh datos`), notas del parche.
+
 ## Parche 202611122202: Cerro León y reinicio de misiones (12/11, noche; publicado con OK del dueño)
 
 Se hizo en la rama `mapa-final` y se publicó encima de la Tienda Noxis (parche 202611122116) con `git push origin mapa-final:main`, juego y web juntos. Falta unir `origin/main` en `arte-cc0`.
