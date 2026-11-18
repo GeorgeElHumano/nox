@@ -9,6 +9,7 @@ export const DR = {
   type: 'dragondorado', nid: 900001, zone: 'asuncion', home: [8, 68], arena: 30, wall: 46,
   from: [2026, 12, 1], to: [2026, 12, 14], hours: [9, 13, 17, 21], tz: -3, // cuatro veces por día (mañana, siesta, tarde y noche), hora de Paraguay
   limit: 1800, warn: 300, share: 14, col: 0xff3a0a,
+  flyT: 13, flyPath: [[-30, -150], [-6, -60], [0, -8], [4, 30], [8, 68]], // pasada: llega por el norte, cruza la iglesia y la plaza y sale por la puerta sur
 };
 const R = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
 const angd = (a, b) => { const d = a - b; return Math.atan2(Math.sin(d), Math.cos(d)); };
@@ -26,9 +27,10 @@ export class Dragon {
     this.max = this.hp = mobStats(60, true) * 4; this.parts = new Map(); this.contrib = {}; this.names = {};
     this.t = 0; this.test = !!opts.test; this.limit = opts.limit || DR.limit; this.phase = 1; this.dead = false; this.deadT = 0; this.gone = false; this.fled = false;
     this.stun = 5.2; this.bcd = 7; this.atkCD = 0; this.rot = 0; this.dash = null; this.ln = 0; this.idle = 0; this.pend = []; this.out = [];
-    this.tele('d_llega', { t: 'circle', r: 9 }, this.x, this.z, 1.9, 0, 0, { pc: .5 });
+    // llega volando: pasa por encima de la iglesia y la plaza de Asunción y recién después baja al campo
+    this.fly = { t: 0, dur: DR.flyT, path: DR.flyPath }; this.x = DR.flyPath[0][0]; this.z = DR.flyPath[0][1]; this.ry = 0;
   }
-  entry() { return [this.n, DR.type, Math.round(this.x * 10), Math.round(this.z * 10), Math.round(this.ry * 100), Math.max(0, Math.round(this.hp)), Math.round(this.max), (this.dead ? 1 : 0) | (this.phase >= 3 ? 32 : 0), this.ln % 100, 0]; }
+  entry() { return [this.n, DR.type, Math.round(this.x * 10), Math.round(this.z * 10), Math.round(this.ry * 100), Math.max(0, Math.round(this.hp)), Math.round(this.max), (this.dead ? 1 : 0) | (this.phase >= 3 ? 32 : 0) | (this.fly ? 64 : 0), this.ln % 100, 0]; }
   state() { return { t: 'wbs', e: this.gone ? null : this.entry(), ph: this.phase, left: Math.max(0, Math.round(this.limit - this.t)), np: this.parts.size, age: Math.round(this.t * 10) / 10 }; }
   emit(o) { this.out.push(o); }
   later(dt, fn) { this.pend.push({ at: this.t + dt, fn }); }
@@ -42,7 +44,7 @@ export class Dragon {
     this.max += share; this.hp += share; // la vida ya quitada no se pierde: se suma la parte del que llega
   }
   hit(uid, d, L, name) {
-    if (this.dead || this.gone) return;
+    if (this.dead || this.gone || this.fly) return; // en el aire no se le puede pegar
     { const b = (this.rate ||= {}), r = b[uid] || (b[uid] = { n: 0, t: this.t }); if (this.t - r.t > 1) { r.t = this.t; r.n = 0; } if (++r.n > 14) return; } // como mucho 14 golpes por segundo por jugador
     this.join(uid, L, name);
     d = Math.max(0, Math.min(5e6, +d || 0)); this.hp -= d; this.contrib[uid] = (this.contrib[uid] || 0) + d; this.idle = 0;
@@ -60,6 +62,13 @@ export class Dragon {
     this.t += dt;
     for (let i = this.pend.length - 1; i >= 0; i--) if (this.pend[i].at <= this.t) { const p = this.pend.splice(i, 1)[0]; try { p.fn(); } catch (e) {} }
     if (this.dead) { this.deadT += dt; if (this.deadT > 25) this.gone = true; return; }
+    if (this.fly) { // tramo por tramo, a velocidad pareja, mirando hacia donde va
+      const F = this.fly, P = F.path; F.t += dt; let L = 0; const seg = []; for (let i = 1; i < P.length; i++) { const d = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]); seg.push(d); L += d; }
+      let s = Math.min(1, F.t / F.dur) * L, i = 0; while (i < seg.length - 1 && s > seg[i]) { s -= seg[i]; i++; }
+      const k = seg[i] ? Math.min(1, s / seg[i]) : 1, ax = P[i][0], az = P[i][1], bx = P[i + 1][0], bz = P[i + 1][1];
+      this.x = ax + (bx - ax) * k; this.z = az + (bz - az) * k; this.turn(Math.atan2(bx - ax, bz - az), dt * 2.5);
+      if (F.t >= F.dur) { this.fly = null; this.x = DR.home[0]; this.z = DR.home[1]; this.stun = 5.2; this.tele('d_llega', { t: 'circle', r: 9 }, this.x, this.z, 1.9, 0, 0, { pc: .5 }); }
+      return; }
     if (this.t > this.limit) { this.gone = this.fled = true; this.emit({ t: 'wbf' }); return; }
     // jugadores en pelea: vivos, fuera de las murallas y cerca del campo
     const near = players.filter(p => p.p && !p.p.d && Math.hypot(p.p.x, p.p.z) > 38 && Math.hypot(p.p.x - DR.home[0], p.p.z - DR.home[1]) < 70);

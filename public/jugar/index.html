@@ -8306,9 +8306,10 @@ function wbState(m){WB.st=m;if(!Z||Z.id!=='asuncion'||mode!=='game')return;
   if(!window.makeDragon){wbLoad();return;}
   let e=WB.e;if(e&&!enemies.includes(e)){WB.e=null;e=null;}
   const [n,,x10,z10,r100,hp,max,f]=m.e,x=x10/10,z=z10/10;
-  if(!e){if(f&1)return;e=WB.e=wbMake(n,x,z,r100/100);e.hp=hp;if(m.age<2.4){e.D.play('aterrizaje');e.D.cur.t=Math.max(0,m.age);for(let k=0;k<3;k++)later(.2+k*.55,()=>drS('dr_ala',e.p.x,e.p.z,.9,.8));}/* recién llegado: baja volando */}
+  if(!e){if(f&1)return;e=WB.e=wbMake(n,x,z,r100/100);e.hp=hp;/* recién llegado: baja volando */}
   if(x!==e.tx||z!==e.tz)e.mvSp=Math.hypot(x-e.p.x,z-e.p.z)/MOB_LAG;e.tx=x;e.tz=z;e.tr=r100/100;e.max=max;
   if(f&1){if(!e.dead)wbDie(e);}else if(e.predT&&T<e.predT)e.hp=Math.min(e.hp,hp);else e.hp=hp;
+  if((f&64)&&!e.fly){e.fly=1;e.D.play('vuelo');e.g.rotation.y=e.tr;drS('dr_rugido',P.x,P.z,.8);toast('<em style="color:#ffb04a">¡El Dragón Dorado sobrevuela Asunción!</em>');}else if(!(f&64))e.fly=0;
   WB.ph=m.ph||1;WB.left=m.left||0;}
 /* sonidos propios del dragón (assets/s/dr_*.mp3, armados con grabaciones CC0 de OpenGameArt: sndaudit/dragon.py y CREDITOS-SONIDO.md). Se oyen desde lejos y se piden al aparecer */
 const DRSND=['dr_rugido','dr_muerte','dr_fuego','dr_pisa','dr_ala','dr_cola','dr_mord','dr_explo'];
@@ -8316,11 +8317,13 @@ function drS(n,x,z,vol,rate,delay){try{return snd(n,{x,z,vol:vol==null?1:vol,rat
 function wbDie(e){e.hp=0;killMobFx(e);e.D.play('muerte');shake=Math.max(shake,.8);drS('dr_muerte',e.p.x,e.p.z,1);later(1.7,()=>drS('dr_pisa',e.p.x,e.p.z,1,.8));}
 function wbUpdate(e,dt){const D=e.D,p=e.p;
   if(e.dead){e.deadT+=dt;D.update(dt);e.bar.visible=false;if(e.deadT>24||(e.goneT&&T>e.goneT&&e.deadT>12))wbGone();return;}
-  let gx=e.tx-p.x,gz=e.tz-p.z,gd=Math.hypot(gx,gz),mv=0;if(gd>14){p.x=e.tx;p.z=e.tz;gd=0;}
+  let gx=e.tx-p.x,gz=e.tz-p.z,gd=Math.hypot(gx,gz),mv=0;if(gd>(e.fly?40:14)){p.x=e.tx;p.z=e.tz;gd=0;}
+  if(e.fly){e.flapT=(e.flapT||0)-dt;if(e.flapT<=0){e.flapT=.75;drS('dr_ala',p.x,p.z,.8,.85);}}
   if(gd>1e-3&&dt>0){mv=Math.min(gd,Math.max(e.mvSp||0,gd/.6)*dt);p.x+=gx/gd*mv;p.z+=gz/gd*mv;}p.y=H(p.x,p.z);
   const sp=e.aSp=(e.aSp||0)+((dt>0?mv/dt:0)-(e.aSp||0))*Math.min(1,dt*6),r0=e.g.rotation.y;e.g.rotation.y=lerpAngle(r0,e.tr,Math.min(1,dt*6));
   const turning=Math.abs(Math.atan2(Math.sin(e.tr-r0),Math.cos(e.tr-r0)))>.12,cn=D.cur.name;
-  if(cn==='quieto'||cn==='caminar'||cn==='girar'){const want=sp>.5?'caminar':turning?'girar':'quieto';if(want!==cn)D.play(want);}
+  if(e.fly){if(cn!=='vuelo')D.play('vuelo');}else if(cn==='vuelo')D.play('quieto');
+  else if(cn==='quieto'||cn==='caminar'||cn==='girar'){const want=sp>.5?'caminar':turning?'girar':'quieto';if(want!==cn)D.play(want);}
   if(cn==='caminar'){e.stepT=(e.stepT||0)-dt;if(e.stepT<=0){e.stepT=.9;drS('dr_pisa',p.x,p.z,.3,1.25);shake=Math.max(shake,Math.hypot(P.x-p.x,P.z-p.z)<22?.12:0);}}
   D.fxMat.uniforms.sc.value=renderer.domElement.height/(2*Math.tan(camera.fov*PI/360));
   D.update(dt);e.g.visible=true;mobShadow(e,0);if(e.flash>0)e.flash-=dt;
@@ -8334,7 +8337,7 @@ function wbTele(m){const e=WB.e;if(!e||e.dead||e.nid!==m.n)return;const f=m.f||{
     /* cada ataque suena al cargarse, así también avisa al oído */
     if(ab==='d_fuego')drS('dr_rugido',ex,ez,.7,1.25);else if(ab==='d_carga')drS('dr_rugido',ex,ez,.8,1.1);else if(ab==='d_brasa')drS('dr_rugido',ex,ez,.6,.8);
     else if(ab==='d_zarpa'||ab==='d_cola')drS('dr_cola',ex,ez,1,ab==='d_cola'?.8:1.15,Math.max(0,dur-.55));else if(ab==='d_pisa')drS('dr_ala',ex,ez,.8,.7);else if(ab==='d_mord')drS('dr_mord',ex,ez,1,1,0);
-    else if(ab==='d_llega'){}
+    else if(ab==='d_llega'){for(let k=0;k<3;k++)later(.15+k*.5,()=>drS('dr_ala',ex,ez,.9,.8));}
     tele(x,z,f,dur,col);if(ab==='d_meteoro')D.meteor(x,z,dur,m.bz||0,0,f.r);
     later(dur,()=>{if(WB.e!==e)return;
       if(ab==='d_brasa'&&m.bz&&!e.dead)D.ignite(x,z,f.r,m.bz);
@@ -8348,6 +8351,29 @@ function wbTele(m){const e=WB.e;if(!e||e.dead||e.nid!==m.n)return;const f=m.f||{
       for(let k=1;k<(m.tk|0);k++)later(k*(m.ti||.45),()=>{if(e.dead||WB.e!==e)return;tele(x,z,f,m.ti||.45,col);if(inTele(P.x,P.z,x,z,f))wbHurt(e,pc);});
       if(m.bz)for(let k=1;k<=Math.round(m.bz*2);k++)later(k*.5,()=>{if(WB.e===e&&inTele(P.x,P.z,x,z,f))wbHurt(e,+m.bpc||.08);});});};
   if(m.d)later(m.d,go);else go();}
+/* --- Campo de la Apertura: el claro fuera de la puerta sur donde pelea el dragón. Pilares con fuego en el borde (queda abierto del lado de la ciudad),
+   tierra quemada y cristales dorados. Sin luces. Se arma durante el evento o cuando hay dragón; se va con la zona (cuelga de zoneG). --- */
+const DRCAMPO={c:[8,68],r:31,fl:null};
+function drCampoTick(){if(mode!=='game'||!Z||Z.id!=='asuncion'||!zoneG)return;
+  if(zoneG.userData.drCampo){const F=DRCAMPO.fl;if(F)for(let i=0;i<F.length;i++){const k=.86+.14*Math.sin(T*9+i*1.7)+.06*Math.sin(T*23+i);F[i].scale.set(1.25*k,2.1*(2-k),1);F[i].material.opacity=.8+.2*Math.sin(T*13+i*2.3);}return;}
+  const now=Date.now();if(!(WB.e||WB.loc||WB.st||(now>=Date.UTC(2026,10,30,12)&&now<Date.UTC(2026,11,15,6))))return;
+  zoneG.userData.drCampo=1;const G=new THREE.Group(),[cx,cz]=DRCAMPO.c,R0=DRCAMPO.r,M4=new THREE.Matrix4(),Q4=new THREE.Quaternion(),S4=new THREE.Vector3(),P4=new THREE.Vector3(),E4=new THREE.Euler();let sd=5;const rn=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  const pts=[];for(let k=0;k<16;k++){const a=k/16*TAU,x=cx+Math.cos(a)*R0,z=cz+Math.sin(a)*R0;if(Math.hypot(x,z)>48)pts.push([x,z]);}
+  const stone=new THREE.MeshStandardMaterial({color:0x6a5f54,roughness:1}),pil=new THREE.InstancedMesh(new THREE.CylinderGeometry(.3,.42,3.2,7),stone,pts.length),bowl=new THREE.InstancedMesh(new THREE.CylinderGeometry(.62,.3,.4,8),new THREE.MeshStandardMaterial({color:0x2a2420,roughness:.8,metalness:.3}),pts.length);
+  const fc=document.createElement('canvas');fc.width=64;fc.height=128;{const c=fc.getContext('2d'),g2=c.createRadialGradient(32,98,0,32,84,46);g2.addColorStop(0,'rgba(255,250,205,1)');g2.addColorStop(.3,'rgba(255,180,50,.92)');g2.addColorStop(.7,'rgba(255,60,0,.35)');g2.addColorStop(1,'rgba(255,30,0,0)');c.fillStyle=g2;c.beginPath();c.moveTo(32,2);c.bezierCurveTo(60,50,62,98,32,127);c.bezierCurveTo(2,98,6,50,32,2);c.fill();}
+  const ft=new THREE.CanvasTexture(fc);DRCAMPO.fl=[];
+  pts.forEach(([x,z],i)=>{const y=H(x,z);M4.compose(P4.set(x,y+1.5,z),Q4.identity(),S4.set(1,1,1));pil.setMatrixAt(i,M4);M4.compose(P4.set(x,y+3.3,z),Q4,S4);bowl.setMatrixAt(i,M4);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:ft,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false}));sp.position.set(x,y+4.35,z);sp.scale.set(1.25,2.1,1);G.add(sp);DRCAMPO.fl.push(sp);});
+  pil.castShadow=true;G.add(pil,bowl);
+  /* tierra quemada */
+  const NB=26,burn=new THREE.InstancedMesh(new THREE.CircleGeometry(1,18),new THREE.MeshBasicMaterial({color:0x140c06,transparent:true,opacity:.2,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),NB);
+  for(let k=0;k<NB;k++){const a=k*2.4,r=Math.sqrt(k/NB)*22,x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r,s=2.6+rn()*3.2;M4.compose(P4.set(x,H(x,z)+.07+k*.002,z),Q4.setFromEuler(E4.set(-PI/2,0,rn()*TAU)),S4.set(s,s*(.7+rn()*.5),1));burn.setMatrixAt(k,M4);}
+  burn.renderOrder=1;G.add(burn);
+  /* cristales dorados, en racimos cerca del borde */
+  const NC=24,cr=new THREE.InstancedMesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0xffc24a,metalness:.85,roughness:.25,emissive:0x8a5200,emissiveIntensity:.8}),NC);
+  for(let k=0;k<NC;k++){const cl=k/3|0,a=cl*1.37+.5,r=R0-2+((cl*7)%5)-1.5,bx=cx+Math.cos(a)*r,bz=cz+Math.sin(a)*r,x=bx+(rn()-.5)*2.2,z=bz+(rn()-.5)*2.2,s=.35+rn()*.55,ok=Math.hypot(x,z)>47;
+    M4.compose(P4.set(x,H(x,z)+s*1.1,z),Q4.setFromEuler(E4.set((rn()-.5)*.6,rn()*TAU,(rn()-.5)*.6)),S4.set(ok?s*.6:0,ok?s*1.9:0,ok?s*.6:0));cr.setMatrixAt(k,M4);}
+  cr.castShadow=true;G.add(cr);zoneG.add(G);}
 /* --- premios que se ven en el mundo: Cría de Dragón Dorado (mascota de la cuenta, casillero `mas`) y Alas del Dragón Dorado (casillero `wing`).
    Propias (NX.eq) y de los demás (cz[6] y cz[7]). Usan el mismo modelo del dragón en versión liviana (opt.pet). --- */
 const DRP={cria:new Map()};
@@ -8970,7 +8996,7 @@ function frame(now){if(window.__KICKED)return;
 function tickOnce(dt,rdt,draw){
   if(PRF.on){PRF.t=performance.now();PRF.n++;}
   if(draw&&!renderer.info.autoReset)renderer.info.reset();
-  if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);nxTick(dt);try{drTick(dt);}catch(e){}ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
+  if(HITSTOP>0)HITSTOP-=dt;const gdt=(mode==='game')?(HITSTOP>0?dt*.07:dt):0;if(STUDIO.frozen){T=5;windT=5;}else{T+=mode==='select'?dt:gdt;windT+=dt;}WIND_T.value=windT;dnTick(dt);petTick(dt);nxTick(dt);try{drCampoTick();drTick(dt);}catch(e){}ravenTick(dt);CLOUD.off.value.set(windT*.0035,windT*.0021);skyU.uTime.value=windT;for(const k in WATER)WATER[k].normalMap.offset.set(windT*.016,windT*.011);
   try{
     if(mode==='game'&&C){updatePlayer(gdt);fpFace(gdt);for(let i=LATER.length-1;i>=0;i--){const l=LATER[i];l.t-=gdt;if(l.t<=0){LATER.splice(i,1);l.fn();}}(MOBNET.role==='guest'?updateEnemiesGuest:updateEnemies)(gdt);mobNetTick(dt);if(EV)evTick(gdt);updateProjs(gdt);updateDrops(gdt);updateAuto(gdt);}pk('juego');
     if(BENCH.nochar)benchHideChars();else{updNpcs(dt);pk('pnj');faceTick(dt);updLife(mode==='select'?dt:gdt);pk('ambiente');}if(!$('#pInv').hidden)irPreview(dt);if(MATE.on||!$('#pMate').hidden)mateTick(dt);animHero(mode==='select'?dt:gdt);pk('heroe');liveTick(dt);if(mode==='game'){liveAnim(Math.min(.5,rdt));duelTick(dt);}pk('jugadores');updateFx(mode==='select'?dt:gdt);for(const f of AMB)f(dt);pk('efectos');
