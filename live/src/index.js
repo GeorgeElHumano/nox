@@ -422,7 +422,7 @@ export class World {
       this.partySend(p, { t: 'ps', id: a.uid, h: pc(m.h), m: pc(m.m), d: m.d ? 1 : 0, L: (a.s && a.s.L) | 0 }, a.uid); return; }
 
     // monstruos: los mueve el servidor; los jugadores mandan sus golpes y piden la lista completa
-    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
+    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d, m.px, m.pz); return; }
     if (t === 'mreq') { const sim = a.zone && this.sims.get(a.zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: a.zone }); return; }
     if (t === 'raid') { this.startRaid(ws, a); return; }
     if (t === 'sk') { // poder usado: los demás del mapa lo ven

@@ -681,3 +681,56 @@ Noxis es la moneda de pago (1 Noxis = 10 Gs). Solo compra cosméticos y servicio
   - `helmHairFit(body,at,h,U,top,brow,S)`: para el resto (vinchas, aros, diademas). Mide el pelo (sin barba) a la altura del aro y ensancha el grupo del casco (`scale.x/z`, tope 1.45, margen 1.04) para que lo rodee en vez de cortarlo. Si el pelo es corto no cambia nada (Caballero y Gladiador quedaron igual).
   - `raven`: pico y gemas más arriba y adelante. `hood` y `sigilhood` (Hechicero sets 1 y 7): esfera más alta y adelantada, el pelo de la frente asomaba por el borde.
   - Revisado con `/home/claude/h/helms.sh` (solo casco, parado, frente/costado/espalda). Sin revisar: en movimiento, con set completo, iconos, otros peinados y PNJ.
+
+## Kit de efectos (VFX), empuje y voces (18/11; publicado en el parche 202611181712)
+
+Publicado el 18/11/2026 con OK del dueño, sin probar antes en iPhone ni en línea con dos jugadores (el dueño lo prueba ya publicado). Falta unir con la rama `dragon-dorado` (el dueño lo pidió aparte). Si algo sale mal en producción: `VFX.on=false` vuelve a los efectos viejos.
+
+### Kit `VFX` (en `public/jugar/index.html`, antes de `clickFx`)
+
+- Módulo `VFX` = piezas para armar poderes. Usa 6 sombreadores fijos (se compilan una vez en `VFX.warm()`, 3,5 s después de cargar) y texturas pintadas en canvas (`VFX.tex(k)`): `noise`, `ring`, `smoke`, `spark`, `crack`, `sigil`, `leaf`, `streak`, `flor`, `tajo`. No baja archivos ni agrega luces (usa `flashLight`).
+- Mezcla premultiplicada (`PM`: One / OneMinusSrcAlpha): el mismo material suma luz (`add:1`) u oscurece (`add:0`), para humo y fuego negro.
+- Piezas:
+  - `decal(x,z,r,{tex,c1,c2,life,dark,gain,g0,gt,spin,fin,fout,cool})`: marca en el suelo que sigue el terreno (`H()`), con prueba de profundidad y `polygonOffset` (no atraviesa personajes). Canal R de la textura = trazo que brilla, G = fondo oscuro. `cool` enfría el brillo.
+  - `ring(x,z,r,c1,c2,life,gain,dark)`: onda de choque (decal con `ring`).
+  - `pillar(x,z,{r,h,c1,c2,life,add,gain})` y `wall(x,z,{r0,r1,h,...})`: columna (cono) y muro circular de llamas, sombreador de ruido que sube.
+  - `emit({n,x,y,z|src:[[x,y,z,demora]],spd,up,jit,flat,dir,grav,drag,life,s0,s1,c1,c2,tex,add,op,rot,fix,raw,burst})`: partículas que mueve la placa de video (posición = f(tiempo) en el vértice; nada por cuadro en el procesador). `s0/s1` en metros.
+  - `bolt(x,z,{c1,c2,w,top,life})`: rayo con ramas (cinta que mira a la cámara, se rearma una vez).
+  - `arc(S,ry,{r0,r1,a0,a1,c1,c2,life,tail,y,tilt,gain})`: estela de arma, sigue a `S`.
+  - `shell(S,{r,c1,c2,life,gain})`: cúpula. `tail(color)`: cola de proyectil (material compartido por color). `lance(...)`: estocada. `flare(x,y,z,col,size,life)`: destello.
+- Calidad: `VFX.q()` escala cantidades (Lite celular ×0,35, Lite PC ×0,5, Media ×0,65); `VFX.lite()` saltea humo y capas secundarias; el parámetro `far` de cada `fx*` hace lo mismo para jugadores lejanos.
+- `VFX.on=false` vuelve a todos los efectos viejos (sirve para comparar y como freno de emergencia).
+- Medido en el banco (PC sin placa): Furia 23 → 14 dibujos extra, Tupã 76 → 13, Estallido 22 → 13. Sin medir en teléfono.
+
+### Poderes (funciones `fx*`, las usan `useSkill` y `remoteSkill`)
+
+Cada raza tiene forma y marca de piso propias, no solo color:
+- Caballero (dorado y azul; grietas de lava): `fxGiro`, `fxEstoque` (por estocada), `fxGrito`, `fxFuria`.
+- Hechicero (violeta; sello de ñandutí `sigil`): proyectil con cola + `fxImpact`, `fxSalto`, `fxEspiritus`, `fxTupa`.
+- Arquera (verde agua; flor `flor`): flechas con `tail`, `fxCurar`, `fxEscudo`, `fxLluvia`.
+- Gladiador (lila, blanco y gris; estrella de cortes `tajo`): `fxTajo`, `fxRayo`, `fxTorbellino`, `fxEspada`.
+- Mburuvicha (negro y rojo; grietas rojas sobre negro, plumas): proyectil `dark` rojo, `fxEstallido` (sin sello: géiser), `fxVoz`, `fxPicada`.
+- Tablas: `FXAOE` (poderes de área alrededor del héroe), `FXBUFF` (por tipo de buff). `zigBolt` → `fxBolt`. `slashFx` → `VFX.arc`. `ringFx` → `VFX.ring` (cambia todos los aros viejos: jefes, muerte, clic). `spiritsFx` → `fxEspiritus`.
+- Comunes: `fxMuerte(e)`, `fxNivel(S)`, `fxQuake(x,z,r,col)` (golpes de jefe: `bossSlam`, `quake`, `stampede`, `dive` y el manejador `tele` en línea). El destello del mob golpeado bajó de blanco .7 a cálido .3.
+- Con `VFX.on` los proyectiles ya no sueltan `parts()` cada 0,03 s (lo reemplaza la cola).
+
+### Empuje
+
+- `KBD` = metros por poder (furia 3, espada 3,2, estallido 2,4, torbellino 1,7, cuervo 1,5, tupa 1,5, espiritus 1,3, giro 1,2, lluvia 1,2, rayo 1, tajo .8, fuego .8, fuerza .7, estocada .6, triple .6). Ataques básicos, buffs y curación no empujan.
+- `KB` global = `{x,z,d}` (desde un centro) o `{dx,dz,d}` (dirección); lo fijan `hitArea`, el bucle de `line` y `updateProjs` (`p.kb`) mientras reparten daño. `kbVec(e)`: jefes y jefe de mundo no; élites y dorados la mitad.
+- Sin conexión / anfitrión: `applyMobDmg` suma `e.kbx/e.kbz` y `e.stun=.32`; `updateEnemies` lo desliza (`dt*9`).
+- En línea: `mobGuestHit` manda `px,pz` en el mensaje `mh` y adelanta `e.tx/e.tz`; el servidor (`live/src/index.js` → `sim.hit(uid,n,d,px,pz)` en `live/src/sim.js`) mueve el mob (tope 4 m, no jefes ni en embestida) y lo aturde .32 s. **Sin probar con el servidor real.**
+
+### Voces y sonidos
+
+- `VOZC[clase]={h:[3 quejidos],d:muerte}`: archivos propios por raza masculina (`vz_cab_*`, `vz_hec_*`, `vz_gla_*`, `vz_mbu_*`), sin cambiar el tono. Salen de los 62 `male_death_NN.ogg` de 0 A.D., repartidos por tono y timbre medidos (los más graves al Mburuvicha); el quejido es el arranque del grito (0,5 s). La Arquera sigue con `hurt_f*`/`die_f`. Ojo: `VOX` ya existía (chat de voz).
+- `SKN[id]` = sonido propio del poder (reemplaza al de la tabla vieja `SK`); `SKR[id]` = tono del sonido base; `SKX[id]` = capas `[sonido, tono, volumen, demora]`; `skSnd(id,S)` toca las capas (local y remoto).
+- Elegidos por el dueño escuchando el probador (18/11): `sk_grito` (Grito de Guerra, opción A = `warcry.ogg` de Flare), `sk_voz` (Voz del Mburuvicha, opción B = frase hablada napatana de 0 A.D. con eco, voz grave natural), `sk_flash` (Salto, B = `teleport.ogg` de Flare), `sk_ave` (Picada, B = aleteo + `wyvern_ment.ogg` + golpe), `sk_dark` (Fuerza del Cetro, A = honda de 0 A.D. + aliento fantasma), `sk_bats` (Espíritus: chillidos reales de murciélago del mod Animalia + aleteo), `sk_corte` (Espada de Poder: silbido de hoja + choque de acero + carne). Estallido Oscuro quedó con su sonido original, sin capas.
+- **El dueño no quiere sonidos por síntesis: usar grabaciones con licencia libre.** Tampoco gritos de muerte para un grito de guerra (suenan «sufridos»).
+- Golpes de jefe: `thunder` (8,7 s, de ambiente) reemplazado por `earth_atk` y `swing2` grave. El trueno queda solo en «¡Peleen!» de la arena.
+- Fuentes nuevas, todas en GitHub (lo único que se alcanza desde la sesión en la nube): `0ad/0ad` (`binaries/data/mods/public/audio/`, CC BY-SA 3.0), `flareteam/flare-game` (créditos por archivo en su wiki; lo usado es CC BY 3.0 de Brandon Morris) y `ElCeejo/animalia` (MIT). Clonar con `--filter=blob:none --no-checkout` + `git sparse-checkout`. Créditos en `CREDITOS-SONIDO.md`. Se armaron con scripts de la sesión (`mk.py`, fuera del repo), no con `sndaudit/build.py`.
+- Probador de sonidos para el dueño: página con botones Antes/Ahora (artifact «NOX · Probador de voces y sonidos»).
+
+### Banco de pruebas de esta sesión (fuera del repo, `/home/claude/h`)
+
+`srv.js` (Chrome con puppeteer-core, `POST /eval`, `/shot?p=`), `help.js` (`__T.hero(cls,set,lv)`, `__T.mobs(tipo,n)`, `__T.steps(n)`), `up.sh` (arranca y entra a Campos), `cls.sh CLASE`, `shoot.sh`, `gif.sh NOMBRE INDICE CROP` (GIF antes | después alternando `VFX.on`), `apply.py` (vuelve a insertar `vfx.js` en `index.html`). Ganchos nuevos en `__NOX`: `VFX`, `FXT`.
