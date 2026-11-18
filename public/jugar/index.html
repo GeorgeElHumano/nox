@@ -8310,7 +8310,7 @@ function wbState(m){WB.st=m;if(!Z||Z.id!=='asuncion'||mode!=='game')return;
   if(x!==e.tx||z!==e.tz)e.mvSp=Math.hypot(x-e.p.x,z-e.p.z)/MOB_LAG;e.tx=x;e.tz=z;e.tr=r100/100;e.max=max;
   if(f&1){if(!e.dead)wbDie(e);}else if(e.predT&&T<e.predT)e.hp=Math.min(e.hp,hp);else e.hp=hp;
   WB.ph=m.ph||1;WB.left=m.left||0;}
-/* sonidos propios del dragón (assets/s/dr_*.mp3, hechos por síntesis: sndaudit/dragon.py). Se oyen desde lejos y se piden al aparecer */
+/* sonidos propios del dragón (assets/s/dr_*.mp3, armados con grabaciones CC0 de OpenGameArt: sndaudit/dragon.py y CREDITOS-SONIDO.md). Se oyen desde lejos y se piden al aparecer */
 const DRSND=['dr_rugido','dr_muerte','dr_fuego','dr_pisa','dr_ala','dr_cola','dr_mord','dr_explo'];
 function drS(n,x,z,vol,rate,delay){try{return snd(n,{x,z,vol:vol==null?1:vol,rate:rate||1,maxD:130,min:.08,delay:delay||0,jit:.04});}catch(er){return null;}}
 function wbDie(e){e.hp=0;killMobFx(e);e.D.play('muerte');shake=Math.max(shake,.8);drS('dr_muerte',e.p.x,e.p.z,1);later(1.7,()=>drS('dr_pisa',e.p.x,e.p.z,1,.8));}
@@ -8333,7 +8333,7 @@ function wbTele(m){const e=WB.e;if(!e||e.dead||e.nid!==m.n)return;const f=m.f||{
     if(clip){e.g.rotation.y=e.tr;D.play(clip);if(ab==='d_rugido'||ab==='d_lluvia'){shake=Math.max(shake,.4);drS('dr_rugido',ex,ez,1);return;}}
     /* cada ataque suena al cargarse, así también avisa al oído */
     if(ab==='d_fuego')drS('dr_rugido',ex,ez,.7,1.25);else if(ab==='d_carga')drS('dr_rugido',ex,ez,.8,1.1);else if(ab==='d_brasa')drS('dr_rugido',ex,ez,.6,.8);
-    else if(ab==='d_zarpa'||ab==='d_cola')drS('dr_cola',ex,ez,1,ab==='d_cola'?.8:1.15,Math.max(0,dur-.55));else if(ab==='d_pisa')drS('dr_ala',ex,ez,.8,.7);else if(ab==='d_mord')drS('dr_mord',ex,ez,1,1,Math.max(0,dur-.2));
+    else if(ab==='d_zarpa'||ab==='d_cola')drS('dr_cola',ex,ez,1,ab==='d_cola'?.8:1.15,Math.max(0,dur-.55));else if(ab==='d_pisa')drS('dr_ala',ex,ez,.8,.7);else if(ab==='d_mord')drS('dr_mord',ex,ez,1,1,0);
     else if(ab==='d_llega'){}
     tele(x,z,f,dur,col);if(ab==='d_meteoro')D.meteor(x,z,dur,m.bz||0,0,f.r);
     later(dur,()=>{if(WB.e!==e)return;
