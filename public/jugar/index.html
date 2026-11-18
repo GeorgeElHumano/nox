@@ -231,6 +231,32 @@ html.cur.dn :not(input):not(textarea):not(select),html.cur.dn{cursor:url(assets/
 .mk.m7{border:2px solid #ffe08a;border-radius:12px 3px 12px 3px;background:linear-gradient(100deg,rgba(60,36,6,.85),rgba(120,80,16,.85),rgba(60,36,6,.85));box-shadow:0 0 0 1px #2a1804,0 0 0 3px #b9822a,0 0 16px 2px rgba(255,205,90,.95)}
 .mk.m7::before,.mk.m7::after{content:"◆";position:absolute;top:50%;transform:translateY(-50%);color:#fff3c4;font-size:9px;text-shadow:0 0 6px #ffd24a}.mk.m7::before{left:4px}.mk.m7::after{right:4px}
 @media (prefers-reduced-motion:reduce){.ttz,.ttz *,.ttz::before,.ttz::after{animation:none!important}}
+/* Apertura del Reino: títulos (z13 Pionero, z14 Guardián, z15 Primeros) y marcos (m9 aurora, m10 guardián, m11 real) */
+@keyframes apAur{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+@keyframes apGlow{0%,100%{filter:drop-shadow(0 0 5px rgba(80,255,210,.9)) drop-shadow(0 2px 2px #000)}50%{filter:drop-shadow(0 0 11px rgba(190,140,255,1)) drop-shadow(0 2px 2px #000)}}
+@keyframes apSh{0%{background-position:-140% 0,0 0}60%,100%{background-position:240% 0,0 0}}
+.ttz.z13{color:#fff;letter-spacing:.13em;padding:7px 20px;border-radius:9px;border:2px solid #d9fff4;background:linear-gradient(90deg,#0f8f78,#38d6ae,#4aa8ff,#a46bff,#ff8ad8,#38d6ae,#0f8f78) 0 50%/300% 100%;animation:apAur 6s linear infinite,apGlow 3s ease-in-out infinite;box-shadow:0 0 0 2px #06302a,inset 0 0 10px rgba(255,255,255,.45)}
+.ttz.z13 b{text-shadow:0 1px 0 #063a32,0 0 8px rgba(255,255,255,.95)}
+.ttz.z13 svg{color:#fffbe0;filter:drop-shadow(0 0 4px #fff);margin:0 8px}
+.ttz.z13 .sp{text-shadow:0 0 5px #fff,0 0 9px #6affda}
+.ttz.z14{color:#3a2206;letter-spacing:.12em;padding:7px 26px;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.85) 50%,transparent 65%) -140% 0/55% 100% no-repeat,linear-gradient(180deg,#fff3b8,#ffd95e 30%,#c98a1e 62%,#f6cf6a 100%);animation:apSh 2.6s ease-in-out infinite;clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%,0 50%);box-shadow:inset 0 0 0 2px #fff6cc,inset 0 0 0 4px #8a5a10;filter:drop-shadow(0 0 7px rgba(255,205,90,.95)) drop-shadow(0 2px 2px #000)}
+.ttz.z14 b{text-shadow:0 1px 0 #fff3c4}
+.ttz.z14 svg{color:#7a4a08;margin:0 8px;width:18px;height:18px}
+.ttz.z14 .sp{display:none}
+.ttz.z15{color:#fff;letter-spacing:.14em;font-size:16px;padding:8px 24px;margin-top:22px;border-radius:7px;border:2px solid #ffe08a;background:linear-gradient(180deg,#b06bff 0%,#7a2fd0 40%,#3d0f78 100%);box-shadow:0 0 0 2px #2a0a52,0 0 16px rgba(190,120,255,1),0 0 40px rgba(150,70,255,.6),inset 0 0 12px rgba(255,220,255,.5)}
+.ttz.z15 b{text-shadow:0 2px 0 #2a0a52,0 0 10px #f0c8ff}
+.ttz.z15 .cw{position:absolute;left:50%;bottom:calc(100% - 5px);transform:translateX(-50%);line-height:0}
+.ttz.z15 .cw svg{width:34px;height:30px;margin:0;color:#ffd76a;filter:drop-shadow(0 0 6px rgba(255,210,90,.95)) drop-shadow(0 2px 1px #2a0a52)}
+.ttz.z15::before,.ttz.z15::after{content:"";position:absolute;top:50%;width:9px;height:9px;transform:translateY(-50%) rotate(45deg);background:#ffd76a;box-shadow:0 0 6px #ffd76a}.ttz.z15::before{left:-7px}.ttz.z15::after{right:-7px}
+.ttz.z15 .sp{text-shadow:0 0 5px #fff,0 0 9px #c98cff}
+.mk.m9{padding:5px 20px;border-radius:12px;border:2.5px solid transparent;background:linear-gradient(rgba(6,40,36,.82),rgba(20,16,56,.82)) padding-box,linear-gradient(90deg,#38d6ae,#4aa8ff,#a46bff,#ff8ad8,#38d6ae) 0 50%/300% 100% border-box;animation:apAur 5s linear infinite;box-shadow:0 0 14px rgba(70,230,200,.85),0 0 30px rgba(160,110,255,.45),inset 0 0 10px rgba(140,245,220,.4)}
+.mk.m9::before,.mk.m9::after{content:"✦";position:absolute;top:50%;transform:translateY(-50%);color:#d9fff4;font-size:13px;text-shadow:0 0 6px #6affda}.mk.m9::before{left:-8px}.mk.m9::after{right:-8px}
+.mk.m10{padding:5px 22px;border-radius:4px;border:3px solid transparent;background:linear-gradient(180deg,rgba(70,44,8,.9),rgba(34,20,4,.9)) padding-box,linear-gradient(180deg,#fff6c8,#ffd76a 25%,#b9822a 55%,#ffe9a0 80%,#8a5410) border-box;box-shadow:0 0 0 1.5px #2a1804,0 0 16px rgba(255,205,90,.9),inset 0 0 10px rgba(255,205,90,.35);color:#ffe9a0}
+.mk.m10::before,.mk.m10::after{content:"";position:absolute;top:50%;width:15px;height:18px;transform:translateY(-50%);background:linear-gradient(180deg,#fff3b8,#c98a1e);clip-path:polygon(50% 0,100% 16%,100% 58%,50% 100%,0 58%,0 16%);filter:drop-shadow(0 0 4px #ffd24a)}.mk.m10::before{left:-10px}.mk.m10::after{right:-10px}
+.mk.m11{margin-top:20px;padding:5px 22px;border-radius:9px;border:2.5px solid #ffe08a;background:linear-gradient(180deg,rgba(70,22,120,.88),rgba(28,8,56,.9));box-shadow:0 0 0 1.5px #2a0a52,0 0 0 3.5px #9a5ae0,0 0 18px rgba(190,120,255,.95),inset 0 0 10px rgba(228,196,255,.45)}
+.mk.m11::before{content:"♛";position:absolute;left:50%;bottom:calc(100% - 3px);transform:translateX(-50%);font-size:22px;line-height:1;color:#ffd76a;text-shadow:0 0 8px rgba(255,210,90,.95),0 2px 0 #2a0a52}
+.mk.m11::after{content:"◆  ◆";position:absolute;left:0;right:0;top:calc(100% - 5px);text-align:center;font-size:8px;letter-spacing:22px;text-indent:22px;color:#ffe08a;text-shadow:0 0 5px #c98cff}
+#pNox .nx-prev .ttz.z15,#pNox .nx-prev .mk.m11{margin-top:22px}
 /* Muro de Fundadores y Placa de la Apertura: vista de cerca */
 #pMuro.panel{left:0!important;right:0!important;top:0!important;bottom:0!important;padding:calc(var(--st,0px) + 10px) var(--sr,16px) calc(var(--sb,0px) + 10px) var(--sl,16px)!important;align-items:center!important;justify-content:center!important;background:rgba(8,5,3,.66)!important}
 #pMuro>.card{animation:none!important;width:min(900px,100%)!important;max-width:none!important;height:min(660px,100%)!important;max-height:100%!important;padding:0 20px 12px!important;display:flex;flex-direction:column;overflow:hidden;border:3px solid #c8953c!important;border-radius:14px!important;box-shadow:inset 0 0 0 1px #f6d892,0 24px 70px rgba(0,0,0,.7)!important;background:linear-gradient(180deg,#5c574f,#34312c)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
@@ -2209,7 +2235,7 @@ const QUESTS=[
 const NPCS={
  herrero:{name:'Don Ramón',role:'Herrero',pos:[-11.5,-9.2],greet:'¿Buscás algo que corte o que aguante golpes? Todo forjado acá mismo, con hierro de Ybycuí.'},
  boticaria:{name:'Ña Eusebia',role:'Pociones',pos:[10.6,-9.4],greet:"Mba'éichapa. Pociones frescas, hechas con yuyos del monte. Llevá bastantes antes de salir."},
- pai:{name:"Pa'i Antonio",role:'Técnicas y evolución',pos:[-6.3,-15.9],greet:'Que Tupã te guíe. Te enseño técnicas nuevas cuando estés listo, y te pongo a prueba para evolucionar.'},
+ pai:{name:"Pa'i Antonio",role:'Técnicas y evolución',pos:[-6.8,-13.2],greet:'Que Tupã te guíe. Te enseño técnicas nuevas cuando estés listo, y te pongo a prueba para evolucionar.'},
  capitan:{name:'Capitán Cabañas',role:'Misiones',pos:[5,30],greet:'Las bestias del Kurupí no dan tregua. Necesito gente con coraje.'},
  chamana:{name:'Jarýi Kuña',role:'Caldero de Kerana',pos:[13,6.5],greet:'El caldero de Kerana da poder… o se traga todo. Vos elegís.'},
  baqueano:{name:'Baqueano Tito',role:'Viajes',pos:[-5,30],greet:'Conozco cada camino del reino. Decime adónde y te llevo, por unos guaraníes.'},
@@ -5605,7 +5631,7 @@ function decPoint(cx,cz,rad,d){if(Z&&Z.tiers){const p=decPoint0(cx,cz,rad,d);ret
 function decPoint0(cx,cz,rad,d){const wet=/cattail|papyrus|reed/.test(d);for(let t=0;t<14;t++){const a=Math.random()*TAU,r=Math.sqrt(Math.random())*rad,x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r;if(Math.abs(x)>96||Math.abs(z)>96)continue;
   if(nearSpecial(x,z,5))continue;if(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]-(wet?-1.5:-.5)&&!wet)continue;
   if(Z.marsh){const h=H(x,z);if(wet?(h>WATER_Y+.6||h<WATER_Y-.5):h<WATER_Y+.1)continue;}else if(wet&&!(Z.lake&&Math.abs(Math.hypot(x-Z.lake[0],z-Z.lake[1])-Z.lake[2])<3))continue;
-  if(Z.safe&&Math.hypot(x,z-6)<15&&!/rock|bush/.test(d))continue;if(blocked(x,z,.7))continue;return [x,z];}return null;}
+  if(Z.safe&&Math.hypot(x,z-6)<15&&!/rock|bush/.test(d))continue;if(Z.id==='asuncion'&&z<-9.5&&z>-19&&Math.abs(x-1.2)<10.2)continue;/* nada delante del Muro, la Placa ni el Pa'i */if(blocked(x,z,.7))continue;return [x,z];}return null;}
 /* ================= ropa por partes: cada pieza cambia su zona del cuerpo ================= */
 const BODYM={};const IMGD={};const BODYV={};
 /* pieza de ropa en 3D: se recortan del cuerpo los triángulos de esa prenda (guantes, botas, pantalón o pechera) */
@@ -6297,7 +6323,7 @@ const BUILD={
    for(const[dx,dz,ry]of[[0,4.05,0],[4.05,0,PI/2]])for(const yy of[5,10]){const wn=mk(BOX(.7,1.4,.1),mat(0x1a120c),kx+dx,yy,kz+dz,G);wn.rotation.y=ry;}
    addFlag(G,kx,16,kz,PI/4);colliders.push({x:kx,z:kz,hw:5.2,hd:5.2});}
   // farolas
-  for(let i=0;i<8;i++){const a=(i+.5)/8*TAU,x=Math.sin(a)*14.8,z=Math.cos(a)*14.8;vput(V,'lamppost',x,1.6,z,0,0,0,1,3.2,1);vput(V,'lantern',x,3.35,z,0,0,0,1,1,1);colliders.push({x,z,r:.25});}
+  for(let i=0;i<8;i++){const a=(i+.5)/8*TAU;let x=Math.sin(a)*14.8,z=Math.cos(a)*14.8;if(z<-13){x=Math.sign(x)*5.2;z=-14.8;}/* las dos del norte flanquean el Muro (antes tapaban la Placa y al Pa'i) */vput(V,'lamppost',x,1.6,z,0,0,0,1,3.2,1);vput(V,'lantern',x,3.35,z,0,0,0,1,1,1);colliders.push({x,z,r:.25});}
   for(const[bx,bz]of[[-6,8],[6,8]]){mk(CYL(.5,.25,.5,10),mat(0x2b2420,{metalness:.6,roughness:.5}),bx,1.05,bz,G);mk(CYL(.07,.1,.85,6),mat(0x2b2420,{metalness:.6,roughness:.5}),bx,.42,bz,G);addFire(G,bx,1.15,bz,0xff8a3a,1.3);colliders.push({x:bx,z:bz,r:.6});}
   // fragua del herrero
   mk(BOX(2.4,1.2,1.6),TM.stone,-14.5,.6,-12.5,G);mk(BOX(1,3.6,1),TM.stone,-15.3,2.4,-13,G);addFire(G,-14.2,1.2,-12.3);
@@ -9527,8 +9553,10 @@ const NXT={t_cazador:['Cazador de Mitos','z1',NXE.arrows,NXE.arrows,'',1],t_pomb
   t_farmeador:['Farmeador Serial','z4 pl',NXE.coins,NXE.coins,''],t_afk:['AFK Profesional','z5 pl',NXE.moon,'<span class="zz a">z</span><span class="zz b">z</span><span class="zz c">Z</span>',''],
   t_terere:['Rey del Tereré','z6',NXE.crown,NXE.guampa,'',1],t_leyenda:['Leyenda de Asunción','z7 pl',NXE.star,NXE.star,''],
   t_fund1:['Fundador','z8 pl',NXE.shield,NXE.shield,''],t_fund2:['Fundador de Plata','z9 pl',NXE.shield,NXE.shield,NXSP],t_fund3:['Fundador de Oro','z10 pl',NXE.crown,NXE.crown,NXSP],
-    t_dragon:['Cazador del Dragón','z11','','',''],t_mata:['Matadragones','z12','<img class="dh" src="assets/ui/dragon_cabeza.webp" alt="">','','']};
-const NXM={m_filete:'m1',m_luna:'m2',m_brasa:'m3',m_estrellas:'m4',m_fund1:'m5',m_fund2:'m6',m_fund3:'m7',m_dragon:'m8'};
+    t_dragon:['Cazador del Dragón','z11','','',''],t_mata:['Matadragones','z12','<img class="dh" src="assets/ui/dragon_cabeza.webp" alt="">','',''],
+    /* Apertura del Reino */
+    t_pionero:['Pionero del Reino','z13','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z" fill="currentColor"/><circle cx="12" cy="12" r="2.2" fill="#0b3b33"/></svg>','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z" fill="currentColor"/><circle cx="12" cy="12" r="2.2" fill="#0b3b33"/></svg>',NXSP],t_guardian:['Guardián de la Beta','z14','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5.2-3.4 9-8 11-4.6-2-8-5.8-8-11V5z" fill="currentColor"/><path d="M12 6.2l1.5 3.2 3.5.4-2.6 2.4.7 3.5-3.1-1.8-3.1 1.8.7-3.5L7 9.800l3.5-.4z" fill="#fff6d0"/></svg>','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5.2-3.4 9-8 11-4.6-2-8-5.8-8-11V5z" fill="currentColor"/><path d="M12 6.2l1.5 3.2 3.5.4-2.6 2.4.7 3.5-3.1-1.8-3.1 1.8.7-3.5L7 9.800l3.5-.4z" fill="#fff6d0"/></svg>',NXSP],t_primeros:['Primeros del Reino','z15','<i class="cw"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8l5 4 5-8 5 8 5-4-2 11H4z" fill="currentColor"/><circle cx="12" cy="4" r="1.6" fill="#fff"/><circle cx="2.4" cy="8" r="1.4" fill="#fff"/><circle cx="21.6" cy="8" r="1.4" fill="#fff"/></svg></i>','',NXSP]};
+const NXM={m_filete:'m1',m_luna:'m2',m_brasa:'m3',m_estrellas:'m4',m_fund1:'m5',m_fund2:'m6',m_fund3:'m7',m_dragon:'m8',m_pionero:'m9',m_guardian:'m10',m_primeros:'m11'};
 function nxTitle(id){const x=NXT[id];return x?`<span class="ttz ${x[1]}">${x[2]}<b${x[5]?' class="gt"':''}>${x[0]}</b>${x[3]}${x[4]}</span>`:'';}
 function nxFrame(id,inner){const c=NXM[id];return c?`<span class="mk ${c}">${inner}</span>`:inner;}
 /* --- estado: lo trae el servidor --- */

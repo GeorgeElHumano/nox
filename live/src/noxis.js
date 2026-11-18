@@ -56,6 +56,13 @@ export const NX_ITEMS = [
   // `esc` = se canjea por esa cantidad de Escamas Doradas (own.escama, las da el servidor en vivo). Kinds nuevos: mas (mascota propia), wing (alas).
   { id: 't_dragon', kind: 'title', name: 'Cazador del Dragón', desc: 'Placa roja de escamas. Por derrotar al Dragón Dorado.', dr: 1 },
   { id: 't_mata', kind: 'title', name: 'Matadragones', desc: 'Fuego y la cabeza del dragón. Para quien más daño hizo en una pelea.', dr: 1 },
+  // Apertura del Reino (dic. 2026): no se venden, los entrega el evento (`ev`). t_primeros es además lo que lee la Placa de la Apertura (GET nox/muro).
+  { id: 't_pionero', kind: 'title', name: 'Pionero del Reino', desc: 'Placa de aurora. Para quien entró al reino en la Apertura.', ev: 1 },
+  { id: 't_guardian', kind: 'title', name: 'Guardián de la Beta', desc: 'Placa de oro con escudos. Para las cuentas que jugaron la beta.', ev: 1 },
+  { id: 't_primeros', kind: 'title', name: 'Primeros del Reino', desc: 'Púrpura real con corona. Para los 10 primeros de la Carrera de Pioneros.', ev: 1 },
+  { id: 'm_pionero', kind: 'frame', name: 'Marco de aurora', desc: 'Borde de aurora que cambia de color. Apertura del Reino.', ev: 1 },
+  { id: 'm_guardian', kind: 'frame', name: 'Marco del Guardián', desc: 'Oro macizo con escudos. Cuentas de la beta.', ev: 1 },
+  { id: 'm_primeros', kind: 'frame', name: 'Marco real', desc: 'Púrpura y oro con corona. Los 10 primeros de la Carrera.', ev: 1 },
   { id: 'm_dragon', kind: 'frame', name: 'Marco del Dragón', desc: 'Marco de oro envuelto en fuego.', esc: 5 },
   { id: 'e_dragon', kind: 'trail', name: 'Fuego del Dragón', desc: 'Llamas y brasas al caminar.', esc: 12 },
   { id: 'cria', kind: 'mas', name: 'Cría de Dragón Dorado', desc: 'Mascota que vuela a tu lado.', esc: 25 },
