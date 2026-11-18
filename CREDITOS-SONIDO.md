@@ -140,6 +140,14 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 | mu_explode.mp3 | leo_magic/04_Fire_explosion_04_medium.wav | Leohpaz | CC BY 4.0 |
 | mu_fireball.mp3 | rd80/spell_fire_02.ogg | rubberduck (OpenGameArt) | CC0 |
 | mu_gem.mp3 | síntesis propia (cristal) | NOX | CC0 |
+| dr_rugido.mp3 | síntesis propia (Dragón Dorado: rugido; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_muerte.mp3 | síntesis propia (Dragón Dorado: rugido de muerte; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_fuego.mp3 | síntesis propia (Dragón Dorado: aliento de fuego; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_pisa.mp3 | síntesis propia (Dragón Dorado: pisotón y pasos; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_ala.mp3 | síntesis propia (Dragón Dorado: aleteo; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_cola.mp3 | síntesis propia (Dragón Dorado: coletazo y zarpazo; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_mord.mp3 | síntesis propia (Dragón Dorado: mordida; `sndaudit/dragon.py`) | NOX | CC0 |
+| dr_explo.mp3 | síntesis propia (Dragón Dorado: meteoro y llamarada; `sndaudit/dragon.py`) | NOX | CC0 |
 | mu_heal.mp3 | leo_heal/02_Heal_02.wav | Leohpaz | CC BY 4.0 |
 | mu_levelup.mp3 | levelup/Level Up!/orchestra.wav | Bart Kelsey (OpenGameArt) | CC BY 3.0 |
 | mu_lightning.mp3 | leo_magic/18_Thunder_02.wav | Leohpaz | CC BY 4.0 |
