@@ -1889,8 +1889,8 @@ const EQK=['weapon','shield','helm','armor','pants','gloves','boots','wings'];
 const ARMK=['helm','armor','pants','gloves','boots'];
 const SLOTLABEL={weapon:'Arma',shield:'Escudo',helm:'Casco',armor:'Armadura',pants:'Piernas',gloves:'Guantes',boots:'Botas',wings:'Alas'};
 const TREQ_LVL=[1,10,24,38,52,70,88,133,177,200],TREQ_STAT=[18,55,100,155,220,300,390,560,760,900];
-const WDMG={gladiador:[[3,7],[9,16],[18,29],[31,46],[47,66],[66,90],[88,118],[150,198],[236,308],[366,478]],mburuvicha:[[3,6],[8,14],[16,26],[28,41],[43,60],[60,82],[80,108],[136,182],[214,284],[332,440]],caballero:[[3,7],[9,15],[18,28],[30,44],[46,64],[64,88],[86,116],[146,196],[230,304],[356,472]],hechicero:[[2,6],[7,13],[15,24],[26,38],[40,56],[56,78],[76,102],[130,174],[204,272],[316,422]],arquera:[[3,6],[8,14],[16,26],[28,40],[42,60],[60,82],[80,106],[136,180],[214,282],[332,438]]};
-const ADEF=[3,7,13,20,29,40,53,86,128,198];
+const WDMG={gladiador:[[3,7],[9,16],[18,29],[31,46],[47,66],[66,90],[88,118],[150,198],[236,308],[307,400]],mburuvicha:[[3,6],[8,14],[16,26],[28,41],[43,60],[60,82],[80,108],[136,182],[214,284],[278,369]],caballero:[[3,7],[9,15],[18,28],[30,44],[46,64],[64,88],[86,116],[146,196],[230,304],[299,395]],hechicero:[[2,6],[7,13],[15,24],[26,38],[40,56],[56,78],[76,102],[130,174],[204,272],[265,354]],arquera:[[3,6],[8,14],[16,26],[28,40],[42,60],[60,82],[80,106],[136,180],[214,282],[278,367]]};
+const ADEF=[3,7,13,20,29,40,53,86,128,166];
 const SLOTF={helm:.8,armor:1.25,pants:1,gloves:.6,boots:.6,shield:1.1};
 const PRICEF={weapon:1.6,shield:1.1,helm:.9,armor:1.3,pants:1,gloves:.7,boots:.7};
 const TPRICE=[1500,14000,60000,180000,420000,900000,1800000,4800000,11000000,26000000];
@@ -1986,6 +1986,7 @@ function matMesh(sub){const M=MATS[sub]||{shape:'bone',hex:0xddccaa},c=M.hex,g=n
   else{tube([[0,-.5,0],[0,.5,0]],.09,.09,c,{roughness:.7});for(const y of[-.5,.5])for(const x of[-.07,.07]){const k=new THREE.Mesh(new THREE.SphereGeometry(.1,10,8),sm(c));k.position.set(x,y,0);g.add(k);}g.rotation.z=.6;}
   return g;}
 const QITEMS={mascara_ana:{name:'Máscara de Añá',desc:'Invitación a la Arena de Añá. Usala para entrar: quedate en pie hasta el final y ganá una pieza antigua.'},manto_tuguy:{name:'Manto de Tuguy',desc:'Invitación a la Fortaleza de Tuguy. Usala para entrar: rompé el portón, vencé al guardián y llevá el Arma de Tupã al altar.'},arma_tupa:{name:'Arma de Tupã',desc:'Llevala al altar de la entrada antes de que se acabe el tiempo.'},pluma:{name:'Pluma de Guyra Pytã',desc:"El Pa'i Antonio necesita 5 para tu prueba de evolución."}};
+const MYTHTXT='Mítico: 35 % más daño y defensa que la pieza común. Solo cae en los mapas de reinicios.';
 const EXW=[['exr','Golpe excelente +10%'],['dmg','Daño +2%'],['spd','Velocidad de ataque +7%'],['lifek','Recuperás vida al matar'],['manak','Recuperás maná al matar'],['zen','Guaraníes +40%']];
 const EXA=[['hp','Vida máxima +4%'],['mp','Maná máximo +4%'],['dr','Daño recibido −4%'],['refl','Refleja 5% del daño'],['defr','Defensa +10%'],['zen2','Guaraníes +30%']];
 const EXN={};EXW.concat(EXA).forEach(([k,n])=>EXN[k]=n);
@@ -2232,7 +2233,7 @@ function loadSave(){try{const d=JSON.parse(localStorage.getItem(SKEY)||'null');i
 const isEq=it=>!!it&&EQK.includes(it.k);
 const stackable=it=>['gem','pot','scroll','quest','mat'].includes(it.k);
 const STACKMAX=999;/* pociones, joyas y demás se apilan hasta 999 por casilla */
-function newEquip(cls,k,t,o){o=o||{};const it={u:++UID,k,c:cls,t,lv:o.lv||0,op:o.op||0,luck:!!o.luck,ex:o.ex||[]};if(o.epic)it.epic=true;if(o.anc)it.anc=o.anc;return it;}
+function newEquip(cls,k,t,o){o=o||{};const it={u:++UID,k,c:cls,t,lv:o.lv||0,op:o.op||0,luck:!!o.luck,ex:o.ex||[]};if(o.epic)it.epic=true;if(o.myth){it.myth=true;it.epic=true;}if(o.anc)it.anc=o.anc;return it;}
 /* separa k unidades de una pila en el primer lugar libre del mismo arreglo (bolsa o baúl); devuelve el índice nuevo o -1 */
 function splitStack(arr,i,k){const it=arr[i];if(!it||!((it.n||1)>1)||k<1||k>=(it.n||1))return -1;const j=arr.indexOf(null);if(j<0)return -1;const nw=JSON.parse(JSON.stringify(it));nw.u=++UID;nw.n=k;it.n=(it.n||1)-k;arr[j]=nw;return j;}
 function stackItem(k,sub,n){return{u:++UID,k,sub,n:n||1};}
@@ -2242,21 +2243,21 @@ const petsOn=()=>C&&C.pets?PETK.filter(k=>C.pets[k]):[];
 const newPet=()=>({u:++UID,k:'pet',sub:pick(['imp','hada','rudolf']),n:1});
 function itemName(it){
   if(it.k==='pet')return PETS[it.sub].n;  if(it.k==='gem')return GEMS[it.sub].name;if(it.k==='pot')return POTS[it.sub].name;if(it.k==='scroll')return SCROLLS[it.sub].name;if(it.k==='quest')return QITEMS[it.sub].name;if(it.k==='mat')return MATS[it.sub]?MATS[it.sub].name:'Trofeo';
-  let n;if(it.uq&&UNIQ[it.uq])return(it.epic?'Épico ':'')+UNIQ[it.uq].n+(it.lv?' +'+it.lv:'');if(it.k==='weapon')n=WNAME[it.c][it.t]||(({hechicero:'Bastón',mburuvicha:'Cetro',arquera:'Arco'})[it.c]||'Espada')+' '+(SETN[it.c][it.t]||'');else if(it.k==='shield')n=SHNAME[it.t]||'Escudo '+(SETN.caballero[it.t]||'');else if(it.k==='wings')n=((it.g||1)>=3?WINGN3:(it.g||1)>=2?WINGN2:WINGN)[it.c];else n=SLOTN[it.c][it.k]+' '+SETN[it.c][it.t];
-  return(it.epic?'Épico ':it.anc?ANCS[it.anc].n+' · ':it.ex&&it.ex.length?'Excelente ':'')+n+(it.lv?' +'+it.lv:'');
+  let n;if(it.uq&&UNIQ[it.uq])return(it.myth?'Mítico ':it.epic?'Épico ':'')+UNIQ[it.uq].n+(it.lv?' +'+it.lv:'');if(it.k==='weapon')n=WNAME[it.c][it.t]||(({hechicero:'Bastón',mburuvicha:'Cetro',arquera:'Arco'})[it.c]||'Espada')+' '+(SETN[it.c][it.t]||'');else if(it.k==='shield')n=SHNAME[it.t]||'Escudo '+(SETN.caballero[it.t]||'');else if(it.k==='wings')n=((it.g||1)>=3?WINGN3:(it.g||1)>=2?WINGN2:WINGN)[it.c];else n=SLOTN[it.c][it.k]+' '+SETN[it.c][it.t];
+  return(it.myth?'Mítico ':it.epic?'Épico ':it.anc?ANCS[it.anc].n+' · ':it.ex&&it.ex.length?'Excelente ':'')+n+(it.lv?' +'+it.lv:'');
 }
 function itemQ(it){if(!isEq(it))return 0;if(it.ex&&it.ex.length)return 3;if(it.lv>=7)return 2;if(it.lv>=4||it.luck||it.op)return 1;return 0;}
 const QCOL=['var(--q0)','var(--q1)','var(--q2)','var(--q3)'],QHEX=[0xefe9dc,0x7cb8ff,0xffcf57,0x63e08a];
-const RAR={normal:{n:'Común',c:'#efe9dc',h:0xefe9dc},opt:{n:'Con opciones',c:'#6ab8ff',h:0x4aa0ff},exc:{n:'Excelente',c:'#5cf08a',h:0x2dff6a},anc:{n:'Antiguo',c:'#ffc94a',h:0xffb02a},epic:{n:'Épico',c:'#c98cff',h:0xa452ff},uniq:{n:'Único',c:'#ff9a3c',h:0xff7a1a}};
+const RAR={normal:{n:'Común',c:'#efe9dc',h:0xefe9dc},opt:{n:'Con opciones',c:'#6ab8ff',h:0x4aa0ff},exc:{n:'Excelente',c:'#5cf08a',h:0x2dff6a},anc:{n:'Antiguo',c:'#ffc94a',h:0xffb02a},epic:{n:'Épico',c:'#c98cff',h:0xa452ff},uniq:{n:'Único',c:'#ff9a3c',h:0xff7a1a},myth:{n:'Mítico',c:'#ff4a6e',h:0xff2a52}};
 const ANCS={humaita:{n:'Humaitá',b:[[2,'Daño +6%'],[3,'Crítico +4%'],[4,'Daño +10%'],[5,'Velocidad de ataque +8%']]},cerrocora:{n:'Cerro Corá',b:[[2,'Defensa +8%'],[3,'Vida máxima +8%'],[4,'Defensa +12%'],[5,'Daño recibido −6%']]}};
-function itemR(it){if(!isEq(it))return 'normal';if(it.epic)return 'epic';if(it.uq)return 'uniq';if(it.anc)return 'anc';if(it.ex&&it.ex.length)return 'exc';if(it.luck||it.op)return 'opt';return 'normal';}
+function itemR(it){if(!isEq(it))return 'normal';if(it.myth)return 'myth';if(it.epic)return 'epic';if(it.uq)return 'uniq';if(it.anc)return 'anc';if(it.ex&&it.ex.length)return 'exc';if(it.luck||it.op)return 'opt';return 'normal';}
 function itemColor(it){if(it.k==='pet')return PETS[it.sub].col;if(it.k==='gem')return GEMS[it.sub].col;if(it.k==='mat')return MATS[it.sub]&&MATS[it.sub].rare?'#ffb04a':'#e8d8b8';if(it.k==='quest')return 'var(--q2)';if(it.k==='pot')return POTS[it.sub].kind==='hp'?'#ff8a7a':'#8ec2ff';const r=itemR(it);if(r==='normal')return QCOL[itemQ(it)];return RAR[r].c;}
 function iconOf(it){return it.k==='weapon'?'weapon_'+it.c:it.k==='pet'?'pet':it.k;}
 const lvAdd=lv=>lv<=9?lv*3:27+(lv-9)*4;
-function itemDmg(it){const b=WDMG[it.c][it.t],a=lvAdd(it.lv)+it.op*4,e=it.epic?1.2:1;return[Math.round((b[0]+a)*e),Math.round((b[1]+a)*e)];}
+function itemDmg(it){const b=WDMG[it.c][it.t],a=lvAdd(it.lv)+it.op*4,e=it.myth?1.35:it.epic?1.2:1;return[Math.round((b[0]+a)*e),Math.round((b[1]+a)*e)];}
 /* alas: la segunda generación da bastante más */
 function wingStats(it){const g=it.g||1;if(g>=3)return{dmg:.32+it.lv*.014,abs:.3+it.lv*.007};const g2=g>=2;return{dmg:(g2?.22:.12)+it.lv*(g2?.012:.01),abs:(g2?.22:.12)+it.lv*(g2?.006:.005)};}
-function itemDef(it){if(it.k==='wings')return ((it.g||1)>=3?55+it.lv*5:(it.g||1)>=2?30+it.lv*4:10+it.lv*3)+it.op*4;return Math.round((Math.round(ADEF[it.t]*SLOTF[it.k])+lvAdd(it.lv)+it.op*4)*(it.epic?1.2:1));}
+function itemDef(it){if(it.k==='wings')return ((it.g||1)>=3?55+it.lv*5:(it.g||1)>=2?30+it.lv*4:10+it.lv*3)+it.op*4;return Math.round((Math.round(ADEF[it.t]*SLOTF[it.k])+lvAdd(it.lv)+it.op*4)*(it.myth?1.35:it.epic?1.2:1));}
 function reqOf(it){if(!isEq(it))return null;const main=CLASSES[it.c].main;if(it.k==='wings')return{lvl:20,stat:0,main};return{lvl:TREQ_LVL[it.t],stat:Math.round(TREQ_STAT[it.t]*(it.k==='weapon'?1:.85)),main};}
 function canEquip(it){
   if(!isEq(it))return 'Este objeto no se equipa';
@@ -3364,6 +3365,9 @@ for(const id in LOOTDEF){const D=LOOTDEF[id],m=MOBS[id];if(!m)continue;const lv=
   MATS[D[1][0]]={name:D[1][1],shape:D[1][2],hex:D[1][3],sell:Math.round(lv*320*b/10)*10,mob:id,rare:1};
   UNIQ[D[2][0]]={k:D[2][1],n:D[2][2],d:D[2][3],mob:id,t:lv<12?0:lv<24?1:lv<38?2:lv<52?3:lv<70?4:lv<88?5:6};}
 const LOOTCH={mat:.22,rare:.025,uq:.006,uqe:.0008};
+/* reliquias del Cerro Tres Kandú: un arma mítica del último set con el nombre de cada jefe; solo la deja ese jefe */
+const RELIQ={kurupirv:['Furia del Kurupí','Guarda la fuerza del señor del monte.'],aoaorv:['Embestida del Ao Ao','Nadie queda en pie cuando arremete la manada.'],monairv:['Colmillo del Moñái','Todavía gotea veneno.'],jasyjatererv:['Bastón de oro del Jasy Jateré','El que lo empuña manda sobre la siesta.'],anabossrv:['Ira de Añá','Arde sin quemar la mano de su dueño.'],yaguaretabarv:['Garra del Yaguareté-Abá','El chamán que se volvió fiera la afiló con su propia sangre.'],yjararv:['Corriente del Y Jára','El agua de todos los saltos corre por su filo.'],taurv:['Legado de Tau','El arma del padre de los siete. No hay otra más fuerte en el reino.']};
+for(const id in RELIQ)UNIQ['reliq_'+id]={k:'weapon',n:RELIQ[id][0],d:RELIQ[id][1],mob:id,t:9,reliq:1};
 const OAD_BEAST={aguara:{f:'b_aguara',len:1.95,ts:{walk:1.4,run:1.15}},luison:{f:'b_luison',len:2.2,ts:{walk:1.4,run:1.15},eye:0xff2a12},
  taitetu:{f:'b_taitetu',len:1.3,ts:{walk:.7,run:.85}},jaguarete:{f:'b_jaguarete',len:2.35,ts:{walk:1.9,run:3.2}},
  teju:{f:'b_teju',len:3.1,ts:{walk:1.3,run:1.5},eye:0xff3a1a},aoao:{f:'b_aoao',len:2.7,ts:{walk:1.1,run:1.05},eye:0xff2a12,horns:1},
@@ -7095,15 +7099,24 @@ function rewardKill0(e,S){if(!S||(!S.xp&&!S.quest&&!S.top))return;
       const it=ep?newEquip(C.cls,k,U.t,{lv:RI(5,8),luck:true,op:RI(2,3),ex:randomEx(k,RI(2,3)),epic:true}):newEquip(C.cls,k,U.t,{lv:RI(2,5),luck:Math.random()<.6,op:RI(1,2),ex:randomEx(k,RI(1,2))});it.uq=D[2][0];dropAt(s[0],s[1],{item:it});
       toast(`<em style="color:${ep?'#c98cff':'#ff9a3c'}">¡${esc(itemName(it))}!</em>`);}}}
   const zt=Z&&Z.id==='mbocaruzu'?7:Z&&Z.id==='saltocristal'?8:null,zym=Z&&!!Z.rst,zgu=Z&&Z.id==='saltosguaira',ztk=Z&&Z.id==='treskandu';
-  /* Cerro León: solo épicos de los sets nuevos (133 en los spots 210-250, 177 en los de 260-300), rarísimos */
-  const itemN=ztk&&boss?(Math.random()<.35?2:1):zym?(Math.random()<(boss?1:zgu?(gold?.22:eli?.12:.025):gold?.15:eli?.08:.015)?1:0):boss?2:gold?1:eli?(Math.random()<.55?1:0):Math.random()<(e.def.k?.16:.09)?1:0;
-  for(let i=0;i<itemN;i++){const s=scat();const it=zym?rollEquip(L,0,1,0,ztk?8:zgu?(Math.random()<.3?7:8):L<=250?7:8):zt!=null?rollEquip(L,boss?1:gold?.3:eli?.3:.06,0,boss?.3:gold?.15:eli?.12:.03,zt):rollEquip(L,boss?1:gold?.3:eli?.25:.025,boss?.22:gold?.05:eli?.04:.004,boss?.3:gold?.15:eli?.12:.03);
-    dropAt(s[0],s[1],{item:it});if(it.epic&&it.t>=7){toast(`<em style="color:#c98cff">¡Cayó ${esc(itemName(it))}!</em>`);if(!snd('mu_rare',{vol:.9,jit:0,min:.3}))sfx('rare');}}
+  const rare=it=>{const s=scat();dropAt(s[0],s[1],{item:it});if(it.epic||it.uq||it.t>=9){toast(`<em style="color:${itemColor(it)}">¡Cayó ${esc(itemName(it))}!</em>`);if(!snd('mu_rare',{vol:.9,jit:0,min:.3}))sfx('rare');}};
+  /* pieza única de la bestia (la de su versión común), pero del set t; opcionalmente mítica */
+  const uniqOf=(t,myth)=>{const D=LOOTDEF[e.def.base||e.type];if(!D||!D[2])return rollEquip(L,0,myth?0:1,0,t,myth);const U=UNIQ[D[2][0]];const it=newEquip(C.cls,U.k,t,myth?{lv:RI(6,9),luck:true,op:3,ex:randomEx(U.k,3),myth:true}:{lv:RI(3,6),luck:true,op:RI(1,2),ex:randomEx(U.k,2)});it.uq=D[2][0];return it;};
+  if(ztk){/* Cerro Tres Kandú: cada jefe deja una pieza mítica del último set; a veces su pieza única mítica y, más raro, su reliquia */
+    if(boss){rare(rollEquip(L,0,0,0,9,true));if(Math.random()<.3)rare(uniqOf(9,true));if(Math.random()<.12&&UNIQ['reliq_'+e.type]){const it=newEquip(C.cls,'weapon',9,{lv:RI(7,9),luck:true,op:3,ex:randomEx('weapon',3),myth:true});it.uq='reliq_'+e.type;rare(it);}}
+  }else if(zgu){/* Saltos del Guairá: míticos y únicos de los sets 133 y 177, y antiguos, únicos y épicos del último set */
+    if(Math.random()<(boss?1:gold?.4:eli?.25:.05)){const r=Math.random(),t78=Math.random()<.3?7:8;rare(r<.3?uniqOf(t78):r<.5?rollEquip(L,0,0,0,t78,true):r<.75?(()=>{let it;for(let i=0;i<8;i++){it=rollEquip(L,0,0,1,9);if(it.anc)break;}return it;})():r<.9?uniqOf(9):rollEquip(L,0,1,0,9));}
+  }else if(zym){/* Cerro León: épicos de los sets 133 y 177 (rarísimos) y, aparte, el último set en versión común o Excelente */
+    if(Math.random()<(boss?1:gold?.15:eli?.08:.015))rare(rollEquip(L,0,1,0,L<=250?7:8));
+    if(Math.random()<(boss?1:gold?.3:eli?.18:.035))rare(rollEquip(L,.2,0,0,9));
+  }else{const itemN=boss?2:gold?1:eli?(Math.random()<.55?1:0):Math.random()<(e.def.k?.16:.09)?1:0;
+    for(let i=0;i<itemN;i++){const s=scat();const it=zt!=null?rollEquip(L,boss?1:gold?.3:eli?.3:.06,0,boss?.3:gold?.15:eli?.12:.03,zt):rollEquip(L,boss?1:gold?.3:eli?.25:.025,boss?.22:gold?.05:eli?.04:.004,boss?.3:gold?.15:eli?.12:.03);dropAt(s[0],s[1],{item:it});}}
   if(C.evoQ&&C.L>=50&&(Z.id==='chaco'||Z.id==='esteros')&&countItem('quest','pluma')<5&&Math.random()<(boss?.5:.02)){/* prueba de evolución: 2 % por bestia y 50 % por jefe (antes 8 % y 100 %) */const s=scat();dropAt(s[0],s[1],{item:stackItem('quest','pluma',1)});}
 }
-function rollEquip(L,exCh,epCh,anCh,tFix){
+function rollEquip(L,exCh,epCh,anCh,tFix,myth){
   const cls=Math.random()<.7?C.cls:pick(Object.keys(CLASSES));const ks=['weapon','armor','pants','gloves','boots'];if(cls!=='gladiador')ks.push('helm');if(cls==='caballero')ks.push('shield');
   const k=pick(ks),t=tFix!=null?tFix:L<12?0:L<24?1:L<38?2:L<52?3:L<70?4:L<88?5:6;const lv=RI(0,Math.min(4,Math.floor(L/14)));
+  if(myth)return newEquip(cls,k,t,{lv:RI(6,9),luck:true,op:3,ex:randomEx(k,3),myth:true});
   if(Math.random()<(epCh||0))return newEquip(cls,k,t,{lv:Math.min(9,lv+RI(3,5)),luck:true,op:RI(2,3),ex:randomEx(k,RI(2,3)),epic:true});
   if(k!=='weapon'&&k!=='shield'&&Math.random()<(anCh||0))return newEquip(cls,k,t,{lv:lv+RI(1,3),luck:Math.random()<.4,op:RI(1,2),anc:pick(Object.keys(ANCS))});
   const ex=Math.random()<exCh?randomEx(k,Math.random()<.3?2:1):[];
@@ -7676,6 +7689,7 @@ function itemCard(it,ctx,tip){if(!tip)ICTX=ctx;const L=[];const iu=iconURL(it);i
   if(it.k==='scroll')L.push(`<p class="it-d">${SCROLLS[it.sub].desc}</p>`);if(it.k==='quest')L.push(`<p class="it-d">${QITEMS[it.sub].desc}</p>`);if(it.k==='mat'&&MATS[it.sub]){const M=MATS[it.sub];L.push(`<p class="it-d">${M.rare?'Trofeo raro':'Trofeo'} de ${esc(MOBS[M.mob].name)}. Los mercaderes de Asunción lo pagan bien.</p>`);}if(it.uq&&UNIQ[it.uq])L.push(`<p class="it-d" style="color:#ffb070">${esc(UNIQ[it.uq].d)}<br><small>Sólo lo suelta: ${esc(MOBS[UNIQ[it.uq].mob].name)}</small></p>`);
   if(it.luck)L.push(`<div class="it-l op">Suerte (+5% crítico, +25% de éxito con gemas)</div>`);
   if(it.op)L.push(`<div class="it-l op">Opción adicional +${it.op*4} ${it.k==='weapon'?'de daño':'de defensa'}</div>`);
+  if(it.myth)L.push(`<p class="it-d" style="color:#ff4a6e">${MYTHTXT}</p>`);
   (it.ex||[]).forEach(o=>L.push(`<div class="it-l ex">${EXN[o]}</div>`));if(it.epic)L.push(`<div class="it-l ep">Épico: daño y defensa base +20%</div>`);
   if(it.anc){const A=ANCS[it.anc],have=ctx&&ctx.src==='mate'?mateAnc(it.anc):(DS&&DS.anc&&DS.anc[it.anc])||0;L.push(`<div class="it-l an">Conjunto antiguo de ${A.n} (${have} puesto${have===1?'':'s'})</div>`);A.b.forEach(([n,t])=>L.push(`<div class="it-l an ${have>=n?'':'off'}">${n} piezas: ${t}</div>`));}
   if(isEq(it)&&!(ctx&&ctx.src==='mate')){const r=reqOf(it);const own=C.cls===it.c;L.push(`<div class="it-l req ${own?'':'bad'}">Clase: ${CLASSES[it.c].name}</div><div class="it-l req ${C.L<r.lvl?'bad':''}">Nivel ${r.lvl}</div>`);if(r.stat)L.push(`<div class="it-l req ${C.st[r.main]<r.stat?'bad':''}">${STATN[r.main]} ${r.stat}</div>`);}
