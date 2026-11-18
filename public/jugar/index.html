@@ -9818,23 +9818,35 @@ function gHands(r,k){if(!r._hr)return;const op=G_OPEN[k]||[];for(const e of r._h
 for(const k in GDEF){const G=GDEF[k];if(!G.f||G.f.__p)continue;const f0=G.f,own=k==='violin'?['vio','bow']:k==='fumar'?['cig']:[];G.f=(r,t,L)=>{gReset(r);gHands(r,k);if(r.gPr)for(const n in r.gPr)if(!own.includes(n))r.gPr[n].visible=false;f0(r,t,L);padFollow(r);gMark(r);};G.f.__p=1;}
 NXGK.forEach(k=>{if(!GESTK.includes(k))GESTK.push(k);});
 /* --- estelas: partículas que quedan atrás al moverse --- */
-const NXTR={e_oro:{c:[0xffc84a,0xfff0b0],sz:.3,up:.3,gr:-.2},e_luna:{c:[0x6fc2ff,0xdff1ff],sz:.32,up:.2,gr:-.1},e_brasas:{c:[0xff5a20,0xffa030],sz:.28,up:.9,gr:-.7},e_fund:{c:[0xffd24a,0xffffff],sz:.38,up:.35,gr:-.15},e_dragon:{c:[0xff5a10,0xffc040],sz:.5,up:1.5,gr:-1.2,n:5}};
+const NXTR={e_oro:{c:[0xffc84a,0xfff0b0],sz:.3,up:.3,gr:-.2},e_luna:{c:[0x6fc2ff,0xdff1ff],sz:.32,up:.2,gr:-.1},e_brasas:{c:[0xff5a20,0xffa030],sz:.28,up:.9,gr:-.7},e_fund:{c:[0xffd24a,0xffffff],sz:.38,up:.35,gr:-.15},e_dragon:{c:[0xff5a10,0xffc040],sz:.5,up:1.5,gr:-1.2,n:5},
+  /* Apertura del Reino: cortina de aurora (aur) */
+  e_aurora:{c:[0x38e6b6,0x4aa8ff,0xa46bff,0xff8ad8],sz:.62,up:.55,gr:-.45,n:3,aur:1}};
+const NXAUR={value:0};/* reloj compartido de la aurora (estela y aspecto de mascota) */
 function nxTrail(o,id,x,y,z,mv,dt){const D=NXTR[id];if(!D)return;o.nxT=(o.nxT||0)-dt;if(mv<.15||o.nxT>0)return;o.nxT=.06;
-  parts(x,y,z,{n:D.n||3,col:D.c[Math.random()*2|0],spd:.3,up:D.up,grav:D.gr,life:1.1,size:D.sz,jit:.5,op:1,add:true});}
-function nxTick(dt){if(mode!=='game'||!C||!P||dt<=0)return;
+  if(D.aur){/* cortina: el color va pasando por la paleta y el punto de salida ondea de lado a lado, a tres alturas; arriba quedan destellos blancos */
+    o.nxA=(o.nxA||0)+1;const t=NXAUR.value,k=(t*1.3)%D.c.length,i0=k|0,col=new THREE.Color(D.c[i0]).lerp(new THREE.Color(D.c[(i0+1)%D.c.length]),k-i0),w=Math.sin(t*5+(o.nxPh||(o.nxPh=Math.random()*6)))*.38;
+    for(let h=0;h<3;h++)parts(x+w*(h?.6:1),y+h*.42,z+w*(h?.6:1)*.6,{n:D.n,col:col.getHex(),spd:.16,up:D.up*(1+h*.35),grav:D.gr,drag:.9,life:1.5,size:D.sz*(1-h*.14),jit:.3,op:.6,add:true});
+    if(o.nxA%3===0)parts(x,y+.9,z,{n:2,col:0xffffff,spd:.7,up:.9,grav:-.2,life:1.2,size:.2,jit:.9,op:1,add:true});return;}
+  parts(x,y,z,{n:D.n||3,col:D.c[Math.random()*D.c.length|0],spd:.3,up:D.up,grav:D.gr,life:1.1,size:D.sz,jit:.5,op:1,add:true});}
+function nxTick(dt){if(mode!=='game'||!C||!P||dt<=0)return;NXAUR.value=(NXAUR.value+dt)%1000;
   if(NX.eq.trail&&!P.dead)nxTrail(NX,NX.eq.trail,P.x,(HERO&&HERO.g?HERO.g.position.y:H(P.x,P.z))+.35,P.z,P.mv||0,dt);
   for(const o of LIVE.others.values()){const t=o.s&&o.s.cz&&o.s.cz[2];if(t&&o.m&&!o.P.dead)nxTrail(o,t,o.x,o.m.g.position.y+.35,o.z,o.P.mv||0,dt);}
   if(P.gest==null&&NX.prev)NX.prev=null;}
 /* --- aspectos de mascota: recolorean el modelo sin tocar sus texturas --- */
-const NXPET={p_imp_azul:{k:'tint',a:[.5,.95,2.1]},p_hada_oro:{k:'tint',a:[1.9,1.4,.45]},p_imp_fund:{k:'gold'},p_rudolf_nav:{k:'xmas'}};
+const NXPET={p_imp_azul:{k:'tint',a:[.5,.95,2.1]},p_hada_oro:{k:'tint',a:[1.9,1.4,.45]},p_imp_fund:{k:'gold'},p_rudolf_nav:{k:'xmas'},p_imp_aurora:{k:'aurora'},p_hada_aurora:{k:'aurora'},p_rudolf_aurora:{k:'aurora'}};
 function nxPetSkin(g,sub,id){const D=NXPET[id];if(!D||!g)return;
   if(D.k==='xmas'){/* guirnalda de luces alrededor del cuerpo (la nariz roja ya la trae el modelo) */
     g.updateMatrixWorld(true);const bx=new THREE.Box3().setFromObject(g),inv=new THREE.Matrix4().copy(g.matrixWorld).invert(),mn=bx.min,mx=bx.max,w=Math.min(mx.x-mn.x,mx.z-mn.z),h=mx.y-mn.y,cx=(mn.x+mx.x)/2,cz=(mn.z+mx.z)/2,cols=[0xff3b3b,0x4fd0ff,0xffd24a,0x6dff8a];
     for(let i=0;i<10;i++){const a=i/10*Math.PI*2,m=new THREE.Mesh(new THREE.SphereGeometry(Math.max(.02,h*.03),8,6),new THREE.MeshBasicMaterial({color:cols[i%4]}));m.position.set(cx+Math.cos(a)*w*.42,mn.y+h*(.5+.04*Math.sin(a*3)),cz+Math.sin(a)*w*.42).applyMatrix4(inv);m.userData.nxLight=1;g.add(m);}return;}
-  const chunk=D.k==='gold'?'float nxl=dot(diffuseColor.rgb,vec3(.3,.59,.11));diffuseColor.rgb=mix(vec3(.05,.045,.05),vec3(1.7,1.25,.4),smoothstep(.42,.85,nxl));':`diffuseColor.rgb=vec3(dot(diffuseColor.rgb,vec3(.3,.59,.11)))*vec3(${D.a.map(x=>x.toFixed(3)).join(',')});`;
+  if(D.k==='aurora'){/* halo y tres chispas que giran alrededor */
+    g.updateMatrixWorld(true);const bx=new THREE.Box3().setFromObject(g),inv=new THREE.Matrix4().copy(g.matrixWorld).invert(),sz=bx.getSize(new THREE.Vector3()),ct=bx.getCenter(new THREE.Vector3()),R=Math.max(sz.x,sz.y,sz.z),sc=g.getWorldScale(new THREE.Vector3()).x||1;
+    const gl=glowSprite(0x6affda,R*1.9/sc,.3);gl.position.copy(ct).applyMatrix4(inv);gl.userData.nxLight=1;g.add(gl);const sp=[];
+    for(let i=0;i<3;i++){const m=glowSprite([0x38e6b6,0xa46bff,0xff8ad8][i],R*.3/sc,.95);m.userData.nxLight=1;g.add(m);sp.push(m);}
+    const c0=ct.clone().applyMatrix4(inv),rr=R*.62/sc;gl.onBeforeRender=()=>{const t=NXAUR.value;gl.material.color.setHSL((.42+.2*Math.sin(t*.9))%1,.9,.6);sp.forEach((m,i)=>{const a=t*2.2+i*2.094;m.position.set(c0.x+Math.cos(a)*rr,c0.y+Math.sin(t*1.7+i*2)*rr*.5,c0.z+Math.sin(a)*rr);});};}
+  const chunk=D.k==='aurora'?'float nxl=dot(diffuseColor.rgb,vec3(.3,.59,.11));float nxp=nxT*.22+gl_FragCoord.y*.0045+gl_FragCoord.x*.0016;vec3 nxc=.5+.5*cos(6.2832*(nxp+vec3(.0,.33,.67)));nxc=mix(nxc,vec3(.25,1.,.82),.22);diffuseColor.rgb=nxc*(.42+nxl*1.5);':D.k==='gold'?'float nxl=dot(diffuseColor.rgb,vec3(.3,.59,.11));diffuseColor.rgb=mix(vec3(.05,.045,.05),vec3(1.7,1.25,.4),smoothstep(.42,.85,nxl));':`diffuseColor.rgb=vec3(dot(diffuseColor.rgb,vec3(.3,.59,.11)))*vec3(${D.a.map(x=>x.toFixed(3)).join(',')});`;
   g.traverse(o=>{if(!o.isMesh||!o.material||o.userData.nxLight)return;const one=m=>{const c=m.clone(),ob=m.onBeforeCompile,ck=m.customProgramCacheKey?m.customProgramCacheKey():'';
-    c.onBeforeCompile=function(sh,rn){if(ob)ob.call(this,sh,rn);sh.fragmentShader=sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\n'+chunk);};c.customProgramCacheKey=()=>ck+'|nx'+id;
-    if(c.emissive&&D.k==='tint'){const l=c.emissive.r*.3+c.emissive.g*.59+c.emissive.b*.11;c.emissive.setRGB(Math.min(1,l*D.a[0]),Math.min(1,l*D.a[1]),Math.min(1,l*D.a[2]));}if(c.emissive&&D.k==='gold')c.emissive.setHex(0x1a1000);c.needsUpdate=true;return c;};
+    c.onBeforeCompile=function(sh,rn){if(ob)ob.call(this,sh,rn);if(D.k==='aurora'){sh.uniforms.nxT=NXAUR;sh.fragmentShader='uniform float nxT;\n'+sh.fragmentShader;}sh.fragmentShader=sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\n'+chunk);};c.customProgramCacheKey=()=>ck+'|nx'+id;
+    if(c.emissive&&D.k==='tint'){const l=c.emissive.r*.3+c.emissive.g*.59+c.emissive.b*.11;c.emissive.setRGB(Math.min(1,l*D.a[0]),Math.min(1,l*D.a[1]),Math.min(1,l*D.a[2]));}if(c.emissive&&D.k==='gold')c.emissive.setHex(0x1a1000);if(c.emissive&&D.k==='aurora')c.emissive.setHex(0x0c3a34);c.needsUpdate=true;return c;};
     o.material=Array.isArray(o.material)?o.material.map(one):one(o.material);});}
 try{window.__NOX.NX=NX;window.__NOX.nxSet=nxSet;window.__NOX.nxTrailT=id=>{for(let i=0;i<14;i++)nxTrail({},id||NX.eq.trail||'e_oro',P.x-1+i*.15,H(P.x,P.z)+.5,P.z+.6,1,1);};}catch(e){}
 /*NOX-TIENDA-FIN*/
