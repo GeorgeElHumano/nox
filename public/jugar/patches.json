@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611191654",
+  "title": "Nombres de los ítems con Alt",
+  "notes": [
+   "PC: la tecla Alt muestra u oculta los nombres de los ítems del piso (antes era Z).",
+   "En 3ra y 1ra persona el cursor se suelta con Esc.",
+   "Celular: el interruptor sigue en Ajustes → Nombres de ítems en el piso."
+  ]
+ },
+ {
   "build": "202611191515",
   "title": "Saltos del Guairá, Cerro Tres Kandú y el último set",
   "notes": [
