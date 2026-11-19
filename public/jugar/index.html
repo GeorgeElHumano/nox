@@ -260,7 +260,7 @@ html.cur.dn :not(input):not(textarea):not(select),html.cur.dn{cursor:url(assets/
 #apeCd{pointer-events:auto;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 7px;margin-top:4px;padding:5px 12px;border:1px solid #e2a83f;border-radius:14px;background:linear-gradient(180deg,rgba(26,29,71,.92),rgba(14,16,46,.92));box-shadow:0 0 10px rgba(226,168,63,.35);font:600 11px/1.25 var(--body);color:#d8d2e6;cursor:pointer;text-align:left;max-width:100%}
 #apeCd b{font-family:var(--display);font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#f6d892;white-space:nowrap}
 #apeCd span{white-space:nowrap}#apeCd em{font-style:normal;font-family:var(--display);font-weight:800;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}#apeCd em.dr{color:#ffb24a}
-@media (orientation:landscape) and (min-width:820px){#apeCd{position:fixed;left:50%;top:calc(var(--st,0px) + 8px);transform:translateX(-50%);margin:0;z-index:6;padding:6px 18px;font-size:12.5px;border-radius:999px;flex-wrap:nowrap;gap:9px}#apeCd b{font-size:13.5px}#apeCd em{font-size:14.5px}}
+@media (orientation:landscape) and (min-width:820px){#apeCd{position:fixed;left:50%;top:calc(var(--st,0px) + 8px);transform:translateX(-50%);margin:0;z-index:6;padding:6px 18px;font-size:12.5px;border-radius:999px;flex-wrap:nowrap;gap:9px}#apeCd b{font-size:13.5px}#apeCd em{font-size:14.5px}body.has-tf #apeCd{top:calc(var(--st,0px) + 64px)}}
 body.half #apeCd{display:none!important}
 #selApe{margin:6px 0 10px;padding:9px 12px;border-radius:14px;border:1px solid rgba(226,168,63,.6);background:linear-gradient(180deg,rgba(26,29,71,.86),rgba(12,14,40,.86));box-shadow:0 0 18px rgba(226,168,63,.22);max-width:520px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
 .has-ev .sel-head>p{display:none}
@@ -8160,7 +8160,7 @@ function hud(){
   else{tk='Misión '+(C.q.i+1);tt=`${esc(MOBS[q.mob].name)} <b>${C.q.n} / ${q.n}</b>`;}
   if(C.L>=50&&!C.evo&&C.evoQ&&countItem('quest','pluma')<5)tt+=`<br>Plumas de Guyra Pytã <b>${countItem('quest','pluma')} / 5</b>`;
   if($('#trK').textContent!==tk)$('#trK').textContent=tk;if($('#trT').innerHTML!==tt)$('#trT').innerHTML=tt;
-  const t=P.target&&!P.target.dead&&!P.target.pvp?P.target:null;{const tf=hEl('tf');if(tf&&tf.hidden!==!t)tf.hidden=!t;}if(t){hT('tfN',t.golden?t.def.name+' Dorado':t.elite?t.def.name+' Élite':t.def.name);hT('tfL','Nv '+t.def.lvl);hS('tfF','width',hPct(t.hp/t.max));}
+  const t=P.target&&!P.target.dead&&!P.target.pvp?P.target:null;{const tf=hEl('tf');if(tf&&tf.hidden!==!t){tf.hidden=!t;document.body.classList.toggle('has-tf',!!t);/* la cuenta regresiva del evento baja para no taparse con la vida del enemigo */}}if(t){hT('tfN',t.golden?t.def.name+' Dorado':t.elite?t.def.name+' Élite':t.def.name);hT('tfL','Nv '+t.def.lvl);hS('tfF','width',hPct(t.hp/t.max));}
   const n=nearNpc(),cx=hEl('ctx'),mu=n?null:muroNear();if(n&&!paused){if(cx.hidden)cx.hidden=false;hT('ctx','Hablar con '+n.def.name);cx._npc=n;cx._mu=null;}else if(mu&&!paused){if(cx.hidden)cx.hidden=false;hT('ctx',mu==='placa'?'Ver la Placa de cerca':'Ver el Muro de cerca');cx._npc=null;cx._mu=mu;}else if(!cx.hidden)cx.hidden=true;
 }
 
