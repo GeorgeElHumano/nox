@@ -1539,10 +1539,14 @@ scene.add(sun);scene.add(sun.target);
 const sunDir=new THREE.Vector3();
 const lin=hex=>new THREE.Color(hex);
 const LOOK={exp:.93,sun:.95,hemi:.78,rim:.3};
+/* (19/11) en Ultra se ve el mapa completo: la niebla empieza 150 m más lejos y termina 300 m más lejos (tope 580), así de punta a punta del mapa (terreno de 380 m con la sierra del borde) se ve todo con apenas una bruma suave en el fondo.
+   Conserva los cambios de la noche y el amanecer (se suman sobre la niebla de cada momento). No toca zonas de evento ni el estudio de fotos. */
+let SKYS=null;
+function ultraFog(f){if(Q.level!=='ultra'||!Z||Z.event||Z.studio||f[1]>=300)return f;return [Math.min(f[0]+150,320),Math.min(f[1]+300,580)];}
 function applySky(s){
   skyU.hor.value.copy(lin(s.hor));skyU.mid.value.copy(lin(s.mid));skyU.top.value.copy(lin(s.top));skyU.ground.value.copy(lin(s.hemiG)).multiplyScalar(.55);skyU.cloud.value.copy(lin(0xffffff)).lerp(lin(s.sunCol),.4);skyU.cloudAmt.value=s.clouds!=null?s.clouds:.5;
   sunDir.set(s.sun[0],s.sun[1],s.sun[2]).normalize();skyU.sun.value.copy(sunDir);
-  if(scene.fog){scene.fog.color.copy(lin(s.hor));scene.fog.near=s.fog[0];scene.fog.far=s.fog[1];}
+  SKYS=s;if(scene.fog){scene.fog.color.copy(lin(s.hor));const uf=ultraFog(s.fog);scene.fog.near=uf[0];scene.fog.far=uf[1];}
   sun.color.setHex(s.sunCol);sun.intensity=s.sunI*LOOK.sun;hemi.color.setHex(s.hemiS);hemi.groundColor.setHex(s.hemiG);hemi.intensity=s.hemiI*LOOK.hemi;
   renderer.toneMappingExposure=s.exp*LOOK.exp;
 }
@@ -1882,7 +1886,7 @@ function qLevel(lv,extra){if(!lv||lv===Q.level)return;const up=QLV.indexOf(lv)>Q
 function applyQuality(){
   /* presupuesto de píxeles: en monitores grandes (PC) la resolución interna se limita para mantener los FPS */
   const dpr=window.devicePixelRatio||1,px=innerWidth*innerHeight,bud=Q.level==='bajo'?.7e6:Q.level==='medio'?1.1e6:Q.level==='alto'?1.5e6:2.6e6,mob=matchMedia('(pointer:coarse)').matches;/* en el celular, alto se queda en 1,5: más que eso no se nota en una pantalla chica y cuesta muchos FPS *//* (12/11) en alto el celular ya no se queda en 1,5: un teléfono que da para alto se ve nítido como la PC; si no aguanta, dynRes baja la resolución sola *//* (16/11) medido en un iPhone 12: en alto con 1,8 se iba a 10-24 FPS por la cantidad de píxeles; con 1,35 en una pantalla de celular casi no se nota */let pr=Q.level==='bajo'?(mob?.9:1):Q.level==='medio'?Math.min(dpr,mob?1.2:1.5):Q.level==='alto'?Math.min(dpr,mob?1.35:1.5):Math.min(dpr,2);pr=Math.max(.6,Math.min(pr,Math.sqrt(bud/px)));pr=+pr.toFixed(2);const big=px>1.2e6;
-  renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);DYN.base=pr;DYN.cur=pr;
+  renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight);DYN.base=pr;DYN.cur=pr;if(SKYS)applySky(SKYS);
   sun.castShadow=Q.level!=='bajo';SHMOD=mob&&!QHI()?2:1;const ms=Q.level==='ultra'||(Q.level==='alto'&&!big)?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
   if(typeof liteAll==='function'&&typeof HERO!=='undefined')liteAll();
   if(composer){try{composer.renderTarget1.dispose();composer.renderTarget2.dispose();}catch(e){}composer=null;bloom=null;}
@@ -5694,7 +5698,7 @@ function lifeZone(id){lifeClear();if(!OAD.on||OAD.failed||!LIFE_POP[id])return;c
   (P0.fly||[]).forEach(([kind,n,cx,cz,rad,h])=>{for(let i=0;i<Math.round(n*low);i++){const c=lifeCritter(kind);if(!c)continue;lifePut(c,cx,cz,{fly:true,cx:cx+R(-3,3),cz:cz+R(-3,3),rad:rad*R(.85,1.15),h:h+R(-2,3),ang:R(0,TAU)+i*.25,w:(kind==='hawk'?.18:.32)*(Math.random()<.5?1:-1),ph:R(0,6)});}});}
 /* portada: el empedrado de la plaza está 3 cm sobre el suelo y los pies de la pose quieta bajan unos 6 cm: se sube al personaje para que no se hunda */
 const SELY=.09;
-function updLife(dt){if(!LIFE.length)return;for(const c of LIFE){const d=Math.hypot(P.x-c.x,P.z-c.z);c.g.visible=d<(c.fly?(IS_MOB?80:110):(IS_MOB?50:66))&&!(mode==='select'&&!c.fly&&Math.abs(c.x)<8&&c.z>1.5&&c.z<19);if(!c.fly)charShadow(c,c.g,d);/* en la portada nadie cruza entre la cámara y el personaje */if(!c.g.visible)continue;
+function updLife(dt){if(!LIFE.length)return;for(const c of LIFE){const d=Math.hypot(P.x-c.x,P.z-c.z);c.g.visible=d<(Q.level==='ultra'?(c.fly?180:120):c.fly?(IS_MOB?80:110):(IS_MOB?50:66))&&!(mode==='select'&&!c.fly&&Math.abs(c.x)<8&&c.z>1.5&&c.z<19);if(!c.fly)charShadow(c,c.g,d);/* en la portada nadie cruza entre la cámara y el personaje */if(!c.g.visible)continue;
   if(c.fly){c.ang+=dt*c.w;const x=c.cx+Math.cos(c.ang)*c.rad,z=c.cz+Math.sin(c.ang)*c.rad;c.x=x;c.z=z;c.g.position.set(x,c.h+Math.sin(T*.6+c.ph)*1.4,z);
     c.g.rotation.set(0,Math.atan2(-Math.sin(c.ang)*c.w,Math.cos(c.ang)*c.w),-Math.sign(c.w)*.35);c.mixer.update(dt);continue;}
   if(c.flee&&d<c.flee&&!P.dead&&mode==='game'){const ax=c.x-P.x,az=c.z-P.z,ad=Math.hypot(ax,az)||1;c.st='run';c.t=1.4;c.tx=c.x+ax/ad*7;c.tz=c.z+az/ad*7;}
@@ -7210,7 +7214,7 @@ function updateEnemies(dt){
     const p=e.p;let tx=P.x,tz=P.z,tdead=P.dead,tid=null;const dl=Math.hypot(P.x-p.x,P.z-p.z);let d=dl;
     if(MOBNET.share)for(const o of LIVE.others.values()){if(o.P.dead)continue;const dd=Math.hypot(o.x-p.x,o.z-p.z);if(tdead||dd<d){d=dd;tx=o.x;tz=o.z;tdead=false;tid=o.id;}}
     d=d||1e-3;const dx=tx-p.x,dz=tz-p.z;
-    e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(d>70&&!e.ret&&e.aggro<=0&&!e.def.boss){e.atkCD-=dt;continue;}
+    e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(d>70&&!e.ret&&e.aggro<=0&&!e.def.boss){e.atkCD-=dt;continue;}
     e.atkCD-=dt;e.aggro=Math.max(0,e.aggro-dt);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;if(e.stun>0)e.stun-=dt;if(e.dash)bossDash(e,dt);
     const homeD=Math.hypot(p.x-e.hx,p.z-e.hz),leash=e.def.boss?22:30,reach=e.rad+.85;let mx=0,mz=0,sp=0;
     const active=!tdead&&!Z.safe;
@@ -9097,7 +9101,7 @@ function updateEnemiesGuest(dt){const k=1-Math.exp(-dt*10);
     let gx=e.tx-p.x,gz=e.tz-p.z,gd=Math.hypot(gx,gz);if(gd>8){p.x=e.tx;p.z=e.tz;gd=0;}
     /* antes: p+=(t-p)*k → arrancaba rápido y frenaba antes de cada aviso, y la animación saltaba entre correr, caminar y quieto (se trababan) */let mv=0;if(gd>1e-3&&dt>0){mv=Math.min(gd,Math.max(e.mvSp||0,gd/.6)*dt);p.x+=gx/gd*mv;p.z+=gz/gd*mv;}p.y=H(p.x,p.z);
     const sp=e.aSp=(e.aSp||0)+((dt>0?mv/dt:0)-(e.aSp||0))*Math.min(1,dt*8);e.g.rotation.y=lerpAngle(e.g.rotation.y,e.tr,Math.min(1,dt*10));
-    const dl=Math.hypot(P.x-p.x,P.z-p.z);e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;
+    const dl=Math.hypot(P.x-p.x,P.z-p.z);e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;
     animEnemy(e,dt,sp);if(e.hitK>0){e.hitK=Math.max(0,e.hitK-dt*7);const h=e.hitK;e.rig.scale.set(1+h*.07,1-h*.09,1+h*.07);}else if(e.rig.scale.y!==1)e.rig.scale.set(1,1,1);
     const fl=e.flash>0?(VFX.on?.3:.7):0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent)m.emissive.setRGB(fl,fl*(VFX.on?.55:.9),fl*(VFX.on?.25:.8));});
     {const b=e.bar,tg=P.target===e;b.visible=e.hp<e.max||tg;if(b.visible){b.position.set(p.x,p.y+e.hgt+.25,p.z);b.quaternion.copy(camera.quaternion);const v=Math.max(0,e.hp/e.max);
