@@ -2168,7 +2168,7 @@ function mobStats(def,golden){const L=def.lvl;let hp=15+L*10+L*L*.55,dmg=4+L*1.1
   if(def.boss){hp*=7;dmg*=1.6;xp*=10;}if(golden){hp*=3;xp*=4;dmg*=1.2;}return{hp:Math.round(hp),dmg,df,xp:Math.round(xp)};}
 
 const ZONES={
- asuncion:{name:'Asunción',sub:'Capital del reino',safe:true,/* segura solo dentro de las murallas (radio 36): ver townR en loadZone */townR:38,lvl:1,cost:0,spawn:[0,8],portals:[[0,43,'campos']],
+ asuncion:{name:'Asunción',sub:'Capital del reino',safe:true,/* segura solo dentro de las murallas (radio 36): ver townR en loadZone */townR:38,lvl:1,cost:0,spawn:[0,8],portals:[[-20,44,'campos']],/* corrido al oeste (18/11): en [0,43] quedaba justo al salir por la puerta sur y dentro del campo del Dragón Dorado */
    spots:[{n:'Afueras del oeste',m:'aguara',x:-64,z:6,r:9,c:5,deco:'bones'},{n:'Chacra del este',m:'aguara',x:62,z:-14,r:9,c:5,deco:'bones'},{n:'Monte del norte',m:'taitetu',x:-22,z:-68,r:9,c:5,deco:'mud'},{n:'Bañado del sur',m:'taitetu',x:46,z:58,r:9,c:4,deco:'mud'}],flat:40,amp:2.4,
    ground:{a:0x86553a,b:0x6a422e,g:0x5f7d33,g2:0x40592a,grass:.5},
    sky:{hor:0xe6ae86,mid:0xd99a80,top:0x34508a,sun:[-.5,.42,-.75],sunCol:0xffd8aa,sunI:1.9,hemiS:0xbfcde8,hemiG:0x4a3326,hemiI:.85,fog:[50,175],exp:1.04}},
