@@ -2524,11 +2524,14 @@ function fitBody(r){const root=r.g||r;let body=null;const cl=[];root.traverse(o=
     const sc=(hi-lo)/1.8||1,cs=.08*sc,m=new Map(),key=(a,b,c)=>a*73856093^b*19349663^c*83492791;for(let i=0;i<n;i++){const k=key(Math.floor(x[i*3]/cs),Math.floor(x[i*3+1]/cs),Math.floor(x[i*3+2]/cs));let l=m.get(k);if(!l)m.set(k,l=[]);l.push(i);}
     G=bg.userData.fitGrid={x,nm,sc,cs,m,key};}
   const {x,nm,sc,cs,m,key}=G,R2=cs*cs,LAT2=(.016*sc)*(.016*sc),IN=.075*sc,OUT=.05*sc,bn=body.skeleton.bones,cov=new Uint8Array(BP.count);let done=0;
+  /* (18/11) lo que ya tiene una placa forjada encima no se toca: la placa conserva los pesos originales de la prenda y, si la prenda copia los del cuerpo, se deforma distinto y asoma (cuero de la bota entre las rodillas del Gladiador) */
+  const SH=new Map(),sh=.024*sc,sh2=sh*sh;root.traverse(o=>{if(!o.isSkinnedMesh||!o.visible||!o.userData.shell||!o.geometry.index)return;const e1=o.bindMatrix.elements,e2=body.bindMatrix.elements;if(e1.some((v,i)=>Math.abs(v-e2[i])>1e-4))return;const p=o.geometry.attributes.position,ix=o.geometry.index,seen=new Uint8Array(p.count);for(let t=0;t<ix.count;t++){const v=ix.getX(t);if(seen[v])continue;seen[v]=1;const X=p.getX(v),Y=p.getY(v),Z=p.getZ(v),k=key(Math.floor(X/sh),Math.floor(Y/sh),Math.floor(Z/sh));let l=SH.get(k);if(!l)SH.set(k,l=[]);l.push(X,Y,Z);}});
+  const plated=(px,py,pz)=>{if(!SH.size)return false;const cx=Math.floor(px/sh),cy=Math.floor(py/sh),cz=Math.floor(pz/sh);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let d=-1;d<=1;d++){const l=SH.get(key(cx+a,cy+b,cz+d));if(!l)continue;for(let i=0;i<l.length;i+=3){const dx=px-l[i],dy=py-l[i+1],dz=pz-l[i+2];if(dx*dx+dy*dy+dz*dz<sh2)return true;}}return false;};
   for(const c of cl){const g=c.geometry,P=g.attributes.position,SI=g.attributes.skinIndex,SW=g.attributes.skinWeight;g.userData.fit=1;if(!P||!SI||!SW)continue;
     const cb=c.skeleton.bones;if(cb.length!==bn.length||cb.some((b,i)=>b.name!==bn[i].name))continue;const e1=c.bindMatrix.elements,e2=body.bindMatrix.elements;if(e1.some((v,i)=>Math.abs(v-e2[i])>1e-4))continue;
     /* solo los vértices que la prenda dibuja: lo recortado con cc0Drop (piel a la vista) sigue en los atributos y no tapa nada */
     let used=null;if(g.index){used=new Uint8Array(P.count);const gi=g.index;for(let t=0;t<gi.count;t++)used[gi.getX(t)]=1;}
-    for(let i=0;i<P.count;i++){if(used&&!used[i])continue;const px=P.getX(i),py=P.getY(i),pz=P.getZ(i),cx=Math.floor(px/cs),cy=Math.floor(py/cs),cz=Math.floor(pz/cs);let bd=R2,bi=-1;
+    for(let i=0;i<P.count;i++){if(used&&!used[i])continue;const px=P.getX(i),py=P.getY(i),pz=P.getZ(i);if(plated(px,py,pz))continue;const cx=Math.floor(px/cs),cy=Math.floor(py/cs),cz=Math.floor(pz/cs);let bd=R2,bi=-1;
       for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let d=-1;d<=1;d++){const l=m.get(key(cx+a,cy+b,cz+d));if(!l)continue;for(const k of l){const dx=px-x[k*3],dy=py-x[k*3+1],dz=pz-x[k*3+2],q=dx*dx+dy*dy+dz*dz;if(q<bd){bd=q;bi=k;}
           /* ¿esta tela tapa ese punto de piel? casi sobre su normal (menos de 1,6 cm de costado), hasta 7,5 cm por debajo o 5 cm por encima */if(!cov[k]){const o=dx*nm[k*3]+dy*nm[k*3+1]+dz*nm[k*3+2];if(o>-IN&&o<OUT&&q-o*o<LAT2)cov[k]=1;}}}
       if(bi<0)continue;SI.setXYZW(i,BI.getX(bi),BI.getY(bi),BI.getZ(bi),BI.getW(bi));SW.setXYZW(i,BW.getX(bi),BW.getY(bi),BW.getZ(bi),BW.getW(bi));}
@@ -5262,7 +5265,7 @@ function cc0Armor(r,cls,eq,add){const slotIs=(...ss)=>m=>ss.includes(m.userData.
   const skinSrc=m=>!m.userData.file&&/Superhero/.test(m.material.name||'');
   if(r.restArmor){grp(cc0Rest(r,'armor',r.restArmor.mat),r.restArmor.it);
     /* gladiador: su peto sale de la piel, así que la manga también (antes quedaba un aro de piel en el codo) */
-    if(cls==='gladiador'&&!r.restArmor.noSleeve)grp(cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('lowerarm')),{src:skinSrc,rest:1,minW:.6,inflate:.011,mat:r.restArmor.mat,uvk:4}),r.restArmor.it);delete r.restArmor;}
+    if(cls==='gladiador'&&!r.restArmor.noSleeve)grp(cc0Shell(r,CC0_SIDES('upperarm').concat(CC0_SIDES('lowerarm'),CC0_SIDES('clavicle')),{src:skinSrc,rest:1,minW:.5,inflate:.011,mat:r.restArmor.mat,uvk:4}),r.restArmor.it);delete r.restArmor;}
   if(eq.gloves){const S=forjaOf(cls,eq.gloves.t);if(S.brace!=='none'){const bk=S.brace==='ornate'?'ornate':S.brace==='metal'?'metal':'leather',bm=cc0ArmorMat(S,bk,cls);const sh=cc0Shell(r,CC0_SIDES('lowerarm'),{src:slotIs('gloves','armor'),minW:.6,inflate:.012,mat:bm,uvk:5});grp(sh,eq.gloves);
       if(S.brace!=='wrap')grp(cc0Rest(r,'gloves',bm,{uvk:5,hands:bk==='leather'?null:bm}),eq.gloves);
       if(cls==='gladiador'&&bk!=='leather')grp(cc0Shell(r,CC0_HANDB,{src:skinSrc,rest:1,minW:.5,inflate:.0035,mat:bm,uvk:7}),eq.gloves);}}
