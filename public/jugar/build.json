@@ -1,13 +1,8 @@
 {
- "build": "202611182225",
- "min": "202611182225",
- "title": "Apertura del Reino: el evento de lanzamiento",
+ "build": "202611182306",
+ "min": "202611182306",
+ "title": "Arreglo de la cuenta regresiva",
  "notes": [
-  "Del 1 al 14 de diciembre: la Apertura del Reino. Entrá cada día y llevate gemas, Noxis, el título Pionero del Reino, el marco de aurora y la estela Aurora",
-  "El Dragón Dorado baja 4 veces por día (9, 13, 17 y 21 h) al campo frente a la puerta sur de Asunción: todo el reino pelea junto y hay premios para todos los que le peguen",
-  "Carrera de Pioneros: los 10 que más niveles suban durante el evento ganan 2.000 Noxis, el título Primeros del Reino y su nombre en la Placa de la Apertura",
-  "Panel del evento en la rueda del sol (Evento) y cuenta regresiva en pantalla",
-  "El Muro de Fundadores ahora es más grande y está frente a la catedral; de cerca se abre la lista completa con buscador",
-  "El portal a Campos de Ypacaraí se corrió a la derecha de la puerta sur"
+  "La cuenta regresiva de la Apertura ya no se encima con la vida del enemigo: baja cuando tenés uno marcado"
  ]
 }

@@ -1,5 +1,12 @@
 [
  {
+  "build": "202611182306",
+  "title": "Arreglo de la cuenta regresiva",
+  "notes": [
+   "La cuenta regresiva de la Apertura ya no se encima con la vida del enemigo: baja cuando tenés uno marcado"
+  ]
+ },
+ {
   "build": "202611182225",
   "title": "Apertura del Reino: el evento de lanzamiento",
   "notes": [
