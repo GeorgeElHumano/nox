@@ -43,6 +43,15 @@
 .onl i,.rk .lt{display:inline-block;width:9px;height:9px;border-radius:50%;background:#5b5a66;box-shadow:inset 0 0 0 1px #0006}
 .onl.on i,.rk .lt.on{background:#46e06a;box-shadow:0 0 8px #46e06a,0 0 2px #b9ffc8}
 #acctBar .onl{margin-left:6px}
+#manTabs button{font-size:12px;padding:8px 2px;white-space:nowrap}
+#manBody{font-size:13.5px;line-height:1.45;color:#e9e2f2}#manBody h3{margin:14px 0 6px;font-family:var(--display);font-size:14px;letter-spacing:.04em;color:#f0cc84}#manBody h3:first-child{margin-top:2px}
+#manBody p{margin:0 0 8px}#manBody ul{margin:0 0 8px;padding-left:18px}#manBody li{margin:2px 0}#manBody b{color:#fff3d6}
+#manBody .mcls{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 10px}#manBody .mcls button{flex:1 1 auto;padding:6px 8px;border-radius:7px;border:1px solid var(--edge);background:rgba(0,0,0,.25);color:var(--dim);font-weight:800;font-size:12px}#manBody .mcls button.on{border-color:var(--gold);color:var(--ink);background:rgba(226,178,90,.14)}
+#manBody table{width:100%;border-collapse:collapse;margin:0 0 10px;font-size:12.5px}#manBody th{text-align:left;font-weight:800;color:var(--dim);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:4px 6px;border-bottom:1px solid rgba(201,160,80,.3)}
+#manBody td{padding:6px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}#manBody td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}#manBody td small{display:block;color:var(--mute);font-size:11.5px;line-height:1.3;margin-top:1px}
+#manBody tr.no td{opacity:.5}#manBody tr.me td{background:rgba(240,204,132,.08)}#manBody tr.me td:first-child{box-shadow:inset 3px 0 0 #f0cc84}
+#manBody .mbox{border:1px solid rgba(201,160,80,.22);border-radius:10px;padding:9px 11px;margin:0 0 10px;background:rgba(0,0,0,.18)}#manBody .mbox.me{border-color:rgba(240,204,132,.6)}
+#manBody .rar{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0 0 10px}#manBody .rar b{white-space:nowrap}
 #rankBody .rkhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 #rankBody .rk{display:grid;grid-template-columns:30px 12px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);margin-bottom:5px;border:1px solid transparent}
 #rankBody .rk .ps{font:800 14px var(--disp,serif);color:#c9c3e8;text-align:center}
@@ -1355,6 +1364,11 @@ body.pad #joy{display:none!important}
   <div class="mu-bar"><div class="tabs" id="muTabs"></div><input id="muQ" type="search" placeholder="Buscar un nombre…" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="24" aria-label="Buscar un nombre"></div>
   <div id="muList"></div>
   <div class="foot" id="muF"></div>
+</div></div>
+<div class="panel" id="pManual" hidden><div class="card wide">
+  <div class="card-h"><h2>Guía del reino</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
+  <div class="tabs" id="manTabs"></div>
+  <div id="manBody"></div>
 </div></div>
 <div class="panel" id="pRank" hidden><div class="card">
   <div class="card-h"><h2>Ranking</h2><button class="x" data-act="close" aria-label="Cerrar">×</button></div>
@@ -8264,10 +8278,10 @@ function sndSetVol(){if(!AU.ctx)return;const t=AU.ctx.currentTime;AU.mus.gain.se
 function bigNote(html,bad){let box=document.getElementById('bigNotes');if(!box){box=document.createElement('div');box.id='bigNotes';document.body.appendChild(box);}const t=document.createElement('div');t.className='bigNote'+(bad?' bad':'');t.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c2.6 0 4.3 1.6 4.8 4.4"/></svg><span>'+html+'</span>';box.appendChild(t);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>t.remove(),4000);}
 function toast(html){const t=document.createElement('div');t.className='toast';t.innerHTML=html;const box=$('#toasts');box.appendChild(t);while(box.children.length>4)box.firstChild.remove();setTimeout(()=>t.remove(),2800);}
 function nearNpc(){let b=null,bd=3.4;for(const n of npcs){const d=Math.hypot(n.x-P.x,n.z-P.z);if(d<bd){bd=d;b=n;}}return b;}
-const anyPanel=()=>['pChar','pMate','pCfg','pRank','pMuro','pApe','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});
+const anyPanel=()=>['pChar','pMate','pCfg','pRank','pManual','pMuro','pApe','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});
 function refreshPause(){paused=anyPanel();if(paused){atkHeld=false;for(const k in keys)keys[k]=false;endJoy({pointerId:joy.id});}}
 function showPanel(id){$('#'+id).hidden=false;refreshPause();try{tabsFor(id);}catch(e){}}
-function closeAll(){try{nxFaceBack();}catch(e){}try{if(TR.on&&!$('#pTrade').hidden){if(TR.stage==='open')liveSend({t:'tx'});if(TR.stage!=='commit')TR.on=false;}}catch(e){}/* cerrar el intercambio (Esc, la rueda, otro menú) lo cancela para los dos */['pChar','pMate','pCfg','pRank','pMuro','pApe','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap','partyBox','chatBox','wheel'].forEach(id=>{const e=$('#'+id);if(e)e.hidden=true;});VST.pin=null;VST.amt=null;GEM=null;CALD.sel=null;refreshPause();}
+function closeAll(){try{nxFaceBack();}catch(e){}try{if(TR.on&&!$('#pTrade').hidden){if(TR.stage==='open')liveSend({t:'tx'});if(TR.stage!=='commit')TR.on=false;}}catch(e){}/* cerrar el intercambio (Esc, la rueda, otro menú) lo cancela para los dos */['pChar','pMate','pCfg','pRank','pManual','pPatch','pMuro','pApe','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pItem','pVault','pMap','partyBox','chatBox','wheel'].forEach(id=>{const e=$('#'+id);if(e)e.hidden=true;});VST.pin=null;VST.amt=null;GEM=null;CALD.sel=null;refreshPause();}
 
 function setupSkillButtons(){
   $('#bAtk').innerHTML=SKIC('atk_'+C.cls)+'Atacar';
@@ -8551,7 +8565,7 @@ const GUIA_T=[
    const miss=ks.filter(k=>!C.eq[k]);let bt=0;for(let t=0;t<9;t++)if(C.L>=TREQ_LVL[t])bt=t;
    const shopT=C.L>=25?2:1,low=ks.filter(k=>C.eq[k]&&C.eq[k].t<bt);
    if(miss.length)out.push(`Te falta${miss.length>1?'n':''} ${tkB(miss.map(k=>SLOTLABEL[k].toLowerCase()).join(', '))}: Don Ramón, el herrero, te vende hasta el set ${shopT+1}.`);
-   if(low.length){const need=Math.round(TREQ_STAT[bt]*.85),have=C.st[main]||0,src=bt<=shopT?'lo vende Don Ramón, el herrero':bt===7?'cae en los Saltos del Mbocaruzú (y su versión épica solo en Cerro León)':bt===8?'cae en Salto Cristal (y su versión épica solo en Cerro León)':(()=>{const h=tkHunt(TIER_MOBL[bt]);return h?`cae de criaturas de nivel ${TIER_MOBL[bt]} o más, como ${tkHuntTxt(h)}`:`cae de criaturas de nivel ${TIER_MOBL[bt]} o más`;})();
+   if(low.length){const need=Math.round(TREQ_STAT[bt]*.85),have=C.st[main]||0,src=bt<=shopT?'lo vende Don Ramón, el herrero':bt===7?'cae en los Saltos del Mbocaruzú (y su versión épica solo en Cerro León)':bt===8?'cae en Salto Cristal (y su versión épica solo en Cerro León)':bt===9?'cae en Cerro León (Antiguo, Único y Épico en los Saltos del Guairá; Mítico solo en el Cerro Tres Kandú)':(()=>{const h=tkHunt(TIER_MOBL[bt]);return h?`cae de criaturas de nivel ${TIER_MOBL[bt]} o más, como ${tkHuntTxt(h)}`:`cae de criaturas de nivel ${TIER_MOBL[bt]} o más`;})();
      out.push(`Por tu nivel ya podés usar el ${tkB('set '+(bt+1)+' '+SETN[C.cls][bt])} y todavía tenés ${low.length} pieza${low.length>1?'s':''} de un set menor. Ese set ${src}.${have<need?` Pide ${need} de ${STATN[main]} (tenés ${have}).`:''}`);}
    else if(bt<8)out.push(`Tu equipo está al día para tu nivel. El ${tkB('set '+(bt+2)+' '+SETN[C.cls][bt+1])} se abre en el nivel ${TREQ_LVL[bt+1]}.`);
    const up=ks.concat(C.eq.wings?['wings']:[]).map(k=>C.eq[k]).filter(Boolean).sort((a,b)=>(b.k==='weapon')-(a.k==='weapon')||a.lv-b.lv),t6=up.find(it=>it.lv<6),tj=up.find(it=>it.lv>=6&&it.lv<9),nT=tkGem('tupa'),nJ=tkGem('jasy');
@@ -8573,7 +8587,7 @@ const GUIA_T=[
  {k:'gemas',q:'¿Para qué sirven las gemas?',re:/\b(gemas?|joyas?|tupa|jasy|yvy|kerana|caldero)\b|\+ ?\d+/,f(){
    const n=k=>tkGem(k);return `${tkB('Tupã')} (tenés ${n('tupa')}): sube de +0 a +6 y nunca falla. ${tkB('Jasy')} (${n('jasy')}): de +6 a +9, 50 % de éxito; si falla en +7 o más, el ítem vuelve a +0. ${tkB('Yvy')} (${n('yvy')}): agrega opción adicional +4, hasta +16. ${tkB('Kerana')} (${n('kerana')}): va al Caldero de Kerana para subir de +9 a +15 y crear alas. Se usan desde la Bolsa (I): tocás la gema y después el ítem. Caen de las criaturas (mucho más de élites, doradas y jefes) y las dan las misiones.`;}},
  {k:'puntos',q:'¿Dónde pongo mis puntos?',re:/\b(puntos?|stats?|fuerza|agilidad|vitalidad|energia|repart[oi]r?|build)\b/,f(){
-   const cl=CLASSES[C.cls],main=cl.main;let bt=0;for(let t=0;t<9;t++)if(C.L>=TREQ_LVL[t])bt=t;const nx=Math.min(8,bt+1),need=TREQ_STAT[nx];
+   const cl=CLASSES[C.cls],main=cl.main;let bt=0;for(let t=0;t<TREQ_LVL.length;t++)if(C.L>=TREQ_LVL[t])bt=t;const nx=Math.min(TREQ_LVL.length-1,bt+1),need=TREQ_STAT[nx];
    return `${C.pts?`Tenés ${tkB(C.pts+' puntos')} sin repartir: abrí Personaje (C).`:'No tenés puntos libres ahora; ganás más con cada nivel.'} Para tu ${esc(cl.name)}: ${esc(cl.hint)} Tu stat principal es ${tkB(STATN[main])} (tenés ${C.st[main]}); el arma del set ${nx+1} pide ${need}. Si morís seguido, sumá Vitalidad.`;}},
  {k:'evo',q:'¿Cómo evoluciono?',re:/\b(evolu\w*|pluma(s)? de guyra|reinici\w*|reset\w*)\b/,f(){
    const cl=CLASSES[C.cls],rc=2000000*((C.resets||0)+1);let s;
@@ -8606,7 +8620,7 @@ function renderGuia(){const b=$('#npcBody');if(!b)return;const keep=$('#gqIn')?$
   b.innerHTML=`<div class="gq"><div class="gq-log" id="gqLog">${log||'<p class="hint" style="margin:0">Elegí un tema o escribí tu pregunta. Ya sé quién sos y por dónde vas.</p>'}</div>
     <div class="gq-chips">${GUIA_T.map(t=>`<button class="btn sm ghost" data-act="guiaTopic" data-k="${t.k}">${esc(typeof t.q==='function'?t.q(C):t.q)}</button>`).join('')}</div>
     <div class="namebox"><input id="gqIn" maxlength="100" placeholder="Escribí tu pregunta sobre NOX" autocomplete="off" enterkeyhint="send" ${GUIA.busy?'disabled':''}><button class="btn sm" data-act="guiaAsk" ${GUIA.busy?'disabled':''}>Preguntar</button></div>
-    <p class="hint" id="gqLeft">${guiaLeftTxt()}</p></div>`;
+    <p class="hint" id="gqLeft">${guiaLeftTxt()}</p><button class="btn sm ghost" data-act="openManual" style="margin-top:8px">Leer la guía del reino</button></div>`;
   const i=$('#gqIn');if(i&&keep)i.value=keep;const L=$('#gqLog');if(L)L.scrollTop=L.scrollHeight;
   if(guiaOnline()&&GUIA.left==null&&!GUIA.ft){GUIA.ft=1;srvApi('GET','game/guia').then(r=>{GUIA.left=r.left;GUIA.max=r.max||GUIA.max;if(NPCV==='guia'&&!$('#pNpc').hidden)renderGuia();}).catch(()=>{});}}
 function guiaTopic(k){const t=GUIA_T.find(x=>x.k===k);if(!t||!C)return;GUIA.log.forEach(m=>{m.deep=0;});guiaSay('me',esc(typeof t.q==='function'?t.q(C):t.q));let h;try{h=t.f();}catch(e){console.error(e);h='Ahora no lo tengo claro. Preguntame otra cosa.';}guiaSay('he',h);renderGuia();}
@@ -8703,7 +8717,7 @@ const ACT={
   split(){const c=ICTX;if(!c)return;const arr=c.src==='vault'?vaultData().items:C.inv,it=arr[c.i];if(!it)return;const k=Math.round(+($('#spN')||{}).value||0);
     if(!(k>=1&&k<(it.n||1))){toast('Elegí entre 1 y '+((it.n||1)-1));return;}const j=splitStack(arr,c.i,k);if(j<0){toast(c.src==='vault'?'No hay lugar libre en el baúl':'Necesitás un lugar libre en la bolsa');return;}
     $('#pItem').hidden=true;refreshPause();toast(`Separaste <em>${k}</em> en otro lugar`);if(c.src==='vault'||c.src==='vinv')vAfter();else{persist();if(!$('#pInv').hidden)renderInv();if(!$('#pShop').hidden)renderShop();}},
-  openChar(){if(mode!=='game')return;closeAll();renderChar();showPanel('pChar');},setInfo(){setInfoToggle();},openPatches(){closeAll();showPanel('pPatch');patchLoad();},openRank(){closeAll();renderRank();showPanel('pRank');rankLoad();},gestWheel(){if(mode!=='game')return;const w=$('#wheel');if(w&&!w.hidden&&WCUR===GESTW){wheelToggle(false);return;}wheelToggle(true,GESTW);},openCfg(){if(mode!=='game')return;closeAll();renderCfg();showPanel('pCfg');},
+  openChar(){if(mode!=='game')return;closeAll();renderChar();showPanel('pChar');},setInfo(){setInfoToggle();},openPatches(){closeAll();showPanel('pPatch');patchLoad();},openRank(){closeAll();renderRank();showPanel('pRank');rankLoad();},openManual(d){closeAll();if(d&&d.v)MAN.tab=d.v;renderManual();showPanel('pManual');},manTab(d){MAN.tab=d.v;renderManual();const b=$('#manBody');if(b)b.scrollTop=0;},manCls(d){MAN.cls=d.v;renderManual();},gestWheel(){if(mode!=='game')return;const w=$('#wheel');if(w&&!w.hidden&&WCUR===GESTW){wheelToggle(false);return;}wheelToggle(true,GESTW);},openCfg(){if(mode!=='game')return;closeAll();renderCfg();showPanel('pCfg');},
   openInv(){if(mode!=='game')return;closeAll();renderInv();showPanel('pInv');},
   openTravel(){if(mode!=='game')return;closeAll();$('#npcName').textContent='Viajar';$('#npcRole').textContent='Mapas del reino';$('#npcGreet').hidden=true;NPCV='travel';renderNpc();showPanel('pNpc');},
   evInfo(){toast('Las invitaciones se tejen en el caldero de Jarýi Kuña con trofeos de las bestias. Usalas desde el inventario mientras el evento esté abierto.');},
@@ -9709,7 +9723,7 @@ function acctBar(){let h;
   else if(/Electron/.test(navigator.userAgent))h='<div class="acct off"><span class="dot"></span><span>Versión de escritorio · tus personajes se guardan en esta computadora</span></div>';
   else h=`<div class="acct off"><span class="dot"></span><span>Sin cuenta · tus personajes se guardan solo en este dispositivo${NET.msg?'. '+esc(NET.msg):''}</span></div><button class="btn sm ghost" data-act="retryNet">Conectar cuenta</button>`;
   if(SRV.on)h+=`<span class="onl${RANK.n?' on':''}"><i></i>${RANK.n?`${RANK.n} jugando ahora`:'Nadie jugando ahora'}</span><button class="btn sm ghost" data-act="openRank">Ranking</button>`;
-  h+='<button class="btn sm ghost" data-act="openPatches">Historial de parches</button>';
+  h+='<button class="btn sm ghost" data-act="openManual">Guía del reino</button><button class="btn sm ghost" data-act="openPatches">Historial de parches</button>';
   $('#acctBar').innerHTML=h;}
 function importBtn(){const n=LOCAL.chars.length;return NET.mode==='online'&&NET.account&&n?`<button class="btn ghost" data-act="importLocal" ${SELV.busy?'disabled':''}>Traer ${n} personaje${n>1?'s':''} de este dispositivo</button>`:'';}
 function renderSelect(){acctBar();const b=$('#selBody'),dis=SELV.busy?'disabled':'',errH=SELV.err?`<div class="it-l req bad">${esc(SELV.err)}</div>`:'';
@@ -9831,7 +9845,7 @@ const SKI={"giro":["M259.738 20.38c-40.36-.244-81.305 9.895-118.744 31.51C28.566
 const SKIG={acero:['#fff6dc','#e2a83f'],fuego:['#ffe2a0','#ff6a1a'],rayo:['#ffffff','#7fc8ff'],oscuro:['#f0d8ff','#9a5cff'],monte:['#e6ffd0','#5fd06a'],voz:['#fff2c8','#ffb347'],cura:['#eaffea','#46d17a']};
 {const d=document.createElement('div');d.style.cssText='position:absolute;width:0;height:0;overflow:hidden';d.innerHTML=`<svg width="0" height="0" aria-hidden="true"><defs>${Object.entries(SKIG).map(([k,[a,b]])=>`<linearGradient id="skg_${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`).join('')}</defs></svg>`;document.body.appendChild(d);}
 function SKIC(k){const s=SKI[k];if(!s)return ICON_SVG('fire');return `<svg class="ski" viewBox="0 0 512 512" aria-hidden="true"><path fill="url(#skg_${s[1]})" d="${s[0]}"/></svg>`;}
-const UI_IC={star:'<path d="M12 2.5l2.9 6.3 6.8.8-5 4.7 1.3 6.8L12 17.7 5.900 21.100l1.300-6.800-5-4.700 6.800-.8z"/>',smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.6 2.4 2.4 4 2.4s3-.8 4-2.4"/><circle cx="9" cy="10" r=".9" fill="currentColor"/><circle cx="15" cy="10" r=".9" fill="currentColor"/>',
+const UI_IC={guia:'<path d="M3 5.5c3-1.3 6-1.1 9 .8 3-1.9 6-2.1 9-.8V19c-3-1.3-6-1.1-9 .8-3-1.9-6-2.1-9-.8z"/><path d="M12 6.3v13.5M6 9.5h3M6 12.5h3M15 9.5h3M15 12.5h3"/>',star:'<path d="M12 2.5l2.9 6.3 6.8.8-5 4.7 1.3 6.8L12 17.7 5.900 21.100l1.300-6.800-5-4.700 6.800-.8z"/>',smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.6 2.4 2.4 4 2.4s3-.8 4-2.4"/><circle cx="9" cy="10" r=".9" fill="currentColor"/><circle cx="15" cy="10" r=".9" fill="currentColor"/>',
 g_saludo:'<path d="M7 11V6a1.5 1.5 0 0 1 3 0v5M10 10V4.5a1.5 1.5 0 0 1 3 0V10M13 10V5.5a1.5 1.5 0 0 1 3 0V12M16 10a1.5 1.5 0 0 1 3 0v4a7 7 0 0 1-7 7h-1a6 6 0 0 1-5-3l-2.5-4a1.5 1.5 0 0 1 2.5-1.6L7 14"/>',
 g_baile:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
 g_risa:'<circle cx="12" cy="12" r="9"/><path d="M7.5 9l2 1-2 1M16.5 9l-2 1 2 1"/><path d="M7.5 13.5h9a4.5 4.5 0 0 1-9 0z"/>',
@@ -9911,7 +9925,7 @@ addEventListener('resize',()=>setTimeout(hudFit,60));addEventListener('orientati
   const sn=$('#sunN');if(sn._n!==n){sn._n=n;sn.hidden=!n;sn.textContent=n;}
   if(!lsGet('noxSunTip')&&!$('#sunTip')&&mode==='game')$('#sunWrap').insertAdjacentHTML('beforeend','<div id="sunTip" class="tg2">Tocá el <b>sol</b> para ver tu bolsa, personaje, grupo, misiones y más</div>');}
 /* la rueda del sol */
-const WHEEL=[['person','Personaje','openChar','ptsDot'],['bag','Bolsa','openInv'],['book','Misiones','openQuests','dayDot'],['party','Grupo','openParty','partyN'],['chat','Chat','openChat','chatDot'],['crown','Ranking','openRank'],...(Date.now()<Date.UTC(2026,11,22)?[['star','Evento','openApe']]:[]),['bag','Mi tienda','openMyShop'],['gear','Ajustes','openCfg']];
+const WHEEL=[['person','Personaje','openChar','ptsDot'],['bag','Bolsa','openInv'],['book','Misiones','openQuests','dayDot'],['party','Grupo','openParty','partyN'],['chat','Chat','openChat','chatDot'],['crown','Ranking','openRank'],['guia','Guía','openManual'],...(Date.now()<Date.UTC(2026,11,22)?[['star','Evento','openApe']]:[]),['bag','Mi tienda','openMyShop'],['gear','Ajustes','openCfg']];
 const WSEL={i:-1};
 let WCUR=null;
 function wheelToggle(force,list){let w=$('#wheel');const L=list||WHEEL;const open=force!=null?force:!w||w.hidden||(WCUR!==L);if(!open){if(w)w.hidden=true;return;}WCUR=L;
@@ -10003,7 +10017,7 @@ const PAD={on:false,prev:[],mv:false,nav:0,wsel:-1};
 function padOn(v){if(PAD.on===v)return;PAD.on=v;document.body.classList.toggle('pad',v);kbLabels();if(v)toast('Mando conectado');}
 addEventListener('gamepaddisconnected',()=>{const g=navigator.getGamepads?[...navigator.getGamepads()].find(x=>x&&x.connected):null;if(!g)padOn(false);});
 function padFocusables(root){return [...root.querySelectorAll('button:not([disabled]),[data-act],.slot,[data-k],input')].filter(el=>el.offsetParent!==null&&!el.closest('[hidden]'));}
-function padRoot(){const ids=['pItem','pMap','pChar','pMate','pCfg','pRank','pMuro','pApe','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pVault','partyBox','chatBox'];for(const id of ids){const e=$('#'+id);if(e&&!e.hidden)return e;}return null;}
+function padRoot(){const ids=['pItem','pMap','pChar','pMate','pCfg','pRank','pManual','pMuro','pApe','pTrade','pMyShop','pShopV','pInv','pShop','pNox','pNpc','pVault','partyBox','chatBox'];for(const id of ids){const e=$('#'+id);if(e&&!e.hidden)return e;}return null;}
 function padMove(root,dx,dy){const els=padFocusables(root);if(!els.length)return;let cur=document.activeElement;if(!els.includes(cur)){els[0].focus();els[0].classList.add('pnav-f');return;}
   const r=cur.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let best=null,bs=1e9;
   for(const el of els){if(el===cur)continue;const q=el.getBoundingClientRect(),x=q.left+q.width/2-cx,y=q.top+q.height/2-cy;const along=x*dx+y*dy;if(along<=4)continue;const perp=Math.abs(x*dy-y*dx);const s=along+perp*2.2;if(s<bs){bs=s;best=el;}}
@@ -10635,6 +10649,55 @@ const RANK={list:null,on:new Set(),n:0,err:0,busy:0};
 async function onlineFetch(){if(!SRV.on)return;try{const r=await fetch('/live/online',{cache:'no-store'});if(!r.ok)return;const j=await r.json();RANK.n=j.n|0;RANK.on=new Set((j.names||[]).map(x=>String(x).toLowerCase()));}catch(e){}}
 async function rankLoad(){if(!SRV.on){RANK.err=2;renderRank();return;}RANK.busy=1;renderRank();try{const [r]=await Promise.all([srvApi('GET','game/ranking'),onlineFetch()]);RANK.list=(r&&r.list)||[];RANK.err=0;}catch(e){RANK.err=1;}RANK.busy=0;renderRank();}
 function patchDate(b){b=String(b);const M=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return b.length>=12?`${+b.slice(6,8)} ${M[+b.slice(4,6)-1]} ${b.slice(0,4)} · ${b.slice(8,10)}:${b.slice(10,12)}`:b;}
+/* (19/11) Guía del reino (#pManual): niveles, reinicios, sets, armas, bonos y mapas. Todo sale de las tablas del juego (TREQ_*, SETN, WNAME, WDMG, ADEF, ANCS, RAR, EXW/EXA, ZONES, RELIQ), así no queda vieja cuando cambian */
+const MAN={tab:'niveles',cls:null};
+const MANT=[['niveles','Niveles'],['sets','Sets'],['armas','Armas'],['bonos','Bonos'],['mapas','Mapas']];
+const MANCL=['caballero','hechicero','arquera','gladiador','mburuvicha'];
+const manSetN=(cls,t)=>SETN[cls][t].replace(/^del? /,'');
+function manSrc(t){if(t<=1)return 'Lo vende Don Ramón, el herrero';if(t===2)return 'Don Ramón desde el nivel 25, o de criaturas';if(t<=6)return `Cae de criaturas de nivel ${TIER_MOBL[t]} o más`;
+  if(t===7)return 'Saltos del Mbocaruzú · Épico en Cerro León · Mítico en los Saltos del Guairá';if(t===8)return 'Salto Cristal · Épico en Cerro León · Mítico en los Saltos del Guairá';
+  return 'Cerro León · Antiguo, Único y Épico en los Saltos del Guairá · Mítico solo en el Cerro Tres Kandú';}
+function manClsBar(cls){return `<div class="mcls">${MANCL.map(k=>`<button class="${k===cls?'on':''}" data-act="manCls" data-v="${k}">${CLASSES[k].name}</button>`).join('')}</div>`;}
+function renderManual(){const tb=$('#manTabs'),b=$('#manBody');if(!tb||!b)return;const me=mode==='game'&&C?C:null;if(!MAN.cls)MAN.cls=me?me.cls:'caballero';const cls=MAN.cls,CL=CLASSES[cls],sn=STATN[CL.main];
+  tb.innerHTML=MANT.map(([k,t])=>`<button class="${MAN.tab===k?'on':''}" data-act="manTab" data-v="${k}">${t}</button>`).join('');let h='';
+  if(MAN.tab==='niveles'){const rs=me?(me.resets||0):0;
+    h+=`<h3>Subir de nivel</h3><p>El nivel máximo es el <b>${MAXL}</b>. Ganás experiencia matando criaturas; en grupo, de noche (+15 %) y con las élite (rojas) y doradas sube más rápido.</p>
+    <p>Puntos por nivel: <b>5</b> el Caballero, el Hechicero y la Arquera; <b>7</b> el Gladiador y el Mburuvicha. Se reparten en la ficha del Personaje. Conviene poner casi todo en el stat principal de tu clase: lo pide cada set para equiparse.</p>
+    <h3>Evolución</h3><p>Desde el nivel <b>50</b>, el Pa'i Antonio (frente a la catedral) te pide 5 Plumas de Guyra Pytã. Al evolucionar ganás <b>1 punto más por nivel</b> y la cuarta técnica.</p>
+    <h3>Reinicios</h3><p>En el nivel <b>${MAXL}</b>, el Pa'i Antonio te reinicia: volvés al nivel 1, tus stats vuelven a la base y recibís <b>300 puntos libres por cada reinicio</b> que llevás. Las misiones del Capitán Cabañas empiezan de nuevo. Cada reinicio cuesta <b>₲ 2.000.000</b> por su número. El Ranking ordena primero por reinicios.</p>
+    ${me?`<div class="mbox me">Llevás <b>${rs}</b> ${rs===1?'reinicio':'reinicios'}. El próximo cuesta <b>₲ ${fmt(2000000*(rs+1))}</b> y te deja <b>${fmt(300*(rs+1))}</b> puntos libres${me.L<MAXL?`; te faltan ${MAXL-me.L} niveles`:''}.</div>`:''}
+    <table><thead><tr><th>Reinicio</th><th class="n">Costo</th><th class="n">Puntos al empezar</th></tr></thead><tbody>${[1,2,3,5,10,15,20].map(n=>`<tr class="${me&&rs+1===n?'me':''}"><td>${n}º</td><td class="n">₲ ${fmt(2000000*n)}</td><td class="n">${fmt(300*n)}</td></tr>`).join('')}</tbody></table>
+    <p class="hint">Los mapas de reinicios se abren desde el nivel 30: Cerro León (ideal 5 reinicios), Saltos del Guairá (10) y Cerro Tres Kandú (20). Ver la pestaña Mapas.</p>`;}
+  else if(MAN.tab==='sets'){h+=manClsBar(cls)+`<p>Cada raza tiene <b>${TREQ_LVL.length} sets</b>. Para equipar una pieza hacen falta el nivel y ${sn}: el arma pide lo de la tabla y las armaduras un 15 % menos.${cls==='gladiador'?' El Gladiador no usa casco: su set se completa con 4 piezas.':cls==='caballero'?' El Caballero suma un escudo en cada set.':''}</p>
+    <table><thead><tr><th>Set</th><th class="n">Nivel</th><th class="n">${sn}</th><th class="n">Def.</th></tr></thead><tbody>${TREQ_LVL.map((lv,t)=>`<tr class="${me&&me.cls===cls?(me.L<lv?'no':''):''}"><td><b>${t+1}. ${esc(manSetN(cls,t))}</b><small>${manSrc(t)}</small></td><td class="n">${lv}</td><td class="n">${TREQ_STAT[t]}</td><td class="n">${ADEF[t]}</td></tr>`).join('')}</tbody></table>
+    <p class="hint">Def. es la defensa base de las piernas a +0; el casco da 0,8 veces eso, el peto 1,25 y guantes y botas 0,6. Cada nivel de mejora suma defensa (ver Armas).</p>`;}
+  else if(MAN.tab==='armas'){const d15=lvAdd(15);
+    h+=manClsBar(cls)+`<p>Daño del arma de cada set, sin mejora (+0) y con mejora máxima (+15). El daño de la clase depende además de ${sn}.</p>
+    <table><thead><tr><th>Arma</th><th class="n">Nivel</th><th class="n">+0</th><th class="n">+15</th></tr></thead><tbody>${WDMG[cls].map((w,t)=>`<tr class="${me&&me.cls===cls&&me.L<TREQ_LVL[t]?'no':''}"><td><b>${esc(WNAME[cls][t])}</b><small>Set ${t+1}</small></td><td class="n">${TREQ_LVL[t]}</td><td class="n">${w[0]}–${w[1]}</td><td class="n">${w[0]+d15}–${w[1]+d15}</td></tr>`).join('')}</tbody></table>
+    ${cls==='caballero'?`<p class="hint" style="margin:-4px 0 10px">Escudos: uno por set, de ${esc(SHNAME[0])} a ${esc(SHNAME[SHNAME.length-1])}; dan 1,1 veces la defensa base del set.</p>`:''}
+    <h3>Mejoras (+0 a +15)</h3><ul><li>De +1 a +9 cada nivel suma <b>3</b> de daño o defensa; de +10 a +15, <b>4</b>.</li><li><b>Gema de Tupã</b>: de +0 a +6, nunca falla.</li><li><b>Gema de Jasy</b>: de +6 a +9, 50 % (75 % con Suerte). Si falla desde +7, vuelve a +0.</li><li><b>Caldero de Kerana</b> (Jarýi Kuña, en la plaza): de +9 a +15, del 60 % al 35 %. Si falla, el ítem se pierde.</li><li><b>Gema de Yvy</b>: opción adicional, +4 por uso hasta +16.</li></ul>
+    <h3>Rareza</h3><p>Un arma <b style="color:${RAR.epic.c}">Épica</b> pega 1,2 veces más y una <b style="color:${RAR.myth.c}">Mítica</b> 1,35 veces más (también la defensa en armaduras).</p>
+    <h3>Reliquias NOX</h3><p>Ocho armas míticas del último set, una por jefe del Cerro Tres Kandú (12 % por jefe), con la forma y el color de su jefe; salen en el arma de tu clase y cuentan para el conjunto NOX: ${Object.values(RELIQ).map(r=>esc(r[0])).join(', ')}.</p>`;}
+  else if(MAN.tab==='bonos'){const an=k=>`<div class="mbox"><b>${esc(ANCS[k].n==='NOX'?'Conjunto NOX':'Set antiguo '+ANCS[k].n)}</b><ul style="margin:4px 0 0">${ANCS[k].b.map(([n,t])=>`<li>${n} piezas: ${esc(t)}</li>`).join('')}</ul></div>`;
+    h+=`<h3>Set completo</h3><p>Con todas las piezas de armadura del mismo set (el Gladiador, 4 sin casco) se activa el <b>set completo</b>: <b>defensa +10 %</b>, y <b>+5 % más</b> si todas están en +10 o más. Desde +7 aparece el aura del set y cada set tiene su efecto propio, que crece con la mejora.</p>
+    <h3>Conjuntos que se juntan pieza a pieza</h3><p>Algunas piezas dan bonos por juntar de 2 a 5 del mismo conjunto, aunque sean de sets distintos.</p>${an('humaita')}${an('cerrocora')}${an('nox')}
+    <p class="hint" style="margin-top:-4px">Humaitá y Cerro Corá son piezas Antiguas. NOX son las piezas y reliquias míticas de los ocho jefes del Cerro Tres Kandú.</p>
+    <h3>Rarezas, de menor a mayor</h3><div class="rar">
+      <b style="color:${RAR.normal.c}">${RAR.normal.n}</b><span>La pieza base.</span>
+      <b style="color:${RAR.opt.c}">${RAR.opt.n}</b><span>Con Suerte (más chance al mejorar y, en el arma, +5 % de crítico) u opción adicional.</span>
+      <b style="color:${RAR.exc.c}">${RAR.exc.n}</b><span>Trae opciones excelentes (abajo).</span>
+      <b style="color:${RAR.anc.c}">${RAR.anc.n}</b><span>Pieza de Humaitá o Cerro Corá.</span>
+      <b style="color:${RAR.uniq.c}">${RAR.uniq.n}</b><span>Pieza con nombre propio, la suelta su criatura.</span>
+      <b style="color:${RAR.epic.c}">${RAR.epic.n}</b><span>1,2 veces más fuerte. Solo de los sets 8, 9 y 10.</span>
+      <b style="color:${RAR.myth.c}">${RAR.myth.n}</b><span>1,35 veces más fuerte. Con el set completo en Mítico gira un sello carmesí a tu espalda.</span>
+      <b style="color:${RAR.myth.c}">NOX</b><span>Míticas con nombre propio de los jefes del Tres Kandú; arman el conjunto NOX.</span></div>
+    <h3>Opciones excelentes</h3><p><b>Armas:</b> ${EXW.map(x=>esc(x[1])).join(' · ')}.</p><p><b>Armaduras:</b> ${EXA.map(x=>esc(x[1])).join(' · ')}.</p>`;}
+  else{const SPC={mbocaruzu:'Set 8',saltocristal:'Set 9',cerroleon:'Set 10 · Épicos de los sets 8 y 9',saltosguaira:'Míticos y Únicos de los sets 8 y 9 · set 10 Antiguo, Único y Épico',treskandu:'Set 10 Mítico seguro por jefe · piezas y reliquias NOX'};
+    h+=`<p>Los mapas en orden de viaje. El nivel es el mínimo para entrar; los de reinicios dicen cuántos reinicios conviene tener. Se viaja con el Baqueano Tito o por los portales.</p>
+    <table><thead><tr><th>Mapa</th><th class="n">Entrada</th><th class="n">Criaturas</th></tr></thead><tbody>${ZORDER.map(id=>{const z=ZONES[id];if(!z)return '';const lv=(z.spots||[]).map(sp=>MOBS[sp.m]&&MOBS[sp.m].lvl).filter(x=>x);const rg=lv.length?`${Math.min(...lv)}–${Math.max(...lv)}`:'—';
+      return `<tr class="${me&&Z&&Z.id===id?'me':''}${me&&me.L<z.lvl?' no':''}"><td><b>${esc(z.name)}</b><small>${esc(z.sub||'')}${SPC[id]?' · <span style="color:#f0cc84">'+SPC[id]+'</span>':''}</small></td><td class="n">${z.safe?'Inicio':z.rst?`Nv ${z.lvl}<small>${z.rst} reinicios</small>`:'Nv '+z.lvl}</td><td class="n">${rg}</td></tr>`;}).join('')}</tbody></table>
+    <p class="hint">Criaturas: nivel de las criaturas de los spots. Del set 4 al 7, el set que cae depende del nivel de la criatura.</p>`;}
+  b.innerHTML=h;}
 async function patchLoad(){const b=$('#patchBody');if(!b)return;b.innerHTML='<p class="hint">Cargando…</p>';let l;try{l=await (await fetch('patches.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){}
   if(!Array.isArray(l)||!l.length){b.innerHTML='<p class="hint">No se pudo cargar el historial. Probá de nuevo en un rato.</p>';return;}
   b.innerHTML=l.map((p,i)=>`<div class="ph${i===0?' new':''}${String(p.build)===NOX_BUILD?' mine':''}"><div class="phh"><b>${esc(p.title||'Parche')}</b><small>${patchDate(p.build)}${String(p.build)===NOX_BUILD?' · tu versión':''}</small></div>${(p.notes||[]).length?'<ul>'+p.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+'</ul>':''}</div>`).join('');}

@@ -10,4 +10,5 @@ sh scripts/patch.sh "Saltos del Guairá, Cerro Tres Kandú y el último set" \
  "Cerro Tres Kandú: cada jefe deja siempre una pieza mítica del último set y puede dejar una pieza NOX o una reliquia NOX, un arma con la forma, el color y el nombre del jefe" \
  "Conjunto NOX: juntá de 2 a 5 piezas NOX y sumá daño, defensa, vida, crítico y velocidad de ataque" \
  "Gladiador: sus sets ya cuentan como completos sin casco (bono, efecto y aura de set), y no asoma más cuero entre las rodillas ni piel en los hombros" \
+ "Guía del reino: una guía para leer en el juego (rueda del sol → Guía, la portada o Arandu) con niveles, reinicios, los diez sets de cada raza, armas y su daño, bonos de set, rarezas y mapas" \
  "Web: los dos mapas, el último set, Mítico y NOX; la forja ya deja ver los diez sets de cada raza"
