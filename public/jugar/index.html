@@ -8114,7 +8114,7 @@ addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;co
   if(k==='escape'){const w=$('#wheel'),open=paused||(w&&!w.hidden)||['partyBox','chatBox'].some(id=>{const e=$('#'+id);return e&&!e.hidden;});if(open||mode!=='game'){closeAll();closeBigMap();}else wheelToggle(true);return;}
   if(mode!=='game')return;
   if(paused){if(k==='i'||k==='v'||k==='c'||k==='m')closeAll();return;}
-  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);return;}if(k==='z'&&!e.repeat){dropLblSet(!DROPLBL);return;}
+  keys[k]=true;if(k==='b'){setCam(CAMS[(CAMS.indexOf(CAMM)+1)%CAMS.length]);return;}
   const wasd=WASD();if(wasd&&k===' '){e.preventDefault();if(!e.repeat)ACT.toggleAuto();}else if(k===' '||k==='j'){e.preventDefault();if(!atkHeld){atkHeld=true;attackPress();}}
   const SKK=wasd?{q:1,e:2,r:3}:{q:0,w:1,e:2,r:3};if(k in SKK)useSkill(SKK[k]);if(k==='1')usePot('hp');if(k==='2')usePot('mp');if(!wasd&&k==='a'&&!atkHeld){atkHeld=true;attackPress();setTimeout(()=>{if(!keys[' '])atkHeld=false;},150);}
   if(k==='i'||k==='v')ACT.openInv();if(k==='c')ACT.openChar();if(k==='m')ACT.openTravel();if(k==='h')ACT.toggleAuto();if(k==='l')ACT.openQuests();
@@ -8653,7 +8653,7 @@ function renderChar(){const cl=CLASSES[C.cls];
 function renderCfg(){$('#cfgBody').innerHTML=`<div class="sect"><h3>Cuenta</h3><p class="it-d">${NET.mode==='online'?`Cuenta <b>${esc(NET.account||'')}</b> · tu progreso se guarda en el servidor${NET.readOnly?' (ahora no se está guardando)':''}`:'Sin cuenta · tu progreso se guarda solo en este dispositivo'}</p></div>
   <div class="sect"><h3>Gráficos</h3><div class="tabs"><button data-act="quality" data-q="auto" class="${Q.auto?'on':''}">Auto</button>${QLV.map(l=>`<button data-act="quality" data-q="${l}" class="${!Q.auto&&Q.level===l?'on':''}">${QNAME[l]}</button>`).join('')}</div><p class="hint" style="margin:0">${Q.auto?'Automático: ahora en <b>'+QNAME[Q.level]+'</b>. El juego sube o baja solo según lo que da tu equipo. ':''}Ultra: lo máximo, para PC y celulares muy potentes. Alta: nítido, con sombras y brillos. Media: sin brillos. Lite: lo más liviano, sin sombras y con menos decorado.</p></div>
   <div class="sect"><h3>Cámara</h3><div class="tabs">${CAMS.map(c=>`<button data-act="camSet" data-c="${c}" class="${CAMM===c?'on':''}">${CAMN[c]}</button>`).join('')}</div><p class="hint" style="margin:0">En 3ra persona, arrastrá la pantalla (o el mouse) para girar y mové con el joystick. Acercá o alejá con dos dedos o la rueda del mouse. Tecla <b>B</b> o el botón de la cámara para cambiar.</p></div>
-  <div class="sect"><h3>Nombres de ítems en el piso</h3><div class="tabs"><button data-act="dropLbl" data-v="1" class="${DROPLBL?'on':''}">Mostrar</button><button data-act="dropLbl" data-v="0" class="${DROPLBL?'':'on'}">Ocultar</button></div><p class="hint" style="margin:0">Ocultos, los ítems siguen brillando en el piso y se levantan igual. En PC, tecla <b>Z</b>.</p></div>
+  <div class="sect"><h3>Nombres de ítems en el piso</h3><div class="tabs"><button data-act="dropLbl" data-v="1" class="${DROPLBL?'on':''}">Mostrar</button><button data-act="dropLbl" data-v="0" class="${DROPLBL?'':'on'}">Ocultar</button></div><p class="hint" style="margin:0">Ocultos, los ítems siguen brillando en el piso y se levantan igual. En PC, tecla <b>Alt</b>.</p></div>
   <div class="sect"><h3>Cuadros por segundo</h3><div class="tabs">${[30,60].map(f=>`<button data-act="fpsCap" data-f="${f}" class="${FCAP.fps===f?'on':''}">${f}</button>`).join('')}<button data-act="fpsShow" class="${FPSM.on?'on':''}">Ver FPS</button></div><p class="hint" style="margin:0">30 gasta menos batería y calienta menos el celular. 60 se ve más suave si tu equipo lo aguanta.</p></div>
   <div class="sect"><h3>Sonido</h3><label class="vol"><span>Música</span><input type="range" id="volMus" min="0" max="1" step="0.05" value="${SND.vol.mus}"></label><label class="vol"><span>Efectos y ambiente</span><input type="range" id="volSfx" min="0" max="1" step="0.05" value="${SND.vol.sfx}"></label></div>
   ${KEEPF.on?`<div class="sect"><h3>Guardado en el dispositivo</h3><div class="tabs">${[['auto','Auto'],['todo','Todo'],['no','Apagado']].map(k=>`<button data-act="keepSet" data-k="${k[0]}" class="${KEEPF.pref===k[0]?'on':''}">${k[1]}</button>`).join('')}</div><p class="hint" style="margin:0"><b id="keepTxt"></b> El juego guarda sus archivos en tu equipo para abrir más rápido y gastar menos datos. Auto: adelanta mapas y sonidos mientras jugás, y la música solo con wifi. Todo: guarda también la música ahora. Apagado: solo guarda lo que vas usando.</p></div>`:''}`;if(KEEPF.on){keepPaint();if(!KEEPF.run)keepStat();}}
@@ -10001,7 +10001,7 @@ function kbLabels(){const ids=['sk0','sk1','sk2','sk3','bAtk','bHP','bMP','autoB
   else if(WASD())L=['Clic D','Q','E','R','Clic','1','2','Esp'];
   else if(IS_FINE)L=['Q','W','E','R','Esp','1','2','H'];
   ids.forEach((id,i)=>{const b=$('#'+id);if(!b)return;let k=b.querySelector(':scope>.kb');if(!L){if(k)k.remove();return;}if(!k){k=document.createElement('span');b.appendChild(k);}k.className='kb'+(PAD.on?' pad '+cls[i]:'');k.textContent=L[i];});}
-const _setCamV2=setCam;setCam=function(m){_setCamV2(m);kbLabels();if(WASD()&&!lsGet('noxWasdTip')){lsSet('noxWasdTip','1');toast('WASD para caminar · hacé clic para mirar con el mouse · Alt suelta el cursor');}};
+const _setCamV2=setCam;setCam=function(m){_setCamV2(m);kbLabels();if(WASD()&&!lsGet('noxWasdTip')){lsSet('noxWasdTip','1');toast('WASD para caminar · hacé clic para mirar con el mouse · Esc suelta el cursor · Alt muestra u oculta los nombres de los ítems del piso');}};
 function nextTarget(){const l=enemies.filter(e=>!e.dead&&e.g.visible&&Math.hypot(e.p.x-P.x,e.p.z-P.z)<22).sort((a,b)=>Math.hypot(a.p.x-P.x,a.p.z-P.z)-Math.hypot(b.p.x-P.x,b.p.z-P.z));if(!l.length){toast('No hay enemigos cerca');return;}const i=l.indexOf(P.target);P.target=l[(i+1)%l.length];}
 const PLK={on:false};
 document.addEventListener('pointerlockchange',()=>{PLK.on=document.pointerLockElement===host;host.classList.toggle('plock',PLK.on);if(!PLK.on)atkHeld=false;});
@@ -10010,7 +10010,14 @@ host.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||!WASD()||mod
   if(e.button===0){atkHeld=true;attackPress();}else if(e.button===2)useSkill(0);},true);
 addEventListener('pointerup',e=>{if(PLK.on&&e.button===0)atkHeld=false;});
 addEventListener('mousemove',e=>{if(PLK.on&&mode==='game'&&!paused)camTurn(e.movementX*.9,e.movementY*.9);});
-addEventListener('keydown',e=>{const k=e.key;if(k==='Alt'&&PLK.on){e.preventDefault();document.exitPointerLock();}
+/* (19/11) Alt solo (apretar y soltar, sin otra tecla en el medio) muestra u oculta los nombres de los ítems del piso, como en MU.
+   Se decide al soltar para no cambiar nada con Alt+Tab ni otros atajos; preventDefault en las dos teclas evita que Chrome/Firefox
+   lleven el foco al menú del navegador. El cursor capturado (3ra/1ra persona) se suelta con Esc. */
+const ALTK={solo:false};
+addEventListener('blur',()=>{ALTK.solo=false;});
+addEventListener('keyup',e=>{if(e.key!=='Alt')return;e.preventDefault();const ok=ALTK.solo;ALTK.solo=false;
+  if(ok&&mode==='game'&&!(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName)))dropLblSet(!DROPLBL);},true);
+addEventListener('keydown',e=>{const k=e.key;if(k==='Alt'){e.preventDefault();if(!e.repeat)ALTK.solo=true;}else ALTK.solo=false;
   if(k==='Tab'&&mode==='game'&&!paused&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();nextTarget();}},true);
 /* ================= mando (Xbox, PlayStation y genéricos): Gamepad API ================= */
 const PAD={on:false,prev:[],mv:false,nav:0,wsel:-1};
