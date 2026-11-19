@@ -1,8 +1,13 @@
 {
- "build": "202611161320",
- "min": "202611161320",
- "title": "Nombres de armas y escudos",
+ "build": "202611182212",
+ "min": "202611182212",
+ "title": "Apertura del Reino: el evento de lanzamiento",
  "notes": [
-  "Las armas y los escudos de los sets de nivel 133 y 177 ya muestran su nombre (antes decían «undefined»)"
+  "Del 1 al 14 de diciembre: la Apertura del Reino. Entrá cada día y llevate gemas, Noxis, el título Pionero del Reino, el marco de aurora y la estela Aurora",
+  "El Dragón Dorado baja 4 veces por día (9, 13, 17 y 21 h) al campo frente a la puerta sur de Asunción: todo el reino pelea junto y hay premios para todos los que le peguen",
+  "Carrera de Pioneros: los 10 que más niveles suban durante el evento ganan 2.000 Noxis, el título Primeros del Reino y su nombre en la Placa de la Apertura",
+  "Panel del evento en la rueda del sol (Evento) y cuenta regresiva en pantalla",
+  "El Muro de Fundadores ahora es más grande y está frente a la catedral; de cerca se abre la lista completa con buscador",
+  "El portal a Campos de Ypacaraí se corrió a la derecha de la puerta sur"
  ]
 }
