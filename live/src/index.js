@@ -470,7 +470,7 @@ export class World {
       this.partySend(p, { t: 'ps', id: a.uid, h: pc(m.h), m: pc(m.m), d: m.d ? 1 : 0, L: (a.s && a.s.L) | 0 }, a.uid); return; }
 
     // monstruos: los mueve el servidor; los jugadores mandan sus golpes y piden la lista completa
-    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
+    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d, m.px, m.pz); return; }
     if (t === 'wbh') { if (this.wb && a.zone === DR.zone && a.s) this.wb.hit(a.uid, m.d, a.s.L | 0, a.s.n); return; }
     if (t === 'wbadm') { // "/dragon" llama al Dragón Dorado para probar; "/dragon fuera" lo saca. Solo administradores
       if (a.role !== 'admin') { this.send(ws, { t: 'sys', m: 'Solo los administradores pueden llamar al Dragón Dorado.' }); return; }

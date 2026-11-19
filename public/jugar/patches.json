@@ -1,6 +1,6 @@
 [
  {
-  "build": "202611182212",
+  "build": "202611182225",
   "title": "Apertura del Reino: el evento de lanzamiento",
   "notes": [
    "Del 1 al 14 de diciembre: la Apertura del Reino. Entrá cada día y llevate gemas, Noxis, el título Pionero del Reino, el marco de aurora y la estela Aurora",
@@ -9,6 +9,36 @@
    "Panel del evento en la rueda del sol (Evento) y cuenta regresiva en pantalla",
    "El Muro de Fundadores ahora es más grande y está frente a la catedral; de cerca se abre la lista completa con buscador",
    "El portal a Campos de Ypacaraí se corrió a la derecha de la puerta sur"
+  ]
+ },
+ {
+  "build": "202611181712",
+  "title": "Poderes nuevos: efectos, empuje y voces",
+  "notes": [
+   "Los 20 poderes de las cinco razas tienen efectos nuevos: fuego, rayos con ramas, sellos y grietas en el suelo, estelas de arma y plumas. Cada raza con su forma y su color.",
+   "Los golpes fuertes ahora empujan a los enemigos (los jefes no se mueven).",
+   "Ataques básicos nuevos: estela en los tajos y cola de luz en flechas y hechizos.",
+   "Cada raza tiene su propia voz al recibir golpes y al caer.",
+   "Sonidos nuevos en varios poderes: Grito de Guerra, Voz del Mburuvicha, Salto de Jasy, Espíritus del Monte, Espada de Poder, Fuerza del Cetro y Picada del Guyra Hũ.",
+   "Los enemigos ya no se ponen blancos al golpearlos, y los golpes de los jefes agrietan el suelo."
+  ]
+ },
+ {
+  "build": "202611181710",
+  "title": "Cascos sin pelo atravesado",
+  "notes": [
+   "El pelo ya no atraviesa los cascos en ningún set de ninguna raza.",
+   "Mburuvicha: los cascos Yaguareté-Abá e Y Jára quedan sobre las cejas y las vinchas rodean el pelo.",
+   "Hechicero: capuchas más altas, mitra y corona de estrellas bien apoyadas."
+  ]
+ },
+ {
+  "build": "202611161629",
+  "title": "Menús que se deslizan bien",
+  "notes": [
+   "Todos los menús entran en la pantalla: ya se llega hasta el final de la lista (mapa y spots en PC, bolsa, ficha, tienda, misiones, ajustes y baúl).",
+   "Celular: la cabecera con la X queda pegada arriba, sin franja por donde pasaba el contenido.",
+   "Bolsa y baúl en el celular: deslizá el dedo sobre los objetos para recorrerlos. Para mover un objeto, mantenelo apretado un instante (se marca en dorado) o arrastralo de costado."
   ]
  },
  {
