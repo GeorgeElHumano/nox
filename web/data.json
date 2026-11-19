@@ -440,7 +440,137 @@
     ]
    ],
    "portals": [
-    "saltocristal"
+    "saltocristal",
+    "saltosguaira"
+   ]
+  },
+  "saltosguaira": {
+   "name": "Saltos del Guairá",
+   "sub": "Canindeyú, las Siete Caídas",
+   "lvl": 30,
+   "rst": 10,
+   "cost": 1500000,
+   "spots": [
+    [
+     "Orilla de las Almas",
+     "almayk"
+    ],
+    [
+     "Monte de Ka'a Jarýi",
+     "kaajaryyk"
+    ],
+    [
+     "Remanso del Ypo",
+     "ypoyk"
+    ],
+    [
+     "Barranca del Yaguarú",
+     "yaguaruyk"
+    ],
+    [
+     "Senda del Póra",
+     "porayk"
+    ],
+    [
+     "Laja del Teju Guasu",
+     "tejuguasuyk"
+    ],
+    [
+     "Claro del Kuarahy Jára",
+     "kuarahyjarayk"
+    ],
+    [
+     "Trinchera hundida",
+     "soldadoyk"
+    ],
+    [
+     "Altar de los Siervos",
+     "siervoyk"
+    ],
+    [
+     "Puerta de Kerana",
+     "guardianyk"
+    ],
+    [
+     "Pozo del Yporã",
+     "yporayk"
+    ],
+    [
+     "Sombra del Jaguarete Hũ",
+     "jaguahuyk"
+    ],
+    [
+     "Nido del Mbói Hovy",
+     "mboihovyyk"
+    ],
+    [
+     "Peñón del Teju Hũ",
+     "tejuhuyk"
+    ],
+    [
+     "Bruma del Ypo Vera",
+     "ypoverayk"
+    ],
+    [
+     "Vado del Yaguarú Vera",
+     "yaguaruverayk"
+    ],
+    [
+     "Cueva del Mbói Itavera",
+     "mboiitaverayk"
+    ],
+    [
+     "Piedra del Ita Jára",
+     "itajarayk"
+    ]
+   ],
+   "portals": [
+    "cerroleon",
+    "treskandu"
+   ]
+  },
+  "treskandu": {
+   "name": "Cerro Tres Kandú",
+   "sub": "Guairá, el techo del Paraguay",
+   "lvl": 30,
+   "rst": 20,
+   "cost": 3000000,
+   "spots": [
+    [
+     "Guarida del Kurupí",
+     "kurupirv"
+    ],
+    [
+     "Corral del Ao Ao",
+     "aoaorv"
+    ],
+    [
+     "Cueva del Moñái",
+     "monairv"
+    ],
+    [
+     "Siesta del Jasy Jateré",
+     "jasyjatererv"
+    ],
+    [
+     "Brasero de Añá",
+     "anabossrv"
+    ],
+    [
+     "Peña del Yaguareté-Abá",
+     "yaguaretabarv"
+    ],
+    [
+     "Manantial del Y Jára",
+     "yjararv"
+    ],
+    [
+     "Trono de Tau",
+     "taurv"
+    ]
+   ],
+   "portals": [
+    "saltosguaira"
    ]
   }
  },
@@ -879,6 +1009,266 @@
     "cerroleon"
    ],
    "base": "malavision"
+  },
+  "almayk": {
+   "name": "Alma en Pena Ypykue",
+   "lvl": 304,
+   "boss": false,
+   "ficha": "Alma en Pena Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "alma"
+  },
+  "kaajaryyk": {
+   "name": "Ka'a Jarýi Ypykue",
+   "lvl": 308,
+   "boss": false,
+   "ficha": "Ka'a Jarýi Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "kaajary"
+  },
+  "ypoyk": {
+   "name": "Ypo Ypykue",
+   "lvl": 312,
+   "boss": false,
+   "ficha": "Ypo Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "ypo"
+  },
+  "yaguaruyk": {
+   "name": "Yaguarú Ypykue",
+   "lvl": 316,
+   "boss": false,
+   "ficha": "Yaguarú Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "yaguaru"
+  },
+  "porayk": {
+   "name": "Póra Ypykue",
+   "lvl": 320,
+   "boss": false,
+   "ficha": "Póra Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "pora"
+  },
+  "tejuguasuyk": {
+   "name": "Teju Guasu Ypykue",
+   "lvl": 324,
+   "boss": false,
+   "ficha": "Teju Guasu Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "tejuguasu"
+  },
+  "kuarahyjarayk": {
+   "name": "Kuarahy Jára Ypykue",
+   "lvl": 328,
+   "boss": false,
+   "ficha": "Kuarahy Jára Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "kuarahyjara"
+  },
+  "soldadoyk": {
+   "name": "Alma de Soldado Ypykue",
+   "lvl": 332,
+   "boss": false,
+   "ficha": "Alma de Soldado Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "soldado"
+  },
+  "siervoyk": {
+   "name": "Siervo de Kerana Ypykue",
+   "lvl": 336,
+   "boss": false,
+   "ficha": "Siervo de Kerana Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "siervo"
+  },
+  "guardianyk": {
+   "name": "Guardián de Kerana Ypykue",
+   "lvl": 340,
+   "boss": false,
+   "ficha": "Guardián de Kerana Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "guardian"
+  },
+  "yporayk": {
+   "name": "Yporã Ypykue",
+   "lvl": 344,
+   "boss": false,
+   "ficha": "Yporã Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "ypora"
+  },
+  "jaguahuyk": {
+   "name": "Jaguarete Hũ Ypykue",
+   "lvl": 348,
+   "boss": false,
+   "ficha": "Jaguarete Hũ Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "jaguahu"
+  },
+  "mboihovyyk": {
+   "name": "Mbói Hovy Ypykue",
+   "lvl": 352,
+   "boss": false,
+   "ficha": "Mbói Hovy Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "mboihovy"
+  },
+  "tejuhuyk": {
+   "name": "Teju Hũ Ypykue",
+   "lvl": 356,
+   "boss": false,
+   "ficha": "Teju Hũ Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "tejuhu"
+  },
+  "ypoverayk": {
+   "name": "Ypo Vera Ypykue",
+   "lvl": 360,
+   "boss": false,
+   "ficha": "Ypo Vera Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "ypovera"
+  },
+  "yaguaruverayk": {
+   "name": "Yaguarú Vera Ypykue",
+   "lvl": 364,
+   "boss": false,
+   "ficha": "Yaguarú Vera Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "yaguaruvera"
+  },
+  "mboiitaverayk": {
+   "name": "Mbói Itavera Ypykue",
+   "lvl": 368,
+   "boss": false,
+   "ficha": "Mbói Itavera Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "mboiitavera"
+  },
+  "itajarayk": {
+   "name": "Ita Jára Ypykue",
+   "lvl": 372,
+   "boss": false,
+   "ficha": "Ita Jára Ypykue («el primero»): el antepasado de la bestia que se conoce en el resto del reino. Quedó bajo las aguas de los Saltos del Guairá y volvió con ellas; es más grande que su versión Ymaguare, pega mucho más fuerte y su cuero es más duro. Para hacerle frente hacen falta unos 10 reinicios.",
+   "zones": [
+    "saltosguaira"
+   ],
+   "base": "itajara"
+  },
+  "kurupirv": {
+   "name": "Kurupí Ruvicha",
+   "lvl": 400,
+   "boss": true,
+   "ficha": "Kurupí Ruvicha («el jefe»): Kurupí en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "kurupi"
+  },
+  "aoaorv": {
+   "name": "Ao Ao Ruvicha",
+   "lvl": 410,
+   "boss": true,
+   "ficha": "Ao Ao Ruvicha («el jefe»): Ao Ao en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "aoao"
+  },
+  "monairv": {
+   "name": "Moñái Ruvicha",
+   "lvl": 420,
+   "boss": true,
+   "ficha": "Moñái Ruvicha («el jefe»): Moñái en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "monai"
+  },
+  "jasyjatererv": {
+   "name": "Jasy Jateré Ruvicha",
+   "lvl": 430,
+   "boss": true,
+   "ficha": "Jasy Jateré Ruvicha («el jefe»): Jasy Jateré en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "jasyjatere"
+  },
+  "anabossrv": {
+   "name": "Añá Ruvicha",
+   "lvl": 440,
+   "boss": true,
+   "ficha": "Añá Ruvicha («el jefe»): Añá en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "anaboss"
+  },
+  "yaguaretabarv": {
+   "name": "Yaguareté-Abá Ruvicha",
+   "lvl": 450,
+   "boss": true,
+   "ficha": "Yaguareté-Abá Ruvicha («el jefe»): Yaguareté-Abá en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "yaguaretaba"
+  },
+  "yjararv": {
+   "name": "Y Jára Ruvicha",
+   "lvl": 460,
+   "boss": true,
+   "ficha": "Y Jára Ruvicha («el jefe»): Y Jára en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "yjara"
+  },
+  "taurv": {
+   "name": "Tau Ruvicha",
+   "lvl": 470,
+   "boss": true,
+   "ficha": "Tau Ruvicha («el jefe»): Tau en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "tau"
   }
  },
  "cls": {
@@ -964,6 +1354,10 @@
     {
      "n": "del Ára Jára",
      "col": "#3a8cff"
+    },
+    {
+     "n": "de Yvy Tenonde",
+     "col": "#ffb41e"
     }
    ],
    "w": [
@@ -975,7 +1369,8 @@
     "Espada del Yvága",
     "Espada de Yvy Marane'ỹ",
     "Espada de Tupã Ryapu",
-    "Espada del Ára Jára"
+    "Espada del Ára Jára",
+    "Espada de Yvy Tenonde"
    ],
    "slots": {
     "helm": "Yelmo",
@@ -1070,6 +1465,10 @@
     {
      "n": "de Mbyja Pytũ",
      "col": "#b040ff"
+    },
+    {
+     "n": "de Ñe'ẽ Porã",
+     "col": "#d45aff"
     }
    ],
    "w": [
@@ -1081,7 +1480,8 @@
     "Bastón de Arandu",
     "Bastón de Ñamandu",
     "Bastón de Yvytu Ñe'ẽ",
-    "Bastón de Mbyja Pytũ"
+    "Bastón de Mbyja Pytũ",
+    "Bastón de Ñe'ẽ Porã"
    ],
    "slots": {
     "helm": "Capucha",
@@ -1176,6 +1576,10 @@
     {
      "n": "del Ita Vera",
      "col": "#e8dcff"
+    },
+    {
+     "n": "de Mbarete",
+     "col": "#b09aff"
     }
    ],
    "w": [
@@ -1187,7 +1591,8 @@
     "Espada de Karai Ru",
     "Espada de Ñamandu Ru",
     "Espada del Mbói Hovy",
-    "Espada del Ita Vera"
+    "Espada del Ita Vera",
+    "Espada de Mbarete"
    ],
    "slots": {
     "helm": "Yelmo",
@@ -1282,6 +1687,10 @@
     {
      "n": "del Y Jára",
      "col": "#ff1a3a"
+    },
+    {
+     "n": "de Kuarahy Hũ",
+     "col": "#ff6a00"
     }
    ],
    "w": [
@@ -1293,7 +1702,8 @@
     "Cetro del Tuvicha Guasu",
     "Cetro de Ñanderu",
     "Cetro del Yaguareté-Abá",
-    "Cetro del Y Jára"
+    "Cetro del Y Jára",
+    "Cetro de Kuarahy Hũ"
    ],
    "slots": {
     "helm": "Corona",
@@ -1388,6 +1798,10 @@
     {
      "n": "del Ysyry Mimbi",
      "col": "#5affe0"
+    },
+    {
+     "n": "de Ka'aguy Rendy",
+     "col": "#9aff3a"
     }
    ],
    "w": [
@@ -1399,7 +1813,8 @@
     "Arco de Jasy Porã",
     "Arco del Yvága",
     "Arco de Mainumby Ruvicha",
-    "Arco del Ysyry Mimbi"
+    "Arco del Ysyry Mimbi",
+    "Arco de Ka'aguy Rendy"
    ],
    "slots": {
     "helm": "Diadema",
@@ -1422,7 +1837,8 @@
   70,
   88,
   133,
-  177
+  177,
+  200
  ],
  "sh": [
   "Escudo de Madera",
@@ -1433,7 +1849,8 @@
   "Escudo del Yvága",
   "Escudo de Yvy Marane'ỹ",
   "Escudo de Tupã Ryapu",
-  "Escudo del Ára Jára"
+  "Escudo del Ára Jára",
+  "Escudo de Yvy Tenonde"
  ],
  "lore": [
   {
@@ -1914,6 +2331,10 @@
   "uniq": {
    "n": "Único",
    "c": "#ff9a3c"
+  },
+  "myth": {
+   "n": "Mítico",
+   "c": "#ff4a6e"
   }
  },
  "ancs": {
@@ -1933,6 +2354,15 @@
     "3: Vida máxima +8%",
     "4: Defensa +12%",
     "5: Daño recibido −6%"
+   ]
+  },
+  "nox": {
+   "n": "NOX",
+   "b": [
+    "2 piezas: Daño +8%",
+    "3: Defensa +10% y vida máxima +8%",
+    "4: Daño +12% y crítico +5%",
+    "5: Velocidad de ataque +10% y daño recibido −8%"
    ]
   }
  },
@@ -2014,7 +2444,7 @@
    "role": "Guía del reino",
    "greet": "Mba'éichapa. Soy Arandu, la sabiduría del reino. Preguntame lo que quieras de NOX.",
    "cls": "hechicero",
-   "t": 9,
+   "t": 10,
    "wg": 3,
    "lv": 9
   }
