@@ -291,6 +291,7 @@ body.half #apeCd{display:none!important}
 .ap-foot{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;margin:10px 0 2px;font-size:13.5px}
 .ap-ok{display:flex;align-items:center;gap:8px;flex:1 1 220px}.ap-ok .ck{width:22px;height:22px;font-size:14px;flex:none}.ap-ok b,.ap-nx b{color:#f6d892}
 .ap-nx{text-align:right;color:#d8d2e6}.ap-nx small{display:block;font-size:11px;opacity:.75}
+.ap-wait{margin:8px 0 0;padding:8px 10px;border-radius:9px;border:1px solid #e2a83f;background:rgba(80,56,10,.4);font-size:12.5px;color:#efe9dc}.ap-wait b{color:#f6d892}
 .ap-h{font-family:var(--display);font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#f6d892;margin:14px 0 8px}
 .ap-meta{margin-bottom:10px}.ap-ml{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px;font-size:13px;margin-bottom:4px}.ap-ml b{color:#fff}.ap-mp{color:#e2a83f}.ap-mp.ok{color:#8ff5d8}
 .ap-bar{height:11px;border-radius:7px;background:rgba(0,0,0,.45);border:1px solid rgba(246,216,146,.3);overflow:hidden}.ap-bar i{display:block;height:100%;background:linear-gradient(90deg,#a8741f,#f6d892);border-radius:7px}.ap-bar.full i{background:linear-gradient(90deg,#1f7a6a,#8ff5d8)}
@@ -6255,7 +6256,7 @@ function muroBuild(G){const gold=mtl(0xd9a441,'gold');
   AMB.push(()=>{if(Z&&Z.id==='asuncion')muroRefresh(false);});}
 /* ===== Apertura del Reino: panel del evento (#pApe) =====
    Evento del 1 al 14 de diciembre de 2026 (hora de Paraguay). APE = lo fijo (fechas, calendario, metas); APE.st = lo que cuenta el servidor
-   (GET /api/ev/apertura → {claimed:[días cobrados], pion, kills, race:[{n,c,g,r}], me:{rank,l0,l1,g}}; lo implementa el punto 19: mientras no exista, el panel muestra el calendario por fecha y las metas sin número).
+   (GET /api/ev/apertura → {day, claimed:[días cobrados], nxp (Noxis en espera de nivel 50), pion, kills, race:[{n,c,g,r}], final, me:{rank,n,l0,l1,g,r}}; POST ev/apertura/claim entrega y devuelve lo mismo más got:[{day?,label,wait}]. Sin cuenta, el panel muestra el calendario por fecha y las metas sin número).
    Pestañas: Calendario (regalo de cada día + metas), Metas, Carrera (niveles subidos) y Dragón (horarios de DR.hours del Dragón Dorado). */
 const APE={t0:Date.UTC(2026,11,1,3),days:14,hours:[9,13,17,21],tab:'cal',st:null,err:0,t:0,busy:false,tm:0,
   /* regalo de cada día: solo gemas, Noxis, títulos, marcos y estelas (pedido del dueño, 18/11). Los Noxis se cobran desde nivel 50. */
@@ -6281,6 +6282,13 @@ function apeDragon(){const now=apeNow(),end=APE.t0+APE.days*864e5,out=[];for(let
 function apeSub(){const d=apeDay(),now=apeNow();return d===0?`Empieza el 1 de diciembre · faltan <b>${apeDur(APE.t0-now)}</b>`:d>APE.days?'El evento terminó · gracias por abrir el reino':`Día ${d} de ${APE.days} · termina en <b>${apeDur(APE.t0+APE.days*864e5-now)}</b>`;}
 async function apeLoad(force){if(APE.busy)return;if(!force&&APE.st&&Date.now()-APE.t<60000)return;if(!(SRV.on&&NET.mode==='online')){APE.err=2;return;}APE.busy=true;
   try{const r=await srvApi('GET','ev/apertura');if(r&&Array.isArray(r.claimed)){APE.st=r;APE.err=0;APE.t=Date.now();}else APE.err=1;}catch(e){APE.err=1;}APE.busy=false;try{if(!$('#pApe').hidden)apeRender();}catch(e){}}
+/* cobra lo que haya para cobrar: el regalo del día, Noxis en espera, metas y carrera. Lo decide todo el servidor; se llama sola al jugar con cuenta
+   (srvTick), como mucho cada 10 minutos, desde el 1/12 hasta el 31/12. */
+async function apeClaim(force){if(mode!=='game'||!C||!SRV.on||NET.mode!=='online'||!NET.account||APE.cbusy)return;const n=apeNow();if(n<APE.t0||n>=APE.t0+31*864e5)return;if(!force&&Date.now()-(APE.ct||0)<600000)return;APE.cbusy=true;APE.ct=Date.now();
+  try{await syncSummary().catch(()=>{});const r=await srvApi('POST','ev/apertura/claim');if(r&&Array.isArray(r.claimed)){APE.st=r;APE.err=0;APE.t=Date.now();
+      if(r.got&&r.got.length){for(const g of r.got)toast(`<em style="color:#f6d892">Apertura del Reino${g.day?' · día '+g.day:''}:</em> ${esc(g.label)}${g.wait?' <small>(se acreditan cuando tengas un personaje de nivel 50)</small>':''}`);
+        if(!snd('mu_levelup',{vol:.5,jit:0}))sfx('rare');try{nxLoad();}catch(e){}srvDeliveries();}
+      try{if(!$('#pApe').hidden)apeRender();}catch(e){}}}catch(e){}APE.cbusy=false;}
 function apeBar(v,max){const p=v==null?0:Math.max(0,Math.min(100,v/max*100));return `<div class="ap-bar${v!=null&&v>=max?' full':''}"><i style="width:${p}%"></i></div>`;}
 function apeMetas(full){const st=APE.st;return APE.metas.map(([k,t,max,prize,why])=>{const v=st&&st[k]!=null?+st[k]:null,done=v!=null&&v>=max;return `<div class="ap-meta"><div class="ap-ml"><span>${t} <b>${v==null?'—':fmt(Math.min(v,max))} / ${fmt(max)}</b></span><span class="ap-mp${done?' ok':''}">${done?'Conseguido':'Premio'}: ${prize}</span></div>${apeBar(v,max)}${full?`<p class="hint">${why}</p>`:''}</div>`;}).join('');}
 function apeRender(){const b=$('#apeBody');if(!b)return;const d=apeDay(),st=APE.st,cl=new Set(st?st.claimed:[]);$('#apeSub').innerHTML=apeSub();
@@ -6289,7 +6297,8 @@ function apeRender(){const b=$('#apeBody');if(!b)return;const d=apeDay(),st=APE.
   if(APE.tab==='cal'){
     h=`<div class="ap-cal">`+APE.cal.map(([k,t],i)=>{const n=i+1,got=cl.has(n),today=n===d,miss=!got&&d>n&&!!st;return `<div class="ap-c${got?' got':''}${today?' today':''}${miss?' miss':''}${k==='nx'?' nx':''}${k==='tit'||k==='mar'?' au':''}${n===APE.days?' big':''}"><span class="d">${n}</span>${got?'<span class="ck">✓</span>':''}<i>${APE.ic[k]}</i><span class="r">${t}</span>${today?`<span class="st">${got?'ENTREGADO HOY':'HOY'}</span>`:''}</div>`;}).join('')+`</div>`;
     const tn=d>=1&&d<=APE.days?APE.cal[d-1]:null,nx=d<APE.days?APE.cal[d]:null;
-    h+=`<div class="ap-foot">${tn?(cl.has(d)?`<div class="ap-ok"><span class="ck">✓</span><span>Hoy recibiste <b>${tn[1]}</b>: ya está en tu cuenta.</span></div>`:`<div class="ap-ok"><span>El regalo de hoy, <b>${tn[1]}</b>, se entrega solo al entrar al juego con tu cuenta.</span></div>`):d===0?`<div class="ap-ok"><span>Un regalo por día durante 14 días, solo por entrar. El primero: <b>${APE.cal[0][1]}</b>.</span></div>`:'<div class="ap-ok"><span>El calendario terminó.</span></div>'}${nx&&d<=APE.days?`<div class="ap-nx">${d===0?'Día 1':'Mañana'}: <b>${nx[1]}</b>${nx[0]==='nx'||nx[0]==='est'?`<small>${nx[0]==='nx'?'(los Noxis se cobran desde nivel 50)':'(el gran regalo del último día)'}</small>`:''}</div>`:''}</div>`;
+    h+=`<div class="ap-foot">${tn?(cl.has(d)?`<div class="ap-ok"><span class="ck">✓</span><span>Hoy recibiste <b>${tn[1]}</b>: ${tn[0]==='nx'&&st&&st.nxp>0?'quedan esperándote hasta que tengas nivel 50':/^g|plu/.test(tn[0])?'están en el baúl de Ña Chela':'ya está en tu cuenta'}.</span></div>`:`<div class="ap-ok"><span>El regalo de hoy, <b>${tn[1]}</b>, se entrega solo al entrar al juego con tu cuenta.</span></div>`):d===0?`<div class="ap-ok"><span>Un regalo por día durante 14 días, solo por entrar. El primero: <b>${APE.cal[0][1]}</b>.</span></div>`:'<div class="ap-ok"><span>El calendario terminó.</span></div>'}${nx&&d<=APE.days?`<div class="ap-nx">${d===0?'Día 1':'Mañana'}: <b>${nx[1]}</b>${nx[0]==='nx'||nx[0]==='est'?`<small>${nx[0]==='nx'?'(los Noxis se cobran desde nivel 50)':'(el gran regalo del último día)'}</small>`:''}</div>`:''}</div>`;
+    if(st&&st.nxp>0)h+=`<p class="ap-wait">Tenés <b>${fmt(st.nxp)} Noxis</b> esperándote: se acreditan solos cuando uno de tus personajes llegue a nivel 50, hasta el 31 de diciembre.</p>`;
     h+=`<h3 class="ap-h">Metas del reino</h3>`+apeMetas(false)+note;}
   else if(APE.tab==='metas'){
     h=`<h3 class="ap-h">Metas del reino</h3><p class="hint">Las cumple el reino entero, entre todos los jugadores.</p>`+apeMetas(true)+
@@ -6297,8 +6306,8 @@ function apeRender(){const b=$('#apeBody');if(!b)return;const d=apeDay(),st=APE.
   else if(APE.tab==='race'){const R=st&&Array.isArray(st.race)?st.race:null,me=st&&st.me;
     h=`<p class="ap-rk-i">Carrera de Pioneros: gana quien más niveles suba durante el evento. Los 10 primeros ganan <b>2.000 Noxis</b> (desde nivel 50), el título ${nxTitle('t_primeros')} y su nombre en la <b>Placa de la Apertura</b>.</p>`;
     if(R&&R.length){h+=`<div class="ap-rk">`+R.slice(0,10).map((r,i)=>`<div class="ap-r${i<3?' top':''}"><span class="p">${i+1}</span><span class="n"><b>${esc(r.n)}</b>${r.c&&CLASSES[r.c]?' · '+esc(CLASSES[r.c].name):''}</span><span class="g">${r.r?r.r+(r.r>1?' reinicios':' reinicio'):'+'+fmt(r.g)+' niveles'}</span><span class="p v">${fmt(r.g)}</span></div>`).join('')+`</div>`;
-      if(me&&me.rank>10)h+=`<div class="ap-r me"><span class="p">${fmt(me.rank)}</span><span class="n"><b>${esc(C&&C.name||'Vos')}</b></span><span class="g">Nv ${me.l0} → ${me.l1}</span><span class="p v">${fmt(me.g)}</span></div>`;
-      else if(!me)h+=`<p class="hint">Subí de nivel durante el evento para entrar a la carrera.</p>`;}
+      if(me&&me.rank>10)h+=`<div class="ap-r me"><span class="p">${fmt(me.rank)}</span><span class="n"><b>${esc(me.n||C&&C.name||'Vos')}</b></span><span class="g">${me.r?me.r+(me.r>1?' reinicios':' reinicio'):'Nv '+me.l0+' → '+me.l1}</span><span class="p v">${fmt(me.g)}</span></div>`;
+      else if(!me)h+=`<p class="hint">Subí de nivel durante el evento para entrar a la carrera.</p>`;else h+=`<p class="hint">Estás en el puesto <b>${me.rank}</b> con ${esc(me.n||'tu personaje')}.</p>`;if(st.final)h+=`<p class="hint">La carrera terminó: estos son los Primeros del Reino.</p>`;}
     else h+=`<p class="hint">${d===0?'La carrera empieza el 1 de diciembre, cuando abra el reino. Todos arrancan de cero.':APE.err===2?'La carrera se ve jugando con tu cuenta de NOX.':st?'Todavía nadie subió de nivel. El primer puesto puede ser el tuyo.':APE.err?'No se pudo cargar la carrera. Probá de nuevo en un rato.':'Cargando la carrera…'}</p>`;}
   else{const L=apeDragon(),now=apeNow(),hh=t=>{const D=new Date(t-3*36e5);return String(D.getUTCHours()).padStart(2,'0')+':00';},dd=t=>{const D=new Date(t-3*36e5),td=new Date(now-3*36e5);const k=Math.round((Date.UTC(D.getUTCFullYear(),D.getUTCMonth(),D.getUTCDate())-Date.UTC(td.getUTCFullYear(),td.getUTCMonth(),td.getUTCDate()))/864e5);return k===0?'Hoy':k===1?'Mañana':D.getUTCDate()+' de diciembre';};
     h=`<div class="ap-dr"><img src="assets/ui/dragon_cabeza.webp" alt=""><div><b>El Dragón Dorado</b><span>Baja sobre el Campo de la Apertura, saliendo por la puerta sur de Asunción. Todo el reino pelea junto.</span></div></div>`;
@@ -6307,7 +6316,7 @@ function apeRender(){const b=$('#apeBody');if(!b)return;const d=apeDay(),st=APE.
     h+=`<p class="hint">Baja 4 veces por día, del 1 al 14 de diciembre: 9:00, 13:00, 17:00 y 21:00 (hora de Paraguay). Con que le pegues una vez ya recibís premio.</p>
       <div class="ap-tt">${nxTitle('t_dragon')}<small>Para todos los que lo derroten, más oro, experiencia, un cofre y Escamas Doradas para canjear en la tienda.</small></div><div class="ap-tt mt">${nxTitle('t_mata')}<small>Para quien más daño le haga en una pelea. Queda para siempre.</small></div>`;}
   b.innerHTML=h;}
-function apeOpen(tab){if(mode!=='game')return;closeAll();if(tab)APE.tab=tab;apeRender();showPanel('pApe');apeLoad(false);clearInterval(APE.tm);APE.tm=setInterval(()=>{const p=$('#pApe');if(!p||p.hidden){clearInterval(APE.tm);return;}$('#apeSub').innerHTML=apeSub();if(APE.tab==='dragon')apeRender();},1000);}
+function apeOpen(tab){if(mode!=='game')return;closeAll();if(tab)APE.tab=tab;apeRender();showPanel('pApe');apeLoad(false);apeClaim();clearInterval(APE.tm);APE.tm=setInterval(()=>{const p=$('#pApe');if(!p||p.hidden){clearInterval(APE.tm);return;}$('#apeSub').innerHTML=apeSub();if(APE.tab==='dragon')apeRender();},1000);}
 /* ===== Apertura del Reino: Asunción de fiesta =====
    apeDecor(G) se llama al final de BUILD.asuncion y solo arma algo entre el 28/11 y el 14/12 de 2026 (apeFiesta; fuera de noxparaguay.com se fuerza con ?fiesta=1).
    Todo liviano: banderines (1 malla + 1 línea) de farola a farola, 2 estandartes en las torres de la catedral, cartel colgante en la puerta sur,
@@ -8402,7 +8411,7 @@ async function srvAdminPoll(){if(!SRV.on||NET.role!=='admin')return;try{const r=
     if(r.latest>SRV.admLast&&(r.orders||r.resets)){if(SRV.admLast)toast(`Administración: <em>${r.orders} pedido${r.orders===1?'':'s'}</em> y <em>${r.resets} contraseña${r.resets===1?'':'s'}</em> por revisar`);
       try{if(SRV.admLast&&'Notification' in window&&Notification.permission==='granted')new Notification('NOX · administración',{body:`${r.orders} pedidos y ${r.resets} contraseñas por revisar`,icon:'../img/icon-192.png'});}catch(e){}}
     SRV.admLast=Math.max(SRV.admLast,r.latest||0);if(mode==='select')acctBar();}catch(e){}}
-function srvTick(){if(!SRV.on||NET.mode!=='online')return;srvAdminPoll();srvDeliveries();}
+function srvTick(){if(!SRV.on||NET.mode!=='online')return;srvAdminPoll();srvDeliveries();try{apeClaim();}catch(e){}}
 setInterval(srvTick,60000);
 async function srvAuth(kind){if(SELV.busy)return;const u=($('#lgUser')||{}).value,pw=($('#lgPass')||{}).value,wa=($('#lgWa')||{}).value;
   SELV.lgUser=(u||'').trim();SELV.err='';SELV.busy=true;renderSelect();
@@ -9063,7 +9072,7 @@ try{window.__NOX={KEEPF,keepStat,keepWarm,moveT:(mv,n,walk)=>{const r=HERO;for(l
 
 /* servidor */
 async function netRun(fn){while(NET.writing)await new Promise(r=>setTimeout(r,120));NET.writing=true;try{return await fn();}finally{NET.writing=false;NET.last=performance.now();}}
-function summary(){return{account:NET.account,accountKey:keyOf(NET.account||''),chars:SAVE.chars.map(c=>({name:c.name,cls:c.cls,L:c.L,resets:c.resets||0,evo:!!c.evo})),charKeys:SAVE.chars.map(c=>keyOf(c.name))};}
+function summary(){return{account:NET.account,accountKey:keyOf(NET.account||''),chars:SAVE.chars.map(c=>({name:c.name,cls:c.cls,L:c.L,resets:c.resets||0,evo:!!c.evo,k:Math.floor((c.kills||0)/25)*25/* criaturas derrotadas, de a 25: alimenta la meta del reino de la Apertura sin mandar el resumen a cada rato */})),charKeys:SAVE.chars.map(c=>keyOf(c.name))};}
 async function syncSummary(){const s=summary(),j=JSON.stringify(s);if(j===NET.lastSum)return;await NET.db.doc('players/'+NET.uid).set(Object.assign(s,{updated:Date.now()}));NET.lastSum=j;}
 async function flushNet(force){
   if(NET.mode!=='online'||NET.readOnly||NET.writing||!NET.account)return;
