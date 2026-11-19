@@ -5,6 +5,8 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 ## Autores y licencias
 
 - **0 A.D.** © Wildfire Games — CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/) — https://play0ad.com — golpes, arcos, pasos, voces, animales, ambientes y toda la música.
+- **Brandon Morris "Augmentality"** — CC BY 3.0 — sonidos del juego Flare (https://flarerpg.org).
+- **ElCeejo** — MIT — mod Animalia de Luanti (https://github.com/ElCeejo/animalia), chillidos de murciélago.
 - **Little Robot Sound Factory** — CC BY 3.0 — Fantasy, Coins, Horror Sound Libraries (OpenGameArt).
 - **Leohpaz** — CC BY 4.0 — 8 Magic Attacks y 8 Heals and Buffs (OpenGameArt).
 - **Iwan "qubodup" Gabovitch** — CC BY 3.0 (Ice and Electricity Spells) y CC0 (Ghost Moans, Ghost Breath) (OpenGameArt).
@@ -140,6 +142,14 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 | mu_explode.mp3 | leo_magic/04_Fire_explosion_04_medium.wav | Leohpaz | CC BY 4.0 |
 | mu_fireball.mp3 | rd80/spell_fire_02.ogg | rubberduck (OpenGameArt) | CC0 |
 | mu_gem.mp3 | síntesis propia (cristal) | NOX | CC0 |
+| dr_rugido.mp3 | «CC0 Deep Monster Roar» (trazzz123) + «Big scary troll sounds» (System G6), bajados de tono y en capas; mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_muerte.mp3 | «CC0 Deep Monster Roar» (trazzz123) + «Big scary troll sounds» (System G6), más lentos y graves; mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_fuego.mp3 | «Fire Staff Sound Effects» (LEGIT Audio) + «Earthquake and Open sesame» (mieki256); mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_pisa.mp3 | «80 CC0 creature SFX #2» (rubberduck) + «Thwack Sounds» (AntumDeluge) + «Muffled Distant Explosion» (Nenad Simic); mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_ala.mp3 | «Dragon Flap» (VishwaJai); mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_cola.mp3 | «Swishes Sound Pack» (qubodup) + «Thwack Sounds» (AntumDeluge); mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_mord.mp3 | «Monster snarls» (Snabisch) + «Thwack Sounds» (AntumDeluge); mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
+| dr_explo.mp3 | «Muffled Distant Explosion» (Nenad Simic) + «Fire Staff Sound Effects» (LEGIT Audio) + «Thwack Sounds» (AntumDeluge); mezcla con `sndaudit/dragon.py` | OpenGameArt.org | CC0 |
 | mu_heal.mp3 | leo_heal/02_Heal_02.wav | Leohpaz | CC BY 4.0 |
 | mu_levelup.mp3 | levelup/Level Up!/orchestra.wav | Bart Kelsey (OpenGameArt) | CC BY 3.0 |
 | mu_lightning.mp3 | leo_magic/18_Thunder_02.wav | Leohpaz | CC BY 4.0 |
@@ -165,6 +175,17 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 | shade0.mp3 | artd/RPG Sound Pack/NPC/shade/shade1.wav | artisticdude (OpenGameArt) | CC0 |
 | shade1.mp3 | artd/RPG Sound Pack/NPC/shade/shade5.wav | artisticdude (OpenGameArt) | CC0 |
 | shade2.mp3 | artd/RPG Sound Pack/NPC/shade/shade9.wav | artisticdude (OpenGameArt) | CC0 |
+| sk_ave.mp3 | mezcla: arrowfly_01..04.ogg y fleshstab_03.ogg de 0 A.D. (aleteo y golpe) + flare-game/.../enemies/wyvern_ment.ogg (chillido) | 0 A.D. (CC BY-SA 3.0) y Brandon Morris "Augmentality" (CC BY 3.0) | CC BY-SA 3.0 / CC BY 3.0 |
+| sk_bats.mp3 | mezcla: animalia_bat_1.ogg, animalia_bat_2.ogg (chillidos de murciélago) + arrowfly_01..04.ogg de 0 A.D. (aleteo) | ElCeejo (mod Animalia, MIT) y 0 A.D. (CC BY-SA 3.0) | MIT / CC BY-SA 3.0 |
+| sk_corte.mp3 | mezcla: sword_attack_10.ogg, swordhit_14.ogg, swordhit_17.ogg, fleshstab_03.ogg | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| sk_dark.mp3 | mezcla: 0ad/attack/weapon/sling_attack_02.ogg + ghost_attack (qubodup, CC0) | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| sk_flash.mp3 | flare-game/mods/fantasycore/soundfx/powers/teleport.ogg | Brandon Morris "Augmentality" (Flare) | CC BY 3.0 |
+| sk_grito.mp3 | flare-game/mods/fantasycore/soundfx/powers/warcry.ogg (recortado) | Brandon Morris "Augmentality" (Flare) | CC BY 3.0 |
+| sk_voz.mp3 | 0ad/voice/napatan/civ/civ_male_garrison_01.ogg (con eco) | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| vz_cab_h0..2 / vz_cab_d | 0ad/actor/human/death/male_death_40, 05, 12 (arranque) / 61 | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| vz_hec_h0..2 / vz_hec_d | 0ad/actor/human/death/male_death_13, 09, 62 (arranque) / 22 | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| vz_gla_h0..2 / vz_gla_d | 0ad/actor/human/death/male_death_60, 28, 47 (arranque) / 41 | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| vz_mbu_h0..2 / vz_mbu_d | 0ad/actor/human/death/male_death_59, 01, 33 (arranque) / 27 | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
 | snake_hiss.mp3 | steam/steam hisses - Marker #3.wav | OpenGameArt "Steam release sounds" | CC0 |
 | snake_strike.mp3 | artd/RPG Sound Pack/NPC/beetle/bite-small2.wav | artisticdude (OpenGameArt) | CC0 |
 | swing0.mp3 | 0ad/attack/weapon/sword_attack_01.ogg | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |

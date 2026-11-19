@@ -1,9 +1,10 @@
 // NOX · servidor (Cloudflare Pages Functions + D1)
 // Cuentas, guardado del juego en la nube, tienda Noxis (recargas por transferencia) y panel de administración.
-import { NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, nxFounderLevel, nxPackGrant } from '../../lib/noxis.js';
+import { NX_ESC, NX_ITEMS, NX_PACKS, NX_BY, NX_PACK, NX_PAY, NOXIS_GS, NX_FOUNDER_END, nxFounderLevel, nxPackGrant } from '../../lib/noxis.js';
 import { IMPORTS } from '../../lib/imports.js';
 import { parseBankMail, BANK_FROM } from '../../lib/bankmail.js';
 import { GUIA, GUIA_REGLAS, resumen } from '../../lib/guia.js';
+import { APE_T0, APE_T1, APE_GRACE, APE_LVL, APE_LMAX, APE_PION, APE_KILLS, APE_CAL, APE_GEM, APE_GUARD, APE_META1, APE_META2, APE_TOP, apeDay } from '../../lib/apertura.js';
 import { ALERT_TYPES, ALERT_SCHEMA, alert, vapid, expireOrders as expireAndAlert, daySummary, summaryText, tally, pyDay } from '../../lib/alerts.js';
 
 const ADMIN_NAME = 'GEORGEELHUMANO';
@@ -29,6 +30,10 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS noxlog_uid ON noxlog(uid)`,
   `CREATE TABLE IF NOT EXISTS bankin(ref TEXT PRIMARY KEY, amt INTEGER NOT NULL, payer TEXT, bank TEXT, at TEXT, t INTEGER, oid INTEGER, st TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS mailin(id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER, frm TEXT, subject TEXT, body TEXT)`,
+  // Apertura del Reino: lo cobrado por cada cuenta (days = días, nxp = Noxis en espera de nivel 50, flags = premios únicos) y la carrera por personaje
+  `CREATE TABLE IF NOT EXISTS evape(uid TEXT PRIMARY KEY, days TEXT NOT NULL DEFAULT '[]', nxp INTEGER NOT NULL DEFAULT 0, flags TEXT NOT NULL DEFAULT '{}', t INTEGER)`,
+  `CREATE TABLE IF NOT EXISTS evrace(uid TEXT NOT NULL, ck TEXT NOT NULL, name TEXT, cls TEXT, l0 INTEGER NOT NULL, r0 INTEGER NOT NULL, l INTEGER NOT NULL, r INTEGER NOT NULL, g INTEGER NOT NULL DEFAULT 0, t INTEGER, PRIMARY KEY(uid,ck))`,
+  `CREATE INDEX IF NOT EXISTS evrace_g ON evrace(g)`,
   `CREATE INDEX IF NOT EXISTS dl_created ON downloads(created)`,
   `CREATE INDEX IF NOT EXISTS orders_status ON orders(status)`,
   `CREATE INDEX IF NOT EXISTS orders_uid ON orders(uid)`,
@@ -287,7 +292,18 @@ route('POST', 'nox/buy', async ({ db, req, me }) => {
   return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
 }, { auth: true });
 
-const NX_SLOT = { title: 'title', frame: 'frame', trail: 'trail', pet_imp: 'pet', pet_hada: 'pet', pet_rudolf: 'pet' };
+// canje por Escamas Doradas (premios del Dragón Dorado): una sola sentencia con la condición adentro, como las compras
+route('POST', 'nox/esc', async ({ db, req, me }) => {
+  const b = await body(req), it = NX_BY.get(String(b.id || ''));
+  if (!it || !it.esc) return fail('Eso no se canjea por Escamas.');
+  await noxRow(db, me.id);
+  const r = await db.prepare(`UPDATE noxis SET own=json_set(own,${jp(NX_ESC)},json_extract(own,${jp(NX_ESC)})-?1,${jp(it.id)},1), upd=?2 WHERE uid=?3 AND COALESCE(json_extract(own,${jp(NX_ESC)}),0)>=?1 AND json_extract(own,${jp(it.id)}) IS NULL RETURNING bal`).bind(it.esc, now(), me.id).first();
+  if (!r) { const n = await noxRow(db, me.id); return fail(n.own[it.id] ? 'Ya tenés ese premio.' : 'No te alcanzan las Escamas. Te faltan ' + (it.esc - (n.own[NX_ESC] | 0)) + '.', 402); }
+  await noxLog(db, me.id, 0, r.bal, 'escamas', it.id + ':-' + it.esc).run();
+  return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
+}, { auth: true });
+
+const NX_SLOT = { title: 'title', frame: 'frame', trail: 'trail', pet_imp: 'pet', pet_hada: 'pet', pet_rudolf: 'pet', mas: 'mas', wing: 'wing' };
 route('POST', 'nox/equip', async ({ db, req, me }) => {
   const b = await body(req), slot = String(b.slot || ''), kind = NX_SLOT[slot];
   if (!kind) return fail('Eso no se puede equipar.');
@@ -312,15 +328,115 @@ route('POST', 'nox/use', async ({ db, req, me }) => {
   return json({ ok: true, ...noxPub(await noxRow(db, me.id)) });
 }, { auth: true });
 
-// Muro de Fundadores: cuentas con el pack de Oro
+// Muro de Fundadores (cuentas con el pack de Oro) y Placa de la Apertura
 let MURO = { t: 0, data: null };
 route('GET', 'nox/muro', async ({ db }) => {
   if (!MURO.data || now() - MURO.t > 60000) {
     const rows = (await db.prepare(`SELECT u.name FROM noxis n JOIN users u ON u.id=n.uid WHERE json_extract(n.own,'$.fund3')>=1 ORDER BY n.upd LIMIT 500`).all()).results || [];
-    MURO = { t: now(), data: rows.map(r => r.name) };
+    // Placa de la Apertura: los 10 primeros de la Carrera de Pioneros (personajes, en orden), fijados al terminar el evento en pushkv 'ape:final'
+    let pl = []; try { pl = JSON.parse(await kvGet(db, 'ape:final') || '[]').map(r => r.n); } catch {}
+    MURO = { t: now(), data: rows.map(r => r.name), placa: pl };
   }
-  return json({ names: MURO.data });
+  return json({ names: MURO.data, placa: MURO.placa || [] });
 });
+
+/* ---------- Apertura del Reino (1 al 14 de diciembre de 2026; fechas y premios en lib/apertura.js) ----------
+   · Calendario: POST ev/apertura/claim (lo llama el juego solo al entrar con la cuenta) entrega el regalo del día del evento, una vez por cuenta.
+     Gemas → entregas al baúl (deliveries); títulos, marcos y estela → noxis.own; Noxis → saldo si la cuenta tiene un personaje de nivel 50
+     (o con reinicio) y si no quedan en espera (evape.nxp) hasta que lo tenga, con tope el 31/12.
+   · Pionero: cualquier cuenta que entre un día del evento recibe el título aunque no haya entrado el día 1. Guardián de la Beta: cuentas creadas antes del 1/12.
+   · Metas del reino: pioneros = cuentas creadas durante el evento; criaturas = suma de lo que cada personaje derrotó (el juego lo manda en el
+     resumen, campo k; se cuenta la diferencia con lo guardado antes). Al cumplirse, premio para toda cuenta que haya cobrado algún día.
+   · Carrera de Pioneros: niveles subidos por personaje durante el evento (evrace; un reinicio vale 200). Vale el mejor personaje de cada cuenta,
+     sin el administrador. Al terminar, los 10 primeros quedan fijos en pushkv 'ape:final' (de ahí lee la Placa) y cobran su premio al entrar. */
+const kvGet = async (db, k) => { const r = await db.prepare('SELECT v FROM pushkv WHERE k=?').bind(k).first(); return r ? r.v : null; };
+async function apeTrack(db, uid, chars, was) {
+  const t = now(); if (t < APE_T0 || t >= APE_T1) return;
+  let old = []; if (was) { try { old = JSON.parse(was.chars || '[]'); } catch {} }
+  const st = []; let dk = 0;
+  for (const c of chars) {
+    const ck = keyOf(c.name); if (!ck) continue; const o = old.find(x => keyOf(x.name) === ck);
+    // punto de partida: lo que el servidor tenía guardado antes; un personaje nuevo arranca en nivel 1; uno desconocido con nivel, en el que trae
+    const l0 = o ? +o.L || 1 : (c.L <= 1 && !c.resets ? 1 : c.L), r0 = o ? +o.resets || 0 : (c.L <= 1 && !c.resets ? 0 : c.resets);
+    st.push(db.prepare(`INSERT INTO evrace(uid,ck,name,cls,l0,r0,l,r,g,t) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,MAX(0,(?8-?6)*${APE_LMAX}+(?7-?5)),?9)
+      ON CONFLICT(uid,ck) DO UPDATE SET name=excluded.name, cls=excluded.cls, l=excluded.l, r=excluded.r,
+        t=CASE WHEN MAX(0,(excluded.r-evrace.r0)*${APE_LMAX}+(excluded.l-evrace.l0))>evrace.g THEN excluded.t ELSE evrace.t END,
+        g=MAX(evrace.g,MAX(0,(excluded.r-evrace.r0)*${APE_LMAX}+(excluded.l-evrace.l0)))`).bind(uid, ck, c.name, c.cls, l0, r0, c.L, c.resets, t));
+    if (o && o.k != null && c.k != null && c.k > o.k) dk += Math.min(5000, c.k - o.k);
+  }
+  if (dk) st.push(db.prepare("INSERT INTO pushkv(k,v,t) VALUES('ape:kills',?1,?2) ON CONFLICT(k) DO UPDATE SET v=CAST(CAST(pushkv.v AS INTEGER)+?1 AS TEXT), t=?2").bind(String(dk), t));
+  if (st.length) await db.batch(st);
+}
+const apeRaceTop = async (db, n) => ((await db.prepare(`SELECT e.uid, e.name, e.cls, e.g, e.r-e.r0 AS rr FROM evrace e JOIN users u ON u.id=e.uid
+  WHERE u.role<>'admin' AND e.g>0 AND e.ck=(SELECT x.ck FROM evrace x WHERE x.uid=e.uid ORDER BY x.g DESC, x.t ASC, x.ck LIMIT 1) ORDER BY e.g DESC, e.t ASC, e.uid LIMIT ?`).bind(n).all()).results || []);
+// al terminar el evento los 10 primeros quedan fijos (el primero que pregunta los escribe; los demás leen lo escrito)
+async function apeFinal(db) {
+  if (now() < APE_T1) return null;
+  let v = await kvGet(db, 'ape:final');
+  if (v == null) { const top = await apeRaceTop(db, 10); await db.prepare("INSERT OR IGNORE INTO pushkv(k,v,t) VALUES('ape:final',?,?)").bind(JSON.stringify(top.map(r => ({ uid: r.uid, n: r.name, c: r.cls, g: r.g, r: r.rr }))), now()).run(); v = await kvGet(db, 'ape:final'); }
+  try { return JSON.parse(v) || []; } catch { return []; }
+}
+let APEG = { t: 0, d: null };
+async function apeGlobal(db) {
+  if (APEG.d && now() - APEG.t < 30000) return APEG.d;
+  const pi = await db.prepare('SELECT COUNT(*) n FROM users WHERE created>=? AND created<?').bind(APE_T0, APE_T1).first();
+  const fin = await apeFinal(db);
+  const race = fin ? fin.map(r => ({ n: r.n, c: r.c, g: r.g, r: r.r })) : now() >= APE_T0 ? (await apeRaceTop(db, 10)).map(r => ({ n: r.name, c: r.cls, g: r.g, r: r.rr })) : [];
+  APEG = { t: now(), d: { pion: pi ? pi.n : 0, kills: +(await kvGet(db, 'ape:kills')) || 0, race, final: !!fin } };
+  return APEG.d;
+}
+async function apeState(db, me) {
+  const g = await apeGlobal(db), out = { now: now(), day: apeDay(now()), claimed: [], nxp: 0, ...g, me: null };
+  if (!me) return out;
+  const row = await db.prepare('SELECT days,nxp FROM evape WHERE uid=?').bind(me.id).first();
+  if (row) { try { out.claimed = JSON.parse(row.days || '[]'); } catch {} out.nxp = row.nxp | 0; }
+  const b = await db.prepare('SELECT name,l0,l,g,r-r0 AS rr FROM evrace WHERE uid=? ORDER BY g DESC, t ASC LIMIT 1').bind(me.id).first();
+  if (b && b.g > 0) { const up = await db.prepare(`SELECT COUNT(DISTINCT e.uid) n FROM evrace e JOIN users u ON u.id=e.uid WHERE u.role<>'admin' AND e.g>?`).bind(b.g).first(); out.me = { rank: (up ? up.n : 0) + 1, n: b.name, l0: b.l0, l1: b.l, g: b.g, r: b.rr }; }
+  return out;
+}
+// entrega un premio; devuelve el texto para mostrar. Los Noxis van al saldo o quedan en espera según el nivel de la cuenta.
+async function apeGive(db, uid, R, ref, lvlOk) {
+  const st = [];
+  for (const [sub, n] of Object.entries(R.gem || {})) st.push(db.prepare('INSERT INTO deliveries(uid,oid,item,label,created) VALUES(?,NULL,?,?,?)').bind(uid, JSON.stringify({ k: 'gem', sub, n }), n + ' × ' + (APE_GEM[sub] || 'Gema'), now()));
+  if (st.length) await db.batch(st);
+  let wait = 0;
+  if (R.nx && !lvlOk) { wait = R.nx; await db.prepare('UPDATE evape SET nxp=nxp+? WHERE uid=?').bind(R.nx, uid).run(); }
+  if (R.own || (R.nx && lvlOk)) {
+    const { own } = await noxRow(db, uid), items = {}; for (const id of Object.keys(R.own || {})) if (!own[id] && NX_BY.has(id)) items[id] = 1;
+    if (Object.keys(items).length || (R.nx && lvlOk)) await noxGive(db, uid, lvlOk ? R.nx | 0 : 0, items, 'apertura', ref);
+  }
+  return { label: R.label, wait };
+}
+const apeFlag = async (db, uid, f) => !!(await db.prepare(`UPDATE evape SET flags=json_set(flags,'$.${f}',1) WHERE uid=? AND json_extract(flags,'$.${f}') IS NULL`).bind(uid).run()).meta.changes;
+route('GET', 'ev/apertura', async ({ db, req }) => json(await apeState(db, await auth(req, db))));
+route('POST', 'ev/apertura/claim', async ({ db, me }) => {
+  const t = now(), got = [];
+  if (t >= APE_T0 && t < APE_GRACE) {
+    const day = t < APE_T1 ? apeDay(t) : 0;
+    const pl = await db.prepare('SELECT chars FROM players WHERE uid=?').bind(me.id).first();
+    let cs = []; try { cs = JSON.parse(pl ? pl.chars || '[]' : '[]'); } catch {}
+    const lvlOk = cs.some(c => (+c.resets || 0) > 0 || (+c.L || 0) >= APE_LVL);
+    if (day) await db.prepare("INSERT OR IGNORE INTO evape(uid,days,nxp,flags,t) VALUES(?,'[]',0,'{}',?)").bind(me.id, t).run();
+    const row = await db.prepare('SELECT days,nxp FROM evape WHERE uid=?').bind(me.id).first();
+    if (row) {
+      // regalo del día: la sentencia solo cambia algo la primera vez, así dos pedidos a la vez no lo entregan dos veces
+      if (day && (await db.prepare("UPDATE evape SET days=json_insert(days,'$[#]',?1), t=?2 WHERE uid=?3 AND NOT EXISTS(SELECT 1 FROM json_each(evape.days) WHERE value=?1)").bind(day, t, me.id).run()).meta.changes)
+        got.push({ day, ...(await apeGive(db, me.id, APE_CAL[day - 1], 'dia' + day, lvlOk)) });
+      if (day > 1 && await apeFlag(db, me.id, 'p')) { const { own } = await noxRow(db, me.id); if (!own.t_pionero) got.push(await apeGive(db, me.id, APE_CAL[0], 'pionero', lvlOk)); }
+      const u = await db.prepare('SELECT created FROM users WHERE id=?').bind(me.id).first();
+      if (u && u.created < APE_T0 && await apeFlag(db, me.id, 'g')) got.push(await apeGive(db, me.id, APE_GUARD, 'guardian', lvlOk));
+      // Noxis en espera: se acreditan cuando la cuenta ya tiene nivel 50
+      if (lvlOk) { const w = await db.prepare('SELECT nxp FROM evape WHERE uid=?').bind(me.id).first();
+        if (w && w.nxp > 0 && (await db.prepare('UPDATE evape SET nxp=0 WHERE uid=? AND nxp=?').bind(me.id, w.nxp).run()).meta.changes) { await noxGive(db, me.id, w.nxp, {}, 'apertura', 'nivel' + APE_LVL); got.push({ label: w.nxp + ' Noxis que te estaban esperando', wait: 0 }); } }
+      const g = await apeGlobal(db);
+      if (g.pion >= APE_PION && await apeFlag(db, me.id, 'm1')) got.push(await apeGive(db, me.id, APE_META1, 'meta1', lvlOk));
+      if (g.kills >= APE_KILLS && await apeFlag(db, me.id, 'm2')) got.push(await apeGive(db, me.id, APE_META2, 'meta2', lvlOk));
+    }
+    // carrera: los 10 primeros cobran al entrar después del final (aunque no hayan cobrado ningún día)
+    if (t >= APE_T1) { const fin = await apeFinal(db); if (fin && fin.some(r => r.uid === me.id)) { await db.prepare("INSERT OR IGNORE INTO evape(uid,days,nxp,flags,t) VALUES(?,'[]',0,'{}',?)").bind(me.id, t).run(); if (await apeFlag(db, me.id, 'f')) got.push(await apeGive(db, me.id, APE_TOP, 'carrera', lvlOk)); } }
+  }
+  return json({ got, ...(await apeState(db, me)) });
+}, { auth: true });
 
 /* juego */
 /* una sola partida por cuenta: el último dispositivo que entra a jugar se queda con la partida; el anterior queda afuera y no puede guardar */
@@ -376,7 +492,7 @@ route('DELETE', 'game/docs/:id', async ({ db, me, p }) => {
 
 route('PUT', 'game/summary', async ({ db, req, me, bg }) => {
   const b = await body(req);
-  const chars = (Array.isArray(b.chars) ? b.chars : []).slice(0, 5).map(c => ({ name: String(c.name || '').slice(0, 24), cls: String(c.cls || '').slice(0, 12), L: +c.L || 1, resets: +c.resets || 0, evo: !!c.evo }));
+  const chars = (Array.isArray(b.chars) ? b.chars : []).slice(0, 5).map(c => ({ name: String(c.name || '').slice(0, 24), cls: String(c.cls || '').slice(0, 12), L: +c.L || 1, resets: +c.resets || 0, evo: !!c.evo, ...(c.k != null ? { k: Math.max(0, Math.floor(+c.k || 0)) } : {}) }));
   const ckeys = ',' + chars.map(c => keyOf(c.name)).join(',') + ',';
   // aviso: un personaje llegó al nivel 200 o hizo su primer reinicio (se compara con lo guardado antes)
   const was = await db.prepare('SELECT chars FROM players WHERE uid=?').bind(me.id).first();
@@ -386,6 +502,7 @@ route('PUT', 'game/summary', async ({ db, req, me, bg }) => {
       else if (c.L >= 200 && (+o.L || 0) < 200 && c.resets === (+o.resets || 0)) bg(alert(db, 'nivel', '¡Nivel 200! · ' + c.name, `${c.cls || 'Personaje'} de ${me.name}${c.resets ? ' con ' + c.resets + ' reinicio' + (c.resets === 1 ? '' : 's') : ''} ya puede reiniciar.`, { url: '/cuenta/#admin/users', key: 'l200:' + me.id + ':' + keyOf(c.name) + ':' + c.resets, every: 30 * 864e5 })); }
   }
   await db.prepare('INSERT INTO players(uid,chars,ckeys,upd) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET chars=excluded.chars,ckeys=excluded.ckeys,upd=excluded.upd').bind(me.id, JSON.stringify(chars), ckeys, now()).run();
+  try { await apeTrack(db, me.id, chars, was); } catch {} // Apertura del Reino: carrera y criaturas (nunca frena el guardado)
   return json({ ok: true });
 }, { auth: true });
 

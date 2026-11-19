@@ -51,8 +51,10 @@ export class Sim {
   emit(o) { this.out.push(o); } // mensajes para todos los del mapa
   tele(m, ab, f, x, z, dur, mult, delay, extra) { this.emit({ t: 'tele', n: m.n, ab, f, x: +x.toFixed(2), z: +z.toFixed(2), dur, m: mult, d: delay || 0, col: (BOSSK[m.type] || {}).col || 0xff3a1a, ...(extra || {}) }); }
 
-  hit(uid, n, d) { // golpe de un jugador
+  hit(uid, n, d, px, pz) { // golpe de un jugador; px,pz = empuje del poder en metros (tope 4, los jefes no se mueven)
     const m = this.mobs.find(x => x.n === n); if (!m || m.dead) return null;
+    px = +px || 0; pz = +pz || 0;
+    if ((px || pz) && !m.boss && !m.dash && isFinite(px) && isFinite(pz)) { const l = Math.hypot(px, pz), k = l > 4 ? 4 / l : 1; m.x = Math.max(-110, Math.min(110, m.x + px * k)); m.z = Math.max(-110, Math.min(110, m.z + pz * k)); m.stun = Math.max(m.stun || 0, .32); }
     d = Math.max(0, Math.min(5e6, +d || 0)); m.hp -= d; m.contrib[uid] = (m.contrib[uid] || 0) + d; m.aggro = 10; m.ret = false;
     if (m.raidBoss && !this.raidStart) this.raidStart = this.t;
     if (m.hp <= 0) return this.kill(m);

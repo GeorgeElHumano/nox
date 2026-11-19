@@ -52,6 +52,25 @@ export const NX_ITEMS = [
   { id: 'p_hada_oro', kind: 'pet', pet: 'hada', name: 'Hada dorada', desc: 'Tu Hada, en dorado.', price: 1500 },
   { id: 'p_rudolf_nav', kind: 'pet', pet: 'rudolf', name: 'Rudolf navideño', desc: 'Nariz roja y luces en la cornamenta.', price: 1500 },
   { id: 'p_imp_fund', kind: 'pet', pet: 'imp', name: 'Imp del Fundador', desc: 'Imp negro y oro.', f: 2 },
+  // premios del Dragón Dorado (evento Apertura del Reino). No se venden por Noxis: `dr` = lo entrega el dragón al morir,
+  // `esc` = se canjea por esa cantidad de Escamas Doradas (own.escama, las da el servidor en vivo). Kinds nuevos: mas (mascota propia), wing (alas).
+  { id: 't_dragon', kind: 'title', name: 'Cazador del Dragón', desc: 'Placa roja de escamas. Por derrotar al Dragón Dorado.', dr: 1 },
+  { id: 't_mata', kind: 'title', name: 'Matadragones', desc: 'Fuego y la cabeza del dragón. Para quien más daño hizo en una pelea.', dr: 1 },
+  // Apertura del Reino (dic. 2026): no se venden, los entrega el evento (`ev`). t_primeros es además lo que lee la Placa de la Apertura (GET nox/muro).
+  { id: 't_pionero', kind: 'title', name: 'Pionero del Reino', desc: 'Placa de aurora. Para quien entró al reino en la Apertura.', ev: 1 },
+  { id: 't_guardian', kind: 'title', name: 'Guardián de la Beta', desc: 'Placa de oro con escudos. Para las cuentas que jugaron la beta.', ev: 1 },
+  { id: 't_primeros', kind: 'title', name: 'Primeros del Reino', desc: 'Púrpura real con corona. Para los 10 primeros de la Carrera de Pioneros.', ev: 1 },
+  { id: 'm_pionero', kind: 'frame', name: 'Marco de aurora', desc: 'Borde de aurora que cambia de color. Apertura del Reino.', ev: 1 },
+  { id: 'm_guardian', kind: 'frame', name: 'Marco del Guardián', desc: 'Oro macizo con escudos. Cuentas de la beta.', ev: 1 },
+  { id: 'm_primeros', kind: 'frame', name: 'Marco real', desc: 'Púrpura y oro con corona. Los 10 primeros de la Carrera.', ev: 1 },
+  { id: 'e_aurora', kind: 'trail', name: 'Aurora de la Apertura', desc: 'Cortina de aurora que ondea detrás tuyo, con destellos.', ev: 1 },
+  { id: 'p_imp_aurora', kind: 'pet', pet: 'imp', name: 'Imp Aurora', desc: 'Tu Imp con los colores de la aurora, que van cambiando.', ev: 1 },
+  { id: 'p_hada_aurora', kind: 'pet', pet: 'hada', name: 'Hada Aurora', desc: 'Tu Hada con los colores de la aurora, que van cambiando.', ev: 1 },
+  { id: 'p_rudolf_aurora', kind: 'pet', pet: 'rudolf', name: 'Rudolf Aurora', desc: 'Tu Rudolf con los colores de la aurora, que van cambiando.', ev: 1 },
+  { id: 'm_dragon', kind: 'frame', name: 'Marco del Dragón', desc: 'Marco de oro envuelto en fuego.', esc: 5 },
+  { id: 'e_dragon', kind: 'trail', name: 'Fuego del Dragón', desc: 'Llamas y brasas al caminar.', esc: 12 },
+  { id: 'cria', kind: 'mas', name: 'Cría de Dragón Dorado', desc: 'Mascota que vuela a tu lado.', esc: 25 },
+  { id: 'alas_dragon', kind: 'wing', name: 'Alas del Dragón Dorado', desc: 'El premio máximo del evento. No vuelven después.', esc: 40 },
   // servicios (se gastan al usarlos)
   { id: 's_nombre', kind: 'svc', name: 'Cambio de nombre', desc: 'Cambiá el nombre de un personaje.', price: 1000 },
   { id: 's_apariencia', kind: 'svc', name: 'Cambio de apariencia', desc: 'Elegí de nuevo la cara de un personaje.', price: 1000 },
@@ -79,6 +98,8 @@ export const NX_PAY = { whatsapp: '595981187259', bank: 'Banco Familiar\nAlias: 
   /* condiciones de compra: se muestran en la pantalla de pago del juego y de la web (pedido del dueño, 13/11) */
   legal: 'Al transferir aceptás estas condiciones: los Noxis y los artículos de la tienda son bienes virtuales sin valor monetario real, se usan solo dentro de NOX y no se canjean por dinero. Las compras son finales y no reembolsables, salvo lo que exija la ley. Con el monto exacto los Noxis se acreditan solos; si no, el pago se revisa a mano dentro de las 48 horas. La factura legal se emite solo si la pedís al comprar (RUC y razón social) y suma el 10 % de IVA. Los Packs Fundador no vencen: quien compra el de Oro queda en el Muro de Fundadores para siempre. NOX está en beta y puede cambiar. Menores de 18 años, solo con autorización de un adulto.' };
 
+// Escamas Doradas: moneda del Dragón Dorado. Se guarda en own[NX_ESC]; no se compra ni se comercia.
+export const NX_ESC = 'escama';
 export const NX_BY = new Map(NX_ITEMS.map(i => [i.id, i]));
 export const NX_PACK = new Map(NX_PACKS.map(p => [p.id, p]));
 export const nxFounderLevel = own => { let f = 0; for (const p of NX_PACKS) if (p.f && own && own[p.id]) f = Math.max(f, p.f); return f; };

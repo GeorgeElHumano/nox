@@ -3,8 +3,9 @@
 // grupos de hasta 5 y la señalización WebRTC del chat de voz del grupo.
 
 import { Sim, RAID_KEY } from './sim.js';
+import { Dragon, dragonWindow, DR } from './dragon.js';
 import { ZONES } from './data.js';
-import { NX_ITEMS, NX_BY } from './noxis.js'; // copia de lib/noxis.js (scripts/noxis-sync.sh)
+import { NX_ITEMS, NX_BY, NX_ESC } from './noxis.js'; // copia de lib/noxis.js (scripts/noxis-sync.sh)
 import { alert, loginMark, peakMark, expireOrders, daySummary, summaryText, pyDay, tally, TRADE_ALERT_NX, nTxt } from './alerts.js'; // copia de lib/alerts.js (scripts/noxis-sync.sh)
 
 const enc = new TextEncoder();
@@ -23,7 +24,7 @@ async function minBuild() {
 const GESTOS = ['saludo', 'baile', 'risa', 'llanto', 'burla', 'celebracion', 'descanso'];
 // gestos de la tienda Noxis: solo los puede mostrar quien los compró (a.gx = máscara de bits según este orden)
 const GESTOS_NX = NX_ITEMS.filter(i => i.kind === 'gest').map(i => i.id);
-const CZ_SLOTS = ['title', 'frame', 'trail', 'pet_imp', 'pet_hada', 'pet_rudolf'];
+const CZ_SLOTS = ['title', 'frame', 'trail', 'pet_imp', 'pet_hada', 'pet_rudolf', 'mas', 'wing'];
 
 /* tareas programadas (wrangler.toml, [triggers]): cada 10 minutos vence pedidos y revisa que el servidor y la API respondan;
    a las 00:00 UTC (21:00 de Paraguay) manda el resumen del día. Todo termina en avisos al celular del administrador. */
@@ -149,7 +150,54 @@ export class World {
         for (const mo of sim.mobs) { const e = sim.entry(mo), k = e.join(','); if (key3 || k !== mo._ns) { mo._ns = k; l.push(e); } }
         if (l.length || key3) { const s = JSON.stringify({ t: 'ms', k: key3 ? 1 : 0, l, key }); for (const x of pl) this.send(x.ws, s); } }
     }
-    if (!this.sims.size) { clearInterval(this.loop); this.loop = null; }
+    this.wbStep(now, dt);
+    if (!this.sims.size && !this.wb) { clearInterval(this.loop); this.loop = null; }
+  }
+  // ---- Dragón Dorado (jefe de mundo del evento): aparece solo en su horario, o cuando un administrador lo llama con /dragon ----
+  wbAll(o) { const s = JSON.stringify(o); for (const x of this.all()) this.send(x.ws, s); }
+  wbZone(o) { const s = typeof o === 'string' ? o : JSON.stringify(o); for (const x of this.inZone(DR.zone)) this.send(x.ws, s); }
+  wbSpawn(opts) { this.wb = new Dragon(opts); this.wbSnap = 0; this.wbKey = 0; this.startLoop(); this.wbAll({ t: 'ann', k: 'wb', m: '¡El Dragón Dorado aterrizó fuera de las murallas de Asunción!' }); }
+  wbCheck(now) {
+    if (now < (this.wbNext || 0)) return; this.wbNext = now + 2000;
+    if (this.wbDone === undefined) { this.wbDone = null; this.state.storage.get('wbDone').then(v => { this.wbDone = v || 0; }).catch(() => { this.wbDone = 0; }); return; }
+    if (this.wbDone === null || this.wb) return;
+    const w = dragonWindow(now); if (!w || this.wbDone === w.start) return;
+    if (now < w.start) { if (this.wbWarned !== w.start) { this.wbWarned = w.start; this.wbAll({ t: 'ann', k: 'wb', m: 'El Dragón Dorado se acerca a Asunción. Llega en ' + Math.max(1, Math.round((w.start - now) / 60000)) + ' minutos: preparate fuera de las murallas.' }); } return; }
+    this.wbWin = w.start; this.wbSpawn({ limit: Math.max(60, (w.end - now) / 1000) });
+  }
+  // premios del dragón: Escamas Doradas (1; 3 a los diez mejores; 5 al primero), título Cazador del Dragón, Matadragones al primero
+  // y 1 % de suerte para las alas. Todo se escribe en la base acá (el juego solo lo muestra). Con /dragon de prueba no se entrega nada.
+  async wbReward(D) {
+    const rank = Object.entries(D.contrib).sort((a, b) => b[1] - a[1]), total = rank.reduce((s, x) => s + x[1], 0) || 1, db = this.env.DB, t = Date.now();
+    const J = id => `'$."${id}"'`;
+    for (let i = 0; i < rank.length; i++) { const [uid, d] = rank[i]; if (i >= 10 && d < total * .001) continue; // casi no pegó: sin premio
+      const n = i === 0 ? 5 : i < 10 ? 3 : 1, x = this.byUid(uid), o = { t: 'wbr', rank: i + 1, np: rank.length, esc: n, pct: Math.round(d / total * 1000) / 10, chest: i < 10 ? 1 : 0 };
+      try {
+        if (D.test) { o.test = 1; o.tot = n; o.first = 1; o.mata = i === 0 ? 1 : 0; }
+        else {
+          await db.prepare("INSERT OR IGNORE INTO noxis(uid,bal,own,eq,upd) VALUES(?,0,'{}','{}',?)").bind(uid, t).run();
+          const own = JSON.parse((await db.prepare('SELECT own FROM noxis WHERE uid=?').bind(uid).first() || {}).own || '{}');
+          o.first = own.t_dragon ? 0 : 1; o.mata = i === 0 && !own.t_mata ? 1 : 0; o.alas = !own.alas_dragon && Math.random() < .01 ? 1 : 0;
+          const r = await db.prepare(`UPDATE noxis SET own=json_set(own,${J(NX_ESC)},COALESCE(json_extract(own,${J(NX_ESC)}),0)+?1,${J('t_dragon')},1${i === 0 ? ',' + J('t_mata') + ',1' : ''}${o.alas ? ',' + J('alas_dragon') + ',1' : ''}), upd=?2 WHERE uid=?3 RETURNING bal, json_extract(own,${J(NX_ESC)}) AS e`).bind(n, t, uid).first();
+          o.tot = r ? r.e | 0 : n;
+          await db.prepare('INSERT INTO noxlog(uid,d,bal,why,ref,t) VALUES(?,?,?,?,?,?)').bind(uid, 0, r ? r.bal : 0, 'dragon', `escamas+${n} puesto ${i + 1}${o.alas ? ' alas' : ''}`, t).run();
+          if (o.alas) this.wbAll({ t: 'ann', k: 'wb', m: '★ ' + (D.names[uid] || 'Un valiente') + ' obtuvo las Alas del Dragón Dorado. ¡Solo cae 1 de cada 100!' });
+        }
+        if (x) this.send(x.ws, o);
+      } catch {}
+    }
+  }
+  wbStep(now, dt) {
+    this.wbCheck(now); const D = this.wb; if (!D) return;
+    const pl = this.inZone(DR.zone).filter(x => x.a.s);
+    D.step(dt, pl.map(x => ({ uid: x.a.uid, p: x.a.p })));
+    if (D.out.length) { for (const o of D.out) { this.wbZone(o);
+        if (o.t === 'wbk') this.wbReward(D).catch(() => {});
+        if (o.t === 'wbk') this.wbAll({ t: 'ann', k: 'wb', m: '¡El Dragón Dorado fue derrotado por ' + o.np + ' valientes! Mayor daño: ' + ((o.top[0] || {}).n || '?') + '.' });
+        if (o.t === 'wbf') this.wbAll({ t: 'ann', k: 'wb', m: 'El Dragón Dorado levantó vuelo: nadie pudo con él esta vez.' }); } D.out = []; }
+    this.wbSnap -= dt; this.wbKey -= dt;
+    if (D.gone) { if (this.wbWin) { this.wbDone = this.wbWin; this.state.storage.put('wbDone', this.wbWin).catch(() => {}); this.wbWin = 0; } this.wb = null; this.wbZone({ t: 'wbs', e: null }); return; }
+    if (this.wbSnap <= 0) { this.wbSnap = .15; const st = D.state(), k = JSON.stringify(st.e) + st.ph; if (this.wbKey <= 0 || k !== this.wbLast) { if (this.wbKey <= 0) this.wbKey = 1; this.wbLast = k; this.wbZone(st); } }
   }
   // ---- objetos en el piso compartidos por mapa: el que lo hizo caer tiene prioridad unos segundos ----
   zoneDrops(zone, make) {
@@ -422,7 +470,13 @@ export class World {
       this.partySend(p, { t: 'ps', id: a.uid, h: pc(m.h), m: pc(m.m), d: m.d ? 1 : 0, L: (a.s && a.s.L) | 0 }, a.uid); return; }
 
     // monstruos: los mueve el servidor; los jugadores mandan sus golpes y piden la lista completa
-    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d); return; }
+    if (t === 'mh') { const sim = a.zone && this.sims.get(a.zone); if (sim) sim.hit(a.uid, m.n | 0, m.d, m.px, m.pz); return; }
+    if (t === 'wbh') { if (this.wb && a.zone === DR.zone && a.s) this.wb.hit(a.uid, m.d, a.s.L | 0, a.s.n); return; }
+    if (t === 'wbadm') { // "/dragon" llama al Dragón Dorado para probar; "/dragon fuera" lo saca. Solo administradores
+      if (a.role !== 'admin') { this.send(ws, { t: 'sys', m: 'Solo los administradores pueden llamar al Dragón Dorado.' }); return; }
+      if (m.op === 'off') { if (this.wb) { this.wb.gone = true; this.wbWin = 0; } this.send(ws, { t: 'sys', m: 'Dragón Dorado retirado.' }); return; }
+      if (this.wb) { this.send(ws, { t: 'sys', m: 'El Dragón Dorado ya está en el campo.' }); return; }
+      this.wbWin = 0; this.wbSpawn({ limit: Math.max(60, Math.min(3600, (+m.min || 30) * 60)), test: m.op !== 'premios' }); return; }
     if (t === 'mreq') { const sim = a.zone && this.sims.get(a.zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: a.zone }); return; }
     if (t === 'raid') { this.startRaid(ws, a); return; }
     if (t === 'sk') { // poder usado: los demás del mapa lo ven
@@ -436,6 +490,7 @@ export class World {
 
     if (t === 'p') { // posición: x,z,ry,mv,ac (contador de ataques),d (muerto),f (vuela)
       a.p = { x: +m.x || 0, z: +m.z || 0, ry: +m.ry || 0, mv: +m.mv || 0, ac: m.ac | 0, d: m.d ? 1 : 0 };
+      this.wbCheck(Date.now()); // el dragón aparece en su horario aunque no haya otros monstruos moviéndose
       if (GESTOS.includes(m.g)) a.p.g = m.g; // gesto en curso (saludo, baile…), para que lo vean los demás
       else { const gi = GESTOS_NX.indexOf(m.g); if (gi >= 0 && ((a.gx | 0) >> gi & 1)) a.p.g = m.g; }
       this.save(ws, a);
@@ -466,6 +521,7 @@ export class World {
         this.send(ws, { t: 'w', you: a.uid, list: this.inZone(zone, ws).filter(x => x.a.s).map(x => this.pub(x.a)) });
         for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'j', ...this.pub(a) });
         const sim = this.ensureSim(zone); if (sim) this.send(ws, { t: 'mr', l: sim.roster(), key: zone });
+        if (zone === DR.zone && this.wb && !this.wb.gone) this.send(ws, this.wb.state());
       } else for (const x of this.inZone(zone, ws)) this.send(x.ws, { t: 'eq', id: a.uid, s: a.s });
       const [pid, p] = this.partyOf(a.uid); if (p) this.partyBroadcast(pid, p);
       if (t === 'hi') { const n = this.all().filter(x => x.a.s).length; this.send(ws, { t: 'online', n, ts: Date.now() });
