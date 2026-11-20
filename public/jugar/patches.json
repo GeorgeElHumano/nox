@@ -1,5 +1,14 @@
 [
  {
+  "build": "202611201612",
+  "title": "Trofeos con forma propia",
+  "notes": [
+   "Los trofeos de las bestias tienen ahora su propia forma según su nombre: corazones, cráneos, coronas, medallas, mechones, frascos, cristales y más",
+   "Ya no hay dos trofeos iguales: cada ojo, piel, colmillo, garra, escama, gota, cuerno y pluma tiene su diseño (ojo de víbora, piel con rosetas, cuerno de carnero, escama de obsidiana…)",
+   "Se ven así en la bolsa, en el baúl y al caer al piso"
+  ]
+ },
+ {
   "build": "202611201256",
   "title": "Domos de luz y bolsa renovada",
   "notes": [
