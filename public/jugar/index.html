@@ -4344,6 +4344,44 @@ const MYTH={
    aura:0x8a5a2a,auraS:1.8}},
  monai:{ficha:'Moñái, tercer hijo: serpiente enorme del color de la tierra colorada, con cresta de fuego, colmillos que gotean veneno y dos cuernos largos que usa como antenas para hipnotizar a las aves; señor de los campos abiertos, trepa a los árboles y roba en los pueblos. Lo venció el sacrificio de Porâsý.',
   snake:{head:'dragon',rear:12,thick:1.25,skin:()=>scalesTex('monaiD',{base:0xa8381a,dark:0x3a0c04,hi:0xf08a3a,size:9,belly:0xeedcb8,spots:.08,nrm:2.4}),belly:0xe8d8b4,eye:0xb8ff3a,horn:[0xc8b48a,0x2a1a0e],crest:0xd8521e}},
+ /* (20/11) Kerana, la madre de los siete: mujer alta de vestido lavanda que flota dormida, corona de flores pálidas, media luna en la frente y un velo largo */
+ kerana:{ficha:'Kerana: la madre de los siete hijos de Tau. Duerme en un lecho de flores pálidas en el Cerro Tres Kandú; cuando despierta, la niebla se vuelve violeta y su canto hace dormir a los guerreros.',
+  human:{body:'f_dress',tex:()=>recolorTex('skeletal_iber_dress_female_01_02','keranaDress3',(d,w,h)=>{for(let i=0;i<w*h;i++){const r=d[i*4],g=d[i*4+1],b=d[i*4+2],l=(r*.3+g*.59+b*.11)/255;if(l<.3||(l<.42&&r-b>38&&r>g&&g<r*.8)){/* cinturón, bolsita y guardas: oro */const k=.55+l*1.6;d[i*4]=k*255;d[i*4+1]=k*196;d[i*4+2]=k*92;continue;}if(r-b>38&&r>g)continue;const k=Math.min(1,l*1.2+.06);d[i*4]=k*236;d[i*4+1]=k*222;d[i*4+2]=k*255;}}),props:['hd_f_ptol'],team:0xb8a0ff,scale:1.45,anim:'w',em:[0x3a2a70,.3],fly:.35,aura:0xc8a8ff,auraS:2.8,sparkle:0xe8d8ff,eyeGlow:0xf0d8ff,
+   /* diosa (20/11): oro con brillo, corona de flores, tiara con gema, media luna, aureola de rayos detrás de la cabeza, collar, brazaletes, cinturón de oro, manto largo, cetro con luna y siete luces que la rodean (los siete hijos) */
+   extra(r,body,U,A){const hp=A(['prop-helmet','helmet','head']);if(!hp)return;
+    const nog=m=>{m.userData.noGhost=true;m.userData.keepEm=true;return m;};
+    const gold=nog(new MSM({color:0xffd27a,metalness:.85,roughness:.28,emissive:0x8a5a10,emissiveIntensity:.55}));
+    const gem=nog(new MSM({color:0xe0c8ff,metalness:.2,roughness:.1,emissive:0xb08aff,emissiveIntensity:2.2}));
+    const SG=gcc('kgS',()=>new THREE.SphereGeometry(1,10,8)),OG=gcc('kgO',()=>new THREE.OctahedronGeometry(1,0)),TG=gcc('kgT',()=>new THREE.TorusGeometry(1,.12,8,32)),CG=gcc('kgC',()=>new THREE.CylinderGeometry(1,1,1,10));
+    const fl=[0xffffff,0xe8c8ff,0xffd8f0].map(c=>nog(new MSM({color:c,emissive:c,emissiveIntensity:1.5,roughness:.5})));const lf=nog(new MSM({color:0x6a8a6a,roughness:.8}));
+    /* corona de flores */const ring=new THREE.Group();ring.position.set(0,A.top-.07*U,0);hp.add(ring);
+    for(let i=0;i<16;i++){const a=i/16*TAU;part(gcc('kfl',()=>new THREE.SphereGeometry(1,8,6)),fl[i%3],Math.cos(a)*.112*U,Math.sin(i*1.7)*.008*U,Math.sin(a)*.122*U,ring,.028*U,.022*U,.028*U);if(i%2)part(gcc('kfl',()=>new THREE.SphereGeometry(1,8,6)),lf,Math.cos(a+.2)*.118*U,-.01*U,Math.sin(a+.2)*.128*U,ring,.03*U,.008*U,.016*U);}
+    /* tiara de oro bajo las flores, con gema en la frente */const ti=part(TG,gold,0,A.top-.1*U,0,hp,.116*U,.116*U,.06*U);ti.rotation.x=PI/2;ti.scale.set(.116*U,.128*U,.09*U);
+    part(OG,gem,0,A.top-.085*U,.128*U,hp,.022*U,.034*U,.014*U);for(const s of[-1,1])part(SG,gem,s*.05*U,A.top-.095*U,.118*U,hp,.011*U);
+    /* media luna */const mm=nog(new MSM({color:0xf6f0ff,emissive:0xd8c0ff,emissiveIntensity:3,metalness:.5,roughness:.25}));
+    const moon=part(gcc('kmoon',()=>new THREE.TorusGeometry(1,.22,8,28,PI*1.2)),mm,0,A.top+.03*U,.1*U,hp,.065*U,.065*U,.065*U);moon.rotation.z=PI*.9;
+    /* aureola: aro de oro con rayos y resplandor detrás de la cabeza */const au=new THREE.Group();au.position.set(0,A.top-.09*U,-.15*U);hp.add(au);
+    part(TG,gold,0,0,0,au,.27*U,.27*U,.2*U);part(TG,gem,0,0,0,au,.21*U,.21*U,.1*U);
+    for(let i=0;i<24;i++){const a=i/24*TAU,ln=(i%2?.09:.16)*U;const ray=part(gcc('kray',()=>new THREE.ConeGeometry(1,1,4)),i%2?gem:gold,Math.cos(a)*(.29*U+ln/2),Math.sin(a)*(.29*U+ln/2),0,au,.012*U,ln,.006*U);ray.rotation.z=a-PI/2;}
+    {const gl=glowSprite(0xe0c8ff,.95*U,.4);au.add(gl);}
+    /* velo largo que cae por la espalda */const vm=nog(new MSM({color:0xe0d4ff,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false,roughness:.8,emissive:0x7a5ac8,emissiveIntensity:.45}));
+    const vg=new THREE.PlaneGeometry(.26*U,1.5*U,6,16);{const q=vg.attributes.position;for(let i=0;i<q.count;i++){const y=q.getY(i),t=(.75*U-y)/(1.5*U);q.setX(i,q.getX(i)*(1+t*.5));q.setZ(i,-Math.pow(t,1.4)*.38*U-Math.abs(q.getX(i))*.6*t);q.setY(i,y-.75*U);}vg.computeVertexNormals();}
+    const veil=new THREE.Mesh(vg,vm);veil.position.set(0,A.top-.05*U,-.07*U);hp.add(veil);
+    /* collar de oro con colgante */const ch=A(['chest']);if(ch){const nk=part(TG,gold,0,.2*U,.0,ch,.11*U,.11*U,.12*U);nk.rotation.x=PI/2-.35;nk.scale.set(.1*U,.085*U,.12*U);
+     for(let i=0;i<9;i++){const a=PI*(.15+.7*i/8);part(SG,i%2?gem:gold,Math.cos(a)*.105*U,.17*U-Math.sin(a)*.05*U,.045*U+Math.sin(a)*.05*U,ch,.014*U);}
+     part(OG,gem,0,.1*U,.11*U,ch,.026*U,.04*U,.016*U);
+     /* manto largo desde los hombros */const cm=nog(new MSM({color:0xd8c8ff,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,roughness:.7,emissive:0x6a4ab8,emissiveIntensity:.5}));
+     const cg=new THREE.PlaneGeometry(.5*U,1.55*U,8,18);{const q=cg.attributes.position;for(let i=0;i<q.count;i++){const x=q.getX(i),y=q.getY(i),t=(.775*U-y)/(1.55*U);q.setX(i,x*(1+t*.7));q.setZ(i,-t*.32*U-Math.cos(x/(.25*U)*1.3)*.05*U+Math.sin(x*20/U+t*6)*.012*U);q.setY(i,y-.775*U);}cg.computeVertexNormals();}
+     const cape=new THREE.Mesh(cg,cm);cape.position.set(0,.2*U,-.1*U);ch.add(cape);
+     const hem=part(CG,gold,0,.2*U,-.1*U,ch,.006*U,.5*U,.006*U);hem.rotation.z=PI/2;
+     for(const s of[-1,1]){part(SG,gold,s*.23*U,.2*U,-.06*U,ch,.035*U,.035*U,.02*U);part(OG,gem,s*.23*U,.2*U,-.04*U,ch,.016*U);}}
+    /* brazaletes en brazos y muñecas */for(const s of['L','R']){for(const [bn,y,rr] of [['arm_'+s,.11,.05],['hand_'+s,-.02,.042]]){const b=A([bn]);if(!b)continue;const t=part(TG,gold,0,y*U,0,b,rr*U,rr*U,.06*U);t.rotation.x=PI/2;t.scale.set(rr*U,rr*U,.07*U);}}
+    /* cinturón de oro con gema */const pv=A(['pelvis','hip']);if(pv){const bl=part(TG,gold,0,.08*U,0,pv,.17*U,.13*U,.08*U);bl.rotation.x=PI/2;bl.scale.set(.17*U,.13*U,.08*U);part(OG,gem,0,.08*U,.15*U,pv,.025*U,.035*U,.015*U);
+     for(let i=0;i<3;i++){const c=part(CG,gold,0,.04*U-i*.13*U,.15*U,pv,.006*U,.13*U,.006*U);part(SG,i==2?gem:gold,0,-.03*U-i*.13*U,.152*U,pv,.012*U);}}
+    /* cetro con media luna en la mano derecha */const hr=A(['hand_R']);if(hr){const sc=new THREE.Group();sc.position.set(0,.04*U,0);hr.add(sc);
+     part(CG,gold,0,0,0,sc,.016*U,1.5*U,.016*U);part(SG,gem,0,.78*U,0,sc,.055*U);const cr=part(gcc('kmoon',()=>new THREE.TorusGeometry(1,.22,8,28,PI*1.2)),mm,0,.86*U,0,sc,.11*U,.11*U,.11*U);cr.rotation.z=PI*.9;
+     for(const y of[.6,-.72])part(SG,gold,0,y*U,0,sc,.03*U);const sg=glowSprite(0xe0c8ff,.45*U,.7);sg.position.y=.8*U;sc.add(sg);/* el cetro sigue a la mano pero siempre parado: antes de dibujarse se compensa el giro de la mano */{const q=new THREE.Quaternion(),q2=new THREE.Quaternion();const fix=()=>{hr.getWorldQuaternion(q);let o=hr;while(o.parent&&!o.parent.isScene)o=o.parent;o.getWorldQuaternion(q2);sc.quaternion.copy(q.invert().multiply(q2));sc.rotateX(.1);sc.updateMatrixWorld(true);};sc.traverse(o=>{if(o.isMesh||o.isSprite)o.onBeforeRender=fix;});}}
+    /* siete luces que la rodean: los siete hijos */wisps(r,0xe8d8ff,7,1.15,1.6,.22);}}},
  kaajary:{ficha:"Ka'a Jarýi: la dueña de la yerba mate, mujer de ojos verdes que cuida los yerbales y castiga a quien los maltrata.",
   human:{body:'f_dress',tex:()=>recolorTex('skeletal_celt_dress_female_01_01','kaaDress',tintRecolor(0x3a9a4a,.85,{gain:1.5})),props:['hd_f_bou'],team:0x2a6a2a,scale:1,anim:'w',
    extra(r,body,U,A){const lm=new MSM({color:0x3a9a3a,roughness:.85,side:THREE.DoubleSide});const lm2=new MSM({color:0x2a6a2a,roughness:.9,side:THREE.DoubleSide});
@@ -7394,7 +7432,7 @@ function updateEnemies(dt){
     collide(p,e.rad*.8);if(!swim&&deepWater(p.x,p.z)&&!deepWater(mox,moz)){p.x=mox;p.z=moz;}p.y=H(p.x,p.z);if(e.sinkY)p.y-=e.sinkY;
     if(e.face!==undefined)e.g.rotation.y=lerpAngle(e.g.rotation.y,e.face,Math.min(1,dt*8));
     animEnemy(e,dt,sp);if(e.hitK>0){e.hitK=Math.max(0,e.hitK-dt*7);const h=e.hitK;e.rig.scale.set(1+h*.07,1-h*.09,1+h*.07);if(e.kind==='glb'&&e.mixer)e.rig.rotation.x=-h*.14;}else if(e.rig.scale.y!==1)e.rig.scale.set(1,1,1);
-    const fl=e.flash>0?(VFX.on?.3:.7):0,er=e.enraged?.22+Math.sin(T*7)*.1:0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent)m.emissive.setRGB(fl+er,fl*(VFX.on?.55:.9),fl*(VFX.on?.25:.8));});
+    const fl=e.flash>0?(VFX.on?.3:.7):0,er=e.enraged?.22+Math.sin(T*7)*.1:0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent&&!m.userData.keepEm)m.emissive.setRGB(fl+er,fl*(VFX.on?.55:.9),fl*(VFX.on?.25:.8));});
     {const b=e.bar,tg=P.target===e;b.visible=e.hp<e.max||tg;if(b.visible){b.position.set(p.x,p.y+e.hgt+.25,p.z);b.quaternion.copy(camera.quaternion);const v=Math.max(0,e.hp/e.max);
       if(v<b.lagV-.001){if(b.cur!=null&&v<b.cur-.001)b.hold=.35;b.hold-=dt;if(b.hold<=0)b.lagV=Math.max(v,b.lagV-dt*.7);}else b.lagV=v;b.cur=v;
       b.fill.scale.x=Math.max(.001,v);b.lag.scale.x=Math.max(.001,b.lagV);b.scale.setScalar((e.def.boss?1.25:.78)*(tg?1.12:1));b.fr.material.color.setHex(tg?0xe0b25a:0x1a100a);b.fill.material.color.setHex(tg?0xff4a30:0xb8301e);}}
@@ -9266,7 +9304,7 @@ function updateEnemiesGuest(dt){const k=1-Math.exp(-dt*10);
     const sp=e.aSp=(e.aSp||0)+((dt>0?mv/dt:0)-(e.aSp||0))*Math.min(1,dt*8);e.g.rotation.y=lerpAngle(e.g.rotation.y,e.tr,Math.min(1,dt*10));
     const dl=Math.hypot(P.x-p.x,P.z-p.z);e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;
     animEnemy(e,dt,sp);if(e.hitK>0){e.hitK=Math.max(0,e.hitK-dt*7);const h=e.hitK;e.rig.scale.set(1+h*.07,1-h*.09,1+h*.07);}else if(e.rig.scale.y!==1)e.rig.scale.set(1,1,1);
-    const fl=e.flash>0?(VFX.on?.3:.7):0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent)m.emissive.setRGB(fl,fl*(VFX.on?.55:.9),fl*(VFX.on?.25:.8));});
+    const fl=e.flash>0?(VFX.on?.3:.7):0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent&&!m.userData.keepEm)m.emissive.setRGB(fl,fl*(VFX.on?.55:.9),fl*(VFX.on?.25:.8));});
     {const b=e.bar,tg=P.target===e;b.visible=e.hp<e.max||tg;if(b.visible){b.position.set(p.x,p.y+e.hgt+.25,p.z);b.quaternion.copy(camera.quaternion);const v=Math.max(0,e.hp/e.max);
       if(b.lagV==null||v>b.lagV)b.lagV=v;else b.lagV=Math.max(v,b.lagV-dt*.7);b.fill.scale.x=Math.max(.001,v);b.lag.scale.x=Math.max(.001,b.lagV);b.scale.setScalar((e.def.boss?1.25:.78)*(tg?1.12:1));b.fr.material.color.setHex(tg?0xe0b25a:0x1a100a);b.fill.material.color.setHex(tg?0xff4a30:0xb8301e);}}}}
 
