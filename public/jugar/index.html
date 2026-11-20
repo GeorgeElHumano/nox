@@ -770,11 +770,11 @@ img.ico.i-epic{filter:drop-shadow(0 0 5px rgba(164,82,255,1)) drop-shadow(0 0 2p
 .rg.r-myth{box-shadow:inset 0 0 0 1px rgba(150,250,255,.95),inset 0 0 16px rgba(40,230,220,.6),0 0 12px rgba(60,210,255,.65);animation:rgm 2s ease-in-out infinite}
 @keyframes rgm{0%,100%{opacity:.75;filter:hue-rotate(0deg)}50%{opacity:1;filter:hue-rotate(-28deg)}}
 img.ico.i-myth{filter:drop-shadow(0 0 5px rgba(40,230,220,1)) drop-shadow(0 0 2px rgba(190,250,255,.9))}
-/* Conjunto NOX: marco de oro grueso con fuego rojo adentro y un destello que recorre el borde */
-.rg.r-nox{box-shadow:inset 0 0 0 2px rgba(255,214,90,1),inset 0 0 0 3px rgba(150,20,10,.9),inset 0 0 18px rgba(230,30,20,.75),0 0 14px rgba(255,190,50,.85),0 0 4px rgba(255,90,30,.9);animation:rgn 1.6s ease-in-out infinite;overflow:hidden}
-.rg.r-nox::after{content:'';position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,240,180,.55) 50%,transparent 58%);animation:rgns 2.6s linear infinite}
+/* Conjunto NOX: marco rojo fuerte con un filete de oro, fuego rojo adentro y un destello que recorre el borde */
+.rg.r-nox{box-shadow:inset 0 0 0 2px rgba(255,26,20,1),inset 0 0 0 3px rgba(255,205,90,.45),inset 0 0 20px rgba(220,0,0,.9),0 0 16px rgba(230,0,0,1),0 0 5px rgba(255,20,10,1);background:radial-gradient(circle,transparent 45%,rgba(190,0,0,.35));animation:rgn 1.6s ease-in-out infinite;overflow:hidden}
+.rg.r-nox::after{content:'';position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,200,150,.5) 50%,transparent 58%);animation:rgns 2.6s linear infinite}
 @keyframes rgn{0%,100%{opacity:.85}50%{opacity:1}}@keyframes rgns{0%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
-img.ico.i-nox{filter:drop-shadow(0 0 4px rgba(255,200,60,1)) drop-shadow(0 0 3px rgba(255,50,20,.9))}
+img.ico.i-nox{filter:drop-shadow(0 0 5px rgba(255,30,15,1)) drop-shadow(0 0 2px rgba(255,190,90,.8))}
 .it-l.ep{color:#c98cff;font-weight:700}.it-l.an{color:#ffc94a}.it-l.an.off{opacity:.45}
 .num.combo{color:#ffd76a;font-size:15px;font-family:var(--display);letter-spacing:.04em}
 .num.big{font-size:26px!important}
@@ -6297,7 +6297,7 @@ document.addEventListener('click',e=>{if(performance.now()-DRAG.block<400&&e.tar
 const TIP={el:null,key:''};
 function tipHide(){if(TIP.el){TIP.el.remove();TIP.el=null;TIP.key='';}}
 function tipPos(e){const d=TIP.el;if(!d)return;const w=d.offsetWidth,h=d.offsetHeight;let x=e.clientX+18,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=Math.max(8,innerHeight-h-8);d.style.left=x+'px';d.style.top=y+'px';}
-document.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!C||DRAG.moved||VDRAG.moved){if(TIP.el&&(DRAG.moved||VDRAG.moved))tipHide();return;}
+document.addEventListener('pointermove',e=>{/* solo cuenta un arrastre en curso: `moved` queda en true después de soltar y antes apagaba la descripción hasta el próximo clic sobre un ítem */const dg=(DRAG.src&&DRAG.moved)||(VDRAG.s&&VDRAG.moved);if(e.pointerType!=='mouse'||!C||dg){if(TIP.el&&dg)tipHide();return;}
   /* bolsa y equipo (por casillero) o cualquier otra celda con marca de ítem: baúl, tienda, caldero, comercio, tiendas de jugadores */
   let it=null,c=e.target.closest&&e.target.closest('#invGrid .cell,#eqGrid .slot');
   if(c&&!$('#pInv').hidden&&$('#pItem').hidden)it=c.matches('.cell')?C.inv[+c.dataset.i]:C.eq[c.dataset.k];
