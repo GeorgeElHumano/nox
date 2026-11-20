@@ -1,12 +1,11 @@
 {
- "build": "202611201035",
- "min": "202611201035",
- "title": "Kerana, la diosa del sueño",
+ "build": "202611201256",
+ "min": "202611201256",
+ "title": "Domos de luz y bolsa renovada",
  "notes": [
-  "Kerana tiene figura propia: ya no es un fantasma de caballero con espada, ahora es una diosa que flota sobre su lecho de flores, con vestido lila, velo y manto de luz",
-  "Corona de flores blancas que brillan, tiara de oro con gema, media luna y una aureola de rayos dorados detrás de la cabeza",
-  "Collar, broches, brazaletes y cinturón de oro con gemas lila, y un cetro de oro con una media luna en la punta",
-  "Siete luces la rodean: una por cada uno de sus siete hijos",
-  "Web: nueva foto de Kerana en el bestiario"
+  "Cerro Tres Kandú: cada altar tiene ahora un domo de luz con niebla del color de su jefe, y el rayo al cielo sale desde la cima del domo",
+  "Bolsa: las piezas Míticas brillan en celeste y verde agua, y las del conjunto NOX llevan un marco rojo con filete de oro",
+  "Arreglo: la descripción de los objetos al pasar el mouse dejaba de aparecer después de arrastrar algo en la bolsa o el baúl",
+  "Nuevo: al entrar podés descargar todo el juego de una vez (unos 80 MB, mejor con wifi) para evitar pantallas de carga largas y tirones al cambiar de mapa; se puede jugar mientras baja"
  ]
 }

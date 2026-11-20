@@ -1,5 +1,15 @@
 [
  {
+  "build": "202611201256",
+  "title": "Domos de luz y bolsa renovada",
+  "notes": [
+   "Cerro Tres Kandú: cada altar tiene ahora un domo de luz con niebla del color de su jefe, y el rayo al cielo sale desde la cima del domo",
+   "Bolsa: las piezas Míticas brillan en celeste y verde agua, y las del conjunto NOX llevan un marco rojo con filete de oro",
+   "Arreglo: la descripción de los objetos al pasar el mouse dejaba de aparecer después de arrastrar algo en la bolsa o el baúl",
+   "Nuevo: al entrar podés descargar todo el juego de una vez (unos 80 MB, mejor con wifi) para evitar pantallas de carga largas y tirones al cambiar de mapa; se puede jugar mientras baja"
+  ]
+ },
+ {
   "build": "202611201035",
   "title": "Kerana, la diosa del sueño",
   "notes": [
