@@ -1,5 +1,13 @@
 [
  {
+  "build": "202611201953",
+  "title": "Alas del Dragón Dorado bien puestas",
+  "notes": [
+   "Las Alas del Dragón Dorado ahora salen de la parte alta de la espalda y se abren hacia arriba (antes colgaban hasta el piso).",
+   "Quieto, las alas quedan abiertas con un leve movimiento; al moverte, aletean."
+  ]
+ },
+ {
   "build": "202611201612",
   "title": "Trofeos con forma propia",
   "notes": [

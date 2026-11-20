@@ -9579,9 +9579,10 @@ function drCria(id,want,px,pz,ry,dt){let Q=DRP.cria.get(id);if(!want){if(Q){scen
   const sp=dt>0?Math.hypot(Q.x-ox,Q.z-oz)/dt:0;Q.ry=lerpAngle(Q.ry,sp>.5?Math.atan2(Q.x-ox,Q.z-oz):ry,Math.min(1,dt*7));
   const D=Q.D;D.g.position.set(Q.x,H(Q.x,Q.z)+1.45+Math.sin(T*2.6+px)*.1,Q.z);D.g.rotation.y=Q.ry-PI/2;D.anim('vuelo',0);D.st.gy=0;D.st.jaw=.12;D.st.flapSpd=1.7;D.step(T);}
 function drWings(r,want,mv){if(!r||!r.g)return;let W=r.drW;
-  if(!want){if(W){r.g.remove(W.grp);try{disposeTree(W.grp);}catch(e){}r.drW=null;if(r.wings&&r.wings.g)r.wings.g.visible=true;}return;}
-  if(!W){const D=makeDragon(THREE,{host:1,pet:1,wingsOnly:1,goldWing:1}),grp=new THREE.Group();grp.add(D.g);D.g.rotation.y=-PI/2;D.g.scale.setScalar(.085);D.g.position.set(0,.72,-.3);r.g.add(grp);W=r.drW={D,grp};}
-  if(r.wings&&r.wings.g)r.wings.g.visible=false;const D=W.D;D.anim('quieto',0);if(mv>.3){D.st.wflap=.5+Math.sin(T*7)*.26;D.st.wfold=.28;}D.step(T);}
+  if(!want){if(W){if(W.grp.parent)W.grp.parent.remove(W.grp);try{disposeTree(W.grp);}catch(e){}r.drW=null;if(r.wings&&r.wings.g)r.wings.g.visible=true;}return;}
+  /* (20/11, pedido del dueño: "las alas no están bien equipadas") más chicas, con la raíz en la espalda alta y abiertas hacia arriba; antes colgaban hasta el piso */
+  if(!W){const D=makeDragon(THREE,{host:1,pet:1,wingsOnly:1,goldWing:1}),grp=new THREE.Group();grp.add(D.g);D.g.rotation.y=-PI/2;D.g.scale.setScalar(.075);D.g.position.set(0,.95,-.28);r.g.add(grp);W=r.drW={D,grp};}
+  if(r.wings&&r.wings.g)r.wings.g.visible=false;const D=W.D;D.anim('quieto',0);D.st.wfold=.2;D.st.wflap=mv>.3?.62+Math.sin(T*7)*.2:.78+Math.sin(T*1.6)*.03;D.step(T);}
 function drTick(dt){if(mode!=='game'||!P||!C){if(DRP.cria.size)for(const id of [...DRP.cria.keys()])drCria(id,false);return;}
   const eq=NX.eq||{},mc=eq.mas==='cria'&&!P.dead,mw=eq.wing==='alas_dragon';let any=mc||mw||DRP.cria.size>0||(HERO&&HERO.drW);
   if(!any)for(const o of LIVE.others.values()){const cz=o.s&&o.s.cz;if(cz&&(cz[6]||cz[7])){any=true;break;}}
@@ -9948,7 +9949,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611201612';const UPD={shown:'',req:false};
+const NOX_BUILD='202611201953';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
