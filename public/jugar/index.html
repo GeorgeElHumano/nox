@@ -1008,6 +1008,10 @@ body.induel #track,body.induel #evClock{display:none}
 #patchBox .pt-in{width:min(440px,100%);max-height:calc(100vh - 32px);overflow:auto;display:flex;flex-direction:column;gap:10px;padding:20px;border-radius:14px;background:linear-gradient(#22264f,#12142e);box-shadow:0 0 0 1px #0c0e28,0 0 0 2px #e2a83f,0 0 40px rgba(226,168,63,.35),0 20px 50px rgba(0,0,0,.7);text-align:center;animation:invIn2 .4s cubic-bezier(.2,1.5,.4,1)}
 #patchBox small{font-family:var(--display);letter-spacing:.24em;text-transform:uppercase;color:#e2a83f;font-size:11.5px}#patchBox b{font-family:var(--display);color:#fff1d2;font-size:21px;letter-spacing:.03em}
 #patchBox ul{margin:0;padding:0 0 0 18px;text-align:left;color:#e8e2f4;font-size:14px;line-height:1.5}#patchBox p{margin:0;color:#cfc6e6;font-size:13px}#patchBox .pb{justify-content:center;gap:8px}
+#dlAsk{position:fixed;inset:0;z-index:190;display:grid;place-items:center;background:rgba(8,5,3,.72);padding:16px}
+#dlAsk .upd-in{width:min(440px,100%);display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:6px;background:linear-gradient(#2a1c10,#120b06);box-shadow:0 0 0 1px #0c0603,0 0 0 2px #c9a050,0 20px 50px rgba(0,0,0,.7);text-align:center}#dlAsk b{font-family:var(--display);color:#f3d38a;letter-spacing:.04em;font-size:17px}#dlAsk p{margin:0;color:#e6d6b8;font-size:14px;line-height:1.45}#dlAsk small{color:#bfae8e;font-size:12px}#dlAsk .pb{justify-content:center;flex-wrap:wrap}
+.dl-bar{height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(201,160,80,.4)}.dl-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#c9a050,#f6d892);transition:width .4s}
+#dlPill{position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top));white-space:nowrap;transform:translateX(-50%);z-index:150;display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:14px;background:rgba(18,12,6,.88);box-shadow:0 0 0 1px #c9a050;color:#f3d38a;font-size:12px;pointer-events:none}#dlPill .dl-bar{width:70px;height:6px}body.lvOn #dlPill{top:calc(32px + env(safe-area-inset-top))}
 #updBox{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(8,5,3,.8);padding:16px}
 #updBox .upd-in{width:min(420px,100%);display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:6px;background:linear-gradient(#2a1c10,#120b06);box-shadow:0 0 0 1px #0c0603,0 0 0 2px #c9a050,0 20px 50px rgba(0,0,0,.7);text-align:center}
 #updBox b{font-family:var(--display);color:#f3d38a;letter-spacing:.04em}#updBox p{margin:0;color:#e6d6b8;font-size:14px;line-height:1.45}#updBox small{color:#bfae8e;font-size:12px}#updBox .pb{justify-content:center}#updBox a.btn{text-decoration:none;color:#fff;display:inline-flex;align-items:center}
@@ -9829,7 +9833,7 @@ function keepMsg(m,ms){return new Promise(res=>{const sw=navigator.serviceWorker
 function keepPlan(){if(KEEPF.pref==='no')return 0;if(KEEPF.pref==='todo')return 2;const c=navigator.connection||{};if(c.saveData||/2g/.test(c.effectiveType||''))return 0;return(!IS_MOB||(c.type&&c.type!=='cellular'))?2:1;}
 const keepRank=p=>p.startsWith('vendor/')?0:p.startsWith('assets/ui/')?1:p.startsWith('assets/s/')?2:p.startsWith('assets/t')?3:p.startsWith('assets/m/')?9:4;
 const keepMB=b=>b>=10485760?Math.round(b/1048576):Math.round(b/104857.6)/10;
-function keepPaint(){const el=document.getElementById('keepTxt');if(!el)return;el.textContent=KEEPF.total?('Guardado: '+keepMB(Math.min(KEEPF.have,KEEPF.total))+' de '+keepMB(KEEPF.total)+' MB'+(KEEPF.run?' · guardando…':KEEPF.have>=KEEPF.total?' · completo':'')+'.'):'';}
+function keepPaint(){dlPaint();const el=document.getElementById('keepTxt');if(!el)return;el.textContent=KEEPF.total?('Guardado: '+keepMB(Math.min(KEEPF.have,KEEPF.total))+' de '+keepMB(KEEPF.total)+' MB'+(KEEPF.run?' · guardando…':KEEPF.have>=KEEPF.total?' · completo':'')+'.'):'';}
 async function keepStat(){const s=await keepMsg({t:'stat'},20000);if(s&&s.ok){KEEPF.have=s.have;KEEPF.total=s.total;keepPaint();return s;}return null;}
 async function keepWarm(){if(KEEPF.run||!KEEPF.on||!keepPlan())return;KEEPF.run=true;
   try{const s=await keepStat();if(!s)return;const list=s.miss.sort((a,b)=>keepRank(a[0])-keepRank(b[0]));let bad=0,i=0;
@@ -9847,6 +9851,35 @@ function keepInit(){if(!window.__SWREG)return;const go=()=>{if(KEEPF.on||!naviga
   window.__SWREG.then(r=>{if(!r)return;go();navigator.serviceWorker.addEventListener('controllerchange',go);});
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}}
 keepInit();
+/* ===== descargar todo al entrar (20/11, pedido del dueño) =====
+   Si falta bajar mucho (más de 8 MB), la primera vez que termina la carga se ofrece bajar todo el juego de una vez.
+   No es obligatorio: «Ahora no» sigue con el guardado de a poco (vuelve a preguntar a los 7 días si sigue faltando).
+   «Descargar todo» pone el guardado en Todo (como en Ajustes) y muestra el progreso; se puede jugar mientras baja. */
+const DLA={show:false,pill:false,go:false};
+const dlPct=()=>KEEPF.total?Math.min(100,Math.round(KEEPF.have/KEEPF.total*100)):0;
+function dlPaint(){const done=KEEPF.total&&KEEPF.have>=KEEPF.total*.995;const box=document.getElementById('dlAsk');
+  if(box&&DLA.go){const t=box.querySelector('#dlTxt'),i=box.querySelector('.dl-bar i');if(i)i.style.width=dlPct()+'%';if(t)t.textContent=done?'¡Listo! El juego quedó guardado completo en tu equipo.':'Descargando: '+keepMB(Math.min(KEEPF.have,KEEPF.total))+' de '+keepMB(KEEPF.total)+' MB ('+dlPct()+' %)';if(done){const g=box.querySelector('#dlPlay');if(g)g.textContent='Jugar';}}
+  let pl=document.getElementById('dlPill');
+  if(DLA.pill&&!done&&!box){if(!pl){pl=document.createElement('div');pl.id='dlPill';pl.innerHTML='<span>Descargando</span><div class="dl-bar"><i></i></div><span class="dlp"></span>';document.body.appendChild(pl);}pl.querySelector('.dl-bar i').style.width=dlPct()+'%';pl.querySelector('.dlp').textContent=dlPct()+' %';}
+  else if(pl){pl.remove();if(done&&DLA.pill){DLA.pill=false;try{toast('El juego quedó descargado completo en tu equipo.');}catch(e){}}}}
+async function dlFull(){KEEPF.pref='todo';try{localStorage.setItem('noxSave','todo');}catch(e){}
+  for(let k=0;k<4;k++){while(KEEPF.run)await new Promise(r=>setTimeout(r,1000));await keepWarm();const st=await keepStat();if(!st||!st.miss||!st.miss.length)break;}dlPaint();}
+function dlAsk(){if(DLA.show||document.getElementById('dlAsk')||document.getElementById('updBox'))return;const miss=Math.max(0,KEEPF.total-KEEPF.have);DLA.show=true;
+  const c=navigator.connection||{},cel=c.type==='cellular',mb=keepMB(KEEPF.total);
+  const d=document.createElement('div');d.id='dlAsk';d.innerHTML=`<div class="upd-in"><b>Descargar el juego completo</b><p>Te recomendamos descargar todo el contenido del juego (<b style="font-size:inherit">${mb} MB</b>) antes de jugar: así evitás pantallas de carga largas y tirones al llegar a un mapa nuevo. Queda guardado en tu equipo y las próximas veces abre al instante.</p>
+   <small>${cel?'Estás con datos móviles: conviene hacerlo con wifi.':'Conviene hacerlo con wifi.'} Podés jugar mientras se descarga.</small>
+   <div class="dl-bar" hidden><i></i></div><small id="dlTxt" hidden></small>
+   <div class="pb"><button class="btn" id="dlGo">Descargar todo</button><button class="btn ghost" id="dlNo">Ahora no</button></div>
+   <small>Lo podés cambiar cuando quieras en Ajustes → Guardado en el dispositivo.</small></div>`;
+  document.body.appendChild(d);try{localStorage.setItem('noxDlAsk',String(Date.now()));}catch(e){}
+  d.querySelector('#dlNo').onclick=()=>{d.remove();};
+  d.querySelector('#dlGo').onclick=()=>{DLA.go=true;d.querySelector('.dl-bar').hidden=false;d.querySelector('#dlTxt').hidden=false;const pb=d.querySelector('.pb');pb.innerHTML='<button class="btn" id="dlPlay">Jugar mientras se descarga</button>';
+    pb.querySelector('#dlPlay').onclick=()=>{d.remove();DLA.pill=true;dlPaint();};dlPaint();dlFull();};}
+/* se fija una vez, cuando el juego ya terminó de cargar */
+(function dlCheck(){let tries=0;const t=setInterval(async()=>{if(++tries>60){clearInterval(t);return;}
+  if(!KEEPF.on||document.getElementById('boot'))return;clearInterval(t);
+  if(KEEPF.pref==='no')return;let last=0;try{last=+localStorage.getItem('noxDlAsk')||0;}catch(e){}if(last&&Date.now()-last<7*864e5)return;
+  const st=await keepStat();if(!st||!st.total)return;if(st.total-st.have<8*1048576)return;dlAsk();},2000);})();
 async function appUpdateCheck(){const m=navigator.userAgent.match(/NOXAndroid\/([0-9.]+)/);if(!m)return;let mine=m[1];try{if(window.NOXApp&&NOXApp.version)mine=NOXApp.version();}catch(e){}
   let v;try{v=await (await fetch('../version.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!v||!v.version||!v.apk||verCmp(mine,v.version)>=0)return;
   try{if(localStorage.getItem('nox-upd-skip')===v.version&&Date.now()-(+localStorage.getItem('nox-upd-t')||0)<6*3600e3)return;}catch(e){}
