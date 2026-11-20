@@ -2072,22 +2072,60 @@ const GEMS={
  mainumby:{name:'Pluma de Mainumby',col:'#39f0c8',hex:0x2ae0b0,sell:60000,desc:'Pluma del mainumby, el colibrí mensajero de Ñamandu. Se usa en el Caldero de Kerana para crear las alas de tercera generación. La sueltan los jefes y los élites de nivel 50 o más.'},
  kerana:{name:'Gema de Kerana',col:'#ff7a2e',hex:0xff5a10,sell:5000,desc:'Se usa en el Caldero de Kerana para subir de +10 a +15 o para crear alas.'}
 };
-/* cada gema tiene forma y color propios, bien saturados, para reconocerla de un vistazo */
+/* cada gema tiene forma y color propios, bien saturados, para reconocerla de un vistazo.
+   Desde el 20/11 son piedras talladas (pedido del dueño): Tupã brillante redonda (rayo), Jasy talla esmeralda (luna),
+   Yvy cristal de seis caras (tierra), Kerana corazón de ámbar (su belleza y el fuego del caldero).
+   GEMCUT = perfil de anillos [radio, alto, medio paso de giro] alrededor de Y; s = escala en metros. */
+const GEMCUT={
+ tupa:{n:16,p:[[.42,.30],[.72,.08],[.72,.02],[0,-.78]],s:.42},
+ jasy:{n:8,p:[[.5,.26],[.66,.15],[.72,.04],[.56,-.22],[.3,-.42],[.12,-.5]],sx:1.35,off:PI/8,s:.4},
+ yvy:{n:6,p:[[0,1.05],[.36,.55],[.36,-.55],[0,-1.05]],s:.3},
+ kerana:{n:48,heart:1,stand:1,p:[[.38,.24],[.78,.05],[.78,0],[0,-.7]],s:.4}
+};
+let GEMHR=null;function gemHeart(a){if(!GEMHR){GEMHR=[];for(let i=0;i<720;i++){const t=i/720*TAU,x=16*Math.pow(Math.sin(t),3),y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);GEMHR.push([Math.atan2(y+3,x),Math.hypot(x,y+3)/17]);}}
+  let best=1,bd=9;for(const q of GEMHR){const d=Math.abs(((a-q[0])%TAU+TAU+PI)%TAU-PI);if(d<bd){bd=d;best=q[1];}}return best;}
+function gemCutGeo(C){const n=C.n,P=C.p,V=[];
+  for(let k=0;k<P.length;k++)for(let i=0;i<n;i++){const a=(i+(P[k][2]?.5:0))/n*TAU+(C.off||0),m=C.heart?gemHeart(a):1,r=P[k][0]*m;V.push([Math.cos(a)*r*(C.sx||1)*C.s,P[k][1]*C.s,Math.sin(a)*r*C.s]);}
+  const pos=[],col=[];let fi=0;const tri=(A,B,D,sh)=>{for(const v of [A,B,D]){pos.push(v[0],v[1],v[2]);col.push(sh,sh,sh);}};
+  const shade=()=>{const f=fi++;return [1,.8,1.1,.88,1.18,.94][f%6];};
+  for(let k=0;k<P.length-1;k++)for(let i=0;i<n;i++){const j=(i+1)%n,a=V[k*n+i],b=V[k*n+j],c=V[(k+1)*n+j],d=V[(k+1)*n+i],sh=shade();
+    if(P[k][0]>0)tri(a,b,c,sh);if(P[k+1][0]>0)tri(a,c,d,sh);}
+  const cap=(k,up)=>{if(P[k][0]<=0)return;const y=P[k][1]*C.s,ctr=[0,y,0],sh=up?1.2:.85;for(let i=0;i<n;i++){const a=V[k*n+i],b=V[k*n+(i+1)%n];/* que la cara mire hacia afuera (arriba en la mesa, abajo en la base) */const ny=(a[2]-ctr[2])*(b[0]-ctr[0])-(a[0]-ctr[0])*(b[2]-ctr[2]);(ny>0)===!!up?tri(ctr,a,b,sh):tri(ctr,b,a,sh);}};
+  cap(0,1);cap(P.length-1,0);
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));if(C.stand)g.rotateX(-PI/2);/* corazón parado, de frente */
+  g.computeVertexNormals();
+  /* punto alto del borde para el destello en estrella */
+  const pa=g.attributes.position;let top=[0,-9,0];for(let i=0;i<pa.count;i++){const y=pa.getY(i),rr=Math.hypot(pa.getX(i),pa.getZ(i));if(y>top[1]+.001||(Math.abs(y-top[1])<.001&&rr>Math.hypot(top[0],top[2])))top=[pa.getX(i),y,pa.getZ(i)];}g.userData.tip=top;return g;}
 const GEMGEO={};function gemGeoOf(sub){if(GEMGEO[sub])return GEMGEO[sub];let g;
-  if(sub==='tupa'){g=new THREE.OctahedronGeometry(.25,0);g.scale(1,1.35,1);}
-  else if(sub==='jasy'){g=new THREE.OctahedronGeometry(.2,0);g.scale(.85,2,.85);}
-  else if(sub==='yvy'){g=new THREE.DodecahedronGeometry(.24,0);}
-  else if(sub==='mainumby'){g=new THREE.OctahedronGeometry(.2,1);g.scale(.42,1.9,.12);g.rotateZ(.5);}
-  else{g=new THREE.TetrahedronGeometry(.3,0);g.rotateX(.62);g.rotateZ(.6);}
-  g.computeVertexNormals();GEMGEO[sub]=keep(g);return g;}
+  if(GEMCUT[sub])g=gemCutGeo(GEMCUT[sub]);
+  else{g=new THREE.OctahedronGeometry(.2,1);g.scale(.42,1.9,.12);g.rotateZ(.5);g.computeVertexNormals();}
+  GEMGEO[sub]=keep(g);return g;}
+/* materiales compartidos por gema (no se recompilan por cada drop) */
+const GEMMAT={};function gemMats(sub){if(GEMMAT[sub])return GEMMAT[sub];const G=GEMS[sub],c=new THREE.Color(G.hex),lt=c.clone().lerp(new THREE.Color(0xffffff),.45);
+  const M={front:new MSM({color:G.hex,emissive:G.hex,emissiveIntensity:.55,roughness:.05,metalness:0,flatShading:true,vertexColors:true,transparent:true,opacity:.95}),
+    back:new THREE.MeshBasicMaterial({color:lt,vertexColors:true,side:THREE.BackSide,transparent:true,opacity:.32,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}),
+    edge:new THREE.LineBasicMaterial({color:lt,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}),
+    core:new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}),
+    star:new THREE.SpriteMaterial({map:sfxTex('star'),color:0xffffff,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false,fog:false})};
+  for(const k in M)keep(M[k]);GEMMAT[sub]=M;return M;}
+const GEMEDGE={};
 function gemMesh(sub,glow){const G=GEMS[sub],g=new THREE.Group();
   /* la pluma de mainumby es una pluma de verdad: verde tornasol, punta violeta, con su raquis */
   if(sub==='mainumby'){const f=cc0Feather(.62,.17,cc0FeatherTex('#07463e','#22e0c0','#a83aff'));f.position.set(.1,-.3,0);f.rotation.z=.45;g.add(f);
     f.traverse(o=>{if(o.material){o.material=o.material.clone();o.material.emissive=new THREE.Color(0x04382e);o.material.emissiveIntensity=.35;o.material.roughness=.35;o.material.metalness=.25;o.material.side=THREE.DoubleSide;}});
     if(glow){const sp=glowSprite(G.hex,1.1,.6);g.add(sp);g.userData.sp=sp;}return g;}
-  const m=new THREE.Mesh(gemGeoOf(sub),new MSM({color:G.hex,emissive:G.hex,emissiveIntensity:.95,roughness:.06,metalness:.15,flatShading:true}));g.add(m);
-  const core=new THREE.Mesh(gemGeoOf(sub),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));core.scale.setScalar(.5);g.add(core);
-  if(glow){const sp=glowSprite(G.hex,1.25,.75);g.add(sp);g.userData.sp=sp;}return g;}
+  const geo=gemGeoOf(sub),M=gemMats(sub);
+  /* caras de atrás vistas a través de la piedra, después la cara de adelante y las aristas.
+     En el ícono (sin glow) la piedra va opaca: con transparencia el fondo del ícono se veía por el medio */
+  if(glow){const bk=new THREE.Mesh(geo,M.back);bk.renderOrder=1;g.add(bk);}
+  const m=new THREE.Mesh(geo,glow?M.front:(M.solid||(M.solid=keep(Object.assign(M.front.clone(),{transparent:false,opacity:1,emissiveIntensity:.22})))));m.renderOrder=2;g.add(m);
+  const eg=GEMEDGE[sub]||(GEMEDGE[sub]=keep(new THREE.EdgesGeometry(geo,8)));const ed=new THREE.LineSegments(eg,M.edge);ed.renderOrder=3;g.add(ed);
+  if(glow){const core=new THREE.Mesh(geo,M.core);core.scale.setScalar(.42);core.renderOrder=3;g.add(core);g.userData.core=core;}
+  if(glow){const sp=glowSprite(G.hex,1.25,.75);g.add(sp);g.userData.sp=sp;
+    /* destello en estrella que salta en el borde (lo anima updateDrops) */
+    const st=new THREE.Sprite(M.star);
+    const tp=geo.userData.tip||[0,.1,0];st.position.set(tp[0],tp[1],tp[2]);st.scale.setScalar(.01);st.renderOrder=4;g.add(st);g.userData.star=st;}
+  return g;}
 const POTS={
  hp1:{name:'Poción de vida chica',kind:'hp',pct:.2,add:20,price:200},hp2:{name:'Poción de vida mediana',kind:'hp',pct:.35,add:60,price:900},hp3:{name:'Poción de vida grande',kind:'hp',pct:.55,add:150,price:2400},
  mp1:{name:'Poción de maná chica',kind:'mp',pct:.2,add:15,price:200},mp2:{name:'Poción de maná mediana',kind:'mp',pct:.35,add:40,price:900},mp3:{name:'Poción de maná grande',kind:'mp',pct:.55,add:90,price:2400}
@@ -6269,7 +6307,7 @@ function irObject(it){const c=it.c,t=it.t;let o=null,mode='prop',region=null;
   else if(it.k==='pot'){const P=POTS[it.sub],sz=it.sub.endsWith('3')?1.2:it.sub.endsWith('2')?1.05:.9;o=new THREE.Group();const liq=P.kind==='hp'?0xd8202a:0x2a5ad8;
     const gl=new THREE.Mesh(new THREE.LatheGeometry([[.001,0],[.32,.02],[.42,.2],[.44,.42],[.36,.62],[.16,.74],[.12,.92],[.14,1.0]].map(p=>new THREE.Vector2(p[0],p[1])),20),new MSM({color:0xdff4ff,roughness:.05,metalness:.1,transparent:true,opacity:.38,side:THREE.DoubleSide}));
     const lq=new THREE.Mesh(new THREE.SphereGeometry(.38,20,14,0,TAU,PI*.28,PI*.72),new MSM({color:liq,emissive:liq,emissiveIntensity:.55,roughness:.2}));lq.position.y=.38;const ck=new THREE.Mesh(new THREE.CylinderGeometry(.12,.1,.16,10),new MSM({color:0x8a5a32,roughness:.9}));ck.position.y=1.04;o.add(gl,lq,ck);o.scale.setScalar(sz);mode='obj';}
-  else if(it.k==='gem'){o=gemMesh(it.sub,false);o.scale.setScalar(2);o.rotation.y=.5;mode='obj';}
+  else if(it.k==='gem'){o=gemMesh(it.sub,false);o.scale.setScalar(2);o.rotation.y=.5;if(it.sub==='tupa'||it.sub==='jasy')o.rotation.x=.55;mode='obj';}
   else if(it.k==='mat'){o=matMesh(it.sub);mode='obj';}
   else if(it.k==='scroll'){o=new THREE.Group();const p=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,1.1,16),new MSM({color:0xe8dcb4,roughness:.9}));p.rotation.z=PI/2.6;const bd=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.12,16),new MSM({color:0xb02a20,roughness:.6}));bd.rotation.z=PI/2.6;o.add(p,bd);mode='obj';}
   else if(it.k==='quest'&&it.sub==='mascara_ana'){o=new THREE.Group();const f=new THREE.Mesh(new THREE.SphereGeometry(.55,20,14,0,TAU,0,PI*.62),new MSM({color:0x7a0e0a,roughness:.4,metalness:.3,emissive:0x3a0402,side:THREE.DoubleSide}));f.scale.set(.85,1.1,.55);f.rotation.x=PI/2;o.add(f);
@@ -7731,7 +7769,8 @@ function updateDrops(dt){for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.t
   if(d.ico){if(!d.icoOK&&(d.tryT=(d.tryT||0)-dt)<=0){d.tryT=.4;const it=d.obj.item,fs=iconFiles(it);if(fs.length&&!oadHave(fs))oadNeed(fs,()=>{});else{let mdl=null;try{mdl=dropModel(it);}catch(e){mdl=null;}
       if(mdl){d.icoOK=1;d.ico.add(mdl);d.ico.remove(d.ico.userData.ph);d.ico.userData.ph.material.dispose();}else if((d.fails=(d.fails||0)+1)>8){d.icoOK=1;}}}}
   else if(d.g.children[0])d.g.children[0].rotation.y+=dt*2;
-  {const c=d.g.children[0];if(c&&c.userData.sp){c.position.y=.38+Math.sin(d.t*2.4)*.06;c.userData.sp.material.opacity=.55+.3*Math.sin(d.t*4.5);d.spk=(d.spk||0)-dt;if(d.spk<=0&&d.vy===-99){d.spk=.55;parts(d.x,d.g.position.y+.45,d.z,{n:3,col:GEMS[d.obj.item.sub].hex,spd:.6,up:1.2,grav:-.2,life:.8,size:.12,op:.9});}}}
+  {const c=d.g.children[0];if(c&&c.userData.star){const st=c.userData.star,ph=(d.t+d.x*.37)%1.7,e=ph<.5?Math.sin(ph/.5*PI):0;st.scale.setScalar(.001+.62*e);if(c.userData.core)c.userData.core.scale.setScalar(.42*(1+.12*Math.sin(d.t*3.3)));}
+  if(c&&c.userData.sp){c.position.y=.38+Math.sin(d.t*2.4)*.06;c.userData.sp.material.opacity=.55+.3*Math.sin(d.t*4.5);d.spk=(d.spk||0)-dt;if(d.spk<=0&&d.vy===-99){d.spk=.55;parts(d.x,d.g.position.y+.45,d.z,{n:3,col:GEMS[d.obj.item.sub].hex,spd:.6,up:1.2,grav:-.2,life:.8,size:.12,op:.9});}}}
   if(d.gl){const k=Math.sin(d.t*2.2+d.x*.7);d.gl.halo.scale.setScalar(d.gl.S*(1+.09*k));d.gl.halo.material.opacity=.44+.14*k;d.gl.core.scale.setScalar(d.gl.S*.4*(1+.06*Math.sin(d.t*3.4)));d.gl.core.material.opacity=.72+.16*Math.sin(d.t*3.4);
     if(!d.gl.gem){d.gsp=(d.gsp||0)-dt;if(d.gsp<=0&&d.vy===-99){d.gsp=.75;parts(d.x,d.g.position.y+.45,d.z,{n:2,col:d.gl.col,spd:.8,up:.5,grav:-.1,life:.9,size:.1,op:.9});}}}
   if(d.t>90)removeDrop(d);}}
@@ -9949,7 +9988,7 @@ function verCmp(a,b){const x=String(a||'0').split('.').map(n=>parseInt(n)||0),y=
 /* ===== parches: aviso de actualización en todos los dispositivos =====
    Cada publicación escribe jugar/build.json (scripts/patch.sh): "build" es el parche nuevo, "min" el mínimo para jugar en línea
    y "notes" lo que cambió. El juego lo revisa al abrir, cada 3 minutos y al volver a la pestaña. */
-const NOX_BUILD='202611201953';const UPD={shown:'',req:false};
+const NOX_BUILD='202611201954';const UPD={shown:'',req:false};
 async function updCheck(){if(!/^https?:$/.test(location.protocol))return;let j;try{j=await (await fetch('build.json?'+Date.now(),{cache:'no-store'})).json();}catch(e){return;}if(!j||!j.build||j.build<=NOX_BUILD)return;updShow(j,!!(j.min&&NOX_BUILD<j.min));}
 function updShow(j,req){if(!(j.notes&&j.notes.length)&&!j._f){fetch('build.json?'+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(k=>updShow(Object.assign({},j,k&&k.build>=j.build?k:{},{_f:1}),req)).catch(()=>updShow(Object.assign({},j,{_f:1}),req));return;}if(UPD.req&&!req)return;if(UPD.shown===j.build+(req?'r':'')&&document.getElementById('patchBox'))return;UPD.shown=j.build+(req?'r':'');UPD.req=UPD.req||req;window.__UPDREQ=UPD.req;
   if(req){try{LIVE.want=false;LIVE.block=true;if(LIVE.ws)LIVE.ws.close();}catch(e){}}
