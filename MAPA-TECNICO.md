@@ -155,6 +155,7 @@ Un solo archivo HTML de unos 1,4 MB con three.js r128, servido desde `public/jug
   - `BSND`: voces de cada criatura.
   - `BEDZ`: ambientes por zona. `MUSZ`: música por zona (`assets/m`).
   - `stepSurface`: qué sonido de pasos va en cada suelo.
+  - Vuelo (20/11): con `HERO.wings` y `HERO.flyK>.25` no suenan pasos; `stepTick` llama a `flyTick`: alas = un aleteo suave (`fly_ala1..3`, Arquera `fly_hada1..2`) cada vez que `HERO.beat` cruza de + a − (≈1,25 por segundo, al ritmo del aleteo), capa del Mburuvicha (`wings.capeW`) = soplo de aire `fly_capa1..2` cada 1,15 s. Solo al moverse (quieto en el aire no suena). Grabaciones de 0 A.D. (arrowfly y windgust), en `sndCore`.
   - `sndCore`: lo que se precarga.
 
 ### Modelos

@@ -221,3 +221,10 @@ Todo el audio del juego es gratuito y de licencia libre. Cada archivo de `public
 | bahianegra.mp3 | Valley of the Nile | CC BY-SA 3.0, Wildfire Games |
 | raid.mp3 | Taiko 2 | CC BY-SA 3.0, Wildfire Games |
 | duelo.mp3 | Honor Bound | CC BY-SA 3.0, Wildfire Games |
+| fly_ala1.mp3 | 0ad/attack/weapon/arrowfly_01.ogg, más grave (×0,68) y filtrado (aleteo suave al volar con alas) | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| fly_ala2.mp3 | 0ad/attack/weapon/arrowfly_02.ogg, más grave (×0,68) y filtrado | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| fly_ala3.mp3 | 0ad/attack/weapon/arrowfly_09.ogg, más grave (×0,68) y filtrado | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| fly_hada1.mp3 | 0ad/attack/weapon/arrowfly_05.ogg, filtrado (aleteo liviano de las alas de hada) | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| fly_hada2.mp3 | 0ad/attack/weapon/arrowfly_06.ogg, filtrado | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| fly_capa1.mp3 | 0ad/ambient/weather/windgust_11.ogg (1,1–2,5 s), filtrado (soplo de aire al volar con capa) | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
+| fly_capa2.mp3 | 0ad/ambient/weather/windgust_11.ogg (3,0–4,4 s), más grave (×0,9) y filtrado | 0 A.D. (Wildfire Games) | CC BY-SA 3.0 |
