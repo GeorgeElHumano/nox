@@ -54,7 +54,7 @@ export class Sim {
   hit(uid, n, d, px, pz) { // golpe de un jugador; px,pz = empuje del poder en metros (tope 4, los jefes no se mueven)
     const m = this.mobs.find(x => x.n === n); if (!m || m.dead) return null;
     px = +px || 0; pz = +pz || 0;
-    if ((px || pz) && !m.boss && !m.dash && isFinite(px) && isFinite(pz)) { const l = Math.hypot(px, pz), k = l > 4 ? 4 / l : 1; m.x = Math.max(-110, Math.min(110, m.x + px * k)); m.z = Math.max(-110, Math.min(110, m.z + pz * k)); m.stun = Math.max(m.stun || 0, .32); }
+    if ((px || pz) && !m.boss && !m.dash && isFinite(px) && isFinite(pz)) { const l = Math.hypot(px, pz), k = l > 4 ? 4 / l : 1; const L = 110 * (this.Z.ext || 1); m.x = Math.max(-L, Math.min(L, m.x + px * k)); m.z = Math.max(-L, Math.min(L, m.z + pz * k)); m.stun = Math.max(m.stun || 0, .32); }
     d = Math.max(0, Math.min(5e6, +d || 0)); m.hp -= d; m.contrib[uid] = (m.contrib[uid] || 0) + d; m.aggro = 10; m.ret = false;
     if (m.raidBoss && !this.raidStart) this.raidStart = this.t;
     if (m.hp <= 0) return this.kill(m);
@@ -72,7 +72,7 @@ export class Sim {
     for (let i = this.pend.length - 1; i >= 0; i--) if (this.pend[i].at <= this.t) { const p = this.pend.splice(i, 1)[0]; try { p.fn(); } catch (e) {} }
     const alive = players.filter(p => p.p && !p.p.d);
     // invasión dorada cada 4 minutos cerca de alguien
-    if (!this.raid && alive.length) { this.goldT -= dt; if (this.goldT <= 0) { this.goldT = 240; const sp = (this.Z.spots || [])[0]; if (sp && !MOBS[sp.m].boss) { const p = alive[Math.floor(Math.random() * alive.length)].p; const a = Math.random() * TAU, r = R(18, 35); let x = Math.max(-108, Math.min(108, p.x + Math.cos(a) * r)), z = Math.max(-108, Math.min(108, p.z + Math.sin(a) * r)); if (inLake(this.Z, x, z, 3)) { x = this.Z.spawn[0] + 20; z = this.Z.spawn[1] + 20; } this.add(sp.m, x, z, { golden: true }); this.emit({ t: 'sys', m: '¡Invasión dorada! Apareció un ' + MOBS[sp.m].n + ' Dorado cerca' }); } } }
+    if (!this.raid && alive.length) { this.goldT -= dt; if (this.goldT <= 0) { this.goldT = 240; const sp = (this.Z.spots || [])[0]; if (sp && !MOBS[sp.m].boss) { const p = alive[Math.floor(Math.random() * alive.length)].p; const a = Math.random() * TAU, r = R(18, 35); const L = 108 * (this.Z.ext || 1); let x = Math.max(-L, Math.min(L, p.x + Math.cos(a) * r)), z = Math.max(-L, Math.min(L, p.z + Math.sin(a) * r)); if (inLake(this.Z, x, z, 3)) { x = this.Z.spawn[0] + 20; z = this.Z.spawn[1] + 20; } this.add(sp.m, x, z, { golden: true }); this.emit({ t: 'sys', m: '¡Invasión dorada! Apareció un ' + MOBS[sp.m].n + ' Dorado cerca' }); } } }
     // la sala de Añaretã se consume si tardan demasiado
     if (this.raid && this.raidStart && this.t - this.raidStart > RAID_TIME) { this.doomT = (this.doomT || 0) - dt; if (this.doomT <= 0) { this.doomT = 3; const b = this.mobs.find(m => m.raidBoss && !m.dead); if (b) this.tele(b, 'doom', { t: 'circle', r: 60 }, b.x, b.z, 2, 8); } }
 
@@ -110,7 +110,7 @@ export class Sim {
       if (sp > 0) { m.x += mx * sp * dt; m.z += mz * sp * dt; m.ry = Math.atan2(mx, mz); }
       for (const o of this.mobs) { if (o === m || o.dead) continue; const ox = m.x - o.x, oz = m.z - o.z, od = Math.hypot(ox, oz), mn = .9; if (od < mn && od > 1e-3) { m.x += ox / od * (mn - od) * .5; m.z += oz / od * (mn - od) * .5; } }
       if (inLake(this.Z, m.x, m.z, 0)) { const L = this.Z.lake, lx = m.x - L[0], lz = m.z - L[1], ld = Math.hypot(lx, lz) || 1; m.x = L[0] + lx / ld * L[2]; m.z = L[1] + lz / ld * L[2]; }
-      m.x = Math.max(-110, Math.min(110, m.x)); m.z = Math.max(-110, Math.min(110, m.z));
+      { const L = 110 * (this.Z.ext || 1); m.x = Math.max(-L, Math.min(L, m.x)); m.z = Math.max(-L, Math.min(L, m.z)); }
     }
   }
 

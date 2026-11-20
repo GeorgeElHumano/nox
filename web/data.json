@@ -537,7 +537,19 @@
    "cost": 3000000,
    "spots": [
     [
-     "Guarida del Kurupí",
+     "Manantial del Y Jára",
+     "yjararv"
+    ],
+    [
+     "Estero del Mbói Tu'i",
+     "mboituirv"
+    ],
+    [
+     "Naranjal de la Siesta",
+     "jasyjatererv"
+    ],
+    [
+     "Árbol del Kurupí",
      "kurupirv"
     ],
     [
@@ -545,24 +557,28 @@
      "aoaorv"
     ],
     [
+     "Gruta del Teju Jagua",
+     "tejurv"
+    ],
+    [
+     "Cementerio del Luisón",
+     "luisonrv"
+    ],
+    [
      "Cueva del Moñái",
      "monairv"
-    ],
-    [
-     "Siesta del Jasy Jateré",
-     "jasyjatererv"
-    ],
-    [
-     "Brasero de Añá",
-     "anabossrv"
     ],
     [
      "Peña del Yaguareté-Abá",
      "yaguaretabarv"
     ],
     [
-     "Manantial del Y Jára",
-     "yjararv"
+     "Brasero de Añá",
+     "anabossrv"
+    ],
+    [
+     "Lecho de Kerana",
+     "keranarv"
     ],
     [
      "Trono de Tau",
@@ -810,6 +826,13 @@
    "zones": [
     "bahianegra"
    ]
+  },
+  "kerana": {
+   "name": "Kerana",
+   "lvl": 108,
+   "boss": true,
+   "ficha": "Kerana: la madre de los siete hijos de Tau. Duerme en un lecho de flores pálidas; cuando despierta, la niebla se vuelve violeta y su canto hace dormir a los guerreros.",
+   "zones": []
   },
   "ypora": {
    "name": "Yporã",
@@ -1269,6 +1292,46 @@
     "treskandu"
    ],
    "base": "tau"
+  },
+  "tejurv": {
+   "name": "Teju Jagua Ruvicha",
+   "lvl": 415,
+   "boss": true,
+   "ficha": "Teju Jagua Ruvicha («el jefe»): Teju Jagua en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "teju"
+  },
+  "mboituirv": {
+   "name": "Mbói Tu'i Ruvicha",
+   "lvl": 425,
+   "boss": true,
+   "ficha": "Mbói Tu'i Ruvicha («el jefe»): Mbói Tu'i en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "mboitui"
+  },
+  "luisonrv": {
+   "name": "Luisón Ruvicha",
+   "lvl": 435,
+   "boss": true,
+   "ficha": "Luisón Ruvicha («el jefe»): Luisón en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "luison"
+  },
+  "keranarv": {
+   "name": "Kerana Ruvicha",
+   "lvl": 465,
+   "boss": true,
+   "ficha": "Kerana Ruvicha («el jefe»): Kerana en la cumbre de su poder, en el Cerro Tres Kandú, el techo del Paraguay. Tiene todos sus ataques, llama a bestias Ypykue y vuelve a aparecer cada 10 minutos. Es para grupos de héroes con unos 20 reinicios.",
+   "zones": [
+    "treskandu"
+   ],
+   "base": "kerana"
   }
  },
  "cls": {
