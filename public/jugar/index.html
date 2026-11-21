@@ -1845,7 +1845,7 @@ const PRF={on:false,t:0,s:{},n:0};
 function pk(k){if(!PRF.on)return;const n=performance.now();PRF.s[k]=(PRF.s[k]||0)+n-PRF.t;PRF.t=n;}
 function benchGPU(){try{const gl=renderer.getContext();const x=gl.getExtension('WEBGL_debug_renderer_info');return x?gl.getParameter(x.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);}catch(e){return '?';}}
 function benchInfo(){const n=navigator;return {equipo:(n.userAgentData&&n.userAgentData.platform)||n.platform||'',nav:n.userAgent,nucleos:n.hardwareConcurrency||'?',memoria:n.deviceMemory?n.deviceMemory+' GB':'?',gpu:benchGPU(),pantalla:innerWidth+'×'+innerHeight+' ×'+(devicePixelRatio||1),webgl:renderer.capabilities.isWebGL2?2:1};}
-function benchBtn(){if(!/[?&]prueba=1/.test(location.search)||mode!=='game'||BENCH.btn)return;const b=document.createElement('button');b.id='benchBtn';b.className='btn sm';b.textContent='Medir rendimiento';b.style.cssText='position:fixed;left:calc(env(safe-area-inset-left,0px) + 8px);top:50%;z-index:98';b.onclick=()=>benchRun();document.body.appendChild(b);BENCH.btn=b;}
+function benchBtn(){if(!/[?&]prueba=1/.test(location.search)||mode!=='game'||BENCH.btn)return;const b=document.createElement('button');b.id='benchBtn';b.className='btn sm';b.textContent='Medir rendimiento';b.style.cssText='position:fixed;left:calc(env(safe-area-inset-left,0px) + 8px);top:50%;z-index:98';b.onclick=()=>benchRun();document.body.appendChild(b);BENCH.btn=b;/* (20/11) segundo botón: solo los mapas de reinicios (los más pesados) */const b2=b.cloneNode();b2.id='benchBtn2';b2.textContent='Medir mapas de reinicios';b2.style.top='calc(50% + 44px)';b2.onclick=()=>benchRun('fin');document.body.appendChild(b2);}
 function benchMsg(h){let m=document.getElementById('benchBox');if(!m){m=document.createElement('div');m.id='benchBox';m.style.cssText='position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:rgba(10,12,32,.55);font:14px/1.4 Cormorant Garamond,Georgia,serif;color:#f4ead2';document.body.appendChild(m);}m.innerHTML='<div style="background:#1a1d47;border:1px solid #c9a24a;border-radius:12px;padding:16px 18px;max-width:min(92vw,520px);max-height:86vh;overflow:auto">'+h+'</div>';return m;}
 const wait_=ms=>new Promise(r=>setTimeout(r,ms));
 /* PNJ, animales y gente del ambiente fuera de escena (prueba «sin personajes»: cuánto cuestan) */
@@ -1861,8 +1861,9 @@ function benchCpu(p){const q=Object.assign({},p);q.escena=Math.max(0,(q.dibujo||
 /* qué pesa más en esa zona: lo que más sube los FPS al sacarlo */
 function benchWhy(r){if(!r.v)return '';const g=[['sin personajes','personajes (PNJ y ambiente)'],['sin sombras','sombras'],['mitad de resolución','píxeles (placa de video)']].map(([k,t])=>[t,(r.v[k]||0)-r.fps]).sort((a,b)=>b[1]-a[1]);
   return g[0][1]>=3?'Lo que más pesa: '+g[0][0]+(g[1][1]>=3?', después '+g[1][0]:''):'Ninguna prueba sola lo mejora: pesa todo junto (procesador)';}
-async function benchRun(){if(BENCH.on)return;BENCH.on=true;const z0=Z.id,p0=[P.x,P.z],list=['asuncion','campos','chaco','esteros','cerrocora'],res=[];const fv=FPSM.on;FPSM.on=true;fpsBox();const pr0=DYN.cur||renderer.getPixelRatio();
-  try{for(let i=0;i<list.length;i++){const z=list[i];benchMsg('<b>Midiendo '+ZONES[z].name+'</b><br>'+(i+1)+' de '+list.length+'. No toques la pantalla.');loadZone(z);await wait_(4000);{const tw=performance.now();while(OAD.pend>0&&performance.now()-tw<30000)await wait_(500);}await wait_(3000);const m=document.getElementById('benchBox');if(m)m.style.background='transparent',m.style.alignItems='flex-end';
+/* (20/11) también los mapas de reinicios; en Tres Kandú se mide desde el centro, donde se ven los altares */const BENCHPOS={treskandu:[0,30],saltosguaira:[0,10]};
+async function benchRun(k){if(BENCH.on)return;BENCH.on=true;const z0=Z.id,p0=[P.x,P.z],list=k==='fin'?['cerroleon','saltosguaira','treskandu']:['asuncion','campos','chaco','esteros','cerrocora','cerroleon','saltosguaira','treskandu'],res=[];const fv=FPSM.on;FPSM.on=true;fpsBox();const pr0=DYN.cur||renderer.getPixelRatio();
+  try{for(let i=0;i<list.length;i++){const z=list[i];benchMsg('<b>Midiendo '+ZONES[z].name+'</b><br>'+(i+1)+' de '+list.length+'. No toques la pantalla.');loadZone(z,BENCHPOS[z]);await wait_(4000);{const tw=performance.now();while(OAD.pend>0&&performance.now()-tw<30000)await wait_(500);}await wait_(3000);const m=document.getElementById('benchBox');if(m)m.style.background='transparent',m.style.alignItems='flex-end';
       const r=await benchMeasure(8000);r.zona=ZONES[z].name;
       r.pnj=npcs.filter(n=>n.m&&n.m.oad&&Math.hypot(P.x-n.x,P.z-n.z)<60).length;r.vida=LIFE.filter(c=>c.g&&c.g.visible).length;
       /* zona lenta: tres pruebas cortas sacando una cosa por vez */
@@ -2805,7 +2806,10 @@ function mergeStatic(G,dyn,moved){if(!G||(Z&&Z.event)||window.__NOBAKE)return 0;
 /* personajes del pueblo (PNJ, vecinos): proyectan sombra solo cerca del jugador (en el celular, 16 m) */
 function charShadow(o,g,d){if(!g)return;const lt=LITE(),on=d<(lt?16:QHI()?(IS_MOB?20:36):24),eye=d<(lt?12:18);if(o.shOn===on&&o.eyOn===eye&&o.shG===g)return;if(o.shG!==g){o.shG=g;o.shL=[];o.eyL=[];g.traverse(x=>{if(x.isMesh&&x.castShadow)o.shL.push(x);if(x.isMesh&&/^(Eyes|Eyebrows|Eyelashes)$/.test(x.name))o.eyL.push(x);});o.shOn=o.eyOn=null;}
   if(o.shOn!==on){o.shOn=on;for(const x of o.shL)x.castShadow=on;}/* de lejos los ojos y las cejas no se distinguen: se ocultan (2 llamadas menos por persona) */if(o.eyOn!==eye){o.eyOn=eye;for(const x of o.eyL)x.visible=eye;}}
-function mobShadow(e,d){const on=d<(LITE()?20:QHI()?(IS_MOB?28:36):24)||e.def.boss;if(e.shOn===on)return;if(!e.shL){e.shL=[];e.g.traverse(o=>{if(o.isMesh&&o.castShadow)e.shL.push(o);});}e.shOn=on;for(const o of e.shL)o.castShadow=on;}
+/* (20/11, rendimiento) los jefes de spot (Cerro Tres Kandú tiene doce, uno por altar) se ocultan de lejos como los demás mobs, pero más tarde;
+   el jefe único de un mapa (Z.boss) sigue siempre a la vista. Antes los doce se animaban y dibujaban siempre, aunque estuvieran a 200 m. */
+const BOSSFAR=()=>Q.level==='ultra'?150:QHI()?110:90;
+function mobShadow(e,d){const on=d<(LITE()?20:QHI()?(IS_MOB?28:36):24)||(e.def.boss&&(!e.spot||d<40));if(e.shOn===on)return;if(!e.shL){e.shL=[];e.g.traverse(o=>{if(o.isMesh&&o.castShadow)e.shL.push(o);});}e.shOn=on;for(const o of e.shL)o.castShadow=on;}
 /* mobs hechos con piezas (serpientes, bichos de 4 patas, alacranes): une las piezas quietas de cada grupo animado
    (cabeza, mandíbula, pata, pájaros) que comparten material, en el espacio del grupo. Lo que el código mueve por su cuenta
    (referenciado directo, alas, llamas, ojos) queda aparte. Los mobs con animación de modelo (mixer) no se tocan. */
@@ -6076,7 +6080,9 @@ function haloTex(){if(HALOT)return HALOT;const c=document.createElement('canvas'
 let ALTDOME=[];
 /* todos los domos en una sola malla (una llamada de dibujo): dos capas de media esfera con niebla que se mueve (ruido en la placa), más densa abajo y en el borde */
 function altDomeFlush(G){const D=ALTDOME;ALTDOME=[];if(!D.length)return;const base=new THREE.SphereGeometry(1,40,14,0,TAU,0,PI/2).toNonIndexed(),bp=base.attributes.position,bn=base.attributes.normal,n=bp.count;
-  const L=[[1,.8],[.8,.6],[.55,.5]],N=D.length*L.length*n,P=new Float32Array(N*3),NR=new Float32Array(N*3),CO=new Float32Array(N*3),OR=new Float32Array(N*4),K=new Float32Array(N*2);let i=0;const c=new THREE.Color();
+  /* (20/11, rendimiento) parado adentro de un domo (donde se pelea con el jefe) cada capa cubre la pantalla entera dos veces (cara de adelante y de atrás)
+     con ruido en cada píxel: 3 capas = 6 pantallas. En celular, Lite usa 1 capa y Media 2, un poco más fuertes para que el color quede parecido. */
+  const L=IS_MOB&&Q.level==='bajo'?[[1,1.35]]:IS_MOB&&Q.level==='medio'?[[1,1.05],[.62,.85]]:[[1,.8],[.8,.6],[.55,.5]],N=D.length*L.length*n,P=new Float32Array(N*3),NR=new Float32Array(N*3),CO=new Float32Array(N*3),OR=new Float32Array(N*4),K=new Float32Array(N*2);let i=0;const c=new THREE.Color();
   for(const [x,y,z,r,h,col,ph] of D){c.setHex(col);for(const [ks,kk] of L){const R=r*ks,Hh=h*ks;for(let v=0;v<n;v++,i++){P[i*3]=x+bp.getX(v)*R;P[i*3+1]=y+bp.getY(v)*Hh;P[i*3+2]=z+bp.getZ(v)*R;NR[i*3]=bn.getX(v)/R;NR[i*3+1]=bn.getY(v)/Hh;NR[i*3+2]=bn.getZ(v)/R;CO[i*3]=c.r;CO[i*3+1]=c.g;CO[i*3+2]=c.b;OR[i*4]=x;OR[i*4+1]=y;OR[i*4+2]=z;OR[i*4+3]=Hh;K[i*2]=kk;K[i*2+1]=ph*6.28;}}}
   base.dispose();const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(P,3));g.setAttribute('normal',new THREE.BufferAttribute(NR,3));g.setAttribute('aC',new THREE.BufferAttribute(CO,3));g.setAttribute('aO',new THREE.BufferAttribute(OR,4));g.setAttribute('aK',new THREE.BufferAttribute(K,2));
   const U={uT:{value:0},uI:{value:Q.level==='bajo'?.75:1}};
@@ -6778,7 +6784,18 @@ function addHouse(G,x,z,ry,w,d,h){
 }
 function addFlag(G,x,y,z,ry){const pole=mk(CYL(.05,.06,4,6),mat(0x3a2a20),x,y+2,z,G);const geo=new THREE.PlaneGeometry(1.6,1,10,4);geo.translate(.8,0,0);const f=new THREE.Mesh(geo,TM.flag);f.position.set(x,y+3.4,z);f.rotation.y=ry;G.add(f);const base=geo.attributes.position.array.slice();
   AMB.push(()=>{const a=geo.attributes.position.array;for(let i=0;i<a.length;i+=3){const u=base[i];a[i+2]=Math.sin(u*3-T*5)*.12*u;}geo.attributes.position.needsUpdate=true;});}
-function addFire(G,x,y,z,col,ints){FIRES.push({x,z});const L=new THREE.PointLight(col||0xff8a3a,ints||2,14,1.6);L.position.set(x,y+.6,z);G.add(L);const fl=[];
+/* (20/11, rendimiento) luces de fuego compartidas: cada luz puntual se suma al sombreado de TODO el mapa (three.js recorre todas en cada píxel),
+   y Cerro Tres Kandú tenía 8 fuegos = 14 luces. Fuera de Ultra el mapa tiene como mucho FIRELN() luces reales que se mudan a los fuegos más cercanos;
+   los demás fuegos siguen con sus llamas y brasas. En Ultra, una luz por fuego como antes. */
+let FIREP=[],FIREL=[];const FIRELN=()=>Q.level==='ultra'?99:QHI()&&!IS_MOB?3:2;
+function fireLight(G,x,y,z,col,ints){const f={x,y:y+.6,z,col:col||0xff8a3a,ints:ints||2,k:ints||2};FIREP.push(f);
+  if(FIREL.length<FIRELN()){const L=new THREE.PointLight(f.col,f.ints,14,1.6);L.position.set(x,f.y,z);G.add(L);const pl={L,f,fade:1};FIREL.push(pl);
+    if(FIREL.length===1){let t=0;AMB.push(dt=>{t-=dt;if(t<=0){t=.35;/* los más cercanos al jugador (o a la cámara en la portada) */const px=P.x,pz=P.z;
+        if(FIREP.length>FIREL.length){const near=FIREP.slice().sort((a,b)=>Math.hypot(a.x-px,a.z-pz)-Math.hypot(b.x-px,b.z-pz)).slice(0,FIREL.length);
+          const free=FIREL.filter(q=>!near.includes(q.f));for(const nf of near){if(FIREL.some(q=>q.f===nf))continue;const q=free.shift();if(!q)break;q.f=nf;q.fade=0;q.L.position.set(nf.x,nf.y,nf.z);q.L.color.setHex(nf.col);}}}
+      for(const q of FIREL){q.fade=Math.min(1,q.fade+dt*3);q.L.intensity=q.f.k*q.fade;}});}}
+  return f;}
+function addFire(G,x,y,z,col,ints){FIRES.push({x,z});const LF=fireLight(G,x,y,z,col,ints),L={set intensity(v){LF.k=v;}};const fl=[];
   for(let i=0;i<3;i++){const f=new THREE.Mesh(CONE(.28-i*.06,.9-i*.15,8),new THREE.MeshBasicMaterial({color:[0xff6a1a,0xffa53a,0xffe08a][i],transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));f.position.set(x,y+.35,z);G.add(f);fl.push(f);}
   const NE=14,eg=new THREE.BufferGeometry(),ea=new Float32Array(NE*3),eL=[];for(let i=0;i<NE;i++){ea[i*3]=x;ea[i*3+1]=y+Math.random()*3;ea[i*3+2]=z;eL.push(Math.random());}eg.setAttribute('position',new THREE.BufferAttribute(ea,3));
   G.add(new THREE.Points(eg,new THREE.PointsMaterial({map:glowTex,color:0xff9a3a,size:.16,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
@@ -7402,9 +7419,9 @@ function drawMinimap(){const W=mmCv.width,s=W/110;mmX.setTransform(1,0,0,1,0,0);
 /* carga de zona */
 function clearZone(){
   if(zoneG){scene.remove(zoneG);disposeTree(zoneG);}
-  for(const p of projs){scene.remove(p.m);}for(const f of FX){scene.remove(f.m);disposeTree(f.m);}
+  for(const p of projs){scene.remove(p.m);}for(const f of FX){scene.remove(f.m);disposeTree(f.m);}SPK.clear();
   LBL.forEach(l=>l.el.remove());LBL.length=0;
-  colliders=[];enemies=[];drops=[];npcs=[];portals=[];AMB=[];projs=[];FX=[];LATER.length=0;CHIMNEYS=[];LIFE=[];FIRES=[];
+  colliders=[];enemies=[];drops=[];npcs=[];portals=[];AMB=[];projs=[];FX=[];LATER.length=0;CHIMNEYS=[];LIFE=[];FIRES=[];FIREP=[];FIREL=[];
   nums.forEach(n=>n.el.remove());nums.length=0;
 }
 function spotPoint(sp){for(let t=0;t<30;t++){const a=Math.random()*TAU,r=Math.sqrt(Math.random())*sp.r,x=sp.x+Math.cos(a)*r,z=sp.z+Math.sin(a)*r;if(!blocked(x,z,1)&&!(Z.lake&&Math.hypot(x-Z.lake[0],z-Z.lake[1])<Z.lake[2]+2))return[x,z];}return[sp.x,sp.z];}
@@ -7502,6 +7519,7 @@ function decoSpot(G,V,sp,boss){
   if(sp.deco==='nest')for(let i=0;i<12;i++){const ang=i/12*TAU+srnd()*.3,rr=sp.r*(.8+srnd()*.2),x=sp.x+Math.cos(ang)*rr,z=sp.z+Math.sin(ang)*rr;vput(V,'log',x,Math.max(H(x,z),WATER_Y)+.15,z,PI/2,ang,0,.5,2+srnd()*1.5,.5);}
 }
 function loadZone(id,pos){
+  /* (20/11, rendimiento) los faroles de la plaza solo existen en Asunción: en los demás mapas no se suman al sombreado de cada píxel */plazaL.forEach(L=>L.visible=id==='asuncion');
   Z=Object.assign({id},ZONES[id]);if(Z.townR)Object.defineProperty(Z,'safe',{get(){try{return !(mode==='game'&&Math.hypot(P.x,P.z)>Z.townR);}catch(e){return true;}},configurable:true});clearZone();zoneG=new THREE.Group();scene.add(zoneG);
   applySky(Object.assign({clouds:Z.clouds},Z.sky));RIM.value.setHex(Z.sky.hor).multiplyScalar(LOOK.rim);seed=hashStr(id);P.spot=null;
   DREC.list=[];DREC.on=!!DECZ[id]&&OAD.on&&!OAD.failed&&oadHave(decFiles(id));
@@ -7609,7 +7627,7 @@ function updateEnemies(dt){
     const p=e.p;let tx=P.x,tz=P.z,tdead=P.dead,tid=null;const dl=Math.hypot(P.x-p.x,P.z-p.z);let d=dl;
     if(MOBNET.share)for(const o of LIVE.others.values()){if(o.P.dead)continue;const dd=Math.hypot(o.x-p.x,o.z-p.z);if(tdead||dd<d){d=dd;tx=o.x;tz=o.z;tdead=false;tid=o.id;}}
     d=d||1e-3;const dx=tx-p.x,dz=tz-p.z;
-    e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(d>70&&!e.ret&&e.aggro<=0&&!e.def.boss){e.atkCD-=dt;continue;}
+    e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||(e.def.boss&&(!e.spot||dl<BOSSFAR())));/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(d>70&&!e.ret&&e.aggro<=0&&!(e.def.boss&&!e.spot)){e.atkCD-=dt;continue;}
     e.atkCD-=dt;e.aggro=Math.max(0,e.aggro-dt);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;if(e.stun>0)e.stun-=dt;if(e.dash)bossDash(e,dt);
     const homeD=Math.hypot(p.x-e.hx,p.z-e.hz),leash=e.def.boss?22:30,reach=e.rad+.85;let mx=0,mz=0,sp=0;
     const active=!tdead&&!Z.safe;
@@ -7778,7 +7796,7 @@ function updateDrops(dt){for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.t
 /* proyectiles y efectos */
 const _wht=new THREE.Color(0xffffff);
 function addFx(m,life,upd){scene.add(m);FX.push({m,life,t:0,upd});}
-function updateFx(dt){flashTick(dt);for(let i=FX.length-1;i>=0;i--){const f=FX[i];f.t+=dt;const k=Math.min(1,f.t/f.life);f.upd(f.m,k,dt);if(k>=1){scene.remove(f.m);disposeTree(f.m);FX.splice(i,1);}}}
+function updateFx(dt){flashTick(dt);SPK.tick(dt);for(let i=FX.length-1;i>=0;i--){const f=FX[i];f.t+=dt;const k=Math.min(1,f.t/f.life);f.upd(f.m,k,dt);if(k>=1){scene.remove(f.m);disposeTree(f.m);FX.splice(i,1);}}}
 const addMat=(c,o)=>new THREE.MeshBasicMaterial(Object.assign({color:c,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false},o||{}));
 function ringFx(x,z,col,maxS,life,y){if(VFX.on){VFX.ring(x,z,(maxS+.4)*1.12,new THREE.Color(col).lerp(_wht,.5).getHex(),col,life,.42);return;}const m=new THREE.Mesh(new THREE.RingGeometry(.85,1,48),addMat(col,{depthTest:false}));m.renderOrder=18;m.rotation.x=-PI/2;m.position.set(x,H(x,z)+(y||.15),z);addFx(m,life,(o,k)=>{const s=.4+k*maxS;o.scale.set(s,s,s);o.material.opacity=.9*(1-k);});}
 function beamFx(x,z,col,life){const m=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,14,20,1,true),addMat(col,{opacity:.5}));m.position.set(x,H(x,z)+7,z);addFx(m,life,(o,k)=>{o.material.opacity=.5*(1-k);o.scale.x=o.scale.z=1-k*.6;});}
@@ -7789,7 +7807,29 @@ function boltFx(x,z){const y=H(x,z);const m=new THREE.Mesh(new THREE.CylinderGeo
 const PMAT={};function pMat(col,size,add){const k=col+'|'+size+'|'+(add?1:0);if(!PMAT[k])PMAT[k]=keep(new THREE.PointsMaterial({map:glowTex,color:col,size,sizeAttenuation:true,transparent:true,depthWrite:false,blending:add===false?THREE.NormalBlending:THREE.AdditiveBlending,fog:false}));return PMAT[k];}
 /* parts(x,y,z,{n,col,spd,up,grav,life,size,spread,dir:[dx,dy,dz],drag}) */
 var ANIM_ISO=false;/* true mientras se anima un modelo fuera de la escena (ficha del compañero): sin partículas ni globitos */
-function parts(x,y,z,o){if(ANIM_ISO)return;if(Q.level==='bajo')o.n=Math.ceil((o.n||20)/(IS_MOB?3:2));const n=o.n||20,pos=new Float32Array(n*3),vel=new Float32Array(n*3),spd=o.spd==null?4:o.spd,sp=o.spread==null?1:o.spread;
+/* (20/11, rendimiento) chispitas sueltas de pocos puntos (brillo de mitos y fantasmas, ítems del piso, alas y sets altos, estelas): antes cada una era un
+   objeto con geometría y material propios = una llamada de dibujo y basura para el recolector; con 20 mitos a la vista (Saltos del Guairá) eran ~50 dibujos.
+   Ahora van todas a un solo dibujo con lugares que se reciclan. Se ven igual (mismo movimiento, tamaño y desvanecido que parts). */
+const SPK=(()=>{const N=IS_MOB?512:1024,pos=new Float32Array(N*3),vel=new Float32Array(N*3),col=new Float32Array(N*3),sz=new Float32Array(N),al=new Float32Array(N),
+  age=new Float32Array(N).fill(9),life=new Float32Array(N).fill(1),s0=new Float32Array(N),op=new Float32Array(N),gr=new Float32Array(N),dr=new Float32Array(N);let head=0,live=0;
+ const g=new THREE.BufferGeometry(),A=(a,n)=>new THREE.BufferAttribute(a,n).setUsage(THREE.DynamicDrawUsage);const aP=A(pos,3),aC=A(col,3),aS=A(sz,1),aA=A(al,1);
+ g.setAttribute('position',aP);g.setAttribute('aC',aC);g.setAttribute('aS',aS);g.setAttribute('aA',aA);g.boundingSphere=new THREE.Sphere(new THREE.Vector3(),1e5);
+ const U={map:{value:glowTex},uSc:{value:300}};
+ const m=keep(new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:'attribute vec3 aC;attribute float aS,aA;uniform float uSc;varying vec3 vC;varying float vA;void main(){vC=aC;vA=aA;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aA>0.?aS*uSc/max(-mv.z,.01):0.;gl_Position=aA>0.?projectionMatrix*mv:vec4(2.,2.,2.,1.);}',
+  fragmentShader:'uniform sampler2D map;varying vec3 vC;varying float vA;void main(){vec4 t=texture2D(map,vec2(gl_PointCoord.x,1.-gl_PointCoord.y));gl_FragColor=vec4(vC*t.rgb,t.a*vA);\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}'}));
+ const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=6;keep(o);o.userData.nobake=1;scene.add(o);const c=new THREE.Color(),sv=new THREE.Vector2();
+ return {o,
+  add(x,y,z,q,n){const spd=q.spd==null?4:q.spd,sp=q.spread==null?1:q.spread,j=q.jit||0;c.setHex(q.col||0xffc070);
+   for(let k=0;k<n;k++){const i=head;head=(head+1)%N;pos[i*3]=x+(Math.random()-.5)*j;pos[i*3+1]=y+(Math.random()-.5)*j*.5;pos[i*3+2]=z+(Math.random()-.5)*j;
+    let vx=(Math.random()-.5)*2,vy=(Math.random()-.5)*2,vz=(Math.random()-.5)*2;const l=Math.hypot(vx,vy,vz)||1,v=spd*(.4+Math.random()*.6);vx=vx/l*v*sp;vy=vy/l*v*sp+(q.up||0)*(.6+Math.random()*.4);vz=vz/l*v*sp;
+    if(q.dir){vx+=q.dir[0];vy+=q.dir[1];vz+=q.dir[2];}vel[i*3]=vx;vel[i*3+1]=vy;vel[i*3+2]=vz;col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+    age[i]=0;life[i]=q.life||.8;s0[i]=q.size||.35;op[i]=q.op||1;gr[i]=q.grav==null?3:q.grav;dr[i]=q.drag==null?1.6:q.drag;}live=N;aC.needsUpdate=true;},
+  tick(dt){if(!live)return;dt=Math.min(dt||.016,.1);let n=0;for(let i=0;i<N;i++){if(age[i]>=life[i]){if(al[i]){al[i]=0;n++;}continue;}age[i]+=dt;const k=Math.min(1,age[i]/life[i]);
+    if(k>=1){al[i]=0;n++;continue;}const f=Math.max(0,1-dr[i]*dt);vel[i*3]*=f;vel[i*3+2]*=f;vel[i*3+1]=vel[i*3+1]*f-gr[i]*dt;pos[i*3]+=vel[i*3]*dt;pos[i*3+1]+=vel[i*3+1]*dt;pos[i*3+2]+=vel[i*3+2]*dt;
+    al[i]=(1-k)*op[i];sz[i]=s0[i]*(1-k*.5);n++;}live=n;aP.needsUpdate=aS.needsUpdate=aA.needsUpdate=true;renderer.getSize(sv);U.uSc.value=renderer.getPixelRatio()*sv.y*.5;},
+  clear(){age.fill(9);al.fill(0);aA.needsUpdate=true;live=0;}};})();
+function parts(x,y,z,o){if(ANIM_ISO)return;if(Q.level==='bajo')o.n=Math.ceil((o.n||20)/(IS_MOB?3:2));const n=o.n||20;if(n<=6&&o.add!==false&&!window.__NOSPK){SPK.add(x,y,z,o,n);return null;}const pos=new Float32Array(n*3),vel=new Float32Array(n*3),spd=o.spd==null?4:o.spd,sp=o.spread==null?1:o.spread;
   for(let i=0;i<n;i++){pos[i*3]=x+(Math.random()-.5)*(o.jit||0);pos[i*3+1]=y+(Math.random()-.5)*(o.jit||0)*.5;pos[i*3+2]=z+(Math.random()-.5)*(o.jit||0);
     let vx=(Math.random()-.5)*2,vy=(Math.random()-.5)*2,vz=(Math.random()-.5)*2;const l=Math.hypot(vx,vy,vz)||1;const s=spd*(.4+Math.random()*.6);vx=vx/l*s*sp;vy=vy/l*s*sp+(o.up||0)*(.6+Math.random()*.4);vz=vz/l*s*sp;
     if(o.dir){vx+=o.dir[0];vy+=o.dir[1];vz+=o.dir[2];}vel[i*3]=vx;vel[i*3+1]=vy;vel[i*3+2]=vz;}
@@ -9506,7 +9546,7 @@ function updateEnemiesGuest(dt){const k=1-Math.exp(-dt*10);
     let gx=e.tx-p.x,gz=e.tz-p.z,gd=Math.hypot(gx,gz);if(gd>8){p.x=e.tx;p.z=e.tz;gd=0;}
     /* antes: p+=(t-p)*k → arrancaba rápido y frenaba antes de cada aviso, y la animación saltaba entre correr, caminar y quieto (se trababan) */let mv=0;if(gd>1e-3&&dt>0){mv=Math.min(gd,Math.max(e.mvSp||0,gd/.6)*dt);p.x+=gx/gd*mv;p.z+=gz/gd*mv;}p.y=H(p.x,p.z);
     const sp=e.aSp=(e.aSp||0)+((dt>0?mv/dt:0)-(e.aSp||0))*Math.min(1,dt*8);e.g.rotation.y=lerpAngle(e.g.rotation.y,e.tr,Math.min(1,dt*10));
-    const dl=Math.hypot(P.x-p.x,P.z-p.z);e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||e.def.boss);/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;
+    const dl=Math.hypot(P.x-p.x,P.z-p.z);e.g.visible=!!(dl<(Q.level==='bajo'?40:Q.level==='medio'?54:Q.level==='ultra'?150:62)||(e.def.boss&&(!e.spot||dl<BOSSFAR())));/* !!: con def.boss sin definir quedaba undefined y three.js lo dibujaba igual (solo oculta con false) */mobShadow(e,dl);if(e.lunge>0)e.lunge-=dt;e.flash-=dt;
     animEnemy(e,dt,sp);if(e.hitK>0){e.hitK=Math.max(0,e.hitK-dt*7);const h=e.hitK;e.rig.scale.set(1+h*.07,1-h*.09,1+h*.07);}else if(e.rig.scale.y!==1)e.rig.scale.set(1,1,1);
     const fl=e.flash>0?(VFX.on?.3:.7):0;e.mats.forEach(m=>{if(m.emissive&&!e.golden&&!m.transparent&&!m.userData.keepEm)m.emissive.setRGB(fl,fl*(VFX.on?.55:.9),fl*(VFX.on?.25:.8));});
     {const b=e.bar,tg=P.target===e;b.visible=e.hp<e.max||tg;if(b.visible){b.position.set(p.x,p.y+e.hgt+.25,p.z);b.quaternion.copy(camera.quaternion);const v=Math.max(0,e.hp/e.max);
